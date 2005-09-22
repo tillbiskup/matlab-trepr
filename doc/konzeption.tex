@@ -1,0 +1,99 @@
+\documentclass{article}
+\usepackage{german}
+\usepackage[paper=a4paper,margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+
+\usepackage{textcomp}
+
+\title{trEPR--Messungen: Konzeption des Auswertungsprogramms}
+\author{Till Biskup}
+\date{\today, $ $Revision$ $}
+
+
+\def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$}
+
+\begin{document}
+\maketitle\thispagestyle{empty}
+
+\begin{abstract}
+  Die folgenden Ausführungen sind eine kurze Zusammenfassung der Konzeption
+  eines Auswertungsprogramms für die Daten aus transienten EPR--Messungen.
+  Zunächst werden die grundlegenden Ideen für die Umsetzung kurz aufgeführt,
+  anschließend die einzelnen Programmblöcke detaillierter erklärt. Ausgehend von
+  dieser Dokumentation sollte es möglich sein, ein entsprechendes Programm in
+  \matlab\ zu erstellen. 
+\end{abstract}
+
+
+\section{Grundsätzliches}
+
+\begin{itemize}
+  \item Aufteilung der einzelnen Programmblöcke in einzelne \matlab--Funktionen
+  \item Dokumentation jeder einzelnen Funktion
+  \item interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern
+  in eigenen ``Treiber--Funktionen''
+  \item Logging aller Einzelschritte und wichtigen Werte in einer Log--Datei
+  \item Versionsverwaltung (CVS) der einzelnen Skripte
+  \item ``Meta--Skript'', das auf die einzelnen Funktionen zurückgreift und
+  einen Datensatz komplett analysiert (später durch GUI ersetzbar)
+\end{itemize}
+
+
+\section{Programmblöcke}
+
+\subsection{Rohdaten einlesen}
+
+\begin{description}
+  \item[Funktion] Liest die vom Spektrometer kommenden Rohdaten (1D) ein und wandelt
+  sie in ein 2D--Array um.
+  \item[Übergabe-Parameter] Dateiname, $t$--Dimension, $B_0$--Dimension
+  \item[Rückgabewert] 2D--Array
+\end{description}
+
+
+\subsection{Reihenfolge anpassen}
+
+\begin{description}
+  \item[Funktion] Ordnet die Daten (2D--Array) nach aufsteigendem $B_0$--Wert an
+  \item[Übergabe-Parameter] 2D--Array
+  \item[Rückgabewert] 2D--Array
+\end{description}
+
+
+\subsection{Akkumulation}
+
+\begin{description}
+  \item[Funktion] Aufakkumulation mehrerer Messungen
+  \item[Übergabe-Parameter] mehrere 2D--Arrays mit Daten
+  \item[Rückgabewert] 2D--Array mit aufakkumulierten Daten
+\end{description}
+
+
+\subsection{Offset--Korrektur über Pretrigger--Signal}
+
+\begin{description}
+  \item[Funktion] Offset--Korrektur des Signals über die Pretrigger--Zeit
+  \item[Übergabe-Parameter] 2D--Array mit Daten, Pretrigger-Zeit
+  \item[Rückgabewert] 2D--Array, offset--korrigiert
+\end{description}
+
+
+\subsection{Integration}
+
+\begin{description}
+  \item[Funktion]
+  \item[Übergabe-Parameter] 
+\end{description}
+
+
+\subsection{Drift--Korrektur über Dunkelsignal}
+
+\begin{description}
+  \item[Funktion] Korrektur der Drift während der Messung über die Dunkelsignale
+  \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
+  Dunkelsignal--Zeitkurven
+  \item[Rückgabewert] 2D--Array, drift--korrigiert
+\end{description}
+
+
+\end{document}
