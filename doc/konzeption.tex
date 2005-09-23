@@ -5,12 +5,13 @@
 
 \usepackage{textcomp}
 
-\title{trEPR--Messungen: Konzeption des Auswertungsprogramms}
+\title{trEPR--Messungen: Konzeption der Auswertungsroutinen}
 \author{Till Biskup}
 \date{\today, $ $Revision$ $}
 
 
 \def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$}
+\def\octave{\textsf{GNU Octave}}
 \def\robodoc{\textsf{ROBODoc}}
 \def\fscii{\texttt{fsc2}}
 
@@ -26,6 +27,9 @@
   \matlab\ zu erstellen. 
 \end{abstract}
 
+\begin{small}
+\tableofcontents 
+\end{small}
 
 \section{Grundsätzliches}
 
@@ -36,7 +40,10 @@
   in eigenen ``Treiber--Funktionen'' bzw. in einem ```Meta--Skript'', das die 
   einzelnen Funktionen in der richtigen Reihenfolge aufruft
   \item Logging aller Einzelschritte und wichtigen Werte in einer Log--Datei
-  (ähnlich einer \textsf{gaussian}--Aus\-gabedatei)
+  (ähnlich einer \textsf{gaussian}--Aus\-gabedatei)\\
+  Kann in einem ersten Schritt mit der Funktion \texttt{diary} von
+  \matlab/\octave\ realisiert werden (vorausgesetzt im ``Meta--Skript'' sind
+  entsprechende zusätzliche Ausgaben programmiert).
   \item Versionsverwaltung (CVS bzw. Subversion) der einzelnen Skripte\\
   Die jeweils aktuelle Fassung aller Dateien (inkl. Dokumentation) liegt auf
   einer Homepage im Internet. Die eigentliche Entwicklungsarbeit an den
@@ -45,10 +52,12 @@
   \item ``Meta--Skript'', das auf die einzelnen Funktionen zurückgreift und
   einen Datensatz komplett analysiert (später durch --- in \matlab\
   programmierte --- GUI ersetzbar)
+  \item Nach Möglichkeit für die nichtgrafischen Teile (alle Kernfunktionen) Kompatibilität zu
+  \octave
 \end{itemize}
 
 
-\section{Programmblöcke}
+\section{Kernfunktionen}
 
 Die Funktionalität wird nicht wie bisher durch ein Gesamtprogramm
 bereitgestellt, sondern durch mehrere kleine Funktionen (``Kernfunktionen''), die jeweils eine
