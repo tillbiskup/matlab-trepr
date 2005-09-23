@@ -11,6 +11,8 @@
 
 
 \def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$}
+\def\robodoc{\textsf{ROBODoc}}
+\def\fscii{\texttt{fsc2}}
 
 \begin{document}
 \maketitle\thispagestyle{empty}
@@ -29,17 +31,31 @@
 
 \begin{itemize}
   \item Aufteilung der einzelnen Programmblöcke in einzelne \matlab--Funktionen
-  \item Dokumentation jeder einzelnen Funktion
-  \item interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern
-  in eigenen ``Treiber--Funktionen''
+  \item Dokumentation jeder einzelnen Funktion (am besten mit \robodoc)
+  \item Interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern
+  in eigenen ``Treiber--Funktionen'' bzw. in einem ```Meta--Skript'', das die 
+  einzelnen Funktionen in der richtigen Reihenfolge aufruft
   \item Logging aller Einzelschritte und wichtigen Werte in einer Log--Datei
-  \item Versionsverwaltung (CVS) der einzelnen Skripte
+  (ähnlich einer \textsf{gaussian}--Aus\-gabedatei)
+  \item Versionsverwaltung (CVS bzw. Subversion) der einzelnen Skripte\\
+  Die jeweils aktuelle Fassung aller Dateien (inkl. Dokumentation) liegt auf
+  einer Homepage im Internet. Die eigentliche Entwicklungsarbeit an den
+  Kernfunktionen (und damit gleichzeitig mit der Versionsverwaltung) beschränkt
+  sich auf einen kleinen Benutzerkreis.
   \item ``Meta--Skript'', das auf die einzelnen Funktionen zurückgreift und
-  einen Datensatz komplett analysiert (später durch GUI ersetzbar)
+  einen Datensatz komplett analysiert (später durch --- in \matlab\
+  programmierte --- GUI ersetzbar)
 \end{itemize}
 
 
 \section{Programmblöcke}
+
+Die Funktionalität wird nicht wie bisher durch ein Gesamtprogramm
+bereitgestellt, sondern durch mehrere kleine Funktionen (``Kernfunktionen''), die jeweils eine
+einzige Aufgabe erfüllen. Diese Kernfunktionen erhalten alle notwendigen
+Parameter durch ihren Aufruf, sie enthalten keine Strukturen, die selbst
+interaktiv nach solchen Parametern fragen.
+
 
 \subsection{Rohdaten einlesen}
 
@@ -50,6 +66,51 @@
   \item[Rückgabewert] 2D--Array
 \end{description}
 
+Die Spektrometer--Software (\fscii) schreibt an den Beginn der Daten--Datei
+zunächst das Skript, mit dem die Daten aufgenommen wurden (durch ``\%''--Zeichen
+auskommentiert für \matlab) und darunter in einer einzigen Spalte (1D) alle
+aufgezeichneten Werte.
+
+Gemessen wird für jeden $B_0$--Wert eine Zeitkurve mit einer definierten Zahl
+von Werten. Die Zahl der Werte pro Zeitkurve ($t$--Dimension), der Bereich des
+durchfahrenen $B_0$--Feldes und dessen Schrittweite ($B_0$--Dimension) werden am
+Ende des auskommentierten Bereiches vor den eigentlichen Daten ausgegeben.
+Sinnvollerweise werden diese Daten nicht per Hand eingegeben, sondern von hier ausgelesen.
+
+Im Folgenden ist ein Ausschnitt einer solchen Datendatei wiedergegeben. Sehr zur
+Vereinfachung des Auslesens trägt die Kennzeichnung der einzelnen Parameter
+durch die vorangestellten Bezeichner bei. Unterhalb der Parameter erscheint der
+vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
+
+\vspace{1em}
+\hrule
+\vspace{-1ex}
+
+\begin{verbatim}
+% 
+% Number of runs     = 1
+% Start field        = 3410.00000 G
+% End field          = 3510.00000 G
+% Field step width   = 0.500000000 G
+% Sensitivity        = 5.00000000 mV/div
+% Number of averages = 20
+% Time base          = 2.00000000 us/div
+% Number of points   = 500
+% Trigger position   = 50
+% Slice length       = 20.0000000 us
+% 
+% 9,68455 GHz
+% 20 dB
+% 274 K
+% 460 nm (1/8)
+% 
+0.000650009918
+\end{verbatim}
+
+\vspace{-1ex}
+\hrule
+\vspace{1em}
+
 
 \subsection{Reihenfolge anpassen}
 
@@ -58,6 +119,10 @@
   \item[Übergabe-Parameter] 2D--Array
   \item[Rückgabewert] 2D--Array
 \end{description}
+
+Gemessen wird meist symmetrisch: Einmal wird das $B_0$--Feld in aufsteigender,
+einmal in absteigender Richtung durchfahren. Zur weiteren Verarbeitung ist es
+aber notwendig, daß alle Datensätze in der gleichen Sortierung vorliegen.
 
 
 \subsection{Akkumulation}
@@ -68,6 +133,8 @@
   \item[Rückgabewert] 2D--Array mit aufakkumulierten Daten
 \end{description}
 
+Zur Verbesserung des Signal--Rausch--Abstandes werden mehrere Messungen aufakkumuliert.
+
 
 \subsection{Offset--Korrektur über Pretrigger--Signal}
 
@@ -77,23 +144,44 @@
   \item[Rückgabewert] 2D--Array, offset--korrigiert
 \end{description}
 
+Langsame Oszillationen oder Drifts (Temperaturschwankungen, Erschütterungen, etc.)
+werden durch Abziehen eines Offsets korrigiert. Das Offset wird über die vor dem
+Laserpuls aufgenommenen Datenpunkte der Zeitkurve (deren Anzahl steht am Ende
+des einleitenden Kommentars der Datendatei) ermittelt.
 
-\subsection{Integration}
+
+\subsection{Integration eines 1D--Spektrums ($B_0$)}
 
 \begin{description}
-  \item[Funktion]
-  \item[Übergabe-Parameter] 
+  \item[Funktion] Optimale Integration eines 1D--$B_0$--Spektrums zu einem
+  definierten Zeitpunkt $t$
+  \item[Übergabe-Parameter] 2D--Array mit Daten, Zeitpunkt $t$, Integrationsbereich
+  \item[Rückgabewert] integriertes 1D--Spektrum
 \end{description}
+
+Oft werden nicht 2D--Spektren, sondern 1D--$B_0$--Spektren zu festen Zeiten $t$ 
+ausgewertet. Für einen verbesserten Signal--Rausch--Abstand wird rund um einen 
+gegebenen Zeitpunkt $t$ das Signal aufintegriert. Es gibt ein optimales 
+Integrationsintervall innerhalb des vorgegebenen Integrationsbereiches, das den 
+Signal--Rausch--Abstand maximiert. Die Funktion optimiert die Integration unter 
+den gegebenen Parametern auf dieses optimale Integrationsintervall und gibt das 
+geglättete 1D--Spektrum zurück
 
 
 \subsection{Drift--Korrektur über Dunkelsignal}
 
 \begin{description}
-  \item[Funktion] Korrektur der Drift während der Messung über die Dunkelsignale
+  \item[Funktion] Korrektur der Drift während der Messung mittels der Dunkelsignale
   \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
   Dunkelsignal--Zeitkurven
   \item[Rückgabewert] 2D--Array, drift--korrigiert
 \end{description}
+
+Häufig zeigen die Spektren eine Drift über die gesamte Messung. Das ist auch der
+Grund für die symmetrische Aufnahme (s.o.). Zur Korrektur dieser Drift werden
+zwei (gleich lange) $B_0$--Intervalle am Anfang und Ende des Spektrums
+ausgewählt (\emph{per definitionem} kein Signal), gemittelt und diese
+Mittelwerte zur Drift--Korrektur verwendet.
 
 
 \end{document}
