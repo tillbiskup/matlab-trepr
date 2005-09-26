@@ -15,6 +15,8 @@
 \def\robodoc{\textsf{ROBODoc}}
 \def\fscii{\texttt{fsc2}}
 
+\newcommand{\func}[1]{\texttt{#1}}
+
 \begin{document}
 \maketitle\thispagestyle{empty}
 
@@ -35,7 +37,7 @@
 
 \begin{itemize}
   \item Aufteilung der einzelnen Programmblöcke in einzelne \matlab--Funktionen
-  \item Dokumentation jeder einzelnen Funktion (am besten mit \robodoc)
+  \item Dokumentation jeder einzelnen Funktion (am besten mit \robodoc) \emph{in Englisch}
   \item Interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern
   in eigenen ``Treiber--Funktionen'' bzw. in einem ```Meta--Skript'', das die 
   einzelnen Funktionen in der richtigen Reihenfolge aufruft
@@ -197,5 +199,60 @@ gewichtet: Zu Beginn trägt nur der Mittelwert vom Anfang des Spektrums zur
 Driftkorrektur bei, sein Beitrag fällt mit fortschreitendem $B_0$ linear ab,
 gleichzeitig steigt der Beitrag des Mittelwertes vom Ende des Spektrums linear
 an, um am Ende des Spektrums sein Maximum zu erreichen.
+
+
+\section{Umsetzung der einzelnen Funktionen}
+
+\subsection{Grundlegendes}
+
+\subsubsection{Aufteilung in einzelne Blöcke}
+
+\matlab\ erlaubt die Deklaration von Funktionen in den sogenannten M--Files. In 
+jeder solchen Datei gibt es nur \emph{eine} Haupt--Funktion und berliebig viele 
+Unterfunktionen, auf die dann nur die Hauptfunktion (die an erster Stelle in 
+der Datei stehen muß) zugreifen kann.
+
+
+\subsubsection{Logging}
+
+\matlab\ stellt grundsätzlich zwei Möglichkeiten bereit, alle Ausgaben in einer 
+separaten Datei zu speichern: über einen Parameter beim Start von \matlab, der
+alle Ausgaben in eine dort zu definierende Datei mitschreibt, oder über die
+(deutlich komfortablere) Funktion \func{diary}, die als Parameter einen
+Dateinamen erwartet.
+
+
+\subsubsection{Meta--Skript}
+
+Fragt die notwendigen Parameter vom Nutzer ab und stößt die weitere
+Datenverarbeitung an.
+
+
+\subsubsection{Versionsverwaltung}
+
+Via CVS oder Subversion. Jede Funktion gibt bei ihrem Aufruf ihre jeweilige
+Revisionsnummer und nach Möglichkeit auch das Datum der Revision aus, um auch im
+Nachhinein noch nachvollziehen zu können, welche Version der Funktion bei der
+Datenverarbeitung verwendet wurde.
+
+
+\subsubsection{Dokumentation}
+
+Jede \matlab\--Funktion kann durch Eingabe eines Kommentars direkt hinter der 
+Funktions--Deklaration grob dokumentiert werden. Hierher gehören:
+
+\begin{enumerate}
+  \item kurze Beschreibung, was die Funktion tut
+  \item Eingabe--Parameter (Anzahl, Typ)
+  \item Ausgabe--Parameter (Anzahl, Typ)
+\end{enumerate}
+
+Eine ausführlichere Dokumentation sollte ebenfalls direkt im Quellcode mittels
+\robodoc\ (oder einem anderen Automatisierungs--Tool für Dokumentationen) erfolgen.
+
+
+\subsection{Kernfunktionen}
+
+
 
 \end{document}
