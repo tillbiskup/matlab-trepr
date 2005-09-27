@@ -5,6 +5,8 @@
 
 \usepackage{textcomp}
 
+\usepackage{natbib}
+
 \title{trEPR--Messungen: Konzeption der Auswertungsroutinen}
 \author{Till Biskup}
 \date{\today, $ $Revision$ $}
@@ -16,6 +18,13 @@
 \def\fscii{\texttt{fsc2}}
 
 \newcommand{\func}[1]{\texttt{#1}}
+\newcommand{\cmd}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\var}[1]{\texttt{#1}}
+
+\newenvironment{Quote}{\begin{quote}\small\vspace*{1em}\hrule\vspace*{1ex}
+}{\end{quote}\hrule\vspace*{1em}}
+%\renewenvironment{quote}{\begin{Quote}}{\end{Quote}}
 
 \begin{document}
 \maketitle\thispagestyle{empty}
@@ -59,13 +68,16 @@
 \end{itemize}
 
 
-\section{Kernfunktionen}
+\section{Beschreibung der Kernfunktionen}
 
 Die Funktionalität wird nicht wie bisher durch ein Gesamtprogramm
 bereitgestellt, sondern durch mehrere kleine Funktionen (``Kernfunktionen''), die jeweils eine
 einzige Aufgabe erfüllen. Diese Kernfunktionen erhalten alle notwendigen
-Parameter durch ihren Aufruf, sie enthalten keine Strukturen, die selbst
+Parameter durch ihren Aufruf, sie besitzen selbst keine Strukturen, die
 interaktiv nach solchen Parametern fragen.
+
+Ziel der Beschreibung ist neben der Darstellung der einzelnen Funktionsbereiche
+und der Aufteilung die Darlegung des allgemeinen Vorgehens bei der Datenanalyse.
 
 
 \subsection{Rohdaten einlesen}
@@ -93,10 +105,7 @@ Vereinfachung des Auslesens trägt die Kennzeichnung der einzelnen Parameter
 durch die vorangestellten Bezeichner bei. Unterhalb der Parameter erscheint der
 vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
 
-\vspace{1em}
-\hrule
-\vspace{-1ex}
-
+\begin{Quote}
 \begin{verbatim}
 % 
 % Number of runs     = 1
@@ -117,10 +126,8 @@ vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
 % 
 0.000650009918
 \end{verbatim}
+\end{Quote}
 
-\vspace{-1ex}
-\hrule
-\vspace{1em}
 
 
 \subsection{Reihenfolge anpassen}
@@ -203,6 +210,11 @@ an, um am Ende des Spektrums sein Maximum zu erreichen.
 
 \section{Umsetzung der einzelnen Funktionen}
 
+Während in den vorangegangenen Abschnitten mehr allgemeine Aspekte im
+Vordergrund standen, sollen in diesem Abschnitt konkrete umsetzungsspezifische
+Details aufgelistet werden.
+
+
 \subsection{Grundlegendes}
 
 \subsubsection{Aufteilung in einzelne Blöcke}
@@ -216,30 +228,68 @@ der Datei stehen muß) zugreifen kann.
 \subsubsection{Logging}
 
 \matlab\ stellt grundsätzlich zwei Möglichkeiten bereit, alle Ausgaben in einer 
-separaten Datei zu speichern: über einen Parameter beim Start von \matlab, der
-alle Ausgaben in eine dort zu definierende Datei mitschreibt, oder über die
-(deutlich komfortablere) Funktion \func{diary}, die als Parameter einen
-Dateinamen erwartet.
+separaten Datei zu speichern: über einen Parameter beim Start von \matlab, der 
+alle Ausgaben in eine dort zu definierende Datei mitschreibt, oder über die 
+(deutlich komfortablere) Funktion \func{diary}, die als Parameter einen 
+Dateinamen erwartet \cite[S. 124]{TheMathWorks:2005ah}:
+
+\begin{Quote}
+To create a file on your disk called \texttt{sept23.out} that contains 
+all the functions you enter, as well as MATLAB output, enter 
+\begin{verbatim} 
+    diary('sept23.out') 
+\end{verbatim}
+To stop recording the session, use 
+\begin{verbatim} 
+    diary('off') 
+\end{verbatim}
+To view the file, run 
+\begin{verbatim} 
+    edit('sept23.out') 
+\end{verbatim}
+\end{Quote}
+
+Eine einfache Möglichkeit, bei jedem Funktionsaufruf die Revisionsnummer und das
+Revisionsdatum mit in der diary--Datei stehen zu haben, ist, vor dem jeweiligen
+Funktionsaufruf im Meta--Skript den Befehl ``\cmd{help <funktionsname>}'' aufzurufen.
+
+Wird neben den Daten gemeinsam mit der Log--Datei das Meta--Skript abgelegt,
+sollten sich einfach und konfortabel die Verarbeitugnsschritte wiederholen und
+gegebenenfalls modifizieren lassen.
 
 
 \subsubsection{Meta--Skript}
 
-Fragt die notwendigen Parameter vom Nutzer ab und stößt die weitere
-Datenverarbeitung an.
+Das Meta--Skript fragt die notwendigen Parameter vom Nutzer ab und stößt die
+weitere Datenverarbeitung an. Dieses Skript kann (zumindest am Anfang)
+für jeden Datensatz angepaßt werden.
+
+Eine eventuell zu programmierende GUI setzt ebenfalls auf dieser Ebene an. Die
+GUI ersetzt quasi das Meta--Skript. Mittlerweile sind GUI--Fähigkeiten für
+\octave\ in Entwicklung, so daß die prinzipielle Möglichkeit besteht, eine frei
+verfügbare Version der Auswertungssoftware über \octave\ zu realisieren.
 
 
 \subsubsection{Versionsverwaltung}
 
-Via CVS oder Subversion. Jede Funktion gibt bei ihrem Aufruf ihre jeweilige
-Revisionsnummer und nach Möglichkeit auch das Datum der Revision aus, um auch im
-Nachhinein noch nachvollziehen zu können, welche Version der Funktion bei der
-Datenverarbeitung verwendet wurde.
+Via CVS oder Subversion \cite{Collins-Sussman:2005qs}. Jede Funktion gibt bei 
+ihrem Aufruf ihre jeweilige Revisionsnummer und nach Möglichkeit auch das Datum 
+der Revision aus, um auch im Nachhinein noch nachvollziehen zu können, welche 
+Version der Funktion bei der Datenverarbeitung verwendet wurde.
+
+Wichtig ist bei der Verwendung der Versionsverwaltung die Angabe kurzer, aber
+sinnvoller und treffender Kommentare bei jedem ``commit''--Vorgang.
+
+\matlab\ erlaubt über eingebaute Funktionen den direkten Zugriff auf
+Versionsverwaltungssysteme (und zumindest unter UNIX/Linux auch auf CVS)
+\cite[S. 431]{TheMathWorks:2005ah}.
 
 
 \subsubsection{Dokumentation}
 
 Jede \matlab\--Funktion kann durch Eingabe eines Kommentars direkt hinter der 
-Funktions--Deklaration grob dokumentiert werden. Hierher gehören:
+Funktions--Deklaration grob dokumentiert werden. Zu den unbedingt notwendigen 
+Angaben gehören:
 
 \begin{enumerate}
   \item kurze Beschreibung, was die Funktion tut
@@ -247,12 +297,84 @@ Funktions--Deklaration grob dokumentiert werden. Hierher gehören:
   \item Ausgabe--Parameter (Anzahl, Typ)
 \end{enumerate}
 
-Eine ausführlichere Dokumentation sollte ebenfalls direkt im Quellcode mittels
-\robodoc\ (oder einem anderen Automatisierungs--Tool für Dokumentationen) erfolgen.
+Eine ausführlichere Dokumentation sollte ebenfalls direkt im Quellcode mittels 
+\robodoc\ \cite{Slothouber:2005hs} (oder einem anderen Automatisierungs--Tool 
+für Dokumentationen) erfolgen.
+
 
 
 \subsection{Kernfunktionen}
 
+Die Kernfunktionen sind diejenigen Funktionen, die die eigentliche
+Datenverarbeitung und --analyse bewerkstelligen. Jede dieser Funktionen wird in
+einem eigenen (gleichnamigen) M--File abgelegt und dokumentiert.
 
+Vorrangiges Ziel ist es, die so modularisierten Funktionen zu optimieren und
+danach von der Programmentwicklung her weitestgehend einzufrieren.
+
+
+\subsubsection{Einlesen der Rohdaten}
+
+Die einfachste Variante, unter \matlab\ die von der Spektrometer--Software
+geschriebenen Daten direkt einzulesen, ist die Funktion \func{load}. Diese
+Funktion liest den Inhalt der als Parameter übergebenen Datei in eine Variable
+mit demselben Namen (ohne Dateiendung). Ein Beispiel:
+%
+\begin{Quote}
+\begin{verbatim}
+load data.dat 
+\end{verbatim} 
+\end{Quote}
+%
+liest die Daten in der Datei \file{data.dat} in die Variable \var{data} ein. Das
+löst allerdings noch nicht das Problem, wie die zusätzlichen Informationen, die
+im Kommentar am Beginn der Datendatei stehen und die zur weiteren Verarbeitung
+der Daten von Interesse sind, von \matlab\ automatisiert eingelesen werden
+können. 
+
+Für das Einlesen dieser Daten stehen eine Reihe von ``low
+level'' Datei--Ein/Ausgabe--Funktionen und entsprechende
+Stringmanipulations--Funktionen zur Verfügung, vgl. Tab. \ref{tab:fileIO}.
+
+\begin{table}
+\begin{tabular*}{\textwidth}{ll}
+\hline
+\\[-1ex]
+Funktion & Beschreibung\\[-1ex]
+\\\hline
+\\[-1ex]
+\cmd{fopen} & Datei öffnen\\
+\cmd{fclose} & Datei schließen\\
+\cmd{fgetl} & Zeile aus Datei einlesen, Zeilenende--Zeichen verwerfen\\[-1ex]
+\\\hline
+\\[-1ex]
+\cmd{findstr} & finde einen String in einem anderen
+\\[-1ex]
+\\\hline
+\end{tabular*}
+\caption{Übersicht über einige ``Low--level'' Datei--Ein/Ausgabe--Funktionen und
+String--Manipulations\-funktionen von \matlab, wie sie zum Auslesen der
+zusätzlichen Informationen aus der Datendatei verwendet werden können.}
+\label{tab:fileIO}
+\end{table}
+
+
+\subsubsection{Anpassen der Reihenfolge der Daten}
+
+
+\subsubsection{Akkumulation mehrerer Spektren}
+
+
+\subsubsection{Offset--Korrektur über Pretrigger--Signal}
+
+
+\subsubsection{Integration eines 1D--Spektrums ($B_0$)}
+
+
+\subsubsection{Drift--Korrekur über das Dunkelsignal}
+
+
+\bibliographystyle{abbrv}%bioscript-authors}
+\bibliography{literatur}
 
 \end{document}
