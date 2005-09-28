@@ -30,6 +30,7 @@ function outstr = substr(str, offset, len, repl)
 %
 %	Modified:	Till Biskup <till.biskup@physik.fu-berlin.de>
 %	Date:		2005/09/28
+%	Revision:	$Revision$
 
    % Check number of input arguments.
    error(nargchk(2, 4, nargin));
