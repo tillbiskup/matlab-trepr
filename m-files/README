@@ -1,0 +1,16 @@
+% README for MATLAB(R)/GNU Octave scripts
+% written for data analysis of trEPR data recorded with fsc2
+%
+% Author:			Till Biskup <till.biskup@physik.fu-berlin.de> 
+% Version: 			$Revision$
+% Last modification:	$Date$
+% Initial creation:	2005/09/29
+%
+
+1.) read_fsc2_data.m
+
+If run with MATLAB(R), the file "read_fsc2_data.m" needs the two files (routines)
+"index.m" and "substr.m" for proper function.
+
+These two files are workarounds to implement functions from GNU Octave in MATLAB(R).
+

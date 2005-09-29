@@ -7,8 +7,9 @@
 % Created: 2005/09/28
 % Version: $Revision$
 % Keywords: transient EPR, fsc2
-% 
-%READ_FSC2_DATA reads parameters and data from fsc2 data file
+%
+%
+% READ_FSC2_DATA reads parameters and data from fsc2 data file
 %
 %	usage: DATA = read_fsc2_data ( FILENAME )
 %
@@ -16,6 +17,10 @@
 %	parameters necessary for the further data analysis that
 %	are written in the leading commentary and returns a matrix
 %	DATA of the raw data.
+%
+%	If the measurement was taken from higher to lower magnetic field
+%	the returned matrix is rearranged to hold the time traces (rows)
+%	in increasing magnetic field strength.
 
 function data = read_fsc2_data (filename)
 
@@ -51,6 +56,16 @@ function data = read_fsc2_data (filename)
   close_file( fid );
   
   field_width = (end_field - start_field) / field_step_width
+
+
+  hightolow = 0;
+
+  if field_step_width < 0				% if measured from higher to lower fields
+  									% field_width is always positive cause of the negative sign
+  									% of the variable field_step_width in case of measurement
+  									% from high to low field
+    hightolow = 1;					% set "boolean" variable
+  end
   
   matrix = zeros (field_width, no_points);
   
@@ -60,7 +75,11 @@ function data = read_fsc2_data (filename)
     matrix (i,:) = raw_data(1+((i-1)*no_points):i*no_points)';
   end
 
-  data = matrix;
+  if hightolow == 1					% if measured from higher to lower fields
+    data = flipud ( matrix );			% reverse rows of the matrix containing the data
+  else
+	data = matrix;					% otherwise return the data as recorded by fsc2
+  end
 
 	
 %##############################################################
