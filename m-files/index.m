@@ -8,10 +8,11 @@ function index = index(str, substr)
 %	SUBSTR is a MATLAB version of the GNU Octave function with the same
 %	name.
 
-%	Author:		Till Biskup <till.biskup@physik.fu-berlin.de>
-%	Maintainer:	Till Biskup <till.biskup@physik.fu-berlin.de>
-%	Created:		2005/09/28
-%	Version:		$Revision$
+%	Author:				Till Biskup <till.biskup@physik.fu-berlin.de>
+%	Maintainer:			Till Biskup <till.biskup@physik.fu-berlin.de>
+%	Created:				2005/09/28
+%	Version:				$Revision$
+%	Last Modification:	$Date$
 
   % Check number of input arguments.
   error(nargchk(2, 2, nargin));

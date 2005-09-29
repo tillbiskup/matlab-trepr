@@ -2,11 +2,12 @@
 % 
 % This file ist free software.
 % 
-% Author: Till Biskup <till.biskup@physik.fu-berlin.de>
-% Maintainer: Till Biskup <till.biskup@physik.fu-berlin.de>
-% Created: 2005/09/28
-% Version: $Revision$
-% Keywords: transient EPR, fsc2
+% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
+% Maintainer:		Till Biskup <till.biskup@physik.fu-berlin.de>
+% Created:			2005/09/28
+% Version:			$Revision$
+% Last Modification:	$Date$
+% Keywords:			transient EPR, fsc2
 %
 %
 % READ_FSC2_DATA reads parameters and data from fsc2 data file
