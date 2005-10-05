@@ -370,8 +370,10 @@ Ist in der Funktion, die die Daten einliest, gleich mit implementiert worden.
 
 \subsubsection{Akkumulation mehrerer Spektren}
 
-Da die Spektren häufig unterschiedliche Signal--Rausch--Abstände haben, werden
-sie nicht einfach addiert.
+Da die Spektren häufig unterschiedliche Signal--Rausch--Abstände haben, werden 
+sie nicht einfach addiert, da sonst die Gefahr besteht, daß die Messungen mit 
+geringem Rauschen und hohem Signal--Rausch--Abstand tendenziell schlechter 
+werden.
 
 Eine pragmatische Lösung ist, zwei Spektren gewichtet aufzuaddieren:
 
@@ -384,7 +386,7 @@ variiert wird und für jeden Wert von $x$ das Verhältnis von maximaler Amplitud
 zu Rauschen bestimmt wird. $x$ gilt dann als optimiert, wenn dieses Verhältnis
 maximiert ist.
 
-Für jede weitere dazuaddierte Matrix wird dasselbe Verfahren angewandt.
+Für jede weitere aufzuaddierende Matrix wird dasselbe Verfahren angewandt.
 
 
 \subsubsection{Offset--Korrektur über Pretrigger--Signal}
