@@ -1,9 +1,9 @@
 #TeXlipse project settings
-#Thu Oct 06 12:21:53 CEST 2005
+#Thu Oct 06 22:40:02 CEST 2005
 builderNum=2
 outputDir=doc/
 outputFormat=pdf
-tempDir=
+tempDir=doc/tmp
 mainTexFile=konzeption.tex
 outputFile=konzeption.pdf
 langSpell=
