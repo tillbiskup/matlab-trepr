@@ -1,5 +1,33 @@
-function outstr = substr(str, offset, len, repl)
-%SUBSTR Extract a substring out of a string.
+% Copyright (C) 2004,2005 Peter J. Acklam, Till Biskup
+% 
+% This file ist free software.
+% 
+%****f* auxilliary_routines/substr.m
+%
+% AUTHOR
+%	Peter J. Acklam <pjacklam@online.no>
+%	URL: http://home.online.no/~pjacklam
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% MAINTAINER
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% COPYRIGHT
+%	(c) 2004,2005 Peter J. Acklam, Till Biskup
+%	This file is free software
+% CREATION DATE
+%	2004/02/21
+% VERSION
+%	$Revision$
+% MODIFICATION DATE
+%	$Date$
+% KEYWORDS
+%	MATLAB(R), GNU Octave
+%
+% SYNOPSIS
+%	outstr = substr(str, offset, len, repl)
+%
+% DESCRIPTION
+%
+%	SUBSTR Extract a substring out of a string.
 %
 %   SUBSTR(STRING, OFFSET, LENGTH) extracts a substring out of STRING with
 %   given LENGTH starting at the given OFFSET.  First character is at offset 0.
@@ -11,7 +39,7 @@ function outstr = substr(str, offset, len, repl)
 %   as specified by STRING, OFFSET, and LENGTH (see above) but rather replace
 %   it by REPLACEMENT and return the result.
 %
-%   Examples:
+% EXAMPLES
 %
 %      Get first character:              substr(string,  0, 1)
 %      Get last character:               substr(string, -1, 1)
@@ -22,15 +50,10 @@ function outstr = substr(str, offset, len, repl)
 %   SUBSTR is a MATLAB version of the Perl operator with the same name.
 %   However, unlike Perl's SUBSTR, no warning is produced if the substring is
 %   totally outside the string.
-
-%   Author:      Peter J. Acklam
-%   Time-stamp:  2004-02-21 22:49:14 +0100
-%   E-mail:      pjacklam@online.no
-%   URL:         http://home.online.no/~pjacklam
 %
-%	Modified:	Till Biskup <till.biskup@physik.fu-berlin.de>
-%	Date:		2005/09/28
-%	Revision:	$Revision$
+% SOURCE
+
+function outstr = substr(str, offset, len, repl)
 
    % Check number of input arguments.
    error(nargchk(2, 4, nargin));
@@ -62,3 +85,5 @@ function outstr = substr(str, offset, len, repl)
    else
       outstr = [str(1:lb-1) repl str(ub+1:end)];    % replace substring
    end
+
+%*******

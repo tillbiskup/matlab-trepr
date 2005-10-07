@@ -6,6 +6,7 @@
 %
 % AUTHOR
 %	Till Biskup <till.biskup@physik.fu-berlin.de>
+%	originally found at http://www.ill.fr/tas/matlab/ftp/install.m
 % MAINTAINER
 %	Till Biskup <till.biskup@physik.fu-berlin.de>
 % COPYRIGHT
@@ -28,7 +29,7 @@
 %	environment. Its two return values are the program name ('Matlab', 'Octave')
 %	and the version of the program as printed with the command 'version'.
 %
-%******
+% SOURCE
 
 function [ program, version ] = discriminate_matlab_octave
 
@@ -55,3 +56,4 @@ function [ program, version ] = discriminate_matlab_octave
 		Program = 'unknown';			% set variable to 'unknown'
 	end
 	
+%******
