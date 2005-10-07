@@ -28,7 +28,7 @@
 %
 % SOURCE
 
-function data = pretrigger_offset ( input_data )
+function data = drift_compensation ( input_data )
 
 
 %******
