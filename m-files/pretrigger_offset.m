@@ -2,7 +2,7 @@
 % 
 % This file ist free software.
 % 
-%****f* core_routines/pretrigger_offset.m
+%****m* core_routines/pretrigger_offset.m
 %
 % AUTHOR
 %	Till Biskup <till.biskup@physik.fu-berlin.de>
@@ -26,8 +26,9 @@
 % DESCRIPTION
 %	This function...
 %
-%******
-%
-% Just to test: Some comments that do not pass to ROBODoc
+% SOURCE
 
 function data = pretrigger_offset ( input_data )
+
+
+%******
