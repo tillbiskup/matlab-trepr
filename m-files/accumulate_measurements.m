@@ -2,23 +2,35 @@
 % 
 % This file ist free software.
 % 
-% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
-% Maintainer:		Till Biskup <till.biskup@physik.fu-berlin.de>
-% Created:			2005/09/29
-% Version:			$Revision$
-% Last Modification:	$Date$
-% Keywords:			transient EPR, fsc2
+%****m* core_routines/accumulate_measurements.m
 %
+% AUTHOR
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% MAINTAINER
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% COPYRIGHT
+%	(c) 2005 Till Biskup
+%	This file is free software
+% CREATION DATE
+%	2005/09/29
+% VERSION
+%	$Revision$
+% MODIFICATION DATE
+%	$Date$
+% KEYWORDS
+%	transient EPR, fsc2
 %
-% ACCUMULATE_MEASUREMENTS reads two or more matrices and sums them up
+% SYNOPSIS
+%	DATA = accumulate_measurements ( MATRIX1, MATRIX2, ... )
 %
-%	usage: DATA = accumulate_measurements ( MATRIX1, MATRIX2, ... )
-%
+% DESCRIPTION
 %	This function gets two or more matrices and sums them up element-wise
 %	thus accumulating the measurements to improve the signal to noise ratio.	
 %
-%	before summarizing up the matrices the function will test for identical
+%	Before summarizing up the matrices the function will test for identical
 %	dimensions of the matrices and otherwise return an error message
+%
+% SOURCE
 
 function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
@@ -44,8 +56,12 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   end					% end if
   
   
+%******
+
 %###############################################################
 % SUBFUNCTIONS
+
+%****if* accumulate_measurements/summarize_matrices
 
 function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
 
@@ -70,3 +86,5 @@ function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
   						% return MATRIX1
   
   end
+
+%*****

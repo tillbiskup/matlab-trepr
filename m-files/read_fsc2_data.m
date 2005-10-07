@@ -2,18 +2,28 @@
 % 
 % This file ist free software.
 % 
-% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
-% Maintainer:		Till Biskup <till.biskup@physik.fu-berlin.de>
-% Created:			2005/09/28
-% Version:			$Revision$
-% Last Modification:	$Date$
-% Keywords:			transient EPR, fsc2
+%****m* core_routines/read_fsc2_data.m
 %
+% AUTHOR
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% MAINTAINER
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% COPYRIGHT
+%	(c) 2005 Till Biskup
+%	This file is free software
+% CREATION DATE
+%	2005/09/28
+% VERSION
+%	$Revision$
+% MODIFICATION DATE
+%	$Date$
+% KEYWORDS
+%	transient EPR, fsc2
 %
-% READ_FSC2_DATA reads parameters and data from fsc2 data file
+% SYNOPSIS
+%	DATA = read_fsc2_data ( FILENAME )
 %
-%	usage: DATA = read_fsc2_data ( FILENAME )
-%
+% DESCRIPTION
 %	This function opens the file FILENAME, looks for some
 %	parameters necessary for the further data analysis that
 %	are written in the leading commentary and returns a matrix
@@ -22,6 +32,8 @@
 %	If the measurement was taken from higher to lower magnetic field
 %	the returned matrix is rearranged to hold the time traces (rows)
 %	in increasing magnetic field strength.
+%
+% SOURCE
 
 function data = read_fsc2_data ( filename )
 
@@ -112,9 +124,15 @@ function data = read_fsc2_data ( filename )
 
   % end of main function
 	
+	
+%******
+
+
 %##############################################################
 % SUBFUNCTIONS
 
+
+%****if* read_fsc2_data/open_file
 
 function fid = open_file ( filename )
 
@@ -140,7 +158,9 @@ function fid = open_file ( filename )
   	
   end								% end while
 
+%******
 
+%****if* read_fsc2_data/close_file
 	
 function status = close_file ( fid )
 	
@@ -150,6 +170,9 @@ function status = close_file ( fid )
 
   % end subfunction close_file
   
+%******
+
+%****if* read_fsc2_data/read_parameter_from_fsc2
   
 function value = read_parameter_from_fsc2 ( string, description )
 
@@ -195,3 +218,5 @@ function value = read_parameter_from_fsc2 ( string, description )
     end							% end if
 
     % end subfunction read_parameter_from_fsc2
+    
+%******
