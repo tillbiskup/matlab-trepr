@@ -28,7 +28,7 @@
 %
 % SOURCE
 
-function data = pretrigger_offset ( input_data )
+function data = 1D_B0_spectrum ( input_data )
 
 
 %******
