@@ -37,7 +37,7 @@ filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 if length( filename ) > 0			% If the user provided a filename
 
   fprintf ( '\nFile %s will be read...\n\n', filename );
-  data = read_fsc2_data ( filename );
+  [ data, trigger_pos ] = read_fsc2_data ( filename );
   								% try to open the file and read the data
   
 else								% In case the user didn't provide a filename
@@ -49,7 +49,7 @@ end
 
 % Just for testing purposes a simple menu...
 
-choice = menu ( '\n\nWhat do you want to do next?', 'Plot data (only GNU Octave)', 'Nothing' );
+choice = menu ( '\n\nWhat do you want to do next?', 'Plot data (GNU Octave, with gsplot)', 'Plot data (MATLAB(R), with mesh; slow with GNU Octave)' );
 
 if choice == 1					% if the user chose the first possibility
 
@@ -57,7 +57,7 @@ if choice == 1					% if the user chose the first possibility
 
 else								% otherwise
 
-	disp ('All done!');			% print nonsense message
+	mesh ( data );				% print nonsense message
 
 end								% end if
 
