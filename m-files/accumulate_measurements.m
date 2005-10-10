@@ -65,11 +65,19 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
 function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
 
-  % This function summarizes up two given matrices MATRIX1 and MATRIX2 and returns
-  % the summarized matrix SUMMARIZED_MATRIX.
-  %
-  % Before the sum operation it is checked whether both matrices are of the same size.
-  % Otherwise a warning is printed and the matrix MATRIX1 is returned as result.
+% SYNOPSIS
+%
+%	summarized_matrix = summarize_matrices ( matrix1, matrix 2 )
+%
+% DESCRIPTION
+%
+%	This function summarizes up two given matrices MATRIX1 and MATRIX2 and returns
+%	the summarized matrix SUMMARIZED_MATRIX.
+%
+%	Before the sum operation it is checked whether both matrices are of the same size.
+%	Otherwise a warning is printed and the matrix MATRIX1 is returned as result.
+%
+% SOURCE
 
   if size(matrix1) == size(matrix2)
   						% if both matrices are of the same size

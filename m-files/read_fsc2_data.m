@@ -21,21 +21,39 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	DATA = read_fsc2_data ( FILENAME )
+%	[ DATA, TRIGGER_POS ] = read_fsc2_data ( FILENAME )
 %
 % DESCRIPTION
 %	This function opens the file FILENAME, looks for some
 %	parameters necessary for the further data analysis that
 %	are written in the leading commentary and returns a matrix
-%	DATA of the raw data.
+%	DATA of the raw data and a variable TRIGGER_POS with the position
+%	of the trigger pulse in the time slice.
 %
 %	If the measurement was taken from higher to lower magnetic field
 %	the returned matrix is rearranged to hold the time traces (rows)
 %	in increasing magnetic field strength.
 %
+% TODO:
+%	Read out the variable "Number of runs" and behave as necessary if runs > 1
+%
+%	Read out other parameters as "Sensitivity" and "Time base" for axis labels...
+%
 % SOURCE
 
-function data = read_fsc2_data ( filename )
+function [ data, trigger_pos ] = read_fsc2_data ( filename )
+
+  if nargin ~= 1			% Check number of input arguments.
+  
+	error();				% get error if function is called with other than
+  						% one input parameter
+  end
+
+  if nargout ~= 2		% Check number of output arguments.
+  
+	error();				% get error if function is called with other than
+  						% two output parameters
+  end
 
   fid = open_file( filename );	% calling internal function (see below) to open the file
   
@@ -75,6 +93,11 @@ function data = read_fsc2_data ( filename )
 	parameter = read_parameter_from_fsc2 ( read, 'Number of points' );
 	if isnumeric(parameter) ~= 0
 	  no_points = parameter
+	end
+
+	parameter = read_parameter_from_fsc2 ( read, 'Trigger position' );
+	if isnumeric(parameter) ~= 0
+	  trigger_pos = parameter
 	end
 	
   end								% end of while loop
