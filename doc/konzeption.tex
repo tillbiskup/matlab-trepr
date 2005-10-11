@@ -190,10 +190,90 @@ den gegebenen Parametern auf dieses optimale Integrationsintervall und gibt das
 geglättete 1D--Spektrum zurück
 
 
-\subsection{Drift--Korrektur über Dunkelsignal}
+\subsection{$B_0$--Drift--Korrektur}
+
+Häufig zeigen die Spektren eine Drift über die gesamte Messung. Das ist auch 
+der Grund für die symmetrische Aufnahme (s.o.). Die Korrektur dieser Drift ist 
+nichttrivial, da sie normalerweise erst zeitlich nach dem Trigger--Puls auftritt
+(das Pretrigger--Offset driftet nicht). Daher werden im folgenden zwei Routinen
+vorgestellt, die diese Drift entlang beider Dimensionen ($B_0$ und $t$)
+korrigieren.
+
+\subsubsection{$B_0$--Drift--Korrektur entlang $t$}
 
 \begin{description}
-  \item[Funktion] Korrektur der Drift während der Messung mittels der Dunkelsignale
+  \item[Funktion] Korrektur der $B_0$--Drift entlang der $t$--Achse
+  \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
+  Dunkelsignal--Zeitkurven
+  \item[Rückgabewert] 2D--Array, drift--korrigiert
+\end{description}
+
+Um die Drift als solche zu charakterisieren, wird das $B_0$--Signal über die
+letzten Zeitpunkte gemittelt und (linear bzw. quadratisch) gefittet. Das
+gefittete Polynom (linear oder quadratisch) wird für alle Zeitpunkte vom Signal
+abgezogen. Dabei tritt das Problem auf, daß das (bereits korrigierte, driftfreie)
+Pretrigger--Offset wieder mit einer Drift überlagert wird. Die Lösung für dieses
+Problem liegt in einer entlang $t$ gewichteten Drift--Korrektur.
+
+Entlang der $t$--Achse lassen sich (für einen Bereich von $B_0$, in dem kein
+Signal beobachtet wird) drei Bereiche unterscheiden:
+\begin{enumerate}
+  \item Zeit vor dem Trigger--Puls $t_0$
+  \item Zeit zwischen dem Trigger--Puls $t_0$ und dem Erreichen des (stabilen)
+  Wertes nach dem Trigger (Zeitpunkt $t_1$)
+  \item Zeit zwischen $t_1$ und $t$ (dem Ende der $t$--Achse)
+\end{enumerate}
+
+Zur entlang $t$ gewichteten Drift--Korrektur muß in einem ersten Schritt der
+Zeitpunkt $t_1$ bestimmt werden, anschließend können die Vektoren mit den 
+Gewichten erstellt werden, die dann für die Drift--Korrektur zum Einsatz kommen.
+
+Das Intervall zwischen $t_0$ (Trigger--Impuls) und $t_1$ sollte möglichst kurz
+gehalten werden, um das Signal, das zügig nach $t_0$ einsetzt, möglichst nicht
+zu beeinflussen.
+
+Zur Bestimmung von $t_1$ wird folgendes Vorgehen vorgeschlagen:
+\begin{enumerate}
+  \item Berechnung des (arithmetischen) Mittels und der Standardabweichung für
+  das Signal deutlich nach dem Trigger bis zum Ende der $t$--Achse.
+%  \item Berechnung des (arithmetischen) Mittels vom Offset
+\item Inkrementeller Vergleich des Signals entlang $t$ ab $t_0$, bis es dem Wert
+für das (stabile) Signal nach dem Trigger entspricht (als Referenz für das
+stabile Signal wird der um die Standardabweichung des stabilen Signals
+verringerte Mittelwert des stabilen Signals verwendet).
+\item Wenn das Signal $\geq$ der Referenz ist, ist der Zeitpunkt $t_1$ gefunden.
+\end{enumerate}
+
+In einem zweiten Schritt können die beiden Gewichts--Vektoren (\var{offset\_weights}
+und \var{drift\_weights}) erstellt werden. Grundsätzlich gilt:
+
+\begin{align*}
+  \text{\var{offset\_weights}} &= 1 & \forall & \quad t=0 \leq t \leq t_0\\ 
+  \text{\var{offset\_weights}} &= 1\dots 0 & \forall & \quad t_0 < t \leq t_1\\
+  \text{\var{offset\_weights}} &= 0 & \forall & \quad t_1 < t \leq t_\text{max}
+\end{align*}
+
+Umgekehrt gilt dasselbe für \var{drift\_weights}. Für den Bereich zwischen $t_0$
+und $t_1$ wird ein linearer Anstieg (\var{slope\_of\_weights}) angenommen: 
+
+\begin{Quote}
+\begin{verbatim}
+  slope_of_weights = 1 / ( t1 - t0 )
+  
+  for i = ( t0 : t1 )
+  
+    offset_weights(i) = i * slope_of_weights;
+    drift_weights(i) = 1 - ( i * slope_of_weights );
+  
+  end    
+\end{verbatim}
+\end{Quote}
+
+
+\subsubsection{$B_0$--Drift--Korrektur entlang $B_0$}
+
+\begin{description}
+  \item[Funktion] Korrektur der $B_0$--Drift entlang der $B_0$--Achse
   \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
   Dunkelsignal--Zeitkurven
   \item[Rückgabewert] 2D--Array, drift--korrigiert
