@@ -199,21 +199,37 @@ nichttrivial, da sie normalerweise erst zeitlich nach dem Trigger--Puls auftritt
 vorgestellt, die diese Drift entlang beider Dimensionen ($B_0$ und $t$)
 korrigieren.
 
+\subsubsection{$B_0$--Drift untersuchen}
+
+\begin{description}
+  \item[Funktion] Korrektur der $B_0$--Drift entlang der $t$--Achse
+  \item[Übergabe-Parameter] 2D--Array, Zahl der $B_0$--Kurven zur Bestimmung 
+  der Drift
+  \item[Rückgabewert] Drift (gemittelt über die Zahl der $B_0$--Kurven), 
+  Exponenten des Polynom--Fits 1. Ordnung, Werte des Polynom--Fits 1. Ordnung, 
+  Exponenten des Polynom--Fits 2. Ordnung, Werte des Polynom--Fits 2. Ordnung
+\end{description}
+
+Um die Drift als solche zu charakterisieren, wird das $B_0$--Signal über die
+letzten Zeitpunkte gemittelt und linear bzw. quadratisch gefittet. Der jeweils
+passendere Fit kann dann verwendet werden, um in einem nächsten Schritt die
+Drift zu korrigieren.
+
+
 \subsubsection{$B_0$--Drift--Korrektur entlang $t$}
 
 \begin{description}
   \item[Funktion] Korrektur der $B_0$--Drift entlang der $t$--Achse
-  \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
-  Dunkelsignal--Zeitkurven
+  \item[Übergabe-Parameter] 2D--Array, Trigger--Position, $t >> t_1$, Zahl der 
+  Off--Resonance--Zeitkurven zur Bestimmung von $t_1$, Polynom--Fit des Driftes
   \item[Rückgabewert] 2D--Array, drift--korrigiert
 \end{description}
 
-Um die Drift als solche zu charakterisieren, wird das $B_0$--Signal über die
-letzten Zeitpunkte gemittelt und (linear bzw. quadratisch) gefittet. Das
-gefittete Polynom (linear oder quadratisch) wird für alle Zeitpunkte vom Signal
-abgezogen. Dabei tritt das Problem auf, daß das (bereits korrigierte, driftfreie)
-Pretrigger--Offset wieder mit einer Drift überlagert wird. Die Lösung für dieses
-Problem liegt in einer entlang $t$ gewichteten Drift--Korrektur.
+Das gefittete Polynom (linear oder quadratisch) wird für alle Zeitpunkte vom 
+Signal abgezogen. Dabei tritt das Problem auf, daß das (bereits korrigierte, 
+driftfreie) Pretrigger--Offset wieder mit einer Drift überlagert wird. Die 
+Lösung für dieses Problem liegt in einer entlang $t$ gewichteten 
+Drift--Korrektur.
 
 Entlang der $t$--Achse lassen sich (für einen Bereich von $B_0$, in dem kein
 Signal beobachtet wird) drei Bereiche unterscheiden:
@@ -244,17 +260,17 @@ verringerte Mittelwert des stabilen Signals verwendet).
 \item Wenn das Signal $\geq$ der Referenz ist, ist der Zeitpunkt $t_1$ gefunden.
 \end{enumerate}
 
-In einem zweiten Schritt können die beiden Gewichts--Vektoren (\var{offset\_weights}
-und \var{drift\_weights}) erstellt werden. Grundsätzlich gilt:
+In einem zweiten Schritt kann der Gewichts--Vektor (\var{drift\_weights}) 
+erstellt werden. Grundsätzlich gilt:
 
 \begin{align*}
-  \text{\var{offset\_weights}} &= 1 & \forall & \quad t=0 \leq t \leq t_0\\ 
-  \text{\var{offset\_weights}} &= 1\dots 0 & \forall & \quad t_0 < t \leq t_1\\
-  \text{\var{offset\_weights}} &= 0 & \forall & \quad t_1 < t \leq t_\text{max}
+  \text{\var{drift\_weights}} &= 1 & \forall & \quad t=0 \leq t \leq t_0\\ 
+  \text{\var{drift\_weights}} &= 1\dots 0 & \forall & \quad t_0 < t \leq t_1\\
+  \text{\var{drift\_weights}} &= 0 & \forall & \quad t_1 < t \leq t_\text{max}
 \end{align*}
 
-Umgekehrt gilt dasselbe für \var{drift\_weights}. Für den Bereich zwischen $t_0$
-und $t_1$ wird ein linearer Anstieg (\var{slope\_of\_weights}) angenommen: 
+Für den Bereich zwischen $t_0$ und $t_1$ wird ein linearer Anstieg 
+(\var{slope\_of\_weights}) angenommen:
 
 \begin{Quote}
 \begin{verbatim}
@@ -262,13 +278,15 @@ und $t_1$ wird ein linearer Anstieg (\var{slope\_of\_weights}) angenommen:
   
   for i = ( t0 : t1 )
   
-    offset_weights(i) = i * slope_of_weights;
     drift_weights(i) = 1 - ( i * slope_of_weights );
   
   end    
 \end{verbatim}
 \end{Quote}
 
+Für eine bessere Performance unter \matlab/\octave\ sollte zur Berechnung der 
+Gewichte keine \cmd{for}--Schleife zum Einsatz kommen (das Beispiel oben war 
+zur Verdeutlichung gedacht).
 
 \subsubsection{$B_0$--Drift--Korrektur entlang $B_0$}
 
