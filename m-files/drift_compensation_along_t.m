@@ -30,7 +30,8 @@
 %	biased data and the variable TRIGGER_POS with the trigger position along the time axis.
 %	The argument STABLE_T holds the position along the time axis from where on the signal
 %	is stable over time. The argument NO_TS holds the number of time slices used for averaging
-%	the signal used to determine t_1.
+%	the signal used to determine t_1. The last argument, DRIFT, is a vector containing the
+%	values from the polynomic fit of the drift.
 %
 %
 % SOURCE
@@ -81,37 +82,24 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
   						% while value of ts_mean for given position i is smaller than
   						% the above computed threshold
   
-  	t_1 = i;			% set t_1 = i
+  	t_1 = i;				% set t_1 = i
   	
   	i = i+1;				% increment i
   
-  end
+  end					% end of while loop
   
   % set slope of weights
   
   slope_of_weights = 1 / ( t_1 - trigger_pos );
   
   
-  % create vectors with weights
-  
-  for i = (1 : (trigger_pos-1))
-  
-  	drift_weights(i) = 0;
-  
-  end
-  
-  for i = ( trigger_pos : (t_1 - 1))
+  % create vector with weights
 
-  	drift_weights(i) = (i-trigger_pos+1) * slope_of_weights;
-
-  end
-
-  for i = ( t_1 : ts_mean_cols )
-
-  	drift_weights(i) = 1;
-
-  end
-
+  drift_weights = [ (zeros (1,trigger_pos-1)), ([ 0 : slope_of_weights : 1 ]), (ones (1,ts_mean_cols-t_1)) ];
+  						% for 0 <= t <= trigger_pos-1		weights = 0
+  						% for trigger_pos <= t <= t_1 	0 <= weights <= 1
+  						% increase stepwise as determined by slope_of_weights
+  						% for t_1 < t < t_max				weights = 1
 
   % drift compensation
 

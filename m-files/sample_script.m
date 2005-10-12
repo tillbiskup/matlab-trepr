@@ -142,26 +142,14 @@ if ( method_drift_comp == 1 )
 
   fprintf('\nLinear drift compensation method chosen...\n');
 
-  for i= 1 : 500 		% for all time points
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv1);
 
-	drift_comp_data (:, i) = offset_comp_data ( :, i ) - pv1' ;
-						% subtract values of linear polynome (pv1, from linear fit)
-						% from the offset compensated data
-  
-  end 
-  
 elseif ( method_drift_comp == 2 )
 						% if the user chose quadratic fit
 
   fprintf('\nQuadratic drift compensation method chosen...\n');
 
-  for i= 1 : 500 		% for all time points
-
-	drift_comp_data (:, i) = offset_comp_data ( :, i ) - pv2' ;
-						% subtract values of quadratic polynome (pv2, from quadratic fit)
-						% from the offset compensated data
-  
-  end 
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv2);
 
 else						% if user chose to do no fit at all
 
