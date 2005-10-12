@@ -20,6 +20,7 @@
 \def\octave{\textsf{GNU Octave}}
 \def\robodoc{\textsf{ROBODoc}}
 \def\fscii{\texttt{fsc2}}
+\def\eclipse{\textsf{eclipse}}
 
 \newcommand{\func}[1]{\texttt{#1}}
 \newcommand{\cmd}[1]{\texttt{#1}}
@@ -68,7 +69,8 @@
   einen Datensatz komplett analysiert (später durch --- in \matlab\
   programmierte --- GUI ersetzbar)
   \item Nach Möglichkeit für die nichtgrafischen Teile (alle Kernfunktionen) Kompatibilität zu
-  \octave
+  \octave. Grund: \octave\ ist im Gegensatz zu \matlab\ freie Software und ohne
+  Probleme jederzeit unter jedem Betriebssystem (Unix/Linux, Mac, Windows) einsetzbar.
 \end{itemize}
 
 
@@ -87,6 +89,7 @@ und der Aufteilung die Darlegung des allgemeinen Vorgehens bei der Datenanalyse.
 \subsection{Rohdaten einlesen}
 
 \begin{description}
+  \item[Name] read\_fsc2\_data
   \item[Funktion] Liest die vom Spektrometer kommenden Rohdaten (1D) ein und wandelt
   sie in ein 2D--Array um.
   \item[Übergabe-Parameter] Dateiname
@@ -137,6 +140,7 @@ vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
 \subsection{Reihenfolge anpassen}
 
 \begin{description}
+  \item[Name] read\_fsc2\_data
   \item[Funktion] Ordnet die Daten (2D--Array) nach aufsteigendem $B_0$--Wert an
   \item[Übergabe-Parameter] 2D--Array
   \item[Rückgabewert] 2D--Array
@@ -150,6 +154,7 @@ aber notwendig, daß alle Datensätze in der gleichen Sortierung vorliegen.
 \subsection{Akkumulation}
 
 \begin{description}
+  \item[Name] accumulate\_measurements
   \item[Funktion] Aufakkumulation mehrerer Messungen
   \item[Übergabe-Parameter] mehrere 2D--Arrays mit Daten
   \item[Rückgabewert] 2D--Array mit aufakkumulierten Daten
@@ -161,6 +166,7 @@ Zur Verbesserung des Signal--Rausch--Abstandes werden mehrere Messungen aufakkum
 \subsection{Offset--Korrektur über Pretrigger--Signal}
 
 \begin{description}
+  \item[Name] pretrigger\_offset
   \item[Funktion] Offset--Korrektur des Signals über die Pretrigger--Zeit
   \item[Übergabe-Parameter] 2D--Array mit Daten, Pretrigger-Zeit
   \item[Rückgabewert] 2D--Array, offset--korrigiert
@@ -175,6 +181,7 @@ des einleitenden Kommentars der Datendatei) ermittelt.
 \subsection{Integration eines 1D--Spektrums ($B_0$)}
 
 \begin{description}
+  \item[Name] 1D\_B0\_spectrum
   \item[Funktion] Optimale Integration eines 1D--$B_0$--Spektrums zu einem
   definierten Zeitpunkt $t$
   \item[Übergabe-Parameter] 2D--Array mit Daten, Zeitpunkt $t$, Integrationsbereich
@@ -202,6 +209,7 @@ korrigieren.
 \subsubsection{$B_0$--Drift untersuchen}
 
 \begin{description}
+  \item[Name] drift\_evaluation
   \item[Funktion] Korrektur der $B_0$--Drift entlang der $t$--Achse
   \item[Übergabe-Parameter] 2D--Array, Zahl der $B_0$--Kurven zur Bestimmung 
   der Drift
@@ -219,6 +227,7 @@ Drift zu korrigieren.
 \subsubsection{$B_0$--Drift--Korrektur entlang $t$}
 
 \begin{description}
+  \item[Name] drift\_compensation\_along\_t
   \item[Funktion] Korrektur der $B_0$--Drift entlang der $t$--Achse
   \item[Übergabe-Parameter] 2D--Array, Trigger--Position, $t >> t_1$, Zahl der 
   Off--Resonance--Zeitkurven zur Bestimmung von $t_1$, Polynom--Fit des Driftes
@@ -291,6 +300,7 @@ zur Verdeutlichung gedacht).
 \subsubsection{$B_0$--Drift--Korrektur entlang $B_0$}
 
 \begin{description}
+  \item[Name] drift\_compensation
   \item[Funktion] Korrektur der $B_0$--Drift entlang der $B_0$--Achse
   \item[Übergabe-Parameter] 2D--Array, Anzahl der zu verwendenden 
   Dunkelsignal--Zeitkurven
@@ -308,6 +318,26 @@ gewichtet: Zu Beginn trägt nur der Mittelwert vom Anfang des Spektrums zur
 Driftkorrektur bei, sein Beitrag fällt mit fortschreitendem $B_0$ linear ab,
 gleichzeitig steigt der Beitrag des Mittelwertes vom Ende des Spektrums linear
 an, um am Ende des Spektrums sein Maximum zu erreichen.
+
+
+\subsection{Fläche unter der Kurve berechnen}
+
+\begin{description}
+  \item[Name] 
+  \item[Funktion] 
+  \item[Übergabe-Parameter] 
+  \item[Rückgabewert] 
+\end{description}
+
+
+\subsection{Zerfallskurve berechnen}
+
+\begin{description}
+  \item[Name] 
+  \item[Funktion] 
+  \item[Übergabe-Parameter] 
+  \item[Rückgabewert] 
+\end{description}
 
 
 \section{Umsetzung der einzelnen Funktionen}
@@ -384,7 +414,10 @@ sinnvoller und treffender Kommentare bei jedem ``commit''--Vorgang.
 
 \matlab\ erlaubt über eingebaute Funktionen den direkten Zugriff auf
 Versionsverwaltungssysteme (und zumindest unter UNIX/Linux auch auf CVS)
-\cite[S. 431]{TheMathWorks:2005ah}.
+\cite[S. 431]{TheMathWorks:2005ah}. Als brauchbare Variante hat sich die
+Verwendung von \eclipse\ als Programmierumgebung herausgestellt. Es häuft unter
+allen relevanten Plattformen (UNIX/Linux, Mac, Windows) und erlaubt das
+komfortable Handling aller notwendigen CVS--Operationen.
 
 
 \subsubsection{Dokumentation}
@@ -403,6 +436,19 @@ Eine ausführlichere Dokumentation sollte ebenfalls direkt im Quellcode mittels
 \robodoc\ \cite{Slothouber:2005hs} (oder einem anderen Automatisierungs--Tool 
 für Dokumentationen) erfolgen.
 
+Ein Vorteil der Kurzdokumentation in direkter Folge der Funktionsdeklaration
+ist, daß dieser Text beim Aufruf des Befehls \cmd{help routinenname} als Hilfe
+unter \matlab/\octave\ erscheint. Innerhalb dieses Blockes sollte die
+Revisionsnummer und das Revisionsdatum ausgegeben werden (für das Logging
+mittels der \cmd{diary}--Funktion).
+
+
+\subsubsection{Fehlerbehandlung}
+
+Jede Routine sollte zumindest grundlegende Fehlerbehandlungs--Fähigkeiten
+mitbringen. Dazu gehört die Überprüfung der Zahl der Eingabe-- und
+Rückgabe--Parameter ebenso wie die Überprüfung des Erfolgs beim Öffnen einer
+Datei, um anschließend in diese Datei schreiben zu können.
 
 
 \subsection{Kernfunktionen}
@@ -460,6 +506,16 @@ zusätzlichen Informationen aus der Datendatei verwendet werden können.}
 \label{tab:fileIO}
 \end{table}
 
+Mithilfe dieser ```low level''--Funktionen wurde in der Routine 
+\func{read\_fsc2\_data} eine Subfunktion \cmd{read\_parameter\_from\_fsc2} 
+implementiert, die als Eingabeparameter die dem Wert vorangestellte 
+Beschreibung des Parameters in der \cmd{fsc2}--Datei übernimmt und den Wert des 
+Parameters zurückgibt. Diese Subfunktion erlaubt auf einfache Weise, zusätzlich
+notwendig werdende Parameter aus der \cmd{fsc2}--Datei auszulesen.
+
+Die eigentlichen Daten werden dann über den einfachsten, oben beschriebenen Weg 
+(\cmd{load filename}) eingelesen.
+
 
 \subsubsection{Anpassen der Reihenfolge der Daten}
 
@@ -489,11 +545,25 @@ Für jede weitere aufzuaddierende Matrix wird dasselbe Verfahren angewandt.
 
 \subsubsection{Offset--Korrektur über Pretrigger--Signal}
 
+Die Routine mittelt für jede einzelne Zeitkurve die Daten über den Zeitbereich 
+bis kurz vor dem eigentlichen Trigger--Signal (nur bis kurz vorher, um 
+Artefakte durch einen extrem schnellen Signalanstieg nach dem Trigger--Impuls 
+zu vermeiden) und zieht von der gesamten Zeitkurve diesen Mittelwert ab. Im 
+Ergebnis erhält man ein bis auf das Rauschen auf den Nullpunkt abgebildetes 
+Pretrigger--Offset.
+
 
 \subsubsection{Integration eines 1D--Spektrums ($B_0$)}
 
 
-\subsubsection{Drift--Korrekur über das Dunkelsignal}
+%\subsubsection{Drift--Korrekur über das Dunkelsignal}
+\subsubsection{$B_0$--Drift untersuchen}
+
+
+\subsubsection{Drift--Korrekur entlang $t$}
+
+
+\subsubsection{Drift--Korrekur entlang $B_0$}
 
 
 \bibliographystyle{abbrv}%bioscript-authors}
