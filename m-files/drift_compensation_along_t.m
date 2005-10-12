@@ -57,8 +57,8 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
 
   % First step: Compute mean values for lower end of B_0 field
   
-  ts_mean = mean ( input_data ( [1:lower_ts], : ) );
-  						% average over the first 'lower_ts' time slices
+  ts_mean = mean ( input_data ( [1:no_ts], : ) );
+  						% average over the first 'no_ts' time slices
 
 
   % Second step: determine t1
@@ -66,10 +66,10 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
   [ ts_mean_rows, ts_mean_cols ] = size ( ts_mean );
   						% determine size of ts_mean
   
-  upper_t_mean = mean ( ts_mean( [ stable_t : ts_mean_rows ] ) );
+  upper_t_mean = mean ( ts_mean( [ stable_t : ts_mean_cols ] ) );
   						% compute (arithmetic) mean of t for t >> t_1
   
-  upper_t_std = std ( ts_mean( [ stable_t : ts_mean_rows ] ) );
+  upper_t_std = std ( ts_mean( [ stable_t : ts_mean_cols ] ) );
   						% compute standard deviation of t for t >> t_1
   						
   threshold = upper_t_mean - upper_t_std;
@@ -83,35 +83,31 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
   
   	t_1 = i;			% set t_1 = i
   	
-  	i++;				% increment i
+  	i = i+1;				% increment i
   
   end
-
-
+  
   % set slope of weights
   
-  slope_of_weights = 1 - ( t_1 - trigger_pos );
+  slope_of_weights = 1 / ( t_1 - trigger_pos );
   
   
   % create vectors with weights
   
   for i = (1 : (trigger_pos-1))
   
-  	offset_weights(i) = 1;
   	drift_weights(i) = 0;
   
   end
   
   for i = ( trigger_pos : (t_1 - 1))
 
-  	offset_weights(i) = i * slope_of_weights;
-  	drift_weights(i) = 1 - ( offset_weights(i) );
+  	drift_weights(i) = (i-trigger_pos+1) * slope_of_weights;
 
   end
 
-  for i = ( t_1 : ts_mean_rows )
+  for i = ( t_1 : ts_mean_cols )
 
-  	offset_weights(i) = 0;
   	drift_weights(i) = 1;
 
   end
@@ -119,7 +115,7 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
 
   % drift compensation
 
-  for i= 1 : ts_mean_rows
+  for i= 1 : ts_mean_cols
   						% for all time points
 
 	data (:, i) = input_data ( :, i ) - ( drift_weights(i) * drift' ) ;
