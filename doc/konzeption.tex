@@ -1,7 +1,6 @@
 \documentclass{article}
 \usepackage{german}
-\usepackage[paper=a4paper,margin=1in]{geometry}
-\usepackage[utf8]{inputenc}
+\usepackage[paper=a4paper,margin=1in]{geometry} \usepackage[utf8]{inputenc}
 
 \usepackage{textcomp}
 
@@ -16,11 +15,9 @@
 \date{\today, $ $Revision$ $}
 
 
-\def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$}
-\def\octave{\textsf{GNU Octave}}
-\def\robodoc{\textsf{ROBODoc}}
-\def\fscii{\texttt{fsc2}}
-\def\eclipse{\textsf{eclipse}}
+\def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$} 
+\def\octave{\textsf{GNU Octave}} \def\robodoc{\textsf{ROBODoc}} 
+\def\fscii{\texttt{fsc2}} \def\eclipse{\textsf{eclipse}}
 
 \newcommand{\func}[1]{\texttt{#1}}
 \newcommand{\cmd}[1]{\texttt{#1}}
@@ -35,54 +32,56 @@
 \maketitle\thispagestyle{empty}
 
 \begin{abstract}
-  Die folgenden Ausführungen sind eine kurze Zusammenfassung der Konzeption
-  eines Auswertungsprogramms für die Daten aus transienten EPR--Messungen.
-  Zunächst werden die grundlegenden Ideen für die Umsetzung kurz aufgeführt,
-  anschließend die einzelnen Programmblöcke detaillierter erklärt. Ausgehend von
-  dieser Dokumentation sollte es möglich sein, ein entsprechendes Programm in
-  \matlab\ zu erstellen. 
+  Die folgenden Ausführungen sind eine kurze Zusammenfassung der Konzeption 
+  eines Auswertungsprogramms für die Daten aus transienten EPR--Messungen. 
+  Zunächst werden die grundlegenden Ideen für die Umsetzung kurz aufgeführt, 
+  anschließend die einzelnen Programmblöcke detaillierter erklärt. Ausgehend 
+  von dieser Dokumentation sollte es möglich sein, ein entsprechendes Programm 
+  in \matlab\ zu erstellen.
 \end{abstract}
 
 \begin{small}
-\tableofcontents 
+\tableofcontents
 \end{small}
 
 \section{Grundsätzliches}
 
 \begin{itemize}
   \item Aufteilung der einzelnen Programmblöcke in einzelne \matlab--Funktionen
-  \item Dokumentation jeder einzelnen Funktion (am besten mit \robodoc) \emph{in Englisch}
-  \item Interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern
+  \item Dokumentation jeder einzelnen Funktion (am besten mit \robodoc) 
+  \emph{in Englisch}
+  \item Interaktive Abfrage von Parametern nicht in den Kernfunktionen, sondern 
   in eigenen ``Treiber--Funktionen'' bzw. in einem ```Meta--Skript'', das die 
   einzelnen Funktionen in der richtigen Reihenfolge aufruft
-  \item Logging aller Einzelschritte und wichtigen Werte in einer Log--Datei
-  (ähnlich einer \textsf{gaussian}--Aus\-gabedatei)\\
-  Kann in einem ersten Schritt mit der Funktion \texttt{diary} von
-  \matlab/\octave\ realisiert werden (vorausgesetzt im ``Meta--Skript'' sind
-  entsprechende zusätzliche Ausgaben programmiert).
-  \item Versionsverwaltung (CVS bzw. Subversion) der einzelnen Skripte\\
-  Die jeweils aktuelle Fassung aller Dateien (inkl. Dokumentation) liegt auf
-  einer Homepage im Internet. Die eigentliche Entwicklungsarbeit an den
-  Kernfunktionen (und damit gleichzeitig mit der Versionsverwaltung) beschränkt
+  \item Logging aller Einzelschritte und wichtigen Werte in einer Log--Datei 
+  (ähnlich einer \textsf{gaussian}--Aus\-gabedatei)\\ Kann in einem ersten 
+  Schritt mit der Funktion \texttt{diary} von \matlab/\octave\ realisiert 
+  werden (vorausgesetzt im ``Meta--Skript'' sind entsprechende zusätzliche 
+  Ausgaben programmiert).
+  \item Versionsverwaltung (CVS bzw. Subversion) der einzelnen Skripte\\ Die 
+  jeweils aktuelle Fassung aller Dateien (inkl. Dokumentation) liegt auf einer 
+  Homepage im Internet. Die eigentliche Entwicklungsarbeit an den 
+  Kernfunktionen (und damit gleichzeitig mit der Versionsverwaltung) beschränkt 
   sich auf einen kleinen Benutzerkreis.
-  \item ``Meta--Skript'', das auf die einzelnen Funktionen zurückgreift und
-  einen Datensatz komplett analysiert (später durch --- in \matlab\
+  \item ``Meta--Skript'', das auf die einzelnen Funktionen zurückgreift und 
+  einen Datensatz komplett analysiert (später durch --- in \matlab\ 
   programmierte --- GUI ersetzbar)
-  \item Nach Möglichkeit für die nichtgrafischen Teile (alle Kernfunktionen) Kompatibilität zu
-  \octave. Grund: \octave\ ist im Gegensatz zu \matlab\ freie Software und ohne
-  Probleme jederzeit unter jedem Betriebssystem (Unix/Linux, Mac, Windows) einsetzbar.
+  \item Nach Möglichkeit für die nichtgrafischen Teile (alle Kernfunktionen) 
+  Kompatibilität zu \octave. Grund: \octave\ ist im Gegensatz zu \matlab\ freie 
+  Software und ohne Probleme jederzeit unter jedem Betriebssystem (Unix/Linux, 
+  Mac, Windows) einsetzbar.
 \end{itemize}
 
 
 \section{Beschreibung der Kernfunktionen}
 
-Die Funktionalität wird nicht wie bisher durch ein Gesamtprogramm
-bereitgestellt, sondern durch mehrere kleine Funktionen (``Kernfunktionen''), die jeweils eine
-einzige Aufgabe erfüllen. Diese Kernfunktionen erhalten alle notwendigen
-Parameter durch ihren Aufruf, sie besitzen selbst keine Strukturen, die
-interaktiv nach solchen Parametern fragen.
+Die Funktionalität wird nicht wie bisher durch ein Gesamtprogramm 
+bereitgestellt, sondern durch mehrere kleine Funktionen (``Kernfunktionen''), 
+die jeweils eine einzige Aufgabe erfüllen. Diese Kernfunktionen erhalten alle 
+notwendigen Parameter durch ihren Aufruf, sie besitzen selbst keine Strukturen, 
+die interaktiv nach solchen Parametern fragen.
 
-Ziel der Beschreibung ist neben der Darstellung der einzelnen Funktionsbereiche
+Ziel der Beschreibung ist neben der Darstellung der einzelnen Funktionsbereiche 
 und der Aufteilung die Darlegung des allgemeinen Vorgehens bei der Datenanalyse.
 
 
@@ -90,26 +89,27 @@ und der Aufteilung die Darlegung des allgemeinen Vorgehens bei der Datenanalyse.
 
 \begin{description}
   \item[Name] read\_fsc2\_data
-  \item[Funktion] Liest die vom Spektrometer kommenden Rohdaten (1D) ein und wandelt
-  sie in ein 2D--Array um.
+  \item[Funktion] Liest die vom Spektrometer kommenden Rohdaten (1D) ein und 
+  wandelt sie in ein 2D--Array um.
   \item[Übergabe-Parameter] Dateiname
   \item[Rückgabewert] 2D--Array
 \end{description}
 
-Die Spektrometer--Software (\fscii) schreibt an den Beginn der Daten--Datei
-zunächst das Skript, mit dem die Daten aufgenommen wurden (durch ``\%''--Zeichen
-auskommentiert für \matlab) und darunter in einer einzigen Spalte (1D) alle
-aufgezeichneten Werte.
+Die Spektrometer--Software (\fscii) schreibt an den Beginn der Daten--Datei 
+zunächst das Skript, mit dem die Daten aufgenommen wurden (durch 
+``\%''--Zeichen auskommentiert für \matlab) und darunter in einer einzigen 
+Spalte (1D) alle aufgezeichneten Werte.
 
-Gemessen wird für jeden $B_0$--Wert eine Zeitkurve mit einer definierten Zahl
-von Werten. Die Zahl der Werte pro Zeitkurve ($t$--Dimension), der Bereich des
-durchfahrenen $B_0$--Feldes und dessen Schrittweite ($B_0$--Dimension) werden am
-Ende des auskommentierten Bereiches vor den eigentlichen Daten ausgegeben.
-Sinnvollerweise werden diese Daten nicht per Hand eingegeben, sondern von hier ausgelesen.
+Gemessen wird für jeden $B_0$--Wert eine Zeitkurve mit einer definierten Zahl 
+von Werten. Die Zahl der Werte pro Zeitkurve ($t$--Dimension), der Bereich des 
+durchfahrenen $B_0$--Feldes und dessen Schrittweite ($B_0$--Dimension) werden 
+am Ende des auskommentierten Bereiches vor den eigentlichen Daten ausgegeben. 
+Sinnvollerweise werden diese Daten nicht per Hand eingegeben, sondern von hier 
+ausgelesen.
 
-Im Folgenden ist ein Ausschnitt einer solchen Datendatei wiedergegeben. Sehr zur
-Vereinfachung des Auslesens trägt die Kennzeichnung der einzelnen Parameter
-durch die vorangestellten Bezeichner bei. Unterhalb der Parameter erscheint der
+Im Folgenden ist ein Ausschnitt einer solchen Datendatei wiedergegeben. Sehr 
+zur Vereinfachung des Auslesens trägt die Kennzeichnung der einzelnen Parameter 
+durch die vorangestellten Bezeichner bei. Unterhalb der Parameter erscheint der 
 vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
 
 \begin{Quote}
@@ -146,8 +146,8 @@ vor der eigentlichen Messung vom Benutzer eingegebene Kommentar.
   \item[Rückgabewert] 2D--Array
 \end{description}
 
-Gemessen wird meist symmetrisch: Einmal wird das $B_0$--Feld in aufsteigender,
-einmal in absteigender Richtung durchfahren. Zur weiteren Verarbeitung ist es
+Gemessen wird meist symmetrisch: Einmal wird das $B_0$--Feld in aufsteigender, 
+einmal in absteigender Richtung durchfahren. Zur weiteren Verarbeitung ist es 
 aber notwendig, daß alle Datensätze in der gleichen Sortierung vorliegen.
 
 
@@ -160,7 +160,8 @@ aber notwendig, daß alle Datensätze in der gleichen Sortierung vorliegen.
   \item[Rückgabewert] 2D--Array mit aufakkumulierten Daten
 \end{description}
 
-Zur Verbesserung des Signal--Rausch--Abstandes werden mehrere Messungen aufakkumuliert.
+Zur Verbesserung des Signal--Rausch--Abstandes werden mehrere Messungen 
+aufakkumuliert.
 
 
 \subsection{Offset--Korrektur über Pretrigger--Signal}
@@ -172,19 +173,20 @@ Zur Verbesserung des Signal--Rausch--Abstandes werden mehrere Messungen aufakkum
   \item[Rückgabewert] 2D--Array, offset--korrigiert
 \end{description}
 
-Langsame Oszillationen oder Drifts (Temperaturschwankungen, Erschütterungen, etc.)
-werden durch Abziehen eines Offsets korrigiert. Das Offset wird über die vor dem
-Laserpuls aufgenommenen Datenpunkte der Zeitkurve (deren Anzahl steht am Ende
-des einleitenden Kommentars der Datendatei) ermittelt.
+Langsame Oszillationen oder Drifts (Temperaturschwankungen, Erschütterungen, 
+etc.) werden durch Abziehen eines Offsets korrigiert. Das Offset wird über die 
+vor dem Laserpuls aufgenommenen Datenpunkte der Zeitkurve (deren Anzahl steht 
+am Ende des einleitenden Kommentars der Datendatei) ermittelt.
 
 
 \subsection{Integration eines 1D--Spektrums ($B_0$)}
 
 \begin{description}
   \item[Name] 1D\_B0\_spectrum
-  \item[Funktion] Optimale Integration eines 1D--$B_0$--Spektrums zu einem
+  \item[Funktion] Optimale Integration eines 1D--$B_0$--Spektrums zu einem 
   definierten Zeitpunkt $t$
-  \item[Übergabe-Parameter] 2D--Array mit Daten, Zeitpunkt $t$, Integrationsbereich
+  \item[Übergabe-Parameter] 2D--Array mit Daten, Zeitpunkt $t$, 
+  Integrationsbereich
   \item[Rückgabewert] integriertes 1D--Spektrum
 \end{description}
 
@@ -201,10 +203,10 @@ geglättete 1D--Spektrum zurück
 
 Häufig zeigen die Spektren eine Drift über die gesamte Messung. Das ist auch 
 der Grund für die symmetrische Aufnahme (s.o.). Die Korrektur dieser Drift ist 
-nichttrivial, da sie normalerweise erst zeitlich nach dem Trigger--Puls auftritt
-(das Pretrigger--Offset driftet nicht). Daher werden im folgenden zwei Routinen
-vorgestellt, die diese Drift entlang beider Dimensionen ($B_0$ und $t$)
-korrigieren.
+nichttrivial, da sie normalerweise erst zeitlich nach dem Trigger--Puls 
+auftritt (das Pretrigger--Offset driftet nicht). Daher werden im folgenden zwei 
+Routinen vorgestellt, die diese Drift entlang beider Dimensionen ($B_0$ und 
+$t$) korrigieren.
 
 \subsubsection{$B_0$--Drift untersuchen}
 
@@ -218,9 +220,9 @@ korrigieren.
   Exponenten des Polynom--Fits 2. Ordnung, Werte des Polynom--Fits 2. Ordnung
 \end{description}
 
-Um die Drift als solche zu charakterisieren, wird das $B_0$--Signal über die
-letzten Zeitpunkte gemittelt und linear bzw. quadratisch gefittet. Der jeweils
-passendere Fit kann dann verwendet werden, um in einem nächsten Schritt die
+Um die Drift als solche zu charakterisieren, wird das $B_0$--Signal über die 
+letzten Zeitpunkte gemittelt und linear bzw. quadratisch gefittet. Der jeweils 
+passendere Fit kann dann verwendet werden, um in einem nächsten Schritt die 
 Drift zu korrigieren.
 
 
@@ -240,33 +242,34 @@ driftfreie) Pretrigger--Offset wieder mit einer Drift überlagert wird. Die
 Lösung für dieses Problem liegt in einer entlang $t$ gewichteten 
 Drift--Korrektur.
 
-Entlang der $t$--Achse lassen sich (für einen Bereich von $B_0$, in dem kein
+Entlang der $t$--Achse lassen sich (für einen Bereich von $B_0$, in dem kein 
 Signal beobachtet wird) drei Bereiche unterscheiden:
 \begin{enumerate}
   \item Zeit vor dem Trigger--Puls $t_0$
-  \item Zeit zwischen dem Trigger--Puls $t_0$ und dem Erreichen des (stabilen)
+  \item Zeit zwischen dem Trigger--Puls $t_0$ und dem Erreichen des (stabilen) 
   Wertes nach dem Trigger (Zeitpunkt $t_1$)
   \item Zeit zwischen $t_1$ und $t$ (dem Ende der $t$--Achse)
 \end{enumerate}
 
-Zur entlang $t$ gewichteten Drift--Korrektur muß in einem ersten Schritt der
+Zur entlang $t$ gewichteten Drift--Korrektur muß in einem ersten Schritt der 
 Zeitpunkt $t_1$ bestimmt werden, anschließend können die Vektoren mit den 
 Gewichten erstellt werden, die dann für die Drift--Korrektur zum Einsatz kommen.
 
-Das Intervall zwischen $t_0$ (Trigger--Impuls) und $t_1$ sollte möglichst kurz
-gehalten werden, um das Signal, das zügig nach $t_0$ einsetzt, möglichst nicht
+Das Intervall zwischen $t_0$ (Trigger--Impuls) und $t_1$ sollte möglichst kurz 
+gehalten werden, um das Signal, das zügig nach $t_0$ einsetzt, möglichst nicht 
 zu beeinflussen.
 
 Zur Bestimmung von $t_1$ wird folgendes Vorgehen vorgeschlagen:
 \begin{enumerate}
-  \item Berechnung des (arithmetischen) Mittels und der Standardabweichung für
+  \item Berechnung des (arithmetischen) Mittels und der Standardabweichung für 
   das Signal deutlich nach dem Trigger bis zum Ende der $t$--Achse.
 %  \item Berechnung des (arithmetischen) Mittels vom Offset
-\item Inkrementeller Vergleich des Signals entlang $t$ ab $t_0$, bis es dem Wert
-für das (stabile) Signal nach dem Trigger entspricht (als Referenz für das
-stabile Signal wird der um die Standardabweichung des stabilen Signals
-verringerte Mittelwert des stabilen Signals verwendet).
-\item Wenn das Signal $\geq$ der Referenz ist, ist der Zeitpunkt $t_1$ gefunden.
+  \item Inkrementeller Vergleich des Signals entlang $t$ ab $t_0$, bis es dem 
+  Wert für das (stabile) Signal nach dem Trigger entspricht (als Referenz für 
+  das stabile Signal wird der um die Standardabweichung des stabilen Signals 
+  verringerte Mittelwert des stabilen Signals verwendet).
+  \item Wenn das Signal $\geq$ der Referenz ist, ist der Zeitpunkt $t_1$ 
+  gefunden.
 \end{enumerate}
 
 In einem zweiten Schritt kann der Gewichts--Vektor (\var{drift\_weights}) 
@@ -289,7 +292,7 @@ Für den Bereich zwischen $t_0$ und $t_1$ wird ein linearer Anstieg
   
     drift_weights(i) = 1 - ( i * slope_of_weights );
   
-  end    
+  end
 \end{verbatim}
 \end{Quote}
 
@@ -307,43 +310,43 @@ zur Verdeutlichung gedacht).
   \item[Rückgabewert] 2D--Array, drift--korrigiert
 \end{description}
 
-Häufig zeigen die Spektren eine Drift über die gesamte Messung. Das ist auch der
-Grund für die symmetrische Aufnahme (s.o.). Zur Korrektur dieser Drift werden
-zwei (gleich lange) $B_0$--Intervalle am Anfang und Ende des Spektrums
-ausgewählt (\emph{per definitionem} kein Signal), gemittelt und diese
+Häufig zeigen die Spektren eine Drift über die gesamte Messung. Das ist auch 
+der Grund für die symmetrische Aufnahme (s.o.). Zur Korrektur dieser Drift 
+werden zwei (gleich lange) $B_0$--Intervalle am Anfang und Ende des Spektrums 
+ausgewählt (\emph{per definitionem} kein Signal), gemittelt und diese 
 Mittelwerte zur Drift--Korrektur verwendet.
 
-Die beiden Korrekturwerte von Anfang und Ende des Spektrums werden gegenläufig
-gewichtet: Zu Beginn trägt nur der Mittelwert vom Anfang des Spektrums zur
-Driftkorrektur bei, sein Beitrag fällt mit fortschreitendem $B_0$ linear ab,
-gleichzeitig steigt der Beitrag des Mittelwertes vom Ende des Spektrums linear
+Die beiden Korrekturwerte von Anfang und Ende des Spektrums werden gegenläufig 
+gewichtet: Zu Beginn trägt nur der Mittelwert vom Anfang des Spektrums zur 
+Driftkorrektur bei, sein Beitrag fällt mit fortschreitendem $B_0$ linear ab, 
+gleichzeitig steigt der Beitrag des Mittelwertes vom Ende des Spektrums linear 
 an, um am Ende des Spektrums sein Maximum zu erreichen.
 
 
 \subsection{Fläche unter der Kurve berechnen}
 
 \begin{description}
-  \item[Name] 
-  \item[Funktion] 
-  \item[Übergabe-Parameter] 
-  \item[Rückgabewert] 
+  \item[Name]
+  \item[Funktion]
+  \item[Übergabe-Parameter]
+  \item[Rückgabewert]
 \end{description}
 
 
 \subsection{Zerfallskurve berechnen}
 
 \begin{description}
-  \item[Name] 
-  \item[Funktion] 
-  \item[Übergabe-Parameter] 
-  \item[Rückgabewert] 
+  \item[Name]
+  \item[Funktion]
+  \item[Übergabe-Parameter]
+  \item[Rückgabewert]
 \end{description}
 
 
 \section{Umsetzung der einzelnen Funktionen}
 
-Während in den vorangegangenen Abschnitten mehr allgemeine Aspekte im
-Vordergrund standen, sollen in diesem Abschnitt konkrete umsetzungsspezifische
+Während in den vorangegangenen Abschnitten mehr allgemeine Aspekte im 
+Vordergrund standen, sollen in diesem Abschnitt konkrete umsetzungsspezifische 
 Details aufgelistet werden.
 
 
@@ -366,39 +369,40 @@ alle Ausgaben in eine dort zu definierende Datei mitschreibt, oder über die
 Dateinamen erwartet \cite[S. 124]{TheMathWorks:2005ah}:
 
 \begin{Quote}
-To create a file on your disk called \texttt{sept23.out} that contains 
-all the functions you enter, as well as MATLAB output, enter 
+To create a file on your disk called \texttt{sept23.out} that contains all the 
+functions you enter, as well as MATLAB output, enter
 \begin{verbatim} 
-    diary('sept23.out') 
+diary('sept23.out')
 \end{verbatim}
-To stop recording the session, use 
+To stop recording the session, use
 \begin{verbatim} 
-    diary('off') 
+diary('off')
 \end{verbatim}
-To view the file, run 
+To view the file, run
 \begin{verbatim} 
-    edit('sept23.out') 
+edit('sept23.out')
 \end{verbatim}
 \end{Quote}
 
-Eine einfache Möglichkeit, bei jedem Funktionsaufruf die Revisionsnummer und das
-Revisionsdatum mit in der diary--Datei stehen zu haben, ist, vor dem jeweiligen
-Funktionsaufruf im Meta--Skript den Befehl ``\cmd{help <funktionsname>}'' aufzurufen.
+Eine einfache Möglichkeit, bei jedem Funktionsaufruf die Revisionsnummer und 
+das Revisionsdatum mit in der diary--Datei stehen zu haben, ist, vor dem 
+jeweiligen Funktionsaufruf im Meta--Skript den Befehl ``\cmd{help 
+<funktionsname>}'' aufzurufen.
 
-Wird neben den Daten gemeinsam mit der Log--Datei das Meta--Skript abgelegt,
-sollten sich einfach und konfortabel die Verarbeitugnsschritte wiederholen und
+Wird neben den Daten gemeinsam mit der Log--Datei das Meta--Skript abgelegt, 
+sollten sich einfach und konfortabel die Verarbeitugnsschritte wiederholen und 
 gegebenenfalls modifizieren lassen.
 
 
 \subsubsection{Meta--Skript}
 
-Das Meta--Skript fragt die notwendigen Parameter vom Nutzer ab und stößt die
-weitere Datenverarbeitung an. Dieses Skript kann (zumindest am Anfang)
-für jeden Datensatz angepaßt werden.
+Das Meta--Skript fragt die notwendigen Parameter vom Nutzer ab und stößt die 
+weitere Datenverarbeitung an. Dieses Skript kann (zumindest am Anfang) für 
+jeden Datensatz angepaßt werden.
 
-Eine eventuell zu programmierende GUI setzt ebenfalls auf dieser Ebene an. Die
-GUI ersetzt quasi das Meta--Skript. Mittlerweile sind GUI--Fähigkeiten für
-\octave\ in Entwicklung, so daß die prinzipielle Möglichkeit besteht, eine frei
+Eine eventuell zu programmierende GUI setzt ebenfalls auf dieser Ebene an. Die 
+GUI ersetzt quasi das Meta--Skript. Mittlerweile sind GUI--Fähigkeiten für 
+\octave\ in Entwicklung, so daß die prinzipielle Möglichkeit besteht, eine frei 
 verfügbare Version der Auswertungssoftware über \octave\ zu realisieren.
 
 
@@ -409,14 +413,14 @@ ihrem Aufruf ihre jeweilige Revisionsnummer und nach Möglichkeit auch das Datum
 der Revision aus, um auch im Nachhinein noch nachvollziehen zu können, welche 
 Version der Funktion bei der Datenverarbeitung verwendet wurde.
 
-Wichtig ist bei der Verwendung der Versionsverwaltung die Angabe kurzer, aber
+Wichtig ist bei der Verwendung der Versionsverwaltung die Angabe kurzer, aber 
 sinnvoller und treffender Kommentare bei jedem ``commit''--Vorgang.
 
-\matlab\ erlaubt über eingebaute Funktionen den direkten Zugriff auf
-Versionsverwaltungssysteme (und zumindest unter UNIX/Linux auch auf CVS)
-\cite[S. 431]{TheMathWorks:2005ah}. Als brauchbare Variante hat sich die
-Verwendung von \eclipse\ als Programmierumgebung herausgestellt. Es häuft unter
-allen relevanten Plattformen (UNIX/Linux, Mac, Windows) und erlaubt das
+\matlab\ erlaubt über eingebaute Funktionen den direkten Zugriff auf 
+Versionsverwaltungssysteme (und zumindest unter UNIX/Linux auch auf CVS) 
+\cite[S. 431]{TheMathWorks:2005ah}. Als brauchbare Variante hat sich die 
+Verwendung von \eclipse\ als Programmierumgebung herausgestellt. Es häuft unter 
+allen relevanten Plattformen (UNIX/Linux, Mac, Windows) und erlaubt das 
 komfortable Handling aller notwendigen CVS--Operationen.
 
 
@@ -436,81 +440,72 @@ Eine ausführlichere Dokumentation sollte ebenfalls direkt im Quellcode mittels
 \robodoc\ \cite{Slothouber:2005hs} (oder einem anderen Automatisierungs--Tool 
 für Dokumentationen) erfolgen.
 
-Ein Vorteil der Kurzdokumentation in direkter Folge der Funktionsdeklaration
-ist, daß dieser Text beim Aufruf des Befehls \cmd{help routinenname} als Hilfe
-unter \matlab/\octave\ erscheint. Innerhalb dieses Blockes sollte die
-Revisionsnummer und das Revisionsdatum ausgegeben werden (für das Logging
+Ein Vorteil der Kurzdokumentation in direkter Folge der Funktionsdeklaration 
+ist, daß dieser Text beim Aufruf des Befehls \cmd{help routinenname} als Hilfe 
+unter \matlab/\octave\ erscheint. Innerhalb dieses Blockes sollte die 
+Revisionsnummer und das Revisionsdatum ausgegeben werden (für das Logging 
 mittels der \cmd{diary}--Funktion).
 
 
 \subsubsection{Fehlerbehandlung}
 
-Jede Routine sollte zumindest grundlegende Fehlerbehandlungs--Fähigkeiten
-mitbringen. Dazu gehört die Überprüfung der Zahl der Eingabe-- und
-Rückgabe--Parameter ebenso wie die Überprüfung des Erfolgs beim Öffnen einer
+Jede Routine sollte zumindest grundlegende Fehlerbehandlungs--Fähigkeiten 
+mitbringen. Dazu gehört die Überprüfung der Zahl der Eingabe-- und 
+Rückgabe--Parameter ebenso wie die Überprüfung des Erfolgs beim Öffnen einer 
 Datei, um anschließend in diese Datei schreiben zu können.
 
 
 \subsection{Kernfunktionen}
 
-Die Kernfunktionen sind diejenigen Funktionen, die die eigentliche
-Datenverarbeitung und --analyse bewerkstelligen. Jede dieser Funktionen wird in
+Die Kernfunktionen sind diejenigen Funktionen, die die eigentliche 
+Datenverarbeitung und --analyse bewerkstelligen. Jede dieser Funktionen wird in 
 einem eigenen (gleichnamigen) M--File abgelegt und dokumentiert.
 
-Vorrangiges Ziel ist es, die so modularisierten Funktionen zu optimieren und
+Vorrangiges Ziel ist es, die so modularisierten Funktionen zu optimieren und 
 danach von der Programmentwicklung her weitestgehend einzufrieren.
 
 
 \subsubsection{Einlesen der Rohdaten}
 
-Die einfachste Variante, unter \matlab\ die von der Spektrometer--Software
-geschriebenen Daten direkt einzulesen, ist die Funktion \func{load}. Diese
-Funktion liest den Inhalt der als Parameter übergebenen Datei in eine Variable
+Die einfachste Variante, unter \matlab\ die von der Spektrometer--Software 
+geschriebenen Daten direkt einzulesen, ist die Funktion \func{load}. Diese 
+Funktion liest den Inhalt der als Parameter übergebenen Datei in eine Variable 
 mit demselben Namen (ohne Dateiendung). Ein Beispiel:
 %
 \begin{Quote}
 \begin{verbatim}
-load data.dat 
+load data.dat
 \end{verbatim} 
 \end{Quote}
 %
-liest die Daten in der Datei \file{data.dat} in die Variable \var{data} ein. Das
-löst allerdings noch nicht das Problem, wie die zusätzlichen Informationen, die
-im Kommentar am Beginn der Datendatei stehen und die zur weiteren Verarbeitung
-der Daten von Interesse sind, von \matlab\ automatisiert eingelesen werden
-können. 
+liest die Daten in der Datei \file{data.dat} in die Variable \var{data} ein. 
+Das löst allerdings noch nicht das Problem, wie die zusätzlichen Informationen, 
+die im Kommentar am Beginn der Datendatei stehen und die zur weiteren 
+Verarbeitung der Daten von Interesse sind, von \matlab\ automatisiert 
+eingelesen werden können.
 
-Für das Einlesen dieser Daten stehen eine Reihe von ``low
-level'' Datei--Ein/Ausgabe--Funktionen und entsprechende
+Für das Einlesen dieser Daten stehen eine Reihe von ``low level'' 
+Datei--Ein/Ausgabe--Funktionen und entsprechende 
 Stringmanipulations--Funktionen zur Verfügung, vgl. Tab. \ref{tab:fileIO}.
 
 \begin{table}
 \begin{tabular*}{\textwidth}{ll}
-\hline
-\\[-1ex]
-Funktion & Beschreibung\\[-1ex]
-\\\hline
-\\[-1ex]
-\cmd{fopen} & Datei öffnen\\
-\cmd{fclose} & Datei schließen\\
-\cmd{fgetl} & Zeile aus Datei einlesen, Zeilenende--Zeichen verwerfen\\[-1ex]
-\\\hline
-\\[-1ex]
-\cmd{findstr} & finde einen String in einem anderen
-\\[-1ex]
-\\\hline
+\hline \\[-1ex] Funktion & Beschreibung\\[-1ex] \\\hline \\[-1ex] \cmd{fopen} & 
+Datei öffnen\\ \cmd{fclose} & Datei schließen\\ \cmd{fgetl} & Zeile aus Datei 
+einlesen, Zeilenende--Zeichen verwerfen\\[-1ex] \\\hline \\[-1ex] \cmd{findstr} 
+& finde einen String in einem anderen \\[-1ex] \\\hline
 \end{tabular*}
-\caption{Übersicht über einige ``Low--level'' Datei--Ein/Ausgabe--Funktionen und
-String--Manipulations\-funktionen von \matlab, wie sie zum Auslesen der
+\caption{Übersicht über einige ``Low--level'' Datei--Ein/Ausgabe--Funktionen 
+und String--Manipulations\-funktionen von \matlab, wie sie zum Auslesen der 
 zusätzlichen Informationen aus der Datendatei verwendet werden können.}
 \label{tab:fileIO}
 \end{table}
 
-Mithilfe dieser ```low level''--Funktionen wurde in der Routine 
+Mithilfe dieser ```low level''--Funktionen wurde in der Routine
 \func{read\_fsc2\_data} eine Subfunktion \cmd{read\_parameter\_from\_fsc2} 
 implementiert, die als Eingabeparameter die dem Wert vorangestellte 
 Beschreibung des Parameters in der \cmd{fsc2}--Datei übernimmt und den Wert des 
-Parameters zurückgibt. Diese Subfunktion erlaubt auf einfache Weise, zusätzlich
+Parameters zurückgibt. Diese Subfunktion erlaubt auf einfache Weise, zusätzlich 
 notwendig werdende Parameter aus der \cmd{fsc2}--Datei auszulesen.
 
 Die eigentlichen Daten werden dann über den einfachsten, oben beschriebenen Weg 
@@ -535,9 +530,9 @@ Eine pragmatische Lösung ist, zwei Spektren gewichtet aufzuaddieren:
 	\vect{C} &= \vect{A} + x \vect{B}
 \end{align*}
 
-Der Parameter $x$ wird dadurch optimiert, daß er über das Intervall $0 < x < 1$
-variiert wird und für jeden Wert von $x$ das Verhältnis von maximaler Amplitude
-zu Rauschen bestimmt wird. $x$ gilt dann als optimiert, wenn dieses Verhältnis
+Der Parameter $x$ wird dadurch optimiert, daß er über das Intervall $0 < x < 1$ 
+variiert wird und für jeden Wert von $x$ das Verhältnis von maximaler Amplitude 
+zu Rauschen bestimmt wird. $x$ gilt dann als optimiert, wenn dieses Verhältnis 
 maximiert ist.
 
 Für jede weitere aufzuaddierende Matrix wird dasselbe Verfahren angewandt.
@@ -559,11 +554,31 @@ Pretrigger--Offset.
 %\subsubsection{Drift--Korrekur über das Dunkelsignal}
 \subsubsection{$B_0$--Drift untersuchen}
 
+Eine (über einen Parameter der Funktion übergebbare) Anzahl von $B_0$--Kurven 
+am Ende der $t$--Achse des Spektrums (wo das Signal quasi zerfallen ist) wird 
+gemittelt und diese so erhaltene Drift über die Funktion \func{polyfit} linear 
+und quadratisch gefittet.
+
+Die Parameter des Polynom--Fits und die zugehörigen Werte werden zusammen mit 
+der Drift von der Funktion zurückgegeben und können zur Veranschaulichung und 
+zur besseren Entscheidung geplottet werden.
+
+\paragraph{TODO} Es wäre zu überlegen, inwieweit ein exponentieller Fit besser 
+zur in den Daten vorliegenden Drift paßt. Dazu müßte dann eine Routine analog 
+\func{poylfit} geschrieben werden, da \matlab/\octave\ standardmäßig keine 
+solche Routine mitbringen.
+
 
 \subsubsection{Drift--Korrekur entlang $t$}
 
 
 \subsubsection{Drift--Korrekur entlang $B_0$}
+
+
+\subsubsection{Berechnung der Fläche unter der Kurve}
+
+
+\subsubsection{Darstellung des Zerfalls des Signals}
 
 
 \bibliographystyle{abbrv}%bioscript-authors}
