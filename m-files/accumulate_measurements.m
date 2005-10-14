@@ -34,6 +34,8 @@
 
 function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
+  disp ( '$Revision$, $Date$' );
+
   if nargin < 2			% Check number of input arguments.
   
 	error();				% get error if function is called with less than

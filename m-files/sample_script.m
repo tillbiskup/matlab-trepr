@@ -18,7 +18,33 @@
 
 
 
-% First of all print some nice message
+% First of all ask user for a log file filename
+
+logfilename = input ( 'Please enter a filename for the log file (if empty, default will be used): ', 's' );
+
+diary ('off')				% in case that the diary function is already started, stop it.
+
+if length( logfilename ) > 0	
+							% If the user provided a filename
+
+  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
+  
+  diary ( logfilename );		% start logging via the 'diary' function
+  
+else							% In case the user didn't provide a filename
+
+  logfilename = [(datestr (now,30)),'.dat']
+  							% generate logfile filename from current date and time ('now')
+  							% formatted as string with 'T' as separator: YYYYMMDDTHHMMSS
+  							
+  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
+  
+  diary ( logfilename );		% start logging via the 'diary' function
+  
+end
+
+
+% Then print some nice message
 
 disp ( ' ' );
 disp ( 'Sample script for testing the routines implemented' );
@@ -32,6 +58,8 @@ disp ( ' ' );
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
+disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
+
 [ program, prog_version ] = discriminate_matlab_octave;
 
 
@@ -42,6 +70,8 @@ filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 if length( filename ) > 0			% If the user provided a filename
 
   fprintf ( '\nFile %s will be read...\n\n', filename );
+
+  help read_fsc2_data;
   
   [ data, trigger_pos ] = read_fsc2_data ( filename );
   								% try to open the file and read the data
@@ -202,5 +232,8 @@ else								% otherwise we assume that we're called by MATLAB(R)
 
 end
 
+% At the very end stop logging...
+
+diary('off')			% logging via the diary function stopped
 
 % end of script

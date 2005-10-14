@@ -43,6 +43,8 @@
 
 function [ data, trigger_pos ] = read_fsc2_data ( filename )
 
+  disp ( '$Revision$, $Date$' );
+
   if nargin ~= 1			% Check number of input arguments.
   
 	error();				% get error if function is called with other than

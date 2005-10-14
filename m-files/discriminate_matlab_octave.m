@@ -33,6 +33,8 @@
 
 function [ program, prog_version ] = discriminate_matlab_octave
 
+	disp ( '$Revision$, $Date$' );
+
 	program = '';					% initially set variable to a default value.
 
 	if exist('OCTAVE_VERSION') 		% test condition for GNU Octave

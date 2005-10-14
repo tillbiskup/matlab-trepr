@@ -39,6 +39,8 @@
 
 function data = drift_compensation ( input_data, weights, lower_ts, varargin )
 
+  disp ( '$Revision$, $Date$' );
+
   % First of all, check number of arguments
 
   if (nargin < 3) | (nargin > 4)
@@ -64,7 +66,7 @@ function data = drift_compensation ( input_data, weights, lower_ts, varargin )
   	
   else					% else (that is, if number of input arguments is three)
   
-	upper_ts = varargin{1}(1)
+	upper_ts = varargin{1}(1);
   						% set number of time slices at the upper end of the B_0 field
   						% to the value given by third parameter
 

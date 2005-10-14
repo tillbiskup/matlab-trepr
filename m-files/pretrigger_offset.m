@@ -31,6 +31,8 @@
 
 function data = pretrigger_offset ( input_data, trigger_pos )
 
+  disp ( '$Revision$, $Date$' );
+
   % First of all, check number of arguments
 
   if nargin ~= 2			% Check number of input arguments.

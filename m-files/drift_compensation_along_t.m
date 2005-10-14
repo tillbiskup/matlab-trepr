@@ -38,6 +38,8 @@
 
 function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, no_ts, drift )
 
+  disp ( '$Revision$, $Date$' );
+
   % First of all, check number of arguments
 
   if nargin ~= 5
