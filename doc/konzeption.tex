@@ -389,8 +389,20 @@ das Revisionsdatum mit in der diary--Datei stehen zu haben, ist, vor dem
 jeweiligen Funktionsaufruf im Meta--Skript den Befehl ``\cmd{help 
 <funktionsname>}'' aufzurufen.
 
+\paragraph{Anmerkung:} Der Aufruf der Hilfe zur Funktion ist momentan dank der 
+\robodoc--Dokumentation etwas unübersichtlich. Eine (momentan realisierte)
+Alternative ist die Ausgabe des Dateinamens, der Revision und des Datums der
+jeweiligen Routine direkt nach dem Aufruf. Diese Ausgabe sollte allerdings die
+einzige direkte Ausgabe dieser Skripte sein.
+
+\paragraph{Dateiname:} Aktuell fragt das Meta--Skript zuallererst einen
+Dateinamen für die Logdatei ab. Wenn der Nutzer keinen solchen eingibt,
+generiert das Skript aus dem aktuellen Datum und der aktuellen Uhrzeit einen
+Dateinamen mit der Endung ``.log'' und legt diese Datei im aktuellen
+Arbeitsverzeichnis ab.
+
 Wird neben den Daten gemeinsam mit der Log--Datei das Meta--Skript abgelegt, 
-sollten sich einfach und konfortabel die Verarbeitugnsschritte wiederholen und 
+sollten sich einfach und konfortabel die Verarbeitungsschritte wiederholen und 
 gegebenenfalls modifizieren lassen.
 
 

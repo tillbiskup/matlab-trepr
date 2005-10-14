@@ -16,6 +16,10 @@
 %
 %	The file serves as an example for own scripts.
 
+% Just to tell the user what's going on...
+
+disp ( 'Sample script for testing the routines implemented' );
+disp ( 'to analyse trEPR data recorded with the program fsc2.' );
 
 
 % First of all ask user for a log file filename
