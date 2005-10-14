@@ -16,6 +16,8 @@
 %
 %	The file serves as an example for own scripts.
 
+tic;						% set starting point for calculation of used time, just for fun...
+
 % Just to tell the user what's going on...
 
 disp ( 'Sample script for testing the routines implemented' );
@@ -50,6 +52,10 @@ end
 
 % Then print some nice message
 
+dateandtime = [datestr(now, 31), ' @ ', computer];
+
+disp ( dateandtime )	% print current date and time and system
+ 
 disp ( ' ' );
 disp ( 'Sample script for testing the routines implemented' );
 disp ( 'to analyse trEPR data recorded with the program fsc2.' );
@@ -72,6 +78,13 @@ disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
 filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
 if length( filename ) > 0			% If the user provided a filename
+
+  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+  
+  	filename = tilde_expand ( filename );
+  								% expand filenames with tilde
+  	
+  end							% end if program == 'Octave'
 
   fprintf ( '\nFile %s will be read...\n\n', filename );
   
@@ -165,7 +178,7 @@ method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 
 
 % Compensate drift along the time axis
 
-fprintf('\nCompensate drift...\n')
+fprintf('\nCompensate B_0 drift along the t axis...\n')
 
 figure(4);						% Opens up a new plot window.
 
@@ -212,7 +225,7 @@ pause;
 
 % Compensate drift along the B_0 axis
 
-fprintf('\nCompensate drift once again...\n')
+fprintf('\nCompensate B_0 drift along the B_0 axis...\n')
 
 figure(5);						% Opens up a new plot window.
 
@@ -233,6 +246,32 @@ else								% otherwise we assume that we're called by MATLAB(R)
 	title('data with drift compensated (weighted along B_0)');
 
 end
+
+
+% Save last dataset to file
+
+outputfilename = [ filename, '.out'];
+
+fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+
+if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+
+	save ('-ascii', outputfilename, 'drift2_comp_data');
+%	save -ascii 'outputfilename' drift2_comp_data
+								% save data to ascii file
+
+else								% otherwise we assume that we're called by MATLAB(R)
+
+	save (outputfilename, 'drift2_comp_data', '-ascii');
+								% save data to ascii file in a MATLAB(R) compatible way
+								% (silly MATLAB behaviour - to accept the Octave variant of
+								% calling but neither saving nor complaining all about...)
+
+end
+
+total_time_used = toc;
+fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
+						% print total time used;
 
 % At the very end stop logging...
 

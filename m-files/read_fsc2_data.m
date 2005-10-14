@@ -92,6 +92,16 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
 	  field_step_width = parameter
 	end
 
+	parameter = read_parameter_from_fsc2 ( read, 'Sensitivity' );
+	if isnumeric(parameter) ~= 0
+	  sensitivity = parameter
+	end
+
+	parameter = read_parameter_from_fsc2 ( read, 'Time base' );
+	if isnumeric(parameter) ~= 0
+	  time_base = parameter
+	end
+
 	parameter = read_parameter_from_fsc2 ( read, 'Number of points' );
 	if isnumeric(parameter) ~= 0
 	  no_points = parameter
