@@ -30,6 +30,6 @@
 
 function data = 1D_B0_spectrum ( input_data )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
 %******

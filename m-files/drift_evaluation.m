@@ -35,7 +35,7 @@
 
 function [ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyval_2nd_order ] = drift_evaluation ( input_data, no_slices )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
   % First of all, check number of arguments
 

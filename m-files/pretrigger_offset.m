@@ -31,7 +31,7 @@
 
 function data = pretrigger_offset ( input_data, trigger_pos )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
   % First of all, check number of arguments
 

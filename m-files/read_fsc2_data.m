@@ -43,7 +43,7 @@
 
 function [ data, trigger_pos ] = read_fsc2_data ( filename )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
   if nargin ~= 1			% Check number of input arguments.
   

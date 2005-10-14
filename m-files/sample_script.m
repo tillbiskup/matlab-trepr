@@ -70,8 +70,6 @@ filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 if length( filename ) > 0			% If the user provided a filename
 
   fprintf ( '\nFile %s will be read...\n\n', filename );
-
-  help read_fsc2_data;
   
   [ data, trigger_pos ] = read_fsc2_data ( filename );
   								% try to open the file and read the data

@@ -34,7 +34,7 @@
 
 function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
   if nargin < 2			% Check number of input arguments.
   

@@ -39,7 +39,7 @@
 
 function data = drift_compensation ( input_data, weights, lower_ts, varargin )
 
-  disp ( '$Revision$, $Date$' );
+  disp ( '$RCSfile$, $Revision$, $Date$' );
 
   % First of all, check number of arguments
 
