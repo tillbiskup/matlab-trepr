@@ -30,6 +30,10 @@
 %	Before summarizing up the matrices the function will test for identical
 %	dimensions of the matrices and otherwise return an error message
 %
+% TODO
+%	Instead of simply summarizing this function should check for the best possibility
+%	to do this in a way the noise is minimized.
+%
 % SOURCE
 
 function data = accumulate_measurements ( matrix1, matrix2, varargin )
