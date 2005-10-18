@@ -65,7 +65,7 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   	
   end
   
-  [ best_quality, index_best_quality ] = max(sum_quality);
+  [ best_quality, index_best_quality ] = max(sum_quality)
   
   data = summarize_matrices ( matrix1, matrix2, (index_best_quality/10) );
   
