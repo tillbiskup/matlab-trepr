@@ -112,6 +112,11 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
 	  trigger_pos = parameter
 	end
 	
+	parameter = read_frequency_from_fsc2 ( read, '9' );
+	if isnumeric(parameter) ~= 0
+	  frequency = parameter
+	end
+	
   end								% end of while loop
   
   close_file( fid );					% calling internal function (see below) to close the file
@@ -249,6 +254,62 @@ function value = read_parameter_from_fsc2 ( string, description )
     								% or if DESCRIPTION starts not at position 3 of STRING
     
       value = 'NaN';				% set the return variable "value" to a defined nonnumeric value
+      
+    end							% end if
+
+    % end subfunction read_parameter_from_fsc2
+    
+%******
+
+
+%****if* read_fsc2_data/read_frequency_from_fsc2
+  
+function frequency = read_frequency_from_fsc2 ( string, substring )
+
+  % This function checks whether the string STRING contains the substring
+  % DESCRIPTION and in this case returns the value VALUE that is printed at
+  % a defined position behind the substring DESCRIPTION in the leading commentary
+  % of the fsc2 data file.
+
+    if index ( string, substring ) == 3  
+    								% The string SUBSTRING is contained more than once
+    								% in the leading commentary block of the fsc2 data file.
+    								% Therefore the condition here set is that the string
+    								% SUBSTRING starts at position 3 of the string STRING.
+    								%
+    								% ATTENTION: The function INDEX is not a native MATLAB(R)
+    								% function and is therefore implemented in the file "index.m"
+      res = substr ( string, 5 );
+      							% The value described by SUBSTRING has a fixed position
+      							% from left in the fsc2 file - it starts at position 3 but
+      							% contains a comma instead of a dot - so it cannot be
+      							% converted to a number by 'str2num'. Workaround: Read out
+      							% the decimal places and add via string concatenation the '9.'
+      							% afterwards.
+      							% This position could be affected by further changes of the
+      							% fsc2 program but due to the loss of regexp functionality
+      							% in Octave this seems to be the simplest way for the moment.
+      contains_spaces = findstr ( res, ' ' );
+      							% If the string RES contains whitespace characters
+      							% (normally at the end of the string)
+      							% than the positions of the whitespace characters
+      							% are elements of CONTAINS_SPACES
+      if length(contains_spaces) > 0
+      							% if CONTAINS_SPACES is not empty
+        res = substr ( res, 1, contains_spaces(1)-1 );
+        							% res is overwritten with its substring, starting at the first
+        							% position and ending at the first position of whitespace character
+        							
+      end						% end if
+      
+      res = ['9.', res];
+ 
+      frequency = str2num( res );		% the value (string) is converted to a number
+      
+    else							% If the string DESCRIPTION is not found in the string STRING
+    								% or if DESCRIPTION starts not at position 3 of STRING
+    
+      frequency = 'NaN';			% set the return variable "value" to a defined nonnumeric value
       
     end							% end if
 

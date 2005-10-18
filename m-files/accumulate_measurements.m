@@ -45,19 +45,38 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
   if nargin < 2			% Check number of input arguments.
   
-	error();				% get error if function is called with less than
+	error;				% get error if function is called with less than
   						% two input parameters
   end
   
-  data = summarize_matrices ( matrix1, matrix2 );
+  [ quality_matrix1, amplitude_matrix1, std_noise_matrix1 ] = quality_of_spectrum ( matrix1, 10 )
+
+  [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, 10 )
+
+  sum_quality = ones(1,100);
+
+  for i = 1:100
+
+    sum = summarize_matrices ( matrix1, matrix2, (i/10) );
   						% in a first step
   						% sum up the first two matrices
+  						
+  	sum_quality (1,i) = quality_of_spectrum ( sum, 10 );
+  	
+  end
+  
+  [ best_quality, index_best_quality ] = max(sum_quality);
+  
+  data = summarize_matrices ( matrix1, matrix2, (index_best_quality/10) );
+  
+  [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, 10 )
+
   
   if nargin > 2			% if the function is called with more than two parameters
 
 	for i = 3 : nargin	% as long as there are unused input parameters
 	
-		data = summarize_matrices ( data, va_arg () )
+		data = summarize_matrices ( data, va_arg () );
 						% sum up the matrices
 		
 	end					% end for
@@ -72,7 +91,7 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
 %****if* accumulate_measurements/summarize_matrices
 
-function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
+function summarized_matrix = summarize_matrices ( matrix1, matrix2, weight )
 
 % SYNOPSIS
 %
@@ -81,7 +100,10 @@ function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
 % DESCRIPTION
 %
 %	This function summarizes up two given matrices MATRIX1 and MATRIX2 and returns
-%	the summarized matrix SUMMARIZED_MATRIX.
+%	the summarized matrix SUMMARIZED_MATRIX. The parameter WEIGHT is used to do a
+%	weighted matrix sum in the form
+%
+%	SUMMARIZED_MATRIX = MATRIX1 + WEIGHT * MATRIX2
 %
 %	Before the sum operation it is checked whether both matrices are of the same size.
 %	Otherwise a warning is printed and the matrix MATRIX1 is returned as result.
@@ -91,7 +113,7 @@ function summarized_matrix = summarize_matrices ( matrix1, matrix2 )
   if size(matrix1) == size(matrix2)
   						% if both matrices are of the same size
 
-	summarized_matrix = matrix1 + matrix2;
+	summarized_matrix = matrix1 + (weight * matrix2);
   						% sum up the matrices
   						% and return summarized matrix
   else
