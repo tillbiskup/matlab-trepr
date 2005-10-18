@@ -549,6 +549,27 @@ optimiert, wenn dieses Verhältnis maximiert ist.
 
 Für jede weitere aufzuaddierende Matrix wird dasselbe Verfahren angewandt.
 
+Als Güteparameter für das einzelne Spektrum wird das Verhältnis von
+Standardabweichung des Offresonance--Rauschens zu maximaler Signalamplitude
+verwendet. Dazu ist es notwendig, beide Größen für die Spektren zu bestimmen:
+
+\begin{enumerate}
+  \item Standardabweichung des Rauschens\\
+  ca. 10 Time Slices werden ausgemittelt und von dieser Mittlung die
+  Standardabweichung berechnet.
+  \item maximale Signalamplitude\\
+  Dazu existiert eine Funktion von Moritz Kirste, die übernommen werden kann.
+\end{enumerate}
+
+Für das konkrete Vorgehen anhand zweier Spektren ergibt sich folgender Ablauf:
+
+\begin{enumerate}
+  \item Güte von $\vect{A}$ und $\vect{B}$ bestimmen und ausgeben
+  \item Güte von $\vect{C}$ in Abhängigkeit von $x$ bestimmen und ausgeben\\
+  Dabei wird $x$ schrittweise variiert ($0.1\leq x\leq 10$ oder kleiner, je nach
+  Rechenaufwand).
+\end{enumerate}
+
 
 \subsubsection{Offset--Korrektur über Pretrigger--Signal}
 
