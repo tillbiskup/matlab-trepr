@@ -33,6 +33,9 @@
 % TODO
 %	Instead of simply summarizing this function should check for the best possibility
 %	to do this in a way the noise is minimized.
+%	This is done by calculating a quality parameter (the ratio of the standard deviation
+%	of the off-resonance noise to the maximum signal amplitude) and a weighted addition of
+%	both spectra optimized in a way to yield maximum quality measured by the quality parameter.
 %
 % SOURCE
 
