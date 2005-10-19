@@ -79,9 +79,9 @@ disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
 [ program, prog_version ] = discriminate_matlab_octave;
 
 
-exit_condition = 0;				% set exit condition for while loop
+exit_condition = 1;				% set exit condition for while loop
 
-while exit_condition == 0			% main while loop
+while exit_condition > 0			% main while loop
 								% responsible for the possibility to accumulate
 								% more than one spectrum after compensation
 								% for pretrigger offset and drift
@@ -114,53 +114,53 @@ end
 
 % Plot raw data
 
-fprintf('\nPlot raw data...\n')
+% fprintf('\nPlot raw data...\n')
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+% if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	gsplot ( data' );			% make simple 3D plot of the raw data
+%	gsplot ( data' );			% make simple 3D plot of the raw data
 
-else								% otherwise we assume that we're called by MATLAB(R)
+% else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( data );				% make simple 3D plot of the raw data
+%	mesh ( data );				% make simple 3D plot of the raw data
 
-	title('Raw data');
+%	title('Raw data');
 
-end
+%end
 
 
 % Next compensate pretrigger offset
 
 offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
-fprintf('\n...press any key to continue...\n')
+% fprintf('\n...press any key to continue...\n')
 
-pause;
+% pause;
 
 % Plot pretrigger offset compensated data
 
-fprintf('\nPlot pretrigger offset compensated data...\n')
+% fprintf('\nPlot pretrigger offset compensated data...\n')
 
-figure(2);						% Opens up a new plot window.
+% figure(2);						% Opens up a new plot window.
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+% if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	gsplot ( offset_comp_data' );
+%	gsplot ( offset_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
-else								% otherwise we assume that we're called by MATLAB(R)
+%else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( offset_comp_data );
+%	mesh ( offset_comp_data );
 								% make simple 3D plot of the offset compensated data
 
-	title('data with pretrigger offset compensated');
+%	title('data with pretrigger offset compensated');
 
-end
+%end
 
 
-fprintf('\n...press any key to continue...\n')
+% fprintf('\n...press any key to continue...\n')
 
-pause;
+% pause;
 
 % Evaluate drift and possible fits
 
@@ -177,6 +177,7 @@ figure(3);				% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
+title('Drift, linear and quadratic fit');
 plot(x,drift,'-',x,pv1,'-',x,pv2,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
@@ -193,7 +194,7 @@ method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 
 
 fprintf('\nCompensate B_0 drift along the t axis...\n')
 
-figure(4);						% Opens up a new plot window.
+% figure(4);						% Opens up a new plot window.
 
 if ( method_drift_comp == 1 )
 						% if the user chose linear fit
@@ -218,23 +219,23 @@ else						% if user chose to do no fit at all
 
 end
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+%if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	gsplot ( drift_comp_data' );
+%	gsplot ( drift_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
-else								% otherwise we assume that we're called by MATLAB(R)
+%else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( drift_comp_data );
+%	mesh ( drift_comp_data );
 								% make simple 3D plot of the offset compensated data
-	title('data with (quadratic) drift compensated');
+%	title('data with (quadratic) drift compensated');
 
-end
+%end
 
 
-fprintf('\n...press any key to continue...\n')
+%fprintf('\n...press any key to continue...\n')
 
-pause;
+%pause;
 
 % Compensate drift along the B_0 axis
 
@@ -249,6 +250,7 @@ drift2_comp_data = drift_compensation ( drift_comp_data, pv1, 20, 10);
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
+	title('data with drift compensated (weighted along B_0)');
 	gsplot ( drift2_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
@@ -279,6 +281,44 @@ else								% otherwise we assume that we're called by MATLAB(R)
 								% save data to ascii file in a MATLAB(R) compatible way
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
+
+end
+
+if exit_condition > 1
+
+  acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
+  
+  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+
+	title('accumulated and compensated data');
+	gsplot ( acc_meas' );
+								% make simple 3D plot of the offset compensated data
+
+  else								% otherwise we assume that we're called by MATLAB(R)
+
+	mesh ( acc_meas );
+								% make simple 3D plot of the offset compensated data
+	title('accumulated and compensated data');
+
+  end
+  
+end;
+
+
+exit_answer = menu ( 'What do you want to do now?', 'Read new file', 'Exit program');
+						% make menu that lets the user choose which drift compensation
+						% method he wants to use
+						
+if exit_answer == 1
+
+  exit_condition = exit_condition + 1
+  
+  matrix1 = drift2_comp_data;
+  						% save compensated data to matrix
+
+elseif exit_answer == 2
+
+  exit_condition = 0;
 
 end
 
