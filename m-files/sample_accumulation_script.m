@@ -141,7 +141,7 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 % fprintf('\nPlot pretrigger offset compensated data...\n')
 
-% figure(2);						% Opens up a new plot window.
+% figure;						% Opens up a new plot window.
 
 % if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
@@ -166,7 +166,7 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 fprintf('\nEvaluate drift and possible fits...\n')
 
-figure(3);				% Opens up a new plot window.
+figure;				% Opens up a new plot window.
 
 [drift,p1,pv1,p2,pv2] = drift_evaluation (offset_comp_data,20);
 
@@ -194,7 +194,7 @@ method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 
 
 fprintf('\nCompensate B_0 drift along the t axis...\n')
 
-% figure(4);						% Opens up a new plot window.
+% figure;						% Opens up a new plot window.
 
 if ( method_drift_comp == 1 )
 						% if the user chose linear fit
@@ -241,7 +241,7 @@ end
 
 fprintf('\nCompensate B_0 drift along the B_0 axis...\n')
 
-figure(5);						% Opens up a new plot window.
+figure;						% Opens up a new plot window.
 
 drift2_comp_data = drift_compensation ( drift_comp_data, pv1, 20, 10);
 								% Make weighted drift compensation along the B_0 axis
