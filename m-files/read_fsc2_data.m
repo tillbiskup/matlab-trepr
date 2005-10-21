@@ -39,6 +39,10 @@
 %
 %	Read out other parameters as "Sensitivity" and "Time base" for axis labels...
 %
+%	Better error handling if data don't match the size given by the field width and
+%	time slice length parameters than just producing an error avoiding any further
+%	execution of the script
+%
 % SOURCE
 
 function [ data, trigger_pos ] = read_fsc2_data ( filename )
@@ -57,7 +61,16 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
   						% two output parameters
   end
 
-  fid = open_file( filename );	% calling internal function (see below) to open the file
+  % save opening of the file that's name is provided by the variable 'filename'
+
+  fid=0;					% set file identifier to standard value
+  while fid < 1 			% while file not opened
+    [fid,message] = fopen(filename, 'r');
+    						% try to open file 'filename' and return fid and message
+    if fid == -1			% if there are any errors while trying to open the file
+      disp(message)		% display the message from fopen
+    end					% end "if fid"
+  end					% end while loop
   
   % read the leading commentary of the fsc2 file line by line
   % and extract the necessary parameters:
@@ -145,6 +158,19 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
   % now read the actual data
   
   raw_data = load ( filename );		% read fsc2 data file (automatically ignore comments)
+
+
+  % Test whether raw_data size fits in dimensions calculated by parameters of the input file
+  % That can happen if a measurement has been aborted before its completion.
+  %
+  % TODO: Better handling that just producing an error that stops immediately any further execution
+  
+  if size (raw_data) ~= (field_width+1) * no_points
+  
+    fprintf('\nData do not match the dimensions given by the parameters!\n');
+    error ();
+  
+  end
 
 
   % fill the previously initialized empty matrix with the data read from the file

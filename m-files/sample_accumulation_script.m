@@ -88,6 +88,8 @@ while exit_condition > 0			% main while loop
 
 % Next ask for a file name to read and if file name is valid, read data
 
+do
+
 filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
 if length( filename ) > 0			% If the user provided a filename
@@ -98,18 +100,28 @@ if length( filename ) > 0			% If the user provided a filename
   								% expand filenames with tilde
   	
   end							% end if program == 'Octave'
-
-  fprintf ( '\nFile %s will be read...\n\n', filename );
   
-  [ data, trigger_pos ] = read_fsc2_data ( filename );
-  								% try to open the file and read the data
+  if exist(filename) = 0
+  
+    fprintf ( 'File not found!' );
+    
+  end
   
 else								% In case the user didn't provide a filename
 
-  error ( 'You have not entered any file name!' );
+  fprintf ( 'You have not entered any file name!\n\n' );
 								% just print a short message and exit
+  filename = 'foo.bar';
   
 end
+
+until exist(filename);
+
+
+fprintf ( '\nFile %s will be read...\n\n', filename );
+  
+[ data, trigger_pos ] = read_fsc2_data ( filename );
+								% try to open the file and read the data
 
 
 % Plot raw data
@@ -363,6 +375,8 @@ if exit_answer == 1
   
   matrix1 = drift2_comp_data;
   						% save compensated data to matrix
+  						
+  clear data drift* filename method* offset* p1 p2 trigger_pos x;
 
 elseif exit_answer == 2
 

@@ -33,6 +33,9 @@
 %	the signal used to determine t_1. The last argument, DRIFT, is a vector containing the
 %	values from the polynomic fit of the drift.
 %
+% TODO
+%	Bugfix if while condition "while ( ts_mean(i) < threshold )" fails - that is if the noise
+%	is bigger than the difference of the off-resonance signal before and after the trigger pulse.
 %
 % SOURCE
 
@@ -80,15 +83,29 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
   
   i = trigger_pos;		% set start point of while loop to trigger position
   
-  while ( ts_mean(i) < threshold )
+  if ts_mean(i) < threshold
+  						% if starting condition of the while loop matches
+  						% (it doesn't match if the difference in the signal value
+  						% of the off-resonance noise before and after the trigger pulse
+  						% is very small)
+   
+	while ( ts_mean(i) < threshold )
   						% while value of ts_mean for given position i is smaller than
   						% the above computed threshold
   
-  	t_1 = i;				% set t_1 = i
+	  t_1 = i;				% set t_1 = i
   	
-  	i = i+1;				% increment i
+  	  i = i+1;				% increment i
   
-  end					% end of while loop
+	end					% end of while loop
+	
+  else					% in case the while loop condition doesn't match
+  
+    t_1 = i+1;			% set t_1 to the trigger_pos value + 1
+    						% the addition of 1 is necessary not to produce a division by zero
+    						% whenn calculating the slope_of_weights above
+
+  end
   
   % set slope of weights
   
