@@ -266,13 +266,15 @@ end
 % Save last dataset to file
 
 outputfilename = [ filename, '.out'];
+								% the output filename consists of the filename of the input file
+								% with appended extension ".out"
 
 fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+								% Telling the user what's going to happen
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
 	save ('-ascii', outputfilename, 'drift2_comp_data');
-%	save -ascii 'outputfilename' drift2_comp_data
 								% save data to ascii file
 
 else								% otherwise we assume that we're called by MATLAB(R)
@@ -282,11 +284,18 @@ else								% otherwise we assume that we're called by MATLAB(R)
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
 
-end
+end								% end of "if program" clause
 
-if exit_condition > 1
+if exit_condition > 1				% if the exit condition for the main while loop
+								% set at the beginning and increased at the end of every
+								% pass of the loop is larger than one (that means that the
+								% while loop is passed for more than one time til here)
+
+fprintf('\nAccumulate measurements...\n')
+								% Telling the user what's going to happen
 
   acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
+  								% accumulate the measurements compensated until here
   
   if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
@@ -294,7 +303,7 @@ if exit_condition > 1
 	gsplot ( acc_meas' );
 								% make simple 3D plot of the offset compensated data
 
-  else								% otherwise we assume that we're called by MATLAB(R)
+  else							% otherwise we assume that we're called by MATLAB(R)
 
 	mesh ( acc_meas );
 								% make simple 3D plot of the offset compensated data
@@ -302,10 +311,49 @@ if exit_condition > 1
 
   end
   
-end;
+  % Save accumulated measurements
+
+  user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with .acc appended): ', 's' );
+
+  if length( user_provided_filename ) > 0	
+						% If the user provided a filename
+
+	outputfilename = user_provided_filename;
+	
+	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
+  
+  else					% In case the user didn't provide a filename
+
+	outputfilename = [ filename, '.acc'];
+						% the output filename consists of the filename of the input file
+						% with appended extension ".out"
+	
+	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
+
+  end
+
+  fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+						% Telling the user what's going to happen
+
+  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+	save ('-ascii', outputfilename, 'acc_meas');
+						% save data to ascii file
+
+  else					% otherwise we assume that we're called by MATLAB(R)
+
+	save (outputfilename, 'acc_meas', '-ascii');
+						% save data to ascii file in a MATLAB(R) compatible way
+						% (silly MATLAB behaviour - to accept the Octave variant of
+						% calling but neither saving nor complaining all about...)
+
+end						% end of "if program" clause
+
+  
+end;						% end "if exit_condition" clause
 
 
-exit_answer = menu ( 'What do you want to do now?', 'Read new file', 'Exit program');
+exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 						
@@ -320,9 +368,9 @@ elseif exit_answer == 2
 
   exit_condition = 0;
 
-end
+end						% end of "if exit_answer" clause
 
-end								% end of main while loop
+end						% end of main while loop
 
 total_time_used = toc;
 fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
