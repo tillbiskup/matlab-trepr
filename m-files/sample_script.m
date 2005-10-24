@@ -24,30 +24,9 @@ disp ( 'Sample script for testing the routines implemented' );
 disp ( 'to analyse trEPR data recorded with the program fsc2.' );
 
 
-% First of all ask user for a log file filename
+% First of all start logging
 
-logfilename = input ( 'Please enter a filename for the log file (if empty, default will be used): ', 's' );
-
-diary ('off')				% in case that the diary function is already started, stop it.
-
-if length( logfilename ) > 0	
-							% If the user provided a filename
-
-  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
-  
-  diary ( logfilename );		% start logging via the 'diary' function
-  
-else							% In case the user didn't provide a filename
-
-  logfilename = [(datestr (now,30)),'.dat']
-  							% generate logfile filename from current date and time ('now')
-  							% formatted as string with 'T' as separator: YYYYMMDDTHHMMSS
-  							
-  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
-  
-  diary ( logfilename );		% start logging via the 'diary' function
-  
-end
+start_logging;
 
 
 % Then print some nice message
@@ -75,28 +54,41 @@ disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
 
 % Next ask for a file name to read and if file name is valid, read data
 
-filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
+do								% do ... until <condition>
 
-if length( filename ) > 0			% If the user provided a filename
+  filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
-  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+  if (length( filename ) > 0)		% If the user provided a filename
+
+    if program == 'Octave'		% if we're called by GNU Octave (as determined above)
   
-  	filename = tilde_expand ( filename );
+  	  filename = tilde_expand ( filename );
   								% expand filenames with tilde
   	
-  end							% end if program == 'Octave'
-
-  fprintf ( '\nFile %s will be read...\n\n', filename );
+    end							% end if program == 'Octave'
   
-  [ data, trigger_pos ] = read_fsc2_data ( filename );
-  								% try to open the file and read the data
+    if (exist(filename) == 0)
   
-else								% In case the user didn't provide a filename
+      fprintf ( 'File not found!' );
+    
+    end
+  
+  else							% In case the user didn't provide a filename
 
-  error ( 'You have not entered any file name!' );
+    fprintf ( 'You have not entered any file name!\n\n' );
 								% just print a short message and exit
+    filename = 'foo.bar';
   
-end
+  end
+
+until exist(filename);		% condition of do...until loop
+
+
+fprintf ( '\nFile %s will be read...\n\n', filename );
+  
+[ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename );
+  								% open the file and read the data
+trigger_pos = time_params(2);	% get trigger_pos out of time_params
 
 
 % Plot raw data
@@ -275,6 +267,6 @@ fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
 
 % At the very end stop logging...
 
-diary('off')			% logging via the diary function stopped
+stop_logging;
 
 % end of script

@@ -104,6 +104,8 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
     t_1 = i+1;			% set t_1 to the trigger_pos value + 1
     						% the addition of 1 is necessary not to produce a division by zero
     						% whenn calculating the slope_of_weights above
+    						
+    	fprintf('\nINFO: There is no difference in the off-resonance signal before and after the trigger.\n');
 
   end
   

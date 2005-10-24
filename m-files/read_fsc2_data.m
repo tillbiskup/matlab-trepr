@@ -37,15 +37,13 @@
 % TODO:
 %	Read out the variable "Number of runs" and behave as necessary if runs > 1
 %
-%	Read out other parameters as "Sensitivity" and "Time base" for axis labels...
-%
 %	Better error handling if data don't match the size given by the field width and
 %	time slice length parameters than just producing an error avoiding any further
 %	execution of the script
 %
 % SOURCE
 
-function [ data, trigger_pos ] = read_fsc2_data ( filename )
+function [ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename )
 
   disp ( '$RCSfile$, $Revision$, $Date$' );
 
@@ -55,9 +53,10 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
   						% one input parameter
   end
 
-  if nargout ~= 2		% Check number of output arguments.
+  if nargout ~= 5		% Check number of output arguments.
   
-	error();				% get error if function is called with other than
+  	fprintf('\nWARNING: Function called with too less return values. Possibly errors might occur.\n')
+	warning();			% get error if function is called with other than
   						% two output parameters
   end
 
@@ -110,6 +109,11 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
 	  sensitivity = parameter
 	end
 
+	parameter = read_parameter_from_fsc2 ( read, 'Number of averages' );
+	if isnumeric(parameter) ~= 0
+	  averages = parameter
+	end
+
 	parameter = read_parameter_from_fsc2 ( read, 'Time base' );
 	if isnumeric(parameter) ~= 0
 	  time_base = parameter
@@ -125,6 +129,11 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
 	  trigger_pos = parameter
 	end
 	
+	parameter = read_parameter_from_fsc2 ( read, 'Slice length' );
+	if isnumeric(parameter) ~= 0
+	  slice_length = parameter
+	end
+	
 	parameter = read_frequency_from_fsc2 ( read, '9' );
 	if isnumeric(parameter) ~= 0
 	  frequency = parameter
@@ -133,6 +142,11 @@ function [ data, trigger_pos ] = read_fsc2_data ( filename )
   end								% end of while loop
   
   close_file( fid );					% calling internal function (see below) to close the file
+  
+  % write parameters grouped to vectors as return values of the function
+  field_params = [ start_field, end_field, field_step_width ];
+  scope_params = [ sensitivity, time_base, averages ];
+  time_params  = [ no_points, trigger_pos, slice_length ];
   
   
   % calculations for the dimension of the 2D-matrix for finally storing the data

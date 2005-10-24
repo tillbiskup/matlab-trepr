@@ -45,7 +45,9 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
   if nargin < 2			% Check number of input arguments.
   
-	error;				% get error if function is called with less than
+  	fprintf('\nERROR: Function called with less than two input parameters. Aborted.\n')
+  
+	error ();			% get error if function is called with less than
   						% two input parameters
   end
   

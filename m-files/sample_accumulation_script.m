@@ -29,30 +29,9 @@ disp ( 'to analyse trEPR data recorded with the program fsc2.' );
 disp ( 'WITH POSSIBILITY TO ACCUMULATE THE SPECTRA.' );
 
 
-% First of all ask user for a log file filename
+% First of all start logging
 
-logfilename = input ( 'Please enter a filename for the log file (if empty, default will be used): ', 's' );
-
-diary ('off')				% in case that the diary function is already started, stop it.
-
-if length( logfilename ) > 0	
-							% If the user provided a filename
-
-  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
-  
-  diary ( logfilename );		% start logging via the 'diary' function
-  
-else							% In case the user didn't provide a filename
-
-  logfilename = [(datestr (now,30)),'.dat']
-  							% generate logfile filename from current date and time ('now')
-  							% formatted as string with 'T' as separator: YYYYMMDDTHHMMSS
-  							
-  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
-  
-  diary ( logfilename );		% start logging via the 'diary' function
-  
-end
+start_logging;
 
 
 % Then print some nice message
@@ -88,40 +67,41 @@ while exit_condition > 0			% main while loop
 
 % Next ask for a file name to read and if file name is valid, read data
 
-do
+do								% do ... until <condition>
 
-filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
+  filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
-if length( filename ) > 0			% If the user provided a filename
+  if length( filename ) > 0		% If the user provided a filename
 
-  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+    if program == 'Octave'		% if we're called by GNU Octave (as determined above)
   
-  	filename = tilde_expand ( filename );
+  	  filename = tilde_expand ( filename );
   								% expand filenames with tilde
   	
-  end							% end if program == 'Octave'
+    end							% end if program == 'Octave'
   
-  if exist(filename) = 0
+    if exist(filename) = 0
   
-    fprintf ( 'File not found!' );
+      fprintf ( 'File not found!' );
     
-  end
+    end
   
-else								% In case the user didn't provide a filename
+  else							% In case the user didn't provide a filename
 
-  fprintf ( 'You have not entered any file name!\n\n' );
+    fprintf ( 'You have not entered any file name!\n\n' );
 								% just print a short message and exit
-  filename = 'foo.bar';
+    filename = 'foo.bar';
   
-end
+  end
 
-until exist(filename);
+until exist(filename);			% condition of do...until loop
 
 
 fprintf ( '\nFile %s will be read...\n\n', filename );
   
-[ data, trigger_pos ] = read_fsc2_data ( filename );
-								% try to open the file and read the data
+[ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename );
+  								% open the file and read the data
+trigger_pos = time_params(2);	% get trigger_pos out of time_params
 
 
 % Plot raw data
@@ -206,7 +186,7 @@ method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 
 
 fprintf('\nCompensate B_0 drift along the t axis...\n')
 
-% figure;						% Opens up a new plot window.
+% figure;				% Opens up a new plot window.
 
 if ( method_drift_comp == 1 )
 						% if the user chose linear fit
@@ -392,6 +372,6 @@ fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
 
 % At the very end stop logging...
 
-diary('off')			% logging via the diary function stopped
+stop_logging;
 
 % end of script
