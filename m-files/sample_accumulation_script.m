@@ -67,11 +67,16 @@ while exit_condition > 0			% main while loop
 
 % Next ask for a file name to read and if file name is valid, read data
 
-do								% do ... until <condition>
+filename = ' ';					% set filename to empty value
+								% the space is necessary not to confuse GNU Octave
+
+while (exist(filename) == 0)		% while there is no valid filename specified
+								% This would be better done with a do...until loop
+								% but silly MATLAB(R) doesn't support this...
 
   filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
-  if length( filename ) > 0		% If the user provided a filename
+  if (length( filename ) > 0)		% If the user provided a filename
 
     if program == 'Octave'		% if we're called by GNU Octave (as determined above)
   
@@ -80,7 +85,7 @@ do								% do ... until <condition>
   	
     end							% end if program == 'Octave'
   
-    if exist(filename) = 0
+    if (exist(filename) == 0)
   
       fprintf ( 'File not found!' );
     
@@ -94,7 +99,7 @@ do								% do ... until <condition>
   
   end
 
-until exist(filename);			% condition of do...until loop
+end		% end of while exist(filename) loop
 
 
 fprintf ( '\nFile %s will be read...\n\n', filename );

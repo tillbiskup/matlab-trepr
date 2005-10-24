@@ -54,7 +54,12 @@ disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
 
 % Next ask for a file name to read and if file name is valid, read data
 
-do								% do ... until <condition>
+filename = ' ';					% set filename to empty value
+								% the space is necessary not to confuse GNU Octave
+
+while (exist(filename) == 0)		% while there is no valid filename specified
+								% This would be better done with a do...until loop
+								% but silly MATLAB(R) doesn't support this...
 
   filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
 
@@ -81,7 +86,7 @@ do								% do ... until <condition>
   
   end
 
-until exist(filename);		% condition of do...until loop
+end		% end of while exist(filename) loop
 
 
 fprintf ( '\nFile %s will be read...\n\n', filename );
@@ -93,15 +98,19 @@ trigger_pos = time_params(2);	% get trigger_pos out of time_params
 
 % Plot raw data
 
+[X,Y] = meshgrid (field_params(2) : 0.5 : field_params(1), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
+
 fprintf('\nPlot raw data...\n')
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-	gsplot ( data' );			% make simple 3D plot of the raw data
+	gsplot ( data' );	% make simple 3D plot of the raw data
 
-else								% otherwise we assume that we're called by MATLAB(R)
+else						% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( data );				% make simple 3D plot of the raw data
+	mesh ( X', Y', data );
+						% make simple 3D plot of the raw data
 
 	title('Raw data');
 
@@ -129,7 +138,7 @@ if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
 else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( offset_comp_data );
+	mesh ( X', Y', offset_comp_data );
 								% make simple 3D plot of the offset compensated data
 
 	title('data with pretrigger offset compensated');
@@ -204,7 +213,7 @@ if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
 else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( drift_comp_data );
+	mesh ( X', Y', drift_comp_data );
 								% make simple 3D plot of the offset compensated data
 	title('data with (quadratic) drift compensated');
 
@@ -233,7 +242,7 @@ if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
 else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( drift2_comp_data );
+	mesh ( X', Y', drift2_comp_data );
 								% make simple 3D plot of the offset compensated data
 	title('data with drift compensated (weighted along B_0)');
 
