@@ -106,6 +106,12 @@ fprintf ( '\nFile %s will be read...\n\n', filename );
   								% open the file and read the data
 trigger_pos = time_params(2);	% get trigger_pos out of time_params
 
+if exit_condition > 1
+
+  [ data, matrix1, field_params ] = adjust_matrix_size ( data, field_params, time_params, matrix1, old_field_params, old_time_params );
+
+end
+
 
 % Plot raw data
 
@@ -289,12 +295,6 @@ if exit_condition > 1				% if the exit condition for the main while loop
 fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
-if ( (abs(field_params(2)-field_params(1)) == abs(old_field_params(2)-old_field_params(1))) & (abs(field_params(3)) == abs(old_field_params(3))) & (time_params == old_time_params) )
-								% in case that field width and field_step_width and the time_params
-								% of both spectra are equal
-								% the absolute values are necessary cause the spectra are recorded
-								% along increasing and decreasing B_0 field alternatively
-
   acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
   								% accumulate the measurements compensated until here
   
@@ -348,13 +348,7 @@ if ( (abs(field_params(2)-field_params(1)) == abs(old_field_params(2)-old_field_
 						% (silly MATLAB behaviour - to accept the Octave variant of
 						% calling but neither saving nor complaining all about...)
 
-end						% end of "if program" clause
-
-else						% of params ~= oldparams
-
-  fprintf('\nSize of the matrices do not match - so NOT accumulated\n')
-
-end						% end if params=oldparams clause
+  end						% end of "if program" clause
   
 end;						% end "if exit_condition" clause
 

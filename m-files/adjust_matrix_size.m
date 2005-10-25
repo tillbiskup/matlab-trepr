@@ -21,7 +21,7 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	[ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params2, matrix2, field_params2, time_params2 )
+%	[ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
 %
 % DESCRIPTION
 %	This function takes two matrices, evaluates the sizes and parameters of them and
@@ -30,7 +30,7 @@
 %
 % SOURCE
 
-function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params2, matrix2, field_params2, time_params2 )
+function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
 
   disp ( '$RCSfile$, $Revision$, $Date$' );
   
@@ -42,6 +42,8 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	new_matrix1 = matrix1;
 	new_matrix2 = matrix2;
 							% just set the output matrices equal to the input matrices
+	new_field_params = field_params1;
+							% just set the field params equal to the params of one of the input matrices
 	
   else						% if matrices differ in some way
   							% do the real work...
