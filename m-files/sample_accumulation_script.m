@@ -169,7 +169,7 @@ fprintf('\nEvaluate drift and possible fits...\n')
 
 figure;				% Opens up a new plot window.
 
-[drift,p1,pv1,p2,pv2] = drift_evaluation (offset_comp_data,20);
+[drift,p1,pv1,p2,pv2,p3,pv3] = drift_evaluation (offset_comp_data,20);
 
 
 [ drift_rows, drift_cols ] = size ( drift );
@@ -178,16 +178,16 @@ figure;				% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-title('Drift, linear and quadratic fit');
-plot(x,drift,'-',x,pv1,'-',x,pv2,'-');
+title('Drift, linear, quadratic and cubic fit');
+plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
 						% values of quadratic fit against x (pv2 = polyval_2nd_order)
 
-title('Drift, linear and quadratic fit');
+title('Drift, linear, quadratic and cubic fit');
 
 
-method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 'quadratic', 'none' );
+method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 'quadratic', 'cubic', 'none' );
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
@@ -210,6 +210,13 @@ elseif ( method_drift_comp == 2 )
   fprintf('\nQuadratic drift compensation method chosen...\n');
 
   drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv2);
+
+elseif ( method_drift_comp == 3 )
+						% if the user chose quadratic fit
+
+  fprintf('\nCubic drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv3);
 
 else						% if user chose to do no fit at all
 

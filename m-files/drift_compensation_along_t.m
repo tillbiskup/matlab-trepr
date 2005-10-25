@@ -101,17 +101,26 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
 	
   else					% in case the while loop condition doesn't match
   
-    t_1 = i+1;			% set t_1 to the trigger_pos value + 1
+    t_1 = i;			% set t_1 to the trigger_pos value
     						% the addition of 1 is necessary not to produce a division by zero
-    						% whenn calculating the slope_of_weights above
+    						% when calculating the slope_of_weights below
     						
     	fprintf('\nINFO: There is no difference in the off-resonance signal before and after the trigger.\n');
 
   end
   
+  
   % set slope of weights
   
-  slope_of_weights = 1 / ( t_1 - trigger_pos );
+  if (t_1 > trigger_pos)
+  
+    slope_of_weights = 1 / ( t_1 - trigger_pos );
+    
+  else					% this is only the case if t_1 equals trigger_pos
+  
+    slope_of_weights = 0;
+  
+  end
   
   
   % create vector with weights

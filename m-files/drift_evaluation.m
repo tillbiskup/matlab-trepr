@@ -21,7 +21,7 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	[ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyval_2nd_order ] = 
+%	[ drift, polyval_1st_order, polyval_2nd_order, polyval_3rd_order, polyval_4th_order, polyval_5th_order, polyval_6th_order, polyval_7th_order ] = 
 %	drift_evaluation ( input_data, no_slices )
 %
 % DESCRIPTION
@@ -33,7 +33,7 @@
 %
 % SOURCE
 
-function [ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyval_2nd_order ] = drift_evaluation ( input_data, no_slices )
+function [ drift, polyval_1st_order, polyval_2nd_order, polyval_3rd_order, polyval_4th_order, polyval_5th_order, polyval_6th_order, polyval_7th_order ] = drift_evaluation ( input_data, no_slices )
 
   disp ( '$RCSfile$, $Revision$, $Date$' );
 
@@ -47,7 +47,7 @@ function [ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyv
   						% two input parameters
   end
 
-  if nargout ~= 5		% Check number of output arguments.
+  if nargout ~= 8		% Check number of output arguments.
   
 	error('Wrong number of output arguments');
 						% get error if function is called with other than
@@ -77,6 +77,36 @@ function [ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyv
 
   polyval_2nd_order = polyval(polynom_2nd_order,x);
 						% get values from 2nd order polynomial fit
+  								
+  polynom_3rd_order = polyfit(x,drift,3);
+						% compute 3rd order polynomial fit
+
+  polyval_3rd_order = polyval(polynom_3rd_order,x);
+						% get values from 3rd order polynomial fit
+  								
+  polynom_4th_order = polyfit(x,drift,4);
+						% compute 4th order polynomial fit
+
+  polyval_4th_order = polyval(polynom_4th_order,x);
+						% get values from 4th order polynomial fit
+  								
+  polynom_5th_order = polyfit(x,drift,5);
+						% compute 5th order polynomial fit
+
+  polyval_5th_order = polyval(polynom_5th_order,x);
+						% get values from 5th order polynomial fit
+  								
+  polynom_6th_order = polyfit(x,drift,6);
+						% compute 6th order polynomial fit
+
+  polyval_6th_order = polyval(polynom_6th_order,x);
+						% get values from 6th order polynomial fit
+  								
+  polynom_7th_order = polyfit(x,drift,7);
+						% compute 7th order polynomial fit
+
+  polyval_7th_order = polyval(polynom_7th_order,x);
+						% get values from 7th order polynomial fit
 
 
   % do some statistics with the fit data
@@ -114,6 +144,22 @@ function [ drift, polynom_1st_order, polyval_1st_order, polynom_2nd_order, polyv
   								
   std_2nd_order_fit = std ( second_order_fit )
 						% compute standard deviation of second order fit  
+
+  
+  % Now some statistics for the third order fit
+  
+  second_order_fit = drift - polyval_3rd_order;
+  						% compute third order fit as difference of drift and
+  						% third order polynom
+  
+  mean_3rd_order_fit = mean ( second_order_fit )
+  						% compute (arithmetic) mean of third order fit
+
+  var_3rd_order_fit = var ( second_order_fit )
+  						% compute (real) variance of third order fit
+  								
+  std_3rd_order_fit = std ( second_order_fit )
+						% compute standard deviation of third order fit  
 
   
 %******

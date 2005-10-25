@@ -96,7 +96,9 @@ trigger_pos = time_params(2);	% get trigger_pos out of time_params
 
 % Plot raw data
 
-[X,Y] = meshgrid (field_params(2) : 0.5 : field_params(1), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+field_boundaries = [ field_params(1) field_params(2) ];
+
+[X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
 
 fprintf('\nPlot raw data...\n')
@@ -114,6 +116,82 @@ else						% otherwise we assume that we're called by MATLAB(R)
 
 end
 
+cut_off = 0;				% set variable to default value that matches while condition
+
+while (cut_off < 3)
+
+  cut_off = menu ( 'Do you want to cut off time slices at beginning and/or end of the spectrum?', 'Yes, at the beginning', 'Yes, at the end', 'No' );
+
+  if ( cut_off == 1 )
+						% if the user chose to cut off the beginning
+
+    no_first_ts = input ( 'How many time slices do you want to cut of AT THE BEGINNING? ' );
+    
+    [ data, field_params ] = cut_off_time_slices ( data, no_first_ts, 0, field_params );
+
+    
+    % Plot raw data with cut time slices
+
+    field_boundaries = [ field_params(1) field_params(2) ]
+
+    [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
+
+	size(X)
+	size(Y)
+	size(data)
+
+    fprintf('\nPlot raw data...\n')
+
+    if program == 'Octave'
+    						% if we're called by GNU Octave (as determined above)
+
+	    gsplot ( data' );
+	    					% make simple 3D plot of the raw data
+
+    else					% otherwise we assume that we're called by MATLAB(R)
+
+	    mesh ( X', Y', data );
+						% make simple 3D plot of the raw data
+
+	    title('Raw data');
+
+    end
+
+  elseif ( cut_off == 2 )
+						% if the user chose to cut off the end
+
+    no_last_ts = input ( 'How many time slices do you want to cut of AT THE END? ' );
+    
+    [ data, field_params ] = cut_off_time_slices ( data, 0, no_last_ts, field_params );
+  
+    % Plot raw data with cut time slices
+
+    field_boundaries = [ field_params(1) field_params(2) ]
+
+    [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
+
+    fprintf('\nPlot raw data...\n')
+
+    if program == 'Octave'
+    						% if we're called by GNU Octave (as determined above)
+
+	    gsplot ( data' );
+	    					% make simple 3D plot of the raw data
+
+    else					% otherwise we assume that we're called by MATLAB(R)
+
+	    mesh ( X', Y', data );
+						% make simple 3D plot of the raw data
+
+	    title('Raw data');
+
+    end
+
+  end					% if condition
+  
+end						% end while (cut_off < 3) loop
 
 % Next compensate pretrigger offset
 
@@ -154,7 +232,7 @@ fprintf('\nEvaluate drift and possible fits...\n')
 
 figure(3);				% Opens up a new plot window.
 
-[drift,p1,pv1,p2,pv2] = drift_evaluation (offset_comp_data,20);
+[drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (offset_comp_data,20);
 
 
 [ drift_rows, drift_cols ] = size ( drift );
@@ -163,15 +241,15 @@ figure(3);				% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-plot(x,drift,'-',x,pv1,'-',x,pv2,'-');
+plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-',x,pv4,'-',x,pv5,'-',x,pv6,'-',x,pv7,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
 						% values of quadratic fit against x (pv2 = polyval_2nd_order)
 
-title('Drift, linear and quadratic fit');
+title('Drift, linear, quadratic and cubic fit');
 
 
-method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 'quadratic', 'none' );
+method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none' );
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
@@ -194,6 +272,41 @@ elseif ( method_drift_comp == 2 )
   fprintf('\nQuadratic drift compensation method chosen...\n');
 
   drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv2);
+
+elseif ( method_drift_comp == 3 )
+						% if the user chose cubic fit
+
+  fprintf('\nCubic drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv3);
+
+elseif ( method_drift_comp == 4 )
+						% if the user chose 4th order fit
+
+  fprintf('\n4th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv4);
+
+elseif ( method_drift_comp == 5 )
+						% if the user chose 5th order fit
+
+  fprintf('\n5th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv5);
+
+elseif ( method_drift_comp == 6 )
+						% if the user chose 6th order fit
+
+  fprintf('\n6th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv6);
+
+elseif ( method_drift_comp == 7 )
+						% if the user chose 7th order fit
+
+  fprintf('\n7th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv7);
 
 else						% if user chose to do no fit at all
 
