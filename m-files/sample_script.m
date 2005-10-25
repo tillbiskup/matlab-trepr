@@ -47,8 +47,6 @@ disp ( ' ' );
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
-disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
-
 [ program, prog_version ] = discriminate_matlab_octave;
 
 

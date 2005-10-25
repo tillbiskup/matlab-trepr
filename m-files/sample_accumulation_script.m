@@ -53,8 +53,6 @@ disp ( ' ' );
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
-disp ( 'Find out whether we are called by MATLAB(R) or GNU Octave...' );
-
 [ program, prog_version ] = discriminate_matlab_octave;
 
 
@@ -187,11 +185,11 @@ method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
+% figure;				% Opens up a new plot window.
+
 % Compensate drift along the time axis
 
 fprintf('\nCompensate B_0 drift along the t axis...\n')
-
-% figure;				% Opens up a new plot window.
 
 if ( method_drift_comp == 1 )
 						% if the user chose linear fit
@@ -291,6 +289,12 @@ if exit_condition > 1				% if the exit condition for the main while loop
 fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
+if ( (abs(field_params(2)-field_params(1)) == abs(old_field_params(2)-old_field_params(1))) & (abs(field_params(3)) == abs(old_field_params(3))) & (time_params == old_time_params) )
+								% in case that field width and field_step_width and the time_params
+								% of both spectra are equal
+								% the absolute values are necessary cause the spectra are recorded
+								% along increasing and decreasing B_0 field alternatively
+
   acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
   								% accumulate the measurements compensated until here
   
@@ -346,6 +350,11 @@ fprintf('\nAccumulate measurements...\n')
 
 end						% end of "if program" clause
 
+else						% of params ~= oldparams
+
+  fprintf('\nSize of the matrices do not match - so NOT accumulated\n')
+
+end						% end if params=oldparams clause
   
 end;						% end "if exit_condition" clause
 
@@ -360,8 +369,12 @@ if exit_answer == 1
   
   matrix1 = drift2_comp_data;
   						% save compensated data to matrix
+  old_field_params = field_params;
+  old_time_params = time_params;
+  						% save parameters for comparison with the next spectrum
   						
   clear data drift* filename method* offset* p1 p2 trigger_pos x;
+						% clear old variables that are not used any more
 
 elseif exit_answer == 2
 
