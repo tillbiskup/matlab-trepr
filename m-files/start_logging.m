@@ -88,4 +88,8 @@ function start_logging
   
   diary ( logfilename );	% start logging via the 'diary' function
 
+  % once again for the log file:
+  
+  fprintf ( '\n$RCSfile$, $Revision$, $Date$\n\n' );
+
 %******

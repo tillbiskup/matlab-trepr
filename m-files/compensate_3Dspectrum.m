@@ -41,16 +41,12 @@ start_logging;
 
 dateandtime = [datestr(now, 31), ' @ ', computer];
 
-disp ( dateandtime )	% print current date and time and system
- 
-disp ( ' ' );
-disp ( 'Sample script for testing the routines implemented' );
-disp ( 'to analyse trEPR data recorded with the program fsc2.' );
-disp ( ' ' );
-disp ( 'Version:        $Revision$ from $Date$' );
-disp ( 'Maintained by:  Till Biskup <till.biskup@physik.fu-berlin.de>' );
-disp ( '	        http://www.physik.fu-berlin.de/~biskup/auswertung' );
-disp ( ' ' );
+fprintf ( '\n%s\n', dateandtime )	% print current date and time and system
+
+fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
+
+fprintf('\nThis file is intended to be used to compensate single 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\nThe whole compensation process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
+fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
 
 
 % Find out whether we are called by MATLAB(R) or GNU Octave

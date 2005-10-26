@@ -377,7 +377,7 @@ function frequency = read_frequency_from_fsc2 ( string, substring )
       if ( position_of_G > 0 )
       							% if POSITION_OF_G is not empty
       
-        res = substr ( res, 1, position_of_G-1 )
+        res = substr ( res, 1, position_of_G-1 );
         							% res is overwritten with its substring, starting at the first
         							% position and ending at the position of the 'G' character
       
