@@ -77,10 +77,22 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   read = '%';					% variable 'read' set to '%' to initially
   								% match the while loop condition
   								
+  is_fsc2_file = 0;				% initialize variable with default value;
+  
   while index (read, '%' ) == 1	% while read line starts with '%'
   
     read = fgetl ( fid );			% linewise read of file
-
+    
+    
+    % check for the file whether it is an fsc2 file or not
+    % this is done by the criterium that in an original fsc2 file
+    % within the first three lines there is one line containing the string
+    % "#!/usr/local/bin/fsc2"
+ 	
+	is_fsc2_file = findstr ( read, '#!/usr/local/bin/fsc2' );
+	
+	% read parameters from the file
+	
 	parameter = read_parameter_from_fsc2 ( read, 'Start field' );
 								% calling internal function (see below) to check whether
 								% the desired parameter stands in the actual line
@@ -142,6 +154,14 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   end								% end of while loop
   
   close_file( fid );					% calling internal function (see below) to close the file
+
+  if ( length(is_fsc2_file) < 1 )
+    
+    fprintf('\nHmmm... does not look like an fsc2 file...\n')
+	error ( 'Aborting further execution...' );
+    
+    end
+
   
   % write parameters grouped to vectors as return values of the function
   field_params = [ start_field, end_field, field_step_width ];
@@ -341,6 +361,21 @@ function frequency = read_frequency_from_fsc2 ( string, substring )
         							% position and ending at the first position of whitespace character
         							
       end						% end if
+      
+      position_of_G = index ( res, 'G' );
+      							% If the string RES contains something as 'G' or 'GHz'
+      							% (at the end of the string)
+      							% than the starting position of this string
+      							% is written to POSITION_OF_G
+      
+      if ( position_of_G > 0 )
+      							% if POSITION_OF_G is not empty
+      
+        res = substr ( res, 1, position_of_G-1 )
+        							% res is overwritten with its substring, starting at the first
+        							% position and ending at the position of the 'G' character
+      
+      end
       
       res = ['9.', res];
  

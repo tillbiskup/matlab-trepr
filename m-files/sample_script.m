@@ -118,9 +118,15 @@ end
 
 cut_off = 0;				% set variable to default value that matches while condition
 
-while (cut_off < 3)
+original_data = data;
+original_field_params = field_params;
 
-  cut_off = menu ( 'Do you want to cut off time slices at beginning and/or end of the spectrum?', 'Yes, at the beginning', 'Yes, at the end', 'No' );
+while (cut_off ~= 3)
+
+  last_data = data;
+  last_field_params = field_params;
+
+  cut_off = menu ( 'Do you want to cut off time slices at beginning and/or end of the spectrum?', 'Yes, at the beginning', 'Yes, at the end', 'No', 'Undo last cut', 'Revert to original spectrum' );
 
   if ( cut_off == 1 )
 						% if the user chose to cut off the beginning
@@ -132,31 +138,10 @@ while (cut_off < 3)
     
     % Plot raw data with cut time slices
 
-    field_boundaries = [ field_params(1) field_params(2) ]
+    field_boundaries = [ field_params(1) field_params(2) ];
 
     [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
-
-	size(X)
-	size(Y)
-	size(data)
-
-    fprintf('\nPlot raw data...\n')
-
-    if program == 'Octave'
-    						% if we're called by GNU Octave (as determined above)
-
-	    gsplot ( data' );
-	    					% make simple 3D plot of the raw data
-
-    else					% otherwise we assume that we're called by MATLAB(R)
-
-	    mesh ( X', Y', data );
-						% make simple 3D plot of the raw data
-
-	    title('Raw data');
-
-    end
 
   elseif ( cut_off == 2 )
 						% if the user chose to cut off the end
@@ -167,29 +152,50 @@ while (cut_off < 3)
   
     % Plot raw data with cut time slices
 
-    field_boundaries = [ field_params(1) field_params(2) ]
+    field_boundaries = [ field_params(1) field_params(2) ];
 
     [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
 
-    fprintf('\nPlot raw data...\n')
+  elseif ( cut_off == 4 )
+						% if the user chose to undo the last cut off
+						
+	data = last_data;
+	field_params = last_field_params;
 
-    if program == 'Octave'
-    						% if we're called by GNU Octave (as determined above)
+    field_boundaries = [ field_params(1) field_params(2) ];
 
-	    gsplot ( data' );
-	    					% make simple 3D plot of the raw data
+    [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
 
-    else					% otherwise we assume that we're called by MATLAB(R)
+  elseif ( cut_off == 5 )
+						% if the user chose to revert to the original spectrum
+						
+	data = original_data;
+	data = original_field_params;
 
-	    mesh ( X', Y', data );
-						% make simple 3D plot of the raw data
+    field_boundaries = [ field_params(1) field_params(2) ];
 
-	    title('Raw data');
-
-    end
+    [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
 
   end					% if condition
+
+
+  if program == 'Octave'
+  						% if we're called by GNU Octave (as determined above)
+
+    gsplot ( data' );
+	    					% make simple 3D plot of the raw data
+
+  else					% otherwise we assume that we're called by MATLAB(R)
+
+    mesh ( X', Y', data );
+						% make simple 3D plot of the raw data
+
+    title('Raw data');
+
+  end
   
 end						% end while (cut_off < 3) loop
 
@@ -241,17 +247,67 @@ figure(3);				% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-',x,pv4,'-',x,pv5,'-',x,pv6,'-',x,pv7,'-');
+%plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-',x,pv4,'-',x,pv5,'-',x,pv6,'-',x,pv7,'-');
+plot(x,drift,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
 						% values of quadratic fit against x (pv2 = polyval_2nd_order)
 
-title('Drift, linear, quadratic and cubic fit');
+title('Drift and polynomic fit');
 
+exit_condition = 0;
 
-method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none' );
+while ( exit_condition == 0 )
+
+  method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none', 'Compensate with chosen method...');
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
+
+
+  if ( method_drift_comp == 1 )
+
+    plot(x,drift,'-',x,pv1,'-');
+
+  elseif ( method_drift_comp == 2 )
+
+    plot(x,drift,'-',x,pv2,'-');
+
+  elseif ( method_drift_comp == 3 )
+
+    plot(x,drift,'-',x,pv3,'-');
+
+  elseif ( method_drift_comp == 4 )
+
+    plot(x,drift,'-',x,pv4,'-');
+
+  elseif ( method_drift_comp == 5 )
+
+    plot(x,drift,'-',x,pv5,'-');
+
+  elseif ( method_drift_comp == 6 )
+
+    plot(x,drift,'-',x,pv6,'-');
+
+  elseif ( method_drift_comp == 7 )
+
+    plot(x,drift,'-',x,pv7,'-');
+
+  elseif ( method_drift_comp == 8 )
+
+    exit_condition = 1;
+
+  elseif ( method_drift_comp == 9 )
+
+    exit_condition = 1;
+    method_drift_comp = old_method;
+
+  end
+  
+  old_method = method_drift_comp;
+  						% to save the previously chosen drift compensation
+  						% method
+  
+end
 
 % Compensate drift along the time axis
 

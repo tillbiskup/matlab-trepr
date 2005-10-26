@@ -115,6 +115,11 @@ end
 
 % Plot raw data
 
+field_boundaries = [ field_params(1) field_params(2) ];
+
+[X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
+
 % fprintf('\nPlot raw data...\n')
 
 % if program == 'Octave'			% if we're called by GNU Octave (as determined above)
@@ -167,9 +172,9 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 fprintf('\nEvaluate drift and possible fits...\n')
 
-figure;				% Opens up a new plot window.
+figure(3);				% Opens up a new plot window.
 
-[drift,p1,pv1,p2,pv2,p3,pv3] = drift_evaluation (offset_comp_data,20);
+[drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (offset_comp_data,20);
 
 
 [ drift_rows, drift_cols ] = size ( drift );
@@ -178,8 +183,7 @@ figure;				% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-title('Drift, linear, quadratic and cubic fit');
-plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-');
+plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-',x,pv4,'-',x,pv5,'-',x,pv6,'-',x,pv7,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
 						% values of quadratic fit against x (pv2 = polyval_2nd_order)
@@ -187,15 +191,15 @@ plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-');
 title('Drift, linear, quadratic and cubic fit');
 
 
-method_drift_comp = menu ( 'Choose an option for drift compensation', 'linear', 'quadratic', 'cubic', 'none' );
+method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none' );
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
-
-% figure;				% Opens up a new plot window.
 
 % Compensate drift along the time axis
 
 fprintf('\nCompensate B_0 drift along the t axis...\n')
+
+figure(4);						% Opens up a new plot window.
 
 if ( method_drift_comp == 1 )
 						% if the user chose linear fit
@@ -212,11 +216,39 @@ elseif ( method_drift_comp == 2 )
   drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv2);
 
 elseif ( method_drift_comp == 3 )
-						% if the user chose quadratic fit
+						% if the user chose cubic fit
 
   fprintf('\nCubic drift compensation method chosen...\n');
 
   drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv3);
+
+elseif ( method_drift_comp == 4 )
+						% if the user chose 4th order fit
+
+  fprintf('\n4th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv4);
+
+elseif ( method_drift_comp == 5 )
+						% if the user chose 5th order fit
+
+  fprintf('\n5th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv5);
+
+elseif ( method_drift_comp == 6 )
+						% if the user chose 6th order fit
+
+  fprintf('\n6th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv6);
+
+elseif ( method_drift_comp == 7 )
+						% if the user chose 7th order fit
+
+  fprintf('\n7th order drift compensation method chosen...\n');
+
+  drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv7);
 
 else						% if user chose to do no fit at all
 
@@ -227,18 +259,18 @@ else						% if user chose to do no fit at all
 
 end
 
-%if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-%	gsplot ( drift_comp_data' );
+	gsplot ( drift_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
-%else								% otherwise we assume that we're called by MATLAB(R)
+else								% otherwise we assume that we're called by MATLAB(R)
 
-%	mesh ( drift_comp_data );
+	mesh ( X', Y', drift_comp_data );
 								% make simple 3D plot of the offset compensated data
-%	title('data with (quadratic) drift compensated');
+	title('data with (quadratic) drift compensated');
 
-%end
+end
 
 
 %fprintf('\n...press any key to continue...\n')
