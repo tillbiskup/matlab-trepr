@@ -89,7 +89,13 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
     % within the first three lines there is one line containing the string
     % "#!/usr/local/bin/fsc2"
  	
-	is_fsc2_file = findstr ( read, '#!/usr/local/bin/fsc2' );
+	fsc2_file_marker = findstr ( read, '#!/usr/local/bin/fsc2' );
+	
+	if ( length(fsc2_file_marker) > 0 )
+	
+	  is_fsc2_file = 1;
+	
+	end
 	
 	% read parameters from the file
 	
@@ -155,7 +161,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   
   close_file( fid );					% calling internal function (see below) to close the file
 
-  if ( length(is_fsc2_file) < 1 )
+  if ( is_fsc2_file == 0 )
     
     fprintf('\nHmmm... does not look like an fsc2 file...\n')
 	error ( 'Aborting further execution...' );

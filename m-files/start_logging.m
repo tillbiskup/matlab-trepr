@@ -34,7 +34,7 @@
 
 function start_logging
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\n$RCSfile$, $Revision$, $Date$\n\n' );
   
   diary ('off')				% in case that the diary function is already started, stop it.
 
