@@ -25,12 +25,11 @@
 tic;						% set starting point for calculation of used time, just for fun...
 
 % Just to tell the user what's going on...
+% This message is not logged, thus it will be repeated after the start of logging
 
 fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to compensate single 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\nThe whole compensation process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
-fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
-
 
 % First of all start logging
 
@@ -38,6 +37,7 @@ start_logging;
 
 
 % Then print some nice message
+% saying what the script is all about
 
 dateandtime = [datestr(now, 31), ' @ ', computer];
 
@@ -119,6 +119,10 @@ else						% otherwise we assume that we're called by MATLAB(R)
 	title('Raw data');
 
 end
+
+
+% Give user the possibility to cut off the spectrum at its start or end
+% by deleting a variable amount of time slices
 
 cut_off = 0;				% set variable to default value that matches while condition
 
@@ -397,27 +401,27 @@ pause;
 
 % Compensate drift along the B_0 axis
 
-fprintf('\nCompensate B_0 drift along the B_0 axis...\n')
+%fprintf('\nCompensate B_0 drift along the B_0 axis...\n')
 
-figure(5);						% Opens up a new plot window.
+%figure(5);						% Opens up a new plot window.
 
-drift2_comp_data = drift_compensation ( drift_comp_data, pv1, 20, 10);
+%drift2_comp_data = drift_compensation ( drift_comp_data, pv1, 20, 10);
 								% Make weighted drift compensation along the B_0 axis
 								% with linear (pv1) or quadratic (pv2) weights
 
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+%if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	gsplot ( drift2_comp_data' );
+%	gsplot ( drift2_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
-else								% otherwise we assume that we're called by MATLAB(R)
+%else								% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( X', Y', drift2_comp_data );
+%	mesh ( X', Y', drift2_comp_data );
 								% make simple 3D plot of the offset compensated data
-	title('data with drift compensated (weighted along B_0)');
+%	title('data with drift compensated (weighted along B_0)');
 
-end
+%end
 
 
 % Save last dataset to file

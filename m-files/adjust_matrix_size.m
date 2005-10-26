@@ -62,20 +62,20 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	
 	  fprintf( '\nPROBLEM: Matrices have no overlapping field boundaries!\nNo way to accumulate...\n' );
 	  
-	  error ();
+	  error ( '' );
 	  
 	elseif ( min(field_boundaries1) < min(field_boundaries2) )
 							% if field boundaries do overlap
 							% and matrix1 starts at lower B_0 field than matrix2
 	
-	  if ( field_params1(3) < field_params2(3) )
+	  if ( abs(field_params1(3)) < abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be bigger than that of matrix1
 	  						
 	  	fprintf( '\nPROBLEM: Field step width of second matrix is bigger than that of the first matrix...\n' );
 	  	
-	  	error ();			% for the moment get an error and abort further execution
+	  	error ( '' );			% for the moment get an error and abort further execution
 	  						
-	  elseif( field_params1(3) > field_params2(3) )
+	  elseif( abs(field_params1(3)) > abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be smaller than that of matrix1
 
 	  	fprintf( '\nPROBLEM: Field step width of first matrix is bigger than that of the second matrix...\n' );
@@ -98,7 +98,7 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  	
 	  	end					% end of filling new matrices
 	  	
-	  	new_field_params = [ min(field__boundaries2) lower_field_boundary field_params1(3) ];
+	  	new_field_params = [ min(field_boundaries2) lower_field_boundary field_params1(3) ];
 	  						% set new_field_params vector with field_params of new matrices
 	  						% the goal of the whole routine is to equalize these parameters
 	  						% that's why we need only one new_field_params vector
@@ -111,14 +111,14 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 							% and matrix1 starts at higher B_0 field than matrix2
 
 	
-	  if ( field_params1(3) < field_params2(3) )
+	  if ( abs(field_params1(3)) < abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be bigger than that of matrix1
 	  						
 	  	fprintf( '\nPROBLEM: Field step width of second matrix is bigger than that of the first matrix...\n' );
 	  	
 	  	error ();			% for the moment get an error and abort further execution
 	  						
-	  elseif( field_params1(3) > field_params2(3) )
+	  elseif( abs(field_params1(3)) > abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be smaller than that of matrix1
 
 	  	fprintf( '\nPROBLEM: Field step width of first matrix is bigger than that of the second matrix...\n' );
@@ -153,14 +153,14 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 							% and matrix1 starts at same B_0 field as matrix2
 
 	
-	  if ( field_params1(3) < field_params2(3) )
+	  if ( abs(field_params1(3)) < abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be bigger than that of matrix1
 	  						
 	  	fprintf( '\nPROBLEM: Field step width of second matrix is bigger than that of the first matrix...\n' );
 	  	
 	  	error ();			% for the moment get an error and abort further execution
 	  						
-	  elseif( field_params1(3) > field_params2(3) )
+	  elseif( abs(field_params1(3)) > abs(field_params2(3)) )
 	  						% for field_step_width of matrix2 be smaller than that of matrix1
 
 	  	fprintf( '\nPROBLEM: Field step width of first matrix is bigger than that of the second matrix...\n' );
@@ -183,7 +183,7 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  	  
 	  	end					% end of filling new matrices
 	  	
-	  	new_field_params = [ min(field__boundaries1) lower_field_boundary field_params1(3) ];
+	  	new_field_params = [ min(field_boundaries1) lower_field_boundary field_params1(3) ];
 	  						% set new_field_params vector with field_params of new matrices
 	  						% the goal of the whole routine is to equalize these parameters
 	  						% that's why we need only one new_field_params vector
