@@ -145,9 +145,6 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
 
-  size(drift2_comp_data)
-  size(matrix1)
-
   fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
@@ -185,8 +182,12 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 
 	outputfilename = [ filename, '.acc'];
 						% the output filename consists of the filename of the input file
-						% with appended extension ".out"
-	
+						% with appended extension ".acc"
+
+	graphicsoutputfilename = [ filename, '.eps'];
+						% the output filename consists of the filename of the input file
+						% with appended extension ".eps"
+
 	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
 
   end
@@ -206,7 +207,11 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 						% (silly MATLAB behaviour - to accept the Octave variant of
 						% calling but neither saving nor complaining all about...)
 
-  end						% end of "if program" clause
+%	saveas(gcf,graphicsoutputfilename,eps);
+						% save last graphics window content as eps file
+						% the handle 'gcf' refers to the actual graphics window
+
+  end					% end of "if program" clause
   
 end;						% end "if exit_main_loop" clause
 
