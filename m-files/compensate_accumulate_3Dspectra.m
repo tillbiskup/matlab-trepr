@@ -57,9 +57,9 @@ disp ( ' ' );
 [ program, prog_version ] = discriminate_matlab_octave;
 
 
-exit_condition = 1;				% set exit condition for while loop
+exit_main_loop = 1;				% set exit condition for while loop
 
-while exit_condition > 0			% main while loop
+while exit_main_loop > 0			% main while loop
 								% responsible for the possibility to accumulate
 								% more than one spectrum after compensation
 								% for pretrigger offset and drift
@@ -67,15 +67,6 @@ while exit_condition > 0			% main while loop
 % Next ask for a file name to read and if file name is valid, read data
 
 script_read_file;
-
-if exit_condition > 1
-						% That is, if the main while loop is passed more than once
-
-  [ data, matrix1, field_params ] = adjust_matrix_size ( data, field_params, time_params, matrix1, old_field_params, old_time_params );
-  						% Adjust sizes of matrices: matrix from former pass of loop
-  						% and matrix just read from the new fsc2 file
-
-end
 
 % Plot raw data
 
@@ -143,12 +134,21 @@ else								% otherwise we assume that we're called by MATLAB(R)
 
 end								% end of "if program" clause
 
-if exit_condition > 1				% if the exit condition for the main while loop
+
+
+if exit_main_loop > 1				% if the exit condition for the main while loop
 								% set at the beginning and increased at the end of every
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
 
-fprintf('\nAccumulate measurements...\n')
+  [ drift2_comp_data, matrix1, field_params ] = adjust_matrix_size ( drift2_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
+  						% Adjust sizes of matrices: matrix from former pass of loop
+  						% and matrix just read from the new fsc2 file
+
+  size(drift2_comp_data)
+  size(matrix1)
+
+  fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
   acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
@@ -208,7 +208,7 @@ fprintf('\nAccumulate measurements...\n')
 
   end						% end of "if program" clause
   
-end;						% end "if exit_condition" clause
+end;						% end "if exit_main_loop" clause
 
 
 exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
@@ -217,7 +217,7 @@ exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumula
 						
 if exit_answer == 1
 
-  exit_condition = exit_condition + 1
+  exit_main_loop = exit_main_loop + 1
   
   matrix1 = drift2_comp_data;
   						% save compensated data to matrix
@@ -225,12 +225,12 @@ if exit_answer == 1
   old_time_params = time_params;
   						% save parameters for comparison with the next spectrum
   						
-  clear data drift* filename method* offset* p1 p2 trigger_pos x;
+  clear data drift* filename method* offset* pv* trigger_pos X Y;
 						% clear old variables that are not used any more
 
 elseif exit_answer == 2
 
-  exit_condition = 0;
+  exit_main_loop = 0;
 
 end						% end of "if exit_answer" clause
 
