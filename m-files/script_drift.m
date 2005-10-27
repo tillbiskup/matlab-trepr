@@ -23,8 +23,6 @@
 
 fprintf('\nEvaluate drift and possible fits...\n')
 
-figure;					% Opens up a new plot window.
-
 [drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (offset_comp_data,20);
 
 
@@ -34,7 +32,8 @@ figure;					% Opens up a new plot window.
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-%plot(x,drift,'-',x,pv1,'-',x,pv2,'-',x,pv3,'-',x,pv4,'-',x,pv5,'-',x,pv6,'-',x,pv7,'-');
+figure;					% Opens up a new plot window.
+
 plot(x,drift,'-');
 						% plot drift against x
 						% values of linear fit against x (pv1 = polyval_1st_order)
@@ -86,8 +85,16 @@ while ( exit_condition == 0 )
   elseif ( method_drift_comp == 9 )
 
     exit_condition = 1;
-    method_drift_comp = old_method;
 
+    if exist ( 'old_method' )
+    						% if user chose this option instead od "none"
+    						% but hasn't chosen any other option the variable
+    						% 'old_method' does not exist...
+
+      method_drift_comp = old_method;
+      
+    end;
+    
   end
   
   old_method = method_drift_comp;

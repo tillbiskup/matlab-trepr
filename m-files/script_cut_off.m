@@ -20,6 +20,17 @@
 
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
+  
+% To be sure no signal is cut off
+% first print a B_0 spectrum
+
+[ spectrum, max_index ] = B0_spectrum ( data, 2 );
+ 
+x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+
+figure; 				
+ 				
+plot(x,spectrum','-',x,zeros(1,length(x)),'-');
 
 cut_off = 0;				% set variable to default value that matches while condition
 

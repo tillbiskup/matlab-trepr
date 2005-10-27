@@ -71,7 +71,7 @@ function data = pretrigger_offset ( input_data, trigger_pos )
   						% compute difference of mean values of single time slice and
   						% whole pretrigger signal
   						
-    data (i,:) = input_data (i,:) - difference;
+    data (i,:) = input_data (i,:) - ts_mean; %- difference;
     						% subtract difference from input data for each time slice
 
   end
