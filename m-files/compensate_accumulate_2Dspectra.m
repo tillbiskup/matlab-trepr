@@ -158,88 +158,36 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   plot(x,spectrum1','-',x,spectrum2','-',x,zeros(1,length(x)),'-')
 
 
-  pause;
+  % After plotting the overlay of both B_0 spectra
+  % ask the user whether he really wants to proceed with accumulation...
 
+  really_accumulate = menu( 'Do you really want to accumulate?', 'Yes, accumulate!', 'No, continue with old spectrum', 'No, continue with new spectrum' )
 
-  fprintf('\nAccumulate measurements...\n')
-								% Telling the user what's going to happen
+  if ( really_accumulate == 1 )
+  						% if the user still wants to accumulate
 
-  acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
-  								% accumulate the measurements compensated until here
+	fprintf('\nYou decided to accumulate both spectra.\n')
+
+    script_accumulate;
+    						% call part of the script that does the accumulation
+    
+  elseif ( really_accumulate == 2 )
+  						% if the user wants to abort accumulation and
+  						% wants to proceed with the old spectrum
+  						
+	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
+  	drift2_comp_data = matrix1;
+  						% set the old matrix to the actual matrix 
+  						
+  else
+  						% if the user wants to abort accumulation and
+  						% wants to proceed with the new spectrum 
+  						% just compensated
+  						
+	fprintf('\nYou decided not to accumulate\n and to continue with the just compensated spectrum.\n')
   
-  figure;						% opens new graphic window
-  
-  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
-
-	title('accumulated and compensated data');
-	gsplot ( acc_meas' );
-								% make simple 3D plot of the offset compensated data
-
-  else							% otherwise we assume that we're called by MATLAB(R)
-
-	mesh ( X', Y', acc_meas );
-								% make simple 3D plot of the offset compensated data
-	title('accumulated and compensated data');
-
   end
   
-  % Save accumulated measurements
-
-  user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with .acc appended): ', 's' );
-
-  if length( user_provided_filename ) > 0	
-						% If the user provided a filename
-
-	outputfilename = user_provided_filename;
-	
-	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
-  
-  else					% In case the user didn't provide a filename
-
-	outputfilename = [ filename, '.acc'];
-						% the output filename consists of the filename of the input file
-						% with appended extension ".acc"
-
-	graphicsoutputfilename = [ filename, '.eps'];
-						% the output filename consists of the filename of the input file
-						% with appended extension ".eps"
-
-	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
-
-  end
-
-  fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
-						% Telling the user what's going to happen
-
-  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
-
-	save ('-ascii', outputfilename, 'acc_meas');
-						% save data to ascii file
-
-  else					% otherwise we assume that we're called by MATLAB(R)
-
-	save (outputfilename, 'acc_meas', '-ascii');
-						% save data to ascii file in a MATLAB(R) compatible way
-						% (silly MATLAB behaviour - to accept the Octave variant of
-						% calling but neither saving nor complaining all about...)
-
-%	saveas(gcf,graphicsoutputfilename,eps);
-						% save last graphics window content as eps file
-						% the handle 'gcf' refers to the actual graphics window
-
-  end					% end of "if program" clause
-  
-
-  % print B_0 spectrum of accumulated data
-
-  figure;
-
-  [spectrum,max_x] = B0_spectrum(acc_meas,2);
- 
-  x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-  
-  plot(x,spectrum,'-',x,zeros(1,length(x)));
-
   
 else 					% if first pass of main loop
 
