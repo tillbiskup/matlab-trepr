@@ -35,7 +35,7 @@
 
 function [ drift, polyval_1st_order, polyval_2nd_order, polyval_3rd_order, polyval_4th_order, polyval_5th_order, polyval_6th_order, polyval_7th_order ] = drift_evaluation ( input_data, no_slices )
 
-  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   % First of all, check number of arguments
 

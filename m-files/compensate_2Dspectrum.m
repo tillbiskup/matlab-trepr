@@ -27,13 +27,13 @@ tic;						% set starting point for calculation of used time, just for fun...
 % Just to tell the user what's going on...
 % This message is not logged, thus it will be repeated after the start of logging
 
-fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
+fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to compensate single 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\nThe whole compensation process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
 
 % First of all start logging
 
-start_logging;
+logfilename = start_logging;
 
 
 % Then print some nice message
@@ -43,7 +43,7 @@ dateandtime = [datestr(now, 31), ' @ ', computer];
 
 fprintf ( '\n%s\n', dateandtime )	% print current date and time and system
 
-fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
+fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to compensate single 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\n');
 fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
@@ -99,15 +99,20 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 % Evaluate drift and possible fits
 
-fprintf('\nEvaluate drift and possible fits...\n')
+fprintf('\nEvaluate drift and possible fits...\n');
+fprintf('\nChoose between the display modes...\n');
 
-drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' )
+drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' );
 
 if ( drift_display == 1)
 
+  fprintf('\tShow drift and fit curve chosen\n');
+  
   script_drift;
 
 else
+
+  fprintf('\tShow B_0 spectrum at signal maximum chosen\n');
 
   script_drift_show_compensated;
 
@@ -167,15 +172,25 @@ drift2_comp_data = drift_comp_data;
   [spectrum,max_x] = B0_spectrum(drift2_comp_data,2);
  
   x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+
+  % to convert from G -> mT
+  x = x / 10000;
+
+  hold on;
+  
+  title(['1D Plot of the B_0 spectrum of the file ' strrep(get_file_basename(filename),'_','\_')]);
+  xlabel('B / mT');
+  ylabel('I');
   
   plot(x,spectrum,'-',x,zeros(1,length(x)));
 
-
+  hold off;
+  
 % Save last dataset to file
 
-outputfilename = [ filename, '.out'];
+outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' get_file_extension(filename) ];
 
-fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename);
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
@@ -190,6 +205,11 @@ else								% otherwise we assume that we're called by MATLAB(R)
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
 
+    fig_output_filename = [ get_file_path(filename) get_file_basename(filename) '-B0-plot.eps' ];
+	print('-depsc2', '-tiff', '-r300', fig_output_filename);
+
+	fprintf('\nThe last plot has been saved to the file\n\t%s\n', fig_output_filename);
+	
 end
 
 total_time_used = toc;
@@ -199,5 +219,32 @@ fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
 % At the very end stop logging...
 
 stop_logging;
+
+new_logfilename = [ get_file_path(filename) get_file_basename(filename) '.log' ];
+
+fprintf('\nFor clarity of the file names it is highly recommended to rename\nthe logfile to a name that matches the input file name,\n\n\t%s\n\n',filename);
+fprintf('\nThe suggested filename is\n\n\t%s\n\nPlease answer yes or no...\n',new_logfilename)
+
+rename_logfile = menu ('Do you want to rename the logfile?','Yes','No');
+
+if ( rename_logfile == 1)
+
+  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+    rename ( logfilename , new_logfilename );
+
+  else					% otherwise we assume that we're called by MATLAB(R)
+  
+    movefile ( logfilename , new_logfilename );
+  
+  end;
+
+  fprintf('\nLogfile renamed...\n\n');
+
+else
+
+  fprintf('\nLogfile not renamed...\n\n');
+
+end
 
 % end of script

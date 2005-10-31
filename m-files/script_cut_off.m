@@ -20,7 +20,9 @@
 
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
-  
+
+fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
+
 % To be sure no signal is cut off
 % first print a B_0 spectrum
 
@@ -88,7 +90,7 @@ while (cut_off ~= 3)
 						% if the user chose to revert to the original spectrum
 						
 	data = original_data;
-	data = original_field_params;
+	field_params = original_field_params;
 
     field_boundaries = [ field_params(1) field_params(2) ];
 
@@ -97,6 +99,11 @@ while (cut_off ~= 3)
 
   end					% if condition
 
+  if ( ( field_params == original_field_params ) )
+  
+    fprintf( '\nNo cut off of the spectrum made.\n' );
+  
+  end
 
   if program == 'Octave'
   						% if we're called by GNU Octave (as determined above)

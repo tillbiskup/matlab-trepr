@@ -26,8 +26,6 @@
 
 % Evaluate drift and possible fits
 
-fprintf('\nEvaluate drift and possible fits...\n')
-
 [drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (offset_comp_data,20);
 
 

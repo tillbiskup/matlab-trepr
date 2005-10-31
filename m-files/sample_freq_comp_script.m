@@ -38,6 +38,8 @@ fprintf('\nThe last versions of this file can be found at:\n\thttp://physik.fu-b
 
 script_read_file;
 
+filename_spectrum1 = filename;
+
 
 % Next compensate pretrigger offset
 
@@ -63,6 +65,7 @@ trigger_pos1 = time_params1(2);	% get trigger_pos out of time_params
 
 script_read_file;
 
+filename_spectrum2 = filename;
 
 % Next compensate pretrigger offset
 
@@ -110,7 +113,7 @@ ylabel('I');
 
 plot(x1,spectrum1','-',x2,spectrum2','-',x1,zeros(1,length(x1)),'-')
 
-legend( {'Spectrum 1','Spectrum 2'} )
+legend( { strrep(get_file_basename(filename_spectrum1),'_','\_') , strrep(get_file_basename(filename_spectrum2),'_','\_') } )
   
 hold off;
   

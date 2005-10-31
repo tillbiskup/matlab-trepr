@@ -21,18 +21,20 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	start_logging
+%	[ logfilename ] = start_logging
 %
 % DESCRIPTION
 %	This function is used to begin the logging of the further processing of a script file.
 %	Therefore it first asks for a filename and checks for the existence of the given file.
+%
+%	The return value logfilename is optional.
 %
 % SEE ALSO
 %	stop_logging
 %
 % SOURCE
 
-function start_logging
+function varargout = start_logging
   
   fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
 
@@ -87,6 +89,13 @@ function start_logging
   fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
   
   diary ( logfilename );	% start logging via the 'diary' function
+
+  if nargout > 0			% if called with more than zero output arguments
+  
+	varargout(1) = { logfilename };
+
+  end
+
 
   % once again for the log file:
 

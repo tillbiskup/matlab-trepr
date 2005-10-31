@@ -79,4 +79,21 @@ Funktionen wurden im vorliegenden Projekt für \matlab\ implementiert.
 
 \octave\ erlaubt in Skripten die Deklaration von Funktionen, \matlab\ hingegen nicht.
 
+
+\section{Interaktive Elemente}
+
+\octave\ erlaubt die Verwendung des Steuerzeichens ``$\backslash$n'' im Titel 
+des Befehls \cmd{menu} und interpretiert ihn entsprechend als Zeilenumbruch,
+\matlab\ dagegen nicht.
+
+
+\section{Grafik--Ausgabe}
+
+\begin{description}
+  \item[title] \octave\ interpretiert im String des Befehls \cmd{title} die für
+  \cmd{fprintf} üblichen ESCAPE--Sequenzen (u.a. ``$\backslash$n''), \matlab\
+  dagegen nicht. Hier wird ein mehrzeiliger Titel durch Übergabe eines \cmd{cell
+  arrays} aus mehreren Elementen erzeugt.
+\end{description}
+
 \end{document}
