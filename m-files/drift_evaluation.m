@@ -112,7 +112,7 @@ function [ drift, polyval_1st_order, polyval_2nd_order, polyval_3rd_order, polyv
   % do some statistics with the fit data
   
   fprintf('\nStatistics of the drift evaluation:\n');
-  fprintf('\n\t\tmean\t\tvar\t\tstd dev\n');
+  fprintf('\n\t\t\tmean\t\tvar\t\tstd dev\n');
   						% print table header for the following statistical data
   
   mean_drift = mean ( drift );
@@ -136,7 +136,7 @@ function [ drift, polyval_1st_order, polyval_2nd_order, polyval_3rd_order, polyv
   std_1st_order_fit = std ( first_order_fit );
 						% compute standard deviation of first order fit  
 
-  fprintf('1st order\t%i\t%i\t%i\n', mean_1st_order_fit, var_1st_order_fit, std_1st_order_fit);
+  fprintf('1st order fit\t%i\t%i\t%i\n', mean_1st_order_fit, var_1st_order_fit, std_1st_order_fit);
   						% print statistical data
 
   
