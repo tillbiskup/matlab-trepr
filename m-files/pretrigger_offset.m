@@ -31,7 +31,7 @@
 
 function data = pretrigger_offset ( input_data, trigger_pos )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   % First of all, check number of arguments
 

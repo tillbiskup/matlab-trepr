@@ -32,7 +32,7 @@
 
 function [ spectrum, max_index ] = B0_spectrum ( input_data, average_half_width )
 
-  fprintf ( '\n$RCSfile$, $Revision$, $Date$\n' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
   
   % evaluate the maximum of the 2D spectrum in two dimensions
   

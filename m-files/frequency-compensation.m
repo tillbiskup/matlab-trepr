@@ -32,7 +32,7 @@
 
 function data = frequency_compensation ( input_data, actual_frequency, target_frequency )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
   
   data = input_data * ( actual_frequency / target_frequency );
   

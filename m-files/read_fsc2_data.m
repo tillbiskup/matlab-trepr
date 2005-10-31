@@ -45,7 +45,7 @@
 
 function [ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   if nargin ~= 1			% Check number of input arguments.
   
@@ -106,7 +106,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 	if isnumeric(parameter) ~= 0	% the function "read_parameter_from_fsc2" returns "NaN" if
 								% the parameter is not found in the actual line
 								% Therefore check whether "parameter" is numeric
-	  start_field = parameter		% and in this case set the variable
+	  start_field = parameter;	% and in this case set the variable
 	  
 	end
 
@@ -114,47 +114,47 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
 	parameter = read_parameter_from_fsc2 ( read, 'End field' );
 	if isnumeric(parameter) ~= 0
-	  end_field = parameter
+	  end_field = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Field step width' );
 	if isnumeric(parameter) ~= 0
-	  field_step_width = parameter
+	  field_step_width = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Sensitivity' );
 	if isnumeric(parameter) ~= 0
-	  sensitivity = parameter
+	  sensitivity = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Number of averages' );
 	if isnumeric(parameter) ~= 0
-	  averages = parameter
+	  averages = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Time base' );
 	if isnumeric(parameter) ~= 0
-	  time_base = parameter
+	  time_base = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Number of points' );
 	if isnumeric(parameter) ~= 0
-	  no_points = parameter
+	  no_points = parameter;
 	end
 
 	parameter = read_parameter_from_fsc2 ( read, 'Trigger position' );
 	if isnumeric(parameter) ~= 0
-	  trigger_pos = parameter
+	  trigger_pos = parameter;
 	end
 	
 	parameter = read_parameter_from_fsc2 ( read, 'Slice length' );
 	if isnumeric(parameter) ~= 0
-	  slice_length = parameter
+	  slice_length = parameter;
 	end
 	
 	parameter = read_frequency_from_fsc2 ( read, '9' );
 	if isnumeric(parameter) ~= 0
-	  frequency = parameter
+	  frequency = parameter;
 	end
 	
   end								% end of while loop
@@ -166,7 +166,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
     fprintf('\nHmmm... does not look like an fsc2 file...\n')
 	error ( 'Aborting further execution...' );
     
-    end
+  end
 
   
   % write parameters grouped to vectors as return values of the function
@@ -174,10 +174,20 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   scope_params = [ sensitivity, time_base, averages ];
   time_params  = [ no_points, trigger_pos, slice_length ];
   
+  % print table with parameters to output
+  
+  fprintf('\nParameters of the file just read:\n')
+  fprintf('\nmagnetic field parameters:\n');
+  fprintf('field start:\t\t%i G\nfield stop:\t\t%i G\nfield step width:\t%2.2f G\n', field_params);
+  fprintf('\nscope parameters:\n');
+  fprintf('sensitivity:\t\t%i e-06 s\ntime base: \t\t%i e-06 s\naverages: \t\t%i\n', scope_params);
+  fprintf('\ntime parameters:\n');
+  fprintf('No of points:\t\t%i\ntrigger position:\t%i\nslice length:\t\t%i\n', time_params);
+  fprintf('\nfrequency:\t\t%1.5f GHz\n', frequency);
   
   % calculations for the dimension of the 2D-matrix for finally storing the data
   
-  field_width = (end_field - start_field) / field_step_width
+  field_width = (end_field - start_field) / field_step_width;
   									% the field width is calculated by the difference between
   									% upper and lower field boundaries divided through the
   									% step width between two adjacent recorded time traces.

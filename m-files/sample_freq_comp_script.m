@@ -219,12 +219,10 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
 
 
   fprintf('\nSpectrum 1 and spectrum 2 are cut to fit to each other.\n');
-  fprintf('\tNew dimensions of spectrum 1: %i rows, %i cols.\n', size(drift_comp_data1));
-  fprintf('\tNew dimensions of spectrum 2: %i rows, %i cols.\n', size(drift_comp_data2));
+  fprintf('\tNew dimensions of both spectra: %i rows, %i cols.\n', size(drift_comp_data1));
 
-  fprintf('\nNew field parameter for both spectra:.\n');
-  fprintf('\tNew field borders of spectrum 1: %i G -  %i G\n\t\t field step width: %i G\n', field_params1);
-  fprintf('\tNew field borders of spectrum 2: %i G -  %i G\n\t\t field step width: %i G\n', field_params2);
+  fprintf('\n\tNew field parameter for both spectra:.\n');
+  fprintf('\t\tfield borders:\t\t%4.2f G - %4.2f G\n\t\tfield step width:\t%2.2f G\n', field_params1);
 
 end;					% end if offset1 or offset 2 ~= 0
 
@@ -256,6 +254,8 @@ legend( {'Spectrum 1','Spectrum 2'} )
   
 hold off;
   
+% At the very end stop logging
 
+stop_logging;
 
 % end of script

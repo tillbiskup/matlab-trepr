@@ -34,7 +34,7 @@
 
 function stop_logging
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
   
   diary ( 'off' );		% logging via the diary function stopped
 

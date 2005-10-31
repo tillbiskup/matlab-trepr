@@ -41,7 +41,7 @@
 
 function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, no_ts, drift )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   % First of all, check number of arguments
 

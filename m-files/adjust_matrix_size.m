@@ -32,7 +32,7 @@
 
 function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
   
   if ( (abs(field_params1(2)-field_params1(1)) == abs(field_params2(2)-field_params2(1))) & (abs(field_params1(3)) == abs(field_params2(3))) & (time_params1 == time_params2) )
 							% in case that field width and field_step_width and the time_params

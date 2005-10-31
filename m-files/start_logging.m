@@ -34,7 +34,7 @@
 
 function start_logging
 
-  fprintf ( '\n$RCSfile$, $Revision$, $Date$\n\n' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
   
   diary ('off')				% in case that the diary function is already started, stop it.
 
@@ -42,7 +42,7 @@ function start_logging
   
   while (proceed == 0)		% while proceed is set to zero
   
-    logfilename = input ( 'Please enter a filename for the log file (if empty, default will be used): ', 's' );
+    logfilename = input ( 'Please enter a filename for the log file (if empty, default will be used):\n   ', 's' );
     							% prompt the user for a filename for the log file
 
     if length( logfilename ) > 0	

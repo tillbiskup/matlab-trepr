@@ -34,7 +34,7 @@
 
 function [ data, field_params ] = cut_off_time_slices ( input_data, no_first_time_slices, no_last_time_slices, input_field_params )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
   
   [ ts, bs ] = size(input_data);
   						% determine size of input matrix

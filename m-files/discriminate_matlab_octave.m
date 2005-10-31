@@ -33,7 +33,7 @@
 
 function [ program, prog_version ] = discriminate_matlab_octave
 
-	disp ( '$RCSfile$, $Revision$, $Date$' );
+	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
 	program = '';					% initially set variable to a default value.
 

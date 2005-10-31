@@ -28,7 +28,7 @@ while (exist(filename) == 0)		% while there is no valid filename specified
 								% This would be better done with a do...until loop
 								% but silly MATLAB(R) doesn't support this...
 
-  filename = input ( 'Please enter a filename of a fsc2 data file: ', 's' );
+  filename = input ( '\nPlease enter a filename of a fsc2 data file:\n   ', 's' );
 
   if (length( filename ) > 0)		% If the user provided a filename
 
@@ -56,7 +56,7 @@ while (exist(filename) == 0)		% while there is no valid filename specified
 end		% end of while exist(filename) loop
 
 
-fprintf ( '\nFile %s will be read...\n\n', filename );
+fprintf ( '\nFile\n\t%s\nwill be read...\n\n', filename );
   
 [ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename );
   								% open the file and read the data
