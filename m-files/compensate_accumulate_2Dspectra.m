@@ -42,11 +42,11 @@ dateandtime = [datestr(now, 31), ' @ ', computer];
 
 disp ( dateandtime )	% print current date and time and system
 
-fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
+fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to compensate and accumulate 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\n');
 fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
-
+fprintf('\nThe last versions of this file can be found at:\n\thttp://physik.fu-berlin.de/~biskup/\n');
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 

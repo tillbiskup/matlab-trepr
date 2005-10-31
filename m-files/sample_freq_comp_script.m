@@ -12,12 +12,20 @@
 %	This file is a sample main script to test the frequency_compensation routine.
 %
 
-disp ( 'Sample script for testing the frequency compensation routine' );
+fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
+fprintf('\nThis file is intended to be used to test the frequency compensation of spectra\nrecorded with the fsc2 software.\nTherefore the user is first asked for a logfile file name...\n');
 
 
 % First of all start logging
 
 start_logging;
+
+
+fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
+
+fprintf('\nThis file is intended to be used to test the frequency compensation of spectra\nrecorded with the fsc2 software.\nTherefore the user is asked for two input file names of fsc2 files.\nThese both spectra are drift compensated and afterwards plotted together\nfor manual frequency compensation.\n');
+fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
+fprintf('\nThe last versions of this file can be found at:\n\thttp://physik.fu-berlin.de/~biskup/\n');
 
 
 

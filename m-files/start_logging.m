@@ -33,9 +33,9 @@
 % SOURCE
 
 function start_logging
-
-  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
   
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
+
   diary ('off')				% in case that the diary function is already started, stop it.
 
   proceed = 0;				% set variable for while condition to default value
@@ -89,7 +89,7 @@ function start_logging
   diary ( logfilename );	% start logging via the 'diary' function
 
   % once again for the log file:
-  
-  fprintf ( '\n$RCSfile$, $Revision$, $Date$\n\n' );
+
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
 
 %******
