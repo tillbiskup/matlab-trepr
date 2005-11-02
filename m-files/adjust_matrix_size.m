@@ -47,7 +47,7 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	
   else						% if matrices differ in some way
   							% do the real work...
-  							
+
   	field_width1 = abs( field_params1(2) - field_params1(1) );
   	field_width2 = abs( field_params2(2) - field_params2(1) );
   							% calculate field width from field_params
@@ -88,11 +88,11 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	    lower_field_boundary = min( [ max(field_boundaries1) max(field_boundaries2) ] );
 	    						% gives the lower upper field boundary of both matrices
 	  	
-	  	for i = 1 : (( lower_field_boundary - min(field_boundaries2)*2))
+	  	for i = 1 : (( lower_field_boundary - min(field_boundaries2))/field_params(3))
 	  						% for i running from 1 to the upper boundary of the matrix
 	  						% with lower upper field boundary
 	  	
-	  	  new_matrix1 ( i , : ) = matrix1 ( i+((min(field_boundaries2)-min(field_boundaries1))*2) , : );
+	  	  new_matrix1 ( i , : ) = matrix1 ( i+((min(field_boundaries2)-min(field_boundaries1))/field_params(3)) , : );
 	  	  
 	  	  new_matrix2 ( i , : ) = matrix2 ( i , : );
 	  	
@@ -103,7 +103,7 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  						% the goal of the whole routine is to equalize these parameters
 	  						% that's why we need only one new_field_params vector
 	  						% the same is true in principal for the time_params vector (see below)
-	  
+
 	  end
 
 	elseif ( min(field_boundaries1) > min(field_boundaries2) )
@@ -131,13 +131,13 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	    lower_field_boundary = min( [ max(field_boundaries1) max(field_boundaries2) ] );
 	    						% gives the lower upper field boundary of both matrices
 	  	
-	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))*2)
+	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))/field_params(3))
 	  						% for i running from 1 to the upper boundary of the matrix
 	  						% with lower upper field boundary
 	  	
 	  	  new_matrix1 ( i , : ) = matrix1 ( i , : );
 	  	
-	  	  new_matrix2 ( i , : ) = matrix2 ( i+((min(field_boundaries1)-min(field_boundaries2))*2)-1 , : );
+	  	  new_matrix2 ( i , : ) = matrix2 ( i+((min(field_boundaries1)-min(field_boundaries2))/field_params(3))-1 , : );
 	  	  
 	  	end					% end of filling new matrices
 	  	
@@ -173,7 +173,7 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	    lower_field_boundary = min( [ max(field_boundaries1) max(field_boundaries2) ] );
 	    						% gives the lower upper field boundary of both matrices
 	  	
-	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))*2)
+	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))/field_params(3))
 	  						% for i running from 1 to the upper boundary of the matrix
 	  						% with lower upper field boundary
 	  	
@@ -205,6 +205,9 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  % do some correction...
 	
 	end						% end of comparison of time_params
+
+	size(new_matrix1);
+	size(new_matrix2);
   
   end
   

@@ -99,7 +99,7 @@
 
   [spectrum,max_x] = B0_spectrum(acc_meas,2);
  
-  x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+  x = [ min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]) ];
   
   plot(x,spectrum,'-',x,zeros(1,length(x)));
 

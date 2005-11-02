@@ -178,7 +178,7 @@ drift2_comp_data = drift_comp_data;
 
   hold on;
   
-  title(['1D Plot of the B_0 spectrum of the file ' strrep(get_file_basename(filename),'_','\_')]);
+  title(['B_0 spectrum of the file ' strrep(get_file_basename(filename),'_','\_')]);
   xlabel('B / mT');
   ylabel('I');
   

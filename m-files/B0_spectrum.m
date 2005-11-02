@@ -21,40 +21,48 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	[ SPECTRUM, MAX_INDEX ] = B0_spectrum ( INPUT_DATA, AVERAGE_HALF_WIDTH )
+%	[ SPECTRUM, MAX_INDEX ] = B0_spectrum ( INPUT_DATA, AVERAGE_HALF_WIDTH, ... )
 %
 % DESCRIPTION
 %	This function takes a full 2D spectrum INPUT_DATA, evaluates the maximum in both dimensions and
 %	returns a B_0 spectrum SPECTRUM at the point MAX_INDEX where the signal amplitude is maximal in t.
 %	This spectrum is averaged over (2 * AVERAGE_HALF_WIDTH + 1) time slices to minimize the noise.
 %
+%	If a third parameter is provided at the function call it is used as user-provided t for computing
+%	the B_0 spectrum around.
+%
 % SOURCE
 
-function [ spectrum, max_index ] = B0_spectrum ( input_data, average_half_width )
+function [ spectrum, max_index ] = B0_spectrum ( input_data, average_half_width, varargin )
 
   fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
   
-  % evaluate the maximum of the 2D spectrum in two dimensions
+  if ( nargin == 2 )			% if the function is called with two parameters
+
+    % evaluate the maximum of the 2D spectrum in two dimensions
   
-  % From the MATLAB documentation:
-  % For matrices, MAX(X) is a row vector containing the maximum element
-  % from each column.
-  % [Y,I] = MAX(X) returns the indices of the maximum values in vector I.
-  % If the values along the first non-singleton dimension contain more
-  % than one maximal element, the index of the first one is returned.
-  % If there are several identical maximum values, the index of the first
-  % one found is returned.
+    % From the MATLAB documentation:
+    % For matrices, MAX(X) is a row vector containing the maximum element
+    % from each column.
+    % [Y,I] = MAX(X) returns the indices of the maximum values in vector I.
+    % If the values along the first non-singleton dimension contain more
+    % than one maximal element, the index of the first one is returned.
+    % If there are several identical maximum values, the index of the first
+    % one found is returned.
   
-  [ max_values, max_index ] = max( max( input_data ));
+    [ max_values, max_index ] = max( max( input_data ));
   
-  spectrum = mean( input_data( : , max_index-average_half_width : max_index+average_half_width )' );
+    spectrum = mean( input_data( : , max_index-average_half_width : max_index+average_half_width )' );
   
+  elseif ( nargin == 3 )	% if the function is called with three parameters
+
+    t = varargin {1};
+    
+    spectrum = mean( input_data( : , t-average_half_width : t+average_half_width )' );
+    
+  end					% end if
+
   
-  % Just for test purposes: plot the B_0 spectrum
-  
-  % x = [ 1 : 1 : size( input_data( :, max_index )) ];
-  
-  % plot(x,spectrum','-',x,zeros(1,length(x)),'-')
 
 
 %******

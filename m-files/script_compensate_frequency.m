@@ -49,7 +49,7 @@ while ( exit_freq_comp == 0 )
   clf;
   hold on;
 
-  title('1D Plot of both B_0 spectra for frequency alignment')
+  title('Both B_0 spectra for frequency alignment')
   xlabel('B / mT');
   ylabel('I');
 
