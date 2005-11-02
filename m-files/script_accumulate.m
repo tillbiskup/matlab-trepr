@@ -24,7 +24,7 @@
   fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
-  acc_meas = accumulate_measurements ( drift2_comp_data, matrix1 );
+  acc_meas = accumulate_measurements ( drift_comp_data, matrix1 );
   								% accumulate the measurements compensated until here
   
   figure;						% opens new graphic window
@@ -56,19 +56,22 @@
   
   else					% In case the user didn't provide a filename
 
-	outputfilename = [ filename, '.acc'];
-						% the output filename consists of the filename of the input file
-						% with appended extension ".acc"
 
-	graphicsoutputfilename = [ filename, '.eps'];
-						% the output filename consists of the filename of the input file
-						% with appended extension ".eps"
+	outputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc.' get_file_extension(filename) ];
+						% the output filename consists of the path of the input file,
+						% the basename of the input file with appended '-acc'
+						% and the extension of the input file (normally '.dat')
 
-	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
+	graphicsoutputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc.eps' ];
+						% the output filename consists of the path of the input file,
+						% the basename of the input file with appended '-acc'
+						% and the extension '.eps'
+
+	fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
 
   end
 
-  fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+  fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 						% Telling the user what's going to happen
 
   if program == 'Octave'	% if we're called by GNU Octave (as determined above)

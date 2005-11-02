@@ -33,8 +33,20 @@
 
 function file_basename = get_file_basename ( filename )
 
+  if ( ( length(findstr(filename,'/')) > 0 ) )
+  						% in the case that a '/' contained in the string 'filename'
+
 	file_basename = filename ((max(findstr(filename,'/'))+1) : (max(findstr(filename,'.'))-1));
 						% get base filename (without extension) from read filename
 	
+  else
+  
+	file_basename = filename ( 1 : (max(findstr(filename,'.'))-1));
+						% get base filename (without extension) from read filename
+						% suggesting that the file_basename starts at position 1 of
+						% the string 'filename'
+
+  end
+
 
 %*******

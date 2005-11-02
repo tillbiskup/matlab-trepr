@@ -174,7 +174,7 @@ drift2_comp_data = drift_comp_data;
   x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 
   % to convert from G -> mT
-  x = x / 10000;
+  x = x / 10;
 
   hold on;
   
@@ -182,13 +182,16 @@ drift2_comp_data = drift_comp_data;
   xlabel('B / mT');
   ylabel('I');
   
-  plot(x,spectrum,'-',x,zeros(1,length(x)));
+  plot(x,spectrum,x,zeros(1,length(x)));
 
   hold off;
   
 % Save last dataset to file
 
 outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' get_file_extension(filename) ];
+								% the output filename consists of the path of the input file,
+								% the basename of the input file with appended '-comp'
+								% and the extension of the input file (normally '.dat')
 
 fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename);
 
@@ -222,29 +225,35 @@ stop_logging;
 
 new_logfilename = [ get_file_path(filename) get_file_basename(filename) '.log' ];
 
-fprintf('\nFor clarity of the file names it is highly recommended to rename\nthe logfile to a name that matches the input file name,\n\n\t%s\n\n',filename);
-fprintf('\nThe suggested filename is\n\n\t%s\n\nPlease answer yes or no...\n',new_logfilename)
+if ( strcmp(new_logfilename, logfilename) > 0 )
+						% if the current logfile name and the suggested logfile name 
+						% are not identical
 
-rename_logfile = menu ('Do you want to rename the logfile?','Yes','No');
+  fprintf('\nFor clarity of the file names it is highly recommended to rename\nthe logfile to a name that matches the input file name,\n\n\t%s\n\n',filename);
+  fprintf('\nThe suggested filename is\n\n\t%s\n\nPlease answer yes or no...\n',new_logfilename)
 
-if ( rename_logfile == 1)
+  rename_logfile = menu ('Do you want to rename the logfile?','Yes','No');
 
-  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+  if ( rename_logfile == 1)
 
-    rename ( logfilename , new_logfilename );
+    if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-  else					% otherwise we assume that we're called by MATLAB(R)
+      rename ( logfilename , new_logfilename );
+
+    else					% otherwise we assume that we're called by MATLAB(R)
   
-    movefile ( logfilename , new_logfilename );
+      movefile ( logfilename , new_logfilename );
   
-  end;
+    end;
 
-  fprintf('\nLogfile renamed...\n\n');
+    fprintf('\nLogfile renamed...\n\n');
 
-else
+  else
 
-  fprintf('\nLogfile not renamed...\n\n');
+    fprintf('\nLogfile not renamed...\n\n');
 
+  end
+  
 end
 
 % end of script

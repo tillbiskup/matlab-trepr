@@ -27,6 +27,8 @@ fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 % first print a B_0 spectrum
 
 [ spectrum, max_index ] = B0_spectrum ( data, 2 );
+
+fprintf( '\nIndex of maximum value: %i\n', max_index );
  
 x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 

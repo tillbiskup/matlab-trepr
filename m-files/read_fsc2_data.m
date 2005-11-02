@@ -49,14 +49,14 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
   if nargin ~= 1			% Check number of input arguments.
   
-	error();				% get error if function is called with other than
+	error('');			% get error if function is called with other than
   						% one input parameter
   end
 
   if nargout ~= 5		% Check number of output arguments.
   
   	fprintf('\nWARNING: Function called with too less return values. Possibly errors might occur.\n')
-	warning();			% get error if function is called with other than
+	warning('');			% get error if function is called with other than
   						% two output parameters
   end
 

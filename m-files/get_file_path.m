@@ -33,8 +33,20 @@
 
 function file_path = get_file_path ( filename )
 
-		file_path = filename (1 : (max(findstr(filename,'/'))));
+
+  if ( ( length(findstr(filename,'/')) > 0 ) )
+  						% in the case that a '/' contained in the string 'filename'
+
+	file_path = filename (1 : (max(findstr(filename,'/'))));
 						% get file path (with ending slash) from read filename
+	
+  else
+  
+	file_path = ''
+						% set the file_path variable to the empty string
+
+  end
+
 	
 
 %*******

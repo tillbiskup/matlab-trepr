@@ -43,8 +43,8 @@ while ( exit_freq_comp == 0 )
 
   % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
 
-  x1 = x1 / 10000;
-  x2 = x2 / 10000;
+  x1 = x1 / 10;
+  x2 = x2 / 10;
   
   clf;
   hold on;

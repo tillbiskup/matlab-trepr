@@ -118,7 +118,7 @@ function data = drift_compensation_along_t ( input_data, trigger_pos, stable_t, 
     
   else					% this is only the case if t_1 equals trigger_pos
   
-    slope_of_weights = 0;
+    slope_of_weights = 1;
   
   end
   

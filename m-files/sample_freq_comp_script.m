@@ -102,8 +102,8 @@ x2 = [ min([field_params2(1) field_params2(2)]) : 0.5 : max([field_params2(1) fi
 
 % to convert from G -> mT
 
-x1 = x1 / 10000;
-x2 = x2 / 10000;
+x1 = x1 / 10;
+x2 = x2 / 10;
 
 hold on;
   

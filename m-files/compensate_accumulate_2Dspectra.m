@@ -102,28 +102,44 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 % Evaluate drift and possible fits
 
-script_drift;
+fprintf('\nEvaluate drift and possible fits...\n');
+fprintf('\nChoose between the display modes...\n');
 
-drift2_comp_data = drift_comp_data;
+drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' );
+
+if ( drift_display == 1)
+
+  fprintf('\tShow drift and fit curve chosen\n');
+  
+  script_drift;
+
+else
+
+  fprintf('\tShow B_0 spectrum at signal maximum chosen\n');
+
+  script_drift_show_compensated;
+
+end
 
 
 % Save last dataset to file
 
-outputfilename = [ filename, '.out'];
-								% the output filename consists of the filename of the input file
-								% with appended extension ".out"
+outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' get_file_extension(filename) ];
+								% the output filename consists of the path of the input file,
+								% the basename of the input file with appended '-comp'
+								% and the extension of the input file (normally '.dat')
 
 fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
 								% Telling the user what's going to happen
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	save ('-ascii', outputfilename, 'drift2_comp_data');
+	save ('-ascii', outputfilename, 'drift_comp_data');
 								% save data to ascii file
 
 else								% otherwise we assume that we're called by MATLAB(R)
 
-	save (outputfilename, 'drift2_comp_data', '-ascii');
+	save (outputfilename, 'drift_comp_data', '-ascii');
 								% save data to ascii file in a MATLAB(R) compatible way
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
@@ -138,30 +154,28 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% while loop is passed for more than one time til here)
   
 
-  [ drift2_comp_data, matrix1, field_params ] = adjust_matrix_size ( drift2_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
+  [ drift_comp_data, matrix1, field_params ] = adjust_matrix_size ( drift_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
 
 
+  % frequency compensation
 
-  fprintf('\nPrinting B_0 spectra for frequency compensation...\n')
-								% Telling the user what's going to happen
-								
-  [ spectrum1, max_index1 ] = B0_spectrum ( matrix1, 2 );
-  
-  [ spectrum2, max_index2 ] = B0_spectrum ( drift2_comp_data, 2 );
-  
-  figure;						% opens new graphic window
-  
-  x = [ 1 : 1 : size( matrix1( :, max_index1 )) ];
-  
-  plot(x,spectrum1','-',x,spectrum2','-',x,zeros(1,length(x)),'-')
+  drift_comp_data1 = drift_comp_data;
+  drift_comp_data2 = matrix1;
+  								% set the matrices according to the necessary settings for the
+  								% script file script_compensate_frequency.m
+  field_params1 = field_params;
+  field_params2 = old_field_params;
+  								
+  script_compensate_frequency;
+
 
 
   % After plotting the overlay of both B_0 spectra
   % ask the user whether he really wants to proceed with accumulation...
 
-  really_accumulate = menu( 'Do you really want to accumulate?', 'Yes, accumulate!', 'No, continue with old spectrum', 'No, continue with new spectrum' )
+  really_accumulate = menu( 'Do you really want to accumulate?', 'Yes, accumulate!', 'No, continue with old spectrum', 'No, continue with new spectrum' );
 
   if ( really_accumulate == 1 )
   						% if the user still wants to accumulate
@@ -176,7 +190,7 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						% wants to proceed with the old spectrum
   						
 	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
-  	drift2_comp_data = matrix1;
+  	drift_comp_data = matrix1;
   						% set the old matrix to the actual matrix 
   						
   else
@@ -198,12 +212,12 @@ else 					% if first pass of main loop
   if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
 	title('accumulated and compensated data');
-	gsplot ( drift2_comp_data' );
+	gsplot ( drift_comp_data' );
 								% make simple 3D plot of the offset compensated data
 
   else							% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( X', Y', drift2_comp_data );
+	mesh ( X', Y', drift_comp_data );
 								% make simple 3D plot of the offset compensated data
 	title('accumulated and compensated data');
 
@@ -213,11 +227,14 @@ else 					% if first pass of main loop
 
   figure;
 
-  [spectrum,max_x] = B0_spectrum(drift2_comp_data,2);
+  [spectrum,max_x] = B0_spectrum(drift_comp_data,2);
  
   x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
   
-  plot(x,spectrum,'-',x,zeros(1,length(x)));
+  % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
+  x = x / 10;  
+  
+  plot(x,spectrum,x,zeros(1,length(x)));
 
 
 end;						% end "if exit_main_loop" clause
@@ -231,7 +248,7 @@ if exit_answer == 1
 
   exit_main_loop = exit_main_loop + 1
   
-  matrix1 = drift2_comp_data;
+  matrix1 = drift_comp_data;
   						% save compensated data to matrix
   old_field_params = field_params;
   old_time_params = time_params;
