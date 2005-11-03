@@ -129,7 +129,6 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
 
   [ r1, c1 ] = size ( drift_comp_data1 );
   [ r2, c2 ] = size ( drift_comp_data2 );
-
   
   drift_comp_data1 = drift_comp_data1( 1+abs(startcut1-endcut2) : r1-abs(endcut1-startcut2) , : );
 
@@ -141,7 +140,7 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   else
   						% if spectrum recorded from high to low field
 
-    field_params1 = [ field_params1(1)-(abs(endcut1-startcut2)*field_params1(3)), field_params1(2)+(abs(startcut1-endcut2)*field_params1(3)), field_params1(3) ];
+    field_params1 = [ field_params1(1)-(abs(endcut1-startcut2)*field_params1(3)), field_params1(2)+(abs(startcut1-endcut2)*abs(field_params1(3))), field_params1(3) ];
 
   end;
 
@@ -156,10 +155,11 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   else
   						% if spectrum recorded from high to low field
 
-    field_params2 = [ field_params2(1)-(abs(startcut2-endcut1)*field_params2(3)), field_params2(2)+(abs(endcut2-startcut1)*field_params2(3)), field_params2(3) ];
+    field_params2 = [ field_params2(1)-(abs(startcut2-endcut1)*field_params2(3)), field_params2(2)+(abs(endcut2-startcut1)*abs(field_params2(3))), field_params2(3) ];
 
   end;
 
+  field_params = field_params1;
 
   fprintf('\nSpectrum 1 and spectrum 2 are cut to fit to each other.\n');
   fprintf('\tNew dimensions of both spectra: %i rows, %i cols.\n', size(drift_comp_data1));

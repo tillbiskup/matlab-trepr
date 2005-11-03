@@ -129,7 +129,7 @@ outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' 
 								% the basename of the input file with appended '-comp'
 								% and the extension of the input file (normally '.dat')
 
-fprintf('\nSaving ASCII data to the file %s...\n', outputfilename)
+fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 								% Telling the user what's going to happen
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
@@ -152,12 +152,10 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% set at the beginning and increased at the end of every
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
-  
 
   [ drift_comp_data, matrix1, field_params ] = adjust_matrix_size ( drift_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
-
 
   % frequency compensation
 
@@ -207,18 +205,21 @@ else 					% if first pass of main loop
 
   % print 2D spectrum
   
-  figure;						% opens new graphic window
+  [X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
   
-  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+  figure;				% opens new graphic window
+  
+  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
 	title('accumulated and compensated data');
 	gsplot ( drift_comp_data' );
-								% make simple 3D plot of the offset compensated data
+						% make simple 3D plot of the offset compensated data
 
-  else							% otherwise we assume that we're called by MATLAB(R)
+  else					% otherwise we assume that we're called by MATLAB(R)
 
 	mesh ( X', Y', drift_comp_data );
-								% make simple 3D plot of the offset compensated data
+						% make simple 3D plot of the offset compensated data
 	title('accumulated and compensated data');
 
   end
@@ -248,8 +249,19 @@ if exit_answer == 1
 
   exit_main_loop = exit_main_loop + 1
   
-  matrix1 = drift_comp_data;
-  						% save compensated data to matrix
+  if ( exist('acc_meas') == 0)
+  						% in the case that there are no accumulated data
+
+    matrix1 = drift_comp_data;
+  						% save compensated data to matrix1
+  						
+  else
+  						% in the case that there are accumulated data
+    matrix1 = acc_meas;
+    						% save accumulated spectra to matrix1
+  
+  end;
+  
   old_field_params = field_params;
   old_time_params = time_params;
   						% save parameters for comparison with the next spectrum

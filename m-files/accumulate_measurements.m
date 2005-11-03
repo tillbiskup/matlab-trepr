@@ -51,9 +51,9 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   						% two input parameters
   end
   
-  [ quality_matrix1, amplitude_matrix1, std_noise_matrix1 ] = quality_of_spectrum ( matrix1, 10 )
+  [ quality_matrix1, amplitude_matrix1, std_noise_matrix1 ] = quality_of_spectrum ( matrix1, 10 );
 
-  [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, 10 )
+  [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, 10 );
 
   sum_quality = ones(1,100);
 
@@ -67,11 +67,18 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   	
   end
   
-  [ best_quality, index_best_quality ] = max(sum_quality)
+  [ best_quality, index_best_quality ] = max(sum_quality);
   
   data = summarize_matrices ( matrix1, matrix2, (index_best_quality/10) );
   
-  [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, 10 )
+  [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, 10 );
+  
+  
+  fprintf('\nOverview of the quality of the spectra\n');
+  fprintf('\n\t\tquality\t\tamplitude\tstd_noise\n');
+  fprintf('matrix 1:\t%2.4f\t\t%1.4f\t\t%f\n',quality_matrix1, amplitude_matrix1, std_noise_matrix1);
+  fprintf('matrix 2:\t%2.4f\t\t%1.4f\t\t%f\n',quality_matrix2, amplitude_matrix2, std_noise_matrix2);
+  fprintf('acc. data:\t%2.4f\t\t%1.4f\t\t%f\n\n',quality_data, amplitude_data, std_noise_data);
 
   
   if nargin > 2			% if the function is called with more than two parameters

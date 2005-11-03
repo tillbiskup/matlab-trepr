@@ -24,10 +24,13 @@
   fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
-  acc_meas = accumulate_measurements ( drift_comp_data, matrix1 );
+  acc_meas = accumulate_measurements ( drift_comp_data1, drift_comp_data2 );
   								% accumulate the measurements compensated until here
   
   figure;						% opens new graphic window
+  
+  [X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
   
   if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
@@ -45,7 +48,7 @@
   
   % Save accumulated measurements
 
-  user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with .acc appended): ', 's' );
+  user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with -acc appended\n at the filename base):\n   ', 's' );
 
   if length( user_provided_filename ) > 0	
 						% If the user provided a filename
@@ -61,11 +64,6 @@
 						% the output filename consists of the path of the input file,
 						% the basename of the input file with appended '-acc'
 						% and the extension of the input file (normally '.dat')
-
-	graphicsoutputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc.eps' ];
-						% the output filename consists of the path of the input file,
-						% the basename of the input file with appended '-acc'
-						% and the extension '.eps'
 
 	fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
 
@@ -86,10 +84,6 @@
 						% (silly MATLAB behaviour - to accept the Octave variant of
 						% calling but neither saving nor complaining all about...)
 
-%	saveas(gcf,graphicsoutputfilename,eps);
-						% save last graphics window content as eps file
-						% the handle 'gcf' refers to the actual graphics window
-
   end					% end of "if program" clause
   
 
@@ -102,4 +96,3 @@
   x = [ min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]) ];
   
   plot(x,spectrum,'-',x,zeros(1,length(x)));
-

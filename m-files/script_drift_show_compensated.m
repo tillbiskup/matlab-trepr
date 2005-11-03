@@ -140,6 +140,14 @@ while ( exit_condition == 0 )
 
   elseif ( method_drift_comp == 9 )
 
+	if ( exist('drift_comp_data') == 0 )
+						% in the case the user hits 'Continue...' before choosing an option...
+	
+	  drift_comp_data = offset_comp_data;
+	  chosen_method = 'none';
+	
+	end
+
     exit_condition = 1;
 
   end
