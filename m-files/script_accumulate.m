@@ -19,13 +19,38 @@
 %
 
 
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nSTART OF $RCSfile$\n');
+  end;
+
 % Accumulate 2D spectra
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(drift_comp_data1));
+    fprintf('\tSize of drift_comp_data2:\t%i %i\n', size(drift_comp_data2));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
 
   fprintf('\nAccumulate measurements...\n')
 								% Telling the user what's going to happen
 
   acc_meas = accumulate_measurements ( drift_comp_data1, drift_comp_data2 );
   								% accumulate the measurements compensated until here
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(drift_comp_data1));
+    fprintf('\tSize of drift_comp_data2:\t%i %i\n', size(drift_comp_data2));
+    fprintf('\tSize of acc_meas:\t\t%i %i\n', size(acc_meas));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+    fprintf('\tfield_params:\t\t\t%4.2f %4.2f %2.2f\n', field_params);
+  end;
   
   figure;						% opens new graphic window
   
@@ -96,3 +121,10 @@
   x = [ min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]) ];
   
   plot(x,spectrum,'-',x,zeros(1,length(x)));
+
+  
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nEND OF $RCSfile$\n');
+  end;
+  

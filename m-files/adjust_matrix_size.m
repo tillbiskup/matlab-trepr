@@ -21,7 +21,7 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	[ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
+%	[ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
 %
 % DESCRIPTION
 %	This function takes two matrices, evaluates the sizes and parameters of them and
@@ -30,9 +30,21 @@
 %
 % SOURCE
 
-function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
+function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = adjust_matrix_size ( matrix1, field_params1, time_params1, matrix2, field_params2, time_params2 )
 
   fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
+
+  global DEBUGGING;
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tDimensions and field parameters of matrices before adjustment:\n');
+    fprintf('\tSize of matrix1:\t%i %i\n', size(matrix1));
+    fprintf('\tSize of matrix2:\t%i %i\n', size(matrix2));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
   
   if ( (abs(field_params1(2)-field_params1(1)) == abs(field_params2(2)-field_params2(1))) & (abs(field_params1(3)) == abs(field_params2(3))) & (time_params1 == time_params2) )
 							% in case that field width and field_step_width and the time_params
@@ -42,7 +54,8 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	new_matrix1 = matrix1;
 	new_matrix2 = matrix2;
 							% just set the output matrices equal to the input matrices
-	new_field_params = field_params1;
+	new_field_params1 = field_params1;
+	new_field_params2 = field_params2;
 							% just set the field params equal to the params of one of the input matrices
 	
   else						% if matrices differ in some way
@@ -97,13 +110,37 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  	  new_matrix2 ( i , : ) = matrix2 ( i , : );
 	  	
 	  	end					% end of filling new matrices
-	  	
-	  	new_field_params = [ min(field_boundaries2) lower_field_boundary field_params1(3) ];
-	  						% set new_field_params vector with field_params of new matrices
-	  						% the goal of the whole routine is to equalize these parameters
-	  						% that's why we need only one new_field_params vector
-	  						% the same is true in principal for the time_params vector (see below)
 
+		if ( field_params1(3) > 0)
+							% if spectrum1 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params1 = [ (field_params1(1)+(min(field_boundaries2)-min(field_boundaries1))) lower_field_boundary field_params1(3) ];
+			
+		else
+							% if spectrum1 recorded from higher to lower B_0 field
+
+		  new_field_params1 = [ lower_field_boundary (field_params1(2)+(min(field_boundaries2)-min(field_boundaries1))) field_params1(3) ];
+		
+		end;
+
+		if ( field_params2(3) > 0)
+							% if spectrum2 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params2 = [ field_params2(1) (lower_field_boundary-min(field_boundaries2)) field_params2(3) ];
+			
+		else
+							% if spectrum2 recorded from higher to lower B_0 field
+
+		  new_field_params2 = [ (lower_field_boundary-min(field_boundaries2)) field_params2(2) field_params2(3) ];
+		
+		end;
+	  	
 	  end
 
 	elseif ( min(field_boundaries1) > min(field_boundaries2) )
@@ -141,12 +178,36 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  	  
 	  	end					% end of filling new matrices
 	  	
-	  	new_field_params = [ min(field_boundaries2) lower_field_boundary field_params1(3) ];
-	  						% set new_field_params vector with field_params of new matrices
-	  						% the goal of the whole routine is to equalize these parameters
-	  						% that's why we need only one new_field_params vector
-	  						% the same is true in principal for the time_params vector (see below)
-	  
+		if ( field_params1(3) > 0)
+							% if spectrum1 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params1 = [ field_params1(1) (lower_field_boundary-min(field_boundaries1)) field_params1(3) ];
+			
+		else
+							% if spectrum1 recorded from higher to lower B_0 field
+
+		  new_field_params1 = [  (lower_field_boundary-min(field_boundaries1)) field_params1(2) field_params1(3) ];
+		
+		end;
+
+		if ( field_params2(3) > 0)
+							% if spectrum2 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params2 = [ (field_params2(1)+(min(field_boundaries1)-min(field_boundaries2))) (lower_field_boundary-min(field_boundaries1)) field_params2(3) ];
+			
+		else
+							% if spectrum1 recorded from higher to lower B_0 field
+
+		  new_field_params2 = [ (lower_field_boundary-min(field_boundaries1)) (field_params2(1)+(min(field_boundaries1)-min(field_boundaries2))) field_params2(3) ];
+		
+		end;
+
 	  end
 	
 	else						% if field boundaries do overlap
@@ -182,12 +243,36 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	  	  new_matrix2 ( i , : ) = matrix2 ( i , : );
 	  	  
 	  	end					% end of filling new matrices
-	  	
-	  	new_field_params = [ min(field_boundaries1) lower_field_boundary field_params1(3) ];
-	  						% set new_field_params vector with field_params of new matrices
-	  						% the goal of the whole routine is to equalize these parameters
-	  						% that's why we need only one new_field_params vector
-	  						% the same is true in principal for the time_params vector (see below)
+
+		if ( field_params1(3) > 0)
+							% if spectrum1 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params1 = [ field_params1(1) min(field_boundaries1) field_params1(3) ];
+			
+		else
+							% if spectrum1 recorded from higher to lower B_0 field
+
+		  new_field_params1 = [ min(field_boundaries1) field_params1(2) field_params1(3) ];
+		
+		end;
+
+		if ( field_params2(3) > 0)
+							% if spectrum2 recorded from lower to higher B_0 field
+							% field_params(3) is the field step width
+							% and is > 0 for spectra recorded from low -> high B_0 field
+							% and is < 0 for spectra recorded from high -> low B_0 field
+							
+		  new_field_params2 = [ field_params2(1) min(field_boundaries1) field_params2(3) ];
+			
+		else
+							% if spectrum2 recorded from higher to lower B_0 field
+
+		  new_field_params2 = [ min(field_boundaries1) field_params2(2) field_params2(3) ];
+		
+		end;
 	  
 	  end
 	
@@ -207,6 +292,15 @@ function [ new_matrix1, new_matrix2, new_field_params ] = adjust_matrix_size ( m
 	end						% end of comparison of time_params
   
   end
-  
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tDimensions and field parameters of matrices after adjustment:\n');
+    fprintf('\tSize of matrix1:\t%i %i\n', size(new_matrix1));
+    fprintf('\tSize of matrix2:\t%i %i\n', size(new_matrix2));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', new_field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', new_field_params2);
+  end;
 
 %******

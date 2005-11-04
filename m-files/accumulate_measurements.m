@@ -78,8 +78,9 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   fprintf('\n\t\tquality\t\tamplitude\tstd_noise\n');
   fprintf('matrix 1:\t%2.4f\t\t%1.4f\t\t%f\n',quality_matrix1, amplitude_matrix1, std_noise_matrix1);
   fprintf('matrix 2:\t%2.4f\t\t%1.4f\t\t%f\n',quality_matrix2, amplitude_matrix2, std_noise_matrix2);
-  fprintf('acc. data:\t%2.4f\t\t%1.4f\t\t%f\n\n',quality_data, amplitude_data, std_noise_data);
+  fprintf('acc. data:\t%2.4f\t\t%1.4f\t\t%f\n',quality_data, amplitude_data, std_noise_data);
 
+  fprintf('\nWeight of the matrix summation: matrix1 + %i * matrix2\n\n', index_best_quality);
   
   if nargin > 2			% if the function is called with more than two parameters
 
@@ -104,7 +105,7 @@ function summarized_matrix = summarize_matrices ( matrix1, matrix2, weight )
 
 % SYNOPSIS
 %
-%	summarized_matrix = summarize_matrices ( matrix1, matrix 2 )
+%	summarized_matrix = summarize_matrices ( matrix1, matrix 2, weight )
 %
 % DESCRIPTION
 %

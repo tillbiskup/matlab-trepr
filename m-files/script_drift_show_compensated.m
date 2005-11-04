@@ -42,10 +42,6 @@ figure;					% Opens up a new plot window.
 x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 plot(x,spectrum,'-',x,zeros(1,length(x)));
 
-% plot(x,drift,'-');
-						% plot drift against x
-						% values of linear fit against x (pv1 = polyval_1st_order)
-						% values of quadratic fit against x (pv2 = polyval_2nd_order)
 
 title('Drift and polynomic fit');
 

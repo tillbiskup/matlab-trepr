@@ -23,6 +23,36 @@
 
 tic;						% set starting point for calculation of used time, just for fun...
 
+if ( exist('DEBUGGING') == 0 )	
+						% in the case the debug variable is not set...
+
+	global DEBUGGING;
+	DEBUGGING = 1;		% set DEBUGGING to ON
+						% if debug <> 0 then additional DEBUGGING OUTPUT is printed
+
+end;
+
+if ( DEBUGGING )			% in the case the debug variable is set...
+
+  fprintf('\nDEBUGGING ON\n');
+
+end;
+
+if ( exist('PLOTTING3D') == 0 )	
+						% in the case the debug variable is not set...
+
+	global PLOTTING3D;
+	PLOTTING3D = 0;		% set PLOTTING3D to OFF
+						% if PLOTTING3D <> 0 then additional 3D PLOTS are generated
+
+end;
+
+if ( PLOTTING3D )		% in the case the plot3d variable is set...
+
+  fprintf('\n3D PLOTS ON\n');
+
+end;
+
 % Just to tell the user what's going on...
 % This message is not logged, thus it will be repeated after the start of logging
 
@@ -68,23 +98,26 @@ script_read_file;
 
 field_boundaries = [ field_params(1) field_params(2) ];
 
-[X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+if ( PLOTTING3D )		% in the case the plot3d variable is set...
+
+  fprintf('\nPlot raw data...\n')
+
+  [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
 
-fprintf('\nPlot raw data...\n')
+  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+    gsplot ( data' );			% make simple 3D plot of the raw data
 
-  gsplot ( data' );			% make simple 3D plot of the raw data
+  else								% otherwise we assume that we're called by MATLAB(R)
 
-else								% otherwise we assume that we're called by MATLAB(R)
+    mesh ( data );				% make simple 3D plot of the raw data
 
-  mesh ( data );				% make simple 3D plot of the raw data
+    title('Raw data');
 
-  title('Raw data');
+  end
 
-end
-
+end;
 
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
@@ -153,9 +186,18 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
 
-  [ drift_comp_data, matrix1, field_params ] = adjust_matrix_size ( drift_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
+  [ drift_comp_data, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( drift_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tSize of drift_comp_data:\t%4.2f %4.2f\n', size(drift_comp_data));
+    fprintf('\tSize of matrix1:\t\t%4.2f %4.2f\n', size(matrix1));
+    fprintf('\tfield parameters1:\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield parameters2:\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
 
   % frequency compensation
 
@@ -163,12 +205,17 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   drift_comp_data2 = matrix1;
   								% set the matrices according to the necessary settings for the
   								% script file script_compensate_frequency.m
-  field_params1 = field_params;
-  field_params2 = old_field_params;
-  								
+								
   script_compensate_frequency;
 
 
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(drift_comp_data1));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
 
   % After plotting the overlay of both B_0 spectra
   % ask the user whether he really wants to proceed with accumulation...
@@ -203,26 +250,30 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   
 else 					% if first pass of main loop
 
-  % print 2D spectrum
+  if ( PLOTTING3D )		% in the case the plot3d variable is set...
+
+    % print 2D spectrum
   
-  [X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+    [X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
   
-  figure;				% opens new graphic window
+    figure;				% opens new graphic window
   
-  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+    if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-	title('accumulated and compensated data');
-	gsplot ( drift_comp_data' );
+	  title('accumulated and compensated data');
+	  gsplot ( drift_comp_data' );
 						% make simple 3D plot of the offset compensated data
 
-  else					% otherwise we assume that we're called by MATLAB(R)
+	else					% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( X', Y', drift_comp_data );
+	  mesh ( X', Y', drift_comp_data );
 						% make simple 3D plot of the offset compensated data
-	title('accumulated and compensated data');
+	  title('accumulated and compensated data');
 
-  end
+    end;
+
+  end;
 
   % print B_0 spectrum
 
@@ -247,7 +298,7 @@ exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumula
 						
 if exit_answer == 1
 
-  exit_main_loop = exit_main_loop + 1
+  exit_main_loop = exit_main_loop + 1;
   
   if ( exist('acc_meas') == 0)
   						% in the case that there are no accumulated data
@@ -268,6 +319,10 @@ if exit_answer == 1
   						
   clear data drift* filename method* offset* pv* trigger_pos X Y;
 						% clear old variables that are not used any more
+
+  fprintf('\n###############################################################\n');
+  fprintf('\n\tStarting round %i of accumulation routine...\n', exit_main_loop);
+  fprintf('\n###############################################################\n');
 
 elseif exit_answer == 2
 

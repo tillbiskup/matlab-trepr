@@ -35,7 +35,7 @@ function [ quality, amplitude, std_noise ] = quality_of_spectrum ( data, num_ts 
 
 %  disp ( '$RCSfile$, $Revision$, $Date$' );
 
-  amplitude = max ( max ( data ) );
+  amplitude = max ( max ( data ) ) + abs(min ( min (data) ));
   
   noise = mean ( data ( [1:num_ts], : ) );
   						% average over the first 'num_ts' time slices

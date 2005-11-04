@@ -19,6 +19,11 @@
 %
 
 
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nSTART OF $RCSfile$\n');
+  end;
+
 % First, plot overlay of both B_0 spectra
 
 
@@ -127,6 +132,17 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
     
   end
 
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tstartcut1:\t%i\n', startcut1);
+    fprintf('\tendcut1:\t%i\n', endcut1);
+    fprintf('\tstartcut2:\t%i\n', startcut2);
+    fprintf('\tendcut2:\t%i\n', endcut2);
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
+
   [ r1, c1 ] = size ( drift_comp_data1 );
   [ r2, c2 ] = size ( drift_comp_data2 );
   
@@ -135,12 +151,12 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   if ( field_params1(1) < field_params1(2))
   						% if spectrum recorded from low to high field
 
-    field_params1 = [ field_params1(1)+(abs(startcut1-endcut2)*field_params1(3)), field_params1(2)-(abs(endcut1-startcut2)*field_params1(3)), field_params1(3) ];
+    field_params1 = [ field_params1(1)+(abs((startcut1-endcut2)*field_params1(3))), field_params1(2)-(abs((endcut1-startcut2)*field_params1(3))), field_params1(3) ];
 
   else
   						% if spectrum recorded from high to low field
 
-    field_params1 = [ field_params1(1)-(abs(endcut1-startcut2)*field_params1(3)), field_params1(2)+(abs(startcut1-endcut2)*abs(field_params1(3))), field_params1(3) ];
+    field_params1 = [ field_params1(1)-(abs((startcut2-endcut1)*field_params1(3))), field_params1(2)+(abs((startcut1-endcut2)*field_params1(3))), field_params1(3) ];
 
   end;
 
@@ -149,13 +165,13 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   if ( field_params2(1) < field_params2(2))
   						% if spectrum recorded from low to high field
 
-    field_params2 = [ field_params2(1)+(abs(endcut2-startcut1)*field_params2(3)), field_params2(2)-(abs(startcut2-endcut1)*field_params2(3)), field_params2(3) ];
+    field_params2 = [ field_params2(1)+(abs((endcut2-startcut1)*field_params2(3))), field_params2(2)-(abs((startcut2-endcut1)*field_params2(3))), field_params2(3) ];
     
 
   else
   						% if spectrum recorded from high to low field
 
-    field_params2 = [ field_params2(1)-(abs(startcut2-endcut1)*field_params2(3)), field_params2(2)+(abs(endcut2-startcut1)*abs(field_params2(3))), field_params2(3) ];
+    field_params2 = [ field_params2(1)-(abs((startcut2-endcut1)*field_params2(3))), field_params2(2)+(abs((endcut2-startcut1)*field_params2(3))), field_params2(3) ];
 
   end;
 
@@ -166,6 +182,20 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
 
   fprintf('\n\tNew field parameter for both spectra:.\n');
   fprintf('\t\tfield borders:\t\t%4.2f G - %4.2f G\n\t\tfield step width:\t%2.2f G\n', field_params1);
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nDEBUGGING OUTPUT:\n');
+    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(drift_comp_data1));
+    fprintf('\tSize of drift_comp_data2:\t%i %i\n', size(drift_comp_data2));
+    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+  end;
+
+  % DEBUGGING OUTPUT
+  if ( DEBUGGING )
+    fprintf('\nEND OF $RCSfile$\n');
+  end;
 
 end;					% end if offset1 or offset 2 ~= 0
 

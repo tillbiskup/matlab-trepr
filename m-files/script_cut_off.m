@@ -106,20 +106,24 @@ while (cut_off ~= 3)
     fprintf( '\nNo cut off of the spectrum made.\n' );
   
   end
-
-  if program == 'Octave'
+  
+  if ( PLOTTING3D )		% in the case the plot3d variable is set...
+  
+    if program == 'Octave'
   						% if we're called by GNU Octave (as determined above)
 
-    gsplot ( data' );
+      gsplot ( data' );
 	    					% make simple 3D plot of the raw data
 
-  else					% otherwise we assume that we're called by MATLAB(R)
+    else					% otherwise we assume that we're called by MATLAB(R)
 
-    mesh ( X', Y', data );
+      mesh ( X', Y', data );
 						% make simple 3D plot of the raw data
 
-    title('Raw data');
+      title('Raw data');
 
+    end
+    
   end
   
 end						% end while (cut_off < 3) loop
