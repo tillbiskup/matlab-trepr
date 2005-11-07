@@ -43,7 +43,7 @@ function [ quality, amplitude, std_noise ] = quality_of_spectrum ( data, num_ts 
   std_noise = std ( noise );
   						% get standard deviation from the noise
   
-  quality = amplitude / std_noise;
+  quality = std_noise / amplitude;
   
 
 %******

@@ -51,24 +51,28 @@
     fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
     fprintf('\tfield_params:\t\t\t%4.2f %4.2f %2.2f\n', field_params);
   end;
+
+  if ( PLOTTING3D )
   
-  figure;						% opens new graphic window
+	figure;						% opens new graphic window
   
-  [X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+	[X,Y] = meshgrid ( min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
   
-  if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+	if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	title('accumulated and compensated data');
-	gsplot ( acc_meas' );
+	  title('accumulated and compensated data');
+	  gsplot ( acc_meas' );
 								% make simple 3D plot of the offset compensated data
 
-  else							% otherwise we assume that we're called by MATLAB(R)
+	else							% otherwise we assume that we're called by MATLAB(R)
 
-	mesh ( X', Y', acc_meas );
+	  mesh ( X', Y', acc_meas );
 								% make simple 3D plot of the offset compensated data
-	title('accumulated and compensated data');
+	  title('accumulated and compensated data');
 
+	end
+	
   end
   
   % Save accumulated measurements
@@ -118,7 +122,7 @@
 
   [spectrum,max_x] = B0_spectrum(acc_meas,2);
  
-  x = [ min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]) ];
+  x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
   
   plot(x,spectrum,'-',x,zeros(1,length(x)));
 

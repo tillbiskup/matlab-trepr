@@ -183,6 +183,8 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   fprintf('\n\tNew field parameter for both spectra:.\n');
   fprintf('\t\tfield borders:\t\t%4.2f G - %4.2f G\n\t\tfield step width:\t%2.2f G\n', field_params1);
 
+end;					% end if offset1 or offset 2 ~= 0
+
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
     fprintf('\nDEBUGGING OUTPUT:\n');
@@ -190,12 +192,11 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
     fprintf('\tSize of drift_comp_data2:\t%i %i\n', size(drift_comp_data2));
     fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
     fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+    fprintf('\tfield_params:\t\t\t%4.2f %4.2f %2.2f\n', field_params);
   end;
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
     fprintf('\nEND OF $RCSfile$\n');
   end;
-
-end;					% end if offset1 or offset 2 ~= 0
 

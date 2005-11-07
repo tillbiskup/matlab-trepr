@@ -17,11 +17,65 @@
 %
 %	The file serves as an example for own scripts.
 %
-%	The big difference tho the script 'sample_script' is that here the main part
-%	that compensates for offset and drift resides in a loop and thus the program
-%	allows to read several fsc2 files and accumulate the spectra
+%	The big difference tho the script 'compensate_2Dspectra' is that here the
+%	main part that compensates for offset and drift resides in a loop and thus
+%	the program allows to read several fsc2 files and accumulate the spectra.
+%
+%
+%	The script consists of several parts each of which accounts for a special
+%	task in the compensation of the raw data.
+%
+%	In addition there are some "administrational" tasks that the script will do.
+%
+%	The parts in the order of their appearance:
+%
+%	NOTE: Tasks in brackets are optional, the user is asked whether to perform or not
+%
+%	0.	Set global variables
+%
+%	1.	Start logging
+%
+%	2.	Evaluate the calling program - MATLAB(R) vs. GNU Octave
+%
+%	3.	Read file
+%
+%	4.	[Cut spectrum]
+%
+%	5.	Compensate pretrigger offset
+%
+%	6.	Evaluate drift
+%
+%	7.	Save data
+%
+%	8.	Frequency compensation
+%
+%	9.	[Accumulation]
+%
+%	10.	Stop logging
+%
+%	Tasks 3 to 9 reside in one main loop that is processed until the user decides to stop it.
+%	Tasks 8 and 9 are only done beginning with the second pass of the main loop.
+%
 
-tic;						% set starting point for calculation of used time, just for fun...
+% ######################################################################
+% BEGIN setting of global variables
+%
+% First of all set some global variables that control the general behaviour of the program.
+% These variables are set in a way that you can set them by yourself before running this script.
+% The script will test whether they are already defined and only if not will set them to some default
+% value.
+%
+% In the moment the global variables are
+%
+%	DEBUGGING
+%		boolean variable
+%		if <> 0 then some additional debugging output is produced
+%		this output starts with the words "DEBUGGING OUTPUT"
+%
+%	PLOTTING3D
+%		boolean variable
+%		if <> 0 then 3D plots of the spectra are plotted
+%
 
 if ( exist('DEBUGGING') == 0 )	
 						% in the case the debug variable is not set...
@@ -53,6 +107,14 @@ if ( PLOTTING3D )		% in the case the plot3d variable is set...
 
 end;
 
+% END setting of global variables
+% ######################################################################
+
+
+
+tic;						% set starting point for calculation of used time, just for fun...
+
+
 % Just to tell the user what's going on...
 % This message is not logged, thus it will be repeated after the start of logging
 
@@ -72,13 +134,19 @@ dateandtime = [datestr(now, 31), ' @ ', computer];
 
 disp ( dateandtime )	% print current date and time and system
 
+fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\n\tGENERAL DESCRIPTION OF THE PROGRAM\n')
+
 fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to compensate and accumulate 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\n');
 fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
 fprintf('\nThe last versions of this file can be found at:\n\thttp://physik.fu-berlin.de/~biskup/\n');
 
+fprintf('\n---------------------------------------------------------------------------\n')
+
 % Find out whether we are called by MATLAB(R) or GNU Octave
+
 
 [ program, prog_version ] = discriminate_matlab_octave;
 
@@ -333,7 +401,7 @@ end						% end of "if exit_answer" clause
 end						% end of main while loop
 
 total_time_used = toc;
-fprintf ('\nThe total time used is %i seconds\n\n', total_time_used);
+fprintf ('\nThe total time used is %4.2f seconds\n\n', total_time_used);
 						% print total time used;
 
 % At the very end stop logging...

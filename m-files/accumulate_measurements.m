@@ -41,6 +41,8 @@
 
 function data = accumulate_measurements ( matrix1, matrix2, varargin )
 
+  global DEBUGGING;
+
   fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   if nargin < 2			% Check number of input arguments.
@@ -56,14 +58,30 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, 10 );
 
   sum_quality = ones(1,100);
+  sum_amplitude = ones(1,100);
+  sum_std_noise = ones(1,100);
+  						% for improved memory usage the vector is initialized at first
 
   for i = 1:100
 
     sum = summarize_matrices ( matrix1, matrix2, (i/10) );
-  						% in a first step
-  						% sum up the first two matrices
+  						% sum up the two matrices
   						
-  	sum_quality (1,i) = quality_of_spectrum ( sum, 10 );
+  	[ quality, amplitude, std_noise ] = quality_of_spectrum ( sum, 10 );
+  						% the quality is calculated with the first 10 off-resonance time slices
+  						% as the reference (the second input parameter for the quality_of_spectrum function)
+  						
+  	sum_quality (1,i) = quality;
+  						% the quality is written to the vector sum_quality for all passes
+  						% of the loop
+  						
+  	sum_amplitude (1,i) = amplitude;
+  						% the amplitude is written to the vector sum_amplitude for all passes
+  						% of the loop
+  						
+  	sum_std_noise (1,i) = std_noise;
+  						% the std_noise is written to the vector sum_std_noise for all passes
+  						% of the loop
   	
   end
   
@@ -72,6 +90,17 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   data = summarize_matrices ( matrix1, matrix2, (index_best_quality/10) );
   
   [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, 10 );
+  
+  if ( DEBUGGING )
+  
+    figure;
+    
+    x = [1:1:100];
+
+    plot(x,sum_quality',x,sum_amplitude',x,sum_std_noise');
+    legend('Quality','Amplitude','Std Dev of Noise');
+  
+  end;
   
   
   fprintf('\nOverview of the quality of the spectra\n');
