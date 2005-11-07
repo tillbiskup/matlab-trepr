@@ -24,15 +24,23 @@
     fprintf('\nSTART OF $RCSfile$\n');
   end;
 
-% First, plot overlay of both B_0 spectra
+% First, evaluate difference in signal amplitude of both spectra and compensate for it
+% to improve the overlay of the B_0 spectra
+
+max_amplitude_spectrum1 = abs((max(max(drift_comp_data1))-(min(min(drift_comp_data1)))));
+max_amplitude_spectrum2 = abs((max(max(drift_comp_data2))-(min(min(drift_comp_data2)))));
+
+amplitude_difference = max_amplitude_spectrum1 / max_amplitude_spectrum2;
+
+% Second, plot overlay of both B_0 spectra
 
 
 fprintf('\nPrinting B_0 spectra for frequency compensation...\n')
 								% Telling the user what's going to happen
 								
-[ spectrum1, max_index1 ] = B0_spectrum ( drift_comp_data1, 2 );
+[ spectrum1, max_index1 ] = B0_spectrum ( drift_comp_data1, 2, t );
   
-[ spectrum2, max_index2 ] = B0_spectrum ( drift_comp_data2, 2 );
+[ spectrum2, max_index2 ] = B0_spectrum ( (drift_comp_data2*amplitude_difference), 2, t );
   
 figure;						% opens new graphic window
 
@@ -175,8 +183,6 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
 
   end;
 
-  field_params = field_params1;
-
   fprintf('\nSpectrum 1 and spectrum 2 are cut to fit to each other.\n');
   fprintf('\tNew dimensions of both spectra: %i rows, %i cols.\n', size(drift_comp_data1));
 
@@ -184,6 +190,10 @@ if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
   fprintf('\t\tfield borders:\t\t%4.2f G - %4.2f G\n\t\tfield step width:\t%2.2f G\n', field_params1);
 
 end;					% end if offset1 or offset 2 ~= 0
+
+
+field_params = field_params1;
+
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )

@@ -43,15 +43,17 @@
 %
 %	5.	Compensate pretrigger offset
 %
-%	6.	Evaluate drift
+%	6.	Evaluate maximum signal amplitude according to t
 %
-%	7.	Save data
+%	7.	Evaluate drift
 %
-%	8.	Frequency compensation
+%	8.	Save data
 %
-%	9.	[Accumulation]
+%	9.	Frequency compensation
 %
-%	10.	Stop logging
+%	10.	[Accumulation]
+%
+%	11.	Stop logging
 %
 %	Tasks 3 to 9 reside in one main loop that is processed until the user decides to stop it.
 %	Tasks 8 and 9 are only done beginning with the second pass of the main loop.
@@ -135,7 +137,7 @@ dateandtime = [datestr(now, 31), ' @ ', computer];
 disp ( dateandtime )	% print current date and time and system
 
 fprintf('\n---------------------------------------------------------------------------\n')
-fprintf('\n\tGENERAL DESCRIPTION OF THE PROGRAM\n')
+fprintf('\nGENERAL DESCRIPTION OF THE PROGRAM\n')
 
 fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
@@ -198,6 +200,12 @@ script_cut_off;
 fprintf( '\nCompensate pretrigger offset\n' )
 
 offset_comp_data = pretrigger_offset ( data, trigger_pos );
+
+
+% Give user the possibility to manually evaluate the t value at which the signal
+% amplitude of the B_0 spectrum is maximal
+
+script_find_max_amplitude;
 
 
 
@@ -347,7 +355,7 @@ else 					% if first pass of main loop
 
   figure;
 
-  [spectrum,max_x] = B0_spectrum(drift_comp_data,2);
+  [spectrum,max_x] = B0_spectrum(drift_comp_data,2,t);
  
   x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
   
@@ -383,6 +391,7 @@ if exit_answer == 1
   
   old_field_params = field_params;
   old_time_params = time_params;
+  old_t = t;
   						% save parameters for comparison with the next spectrum
   						
   clear data drift* filename method* offset* pv* trigger_pos X Y;

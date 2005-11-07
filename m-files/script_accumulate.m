@@ -120,10 +120,13 @@
 
   figure;
 
-  [spectrum,max_x] = B0_spectrum(acc_meas,2);
+  [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
  
   x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
   
+  % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
+  x = x / 10;  
+
   plot(x,spectrum,'-',x,zeros(1,length(x)));
 
   

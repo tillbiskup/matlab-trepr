@@ -58,6 +58,8 @@ function [ spectrum, max_index ] = B0_spectrum ( input_data, average_half_width,
 
     t = varargin {1};
     
+	max_index = t;
+
     spectrum = mean( input_data( : , t-average_half_width : t+average_half_width )' );
     
   end					% end if
