@@ -22,6 +22,61 @@
 %	The file may as well serve as an example for own scripts tailored to one's personal needs.
 
 
+% ######################################################################
+% BEGIN setting of global variables
+%
+% First of all set some global variables that control the general behaviour of the program.
+% These variables are set in a way that you can set them by yourself before running this script.
+% The script will test whether they are already defined and only if not will set them to some default
+% value.
+%
+% In the moment the global variables are
+%
+%	DEBUGGING
+%		boolean variable
+%		if <> 0 then some additional debugging output is produced
+%		this output starts with the words "DEBUGGING OUTPUT"
+%
+%	PLOTTING3D
+%		boolean variable
+%		if <> 0 then 3D plots of the spectra are plotted
+%
+
+if ( exist('DEBUGGING') == 0 )	
+						% in the case the debug variable is not set...
+
+	global DEBUGGING;
+	DEBUGGING = 1;		% set DEBUGGING to ON
+						% if debug <> 0 then additional DEBUGGING OUTPUT is printed
+
+end;
+
+if ( DEBUGGING )			% in the case the debug variable is set...
+
+  fprintf('\nDEBUGGING ON\n');
+
+end;
+
+if ( exist('PLOTTING3D') == 0 )	
+						% in the case the debug variable is not set...
+
+	global PLOTTING3D;
+	PLOTTING3D = 0;		% set PLOTTING3D to OFF
+						% if PLOTTING3D <> 0 then additional 3D PLOTS are generated
+
+end;
+
+if ( PLOTTING3D )		% in the case the plot3d variable is set...
+
+  fprintf('\n3D PLOTS ON\n');
+
+end;
+
+% END setting of global variables
+% ######################################################################
+
+
+
 tic;						% set starting point for calculation of used time, just for fun...
 
 % Just to tell the user what's going on...

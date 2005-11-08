@@ -218,7 +218,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   if size (raw_data) ~= (field_width+1) * no_points
   
     fprintf('\nData do not match the dimensions given by the parameters!\n');
-    error ();
+    error ('');
   
   end
 
