@@ -189,7 +189,7 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 		else
 							% if spectrum1 recorded from higher to lower B_0 field
 
-		  new_field_params1 = [  (lower_field_boundary-min(field_boundaries1)) field_params1(2) field_params1(3) ];
+		  new_field_params1 = [  (field_params1(2)+(lower_field_boundary-min(field_boundaries1))) field_params1(2) field_params1(3) ];
 		
 		end;
 
@@ -199,7 +199,7 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 							% and is > 0 for spectra recorded from low -> high B_0 field
 							% and is < 0 for spectra recorded from high -> low B_0 field
 							
-		  new_field_params2 = [ (field_params2(1)+(min(field_boundaries1)-min(field_boundaries2))) (lower_field_boundary-min(field_boundaries1)) field_params2(3) ];
+		  new_field_params2 = [ (field_params2(1)+(min(field_boundaries1)-min(field_boundaries2))) lower_field_boundary field_params2(3) ];
 			
 		else
 							% if spectrum1 recorded from higher to lower B_0 field
@@ -234,7 +234,7 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 	    lower_field_boundary = min( [ max(field_boundaries1) max(field_boundaries2) ] );
 	    						% gives the lower upper field boundary of both matrices
 	  	
-	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))/abs(field_params1(3)))
+	  	for i = 1 : (( lower_field_boundary - min(field_boundaries1))/abs(field_params1(3))+1)
 	  						% for i running from 1 to the upper boundary of the matrix
 	  						% with lower upper field boundary
 	  	
@@ -250,12 +250,12 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 							% and is > 0 for spectra recorded from low -> high B_0 field
 							% and is < 0 for spectra recorded from high -> low B_0 field
 							
-		  new_field_params1 = [ field_params1(1) min(field_boundaries1) field_params1(3) ];
+		  new_field_params1 = [ field_params1(1) lower_field_boundary field_params1(3) ];
 			
 		else
 							% if spectrum1 recorded from higher to lower B_0 field
 
-		  new_field_params1 = [ min(field_boundaries1) field_params1(2) field_params1(3) ];
+		  new_field_params1 = [ lower_field_boundary field_params1(2) field_params1(3) ];
 		
 		end;
 
@@ -265,12 +265,12 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 							% and is > 0 for spectra recorded from low -> high B_0 field
 							% and is < 0 for spectra recorded from high -> low B_0 field
 							
-		  new_field_params2 = [ field_params2(1) min(field_boundaries1) field_params2(3) ];
+		  new_field_params2 = [ field_params2(1) lower_field_boundary field_params2(3) ];
 			
 		else
 							% if spectrum2 recorded from higher to lower B_0 field
 
-		  new_field_params2 = [ min(field_boundaries1) field_params2(2) field_params2(3) ];
+		  new_field_params2 = [ lower_field_boundary field_params2(2) field_params2(3) ];
 		
 		end;
 	  
