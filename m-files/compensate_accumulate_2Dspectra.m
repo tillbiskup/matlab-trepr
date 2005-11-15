@@ -127,7 +127,7 @@ fprintf('\nThis file is intended to be used to compensate and accumulate 3D spec
 
 % First of all start logging
 
-start_logging;
+logfilename = start_logging;
 
 
 % Then print some nice message
@@ -154,6 +154,11 @@ fprintf('\n---------------------------------------------------------------------
 
 
 exit_main_loop = 1;				% set exit condition for while loop
+
+num_accumulated_spectra = 1;		% set number of accumulated spectra to 1 (default)
+
+filenames_accumulated = '';
+filenames_not_accumulated = '';
 
 while exit_main_loop > 0			% main while loop
 								% responsible for the possibility to accumulate
@@ -305,6 +310,11 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 
     script_accumulate;
     						% call part of the script that does the accumulation
+
+	num_accumulated_spectra = num_accumulated_spectra + 1;
+						% increase value of counter
+						
+	filenames_accumulated = [ filenames_accumulated '\n\t' filename ];
     
   elseif ( really_accumulate == 2 )
   						% if the user wants to abort accumulation and
@@ -313,6 +323,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
   	drift_comp_data = matrix1;
   						% set the old matrix to the actual matrix 
+						
+	filenames_not_accumulated = [ filenames_not_accumulated '\n\t' filename ];
   						
   else
   						% if the user wants to abort accumulation and
@@ -320,11 +332,16 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						% just compensated
   						
 	fprintf('\nYou decided not to accumulate\n and to continue with the just compensated spectrum.\n')
+						
+	filenames_not_accumulated = filenames_accumulated;
+	filenames_accumulated = filename;
   
   end
   
   
 else 					% if first pass of main loop
+
+  filenames_accumulated = filename;
 
   if ( PLOTTING3D )		% in the case the plot3d variable is set...
 
@@ -399,19 +416,55 @@ if exit_answer == 1
 
   fprintf('\n###############################################################\n');
   fprintf('\n\tStarting round %i of accumulation routine...\n', exit_main_loop);
+  fprintf('\n\tNumber of accumulated spectra: %i\n', num_accumulated_spectra);
   fprintf('\n###############################################################\n');
 
 elseif exit_answer == 2
 
+  num_compensated_spectra = exit_main_loop;
   exit_main_loop = 0;
 
 end						% end of "if exit_answer" clause
 
 end						% end of main while loop
 
+% print some additional stuff to the figure
+
+figure_title = input ('Please type in a figure title\n(the number of accumulations will be added automatically)', 's');
+
+title_string = [figure_title '(accumulated from '  num2str(num_accumulated_spectra) ' measurements)'];
+
+title(title_string);
+xlabel('B / mT')
+ylabel('I')
+
+% print some summarizing statistics and information
+
+fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\nSUMMARY OF THE PERFORMED ACTIONS:\n')
+
+fprintf('\nTotal number of compensated spectra:\t%i', num_compensated_spectra);
+fprintf('\nTotal number of accumulated spectra:\t%i\n', num_accumulated_spectra);
+
+fprintf('\nThe following files were accumulated:\n\t');
+fprintf(filenames_accumulated);
+
+if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
+
+  fprintf('\n\nThe following files were NOT accumulated:\n\t');
+  fprintf(filenames_not_accumulated);
+
+end;
+
+fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
+
+
 total_time_used = toc;
-fprintf ('\nThe total time used is %4.2f seconds\n\n', total_time_used);
+fprintf ('\nThe total time used is %4.2f seconds\n', total_time_used);
 						% print total time used;
+
+fprintf('\n---------------------------------------------------------------------------\n')
+
 
 % At the very end stop logging...
 

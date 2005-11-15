@@ -152,6 +152,12 @@ fprintf( '\nCompensate pretrigger offset\n' )
 offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
 
+% Give user the possibility to manually evaluate the t value at which the signal
+% amplitude of the B_0 spectrum is maximal
+
+script_find_max_amplitude;
+
+
 % Evaluate drift and possible fits
 
 fprintf('\nEvaluate drift and possible fits...\n');

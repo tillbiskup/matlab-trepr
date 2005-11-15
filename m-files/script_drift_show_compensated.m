@@ -38,7 +38,7 @@ x = [1:1:drift_cols];		% create x-axis values
 figure;					% Opens up a new plot window.
 
     
-[ spectrum, max_ind ] = B0_spectrum ( offset_comp_data, 2 );
+[ spectrum, max_ind ] = B0_spectrum ( offset_comp_data, 2, t );
 x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -58,7 +58,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv1);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
     
@@ -68,7 +68,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv2);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -78,7 +78,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv3);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -88,7 +88,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv4);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -98,7 +98,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv5);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -108,7 +108,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv6);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -118,7 +118,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = drift_compensation_along_t(offset_comp_data, trigger_pos, 100, 10, pv7);
     
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 
@@ -128,7 +128,7 @@ while ( exit_condition == 0 )
 
     drift_comp_data = offset_comp_data;
 
-    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2 );
+    [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
     plot(x,spectrum,'-',x,zeros(1,length(x)));
 

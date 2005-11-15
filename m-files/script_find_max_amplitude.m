@@ -21,7 +21,7 @@
 
 % Plot B_0 spectrum and find signal maximum in t
 
-figure;						% opens new graphic window
+grfhandle = figure;			% opens new graphic window
 
 exit_find_max = 0;			% set while loop exit condition to default value;
 
@@ -52,6 +52,8 @@ while ( exit_find_max == 0 )
 
   spectrum = B0_spectrum ( offset_comp_data, 2, t );
   
+  figure(grfhandle);
+  
   clf;
   hold on;
   
@@ -67,7 +69,7 @@ while ( exit_find_max == 0 )
   
   hold off;
   
-  freq_comp_option = menu ( 'What would you want to do?', '< t (1 step)', 't (1 step) >', '< t (10 step)', 't (10 step) >', 'Exit');
+  freq_comp_option = menu ( 'What would you want to do?', '< t (1 step)', 't (1 step) >', '< t (10 step)', 't (10 step) >', 'Type in t value manually', 'Show 2D Spectrum', 'Exit');
   
   if ( freq_comp_option == 1)
   
@@ -86,6 +88,32 @@ while ( exit_find_max == 0 )
     t = t + 10;
   
   elseif ( freq_comp_option == 5)
+
+	t_manually = input ( '\nType in a t value manually: ', 's' );
+	t = str2num (t_manually);
+  
+  elseif ( freq_comp_option == 6)
+  
+	fprintf('\nPlot 2D spectrum of offset-compensated data...\n')
+
+	figure;
+
+	[X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+						% set X and Y matrices for the mesh command
+
+	if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+
+	  gsplot ( offset_comp_data' );			% make simple 3D plot of the raw data
+
+	else								% otherwise we assume that we're called by MATLAB(R)
+
+	  mesh ( offset_comp_data );				% make simple 3D plot of the raw data
+
+	title('2D plot of offset-compensated data');
+
+  end
+	
+  elseif ( freq_comp_option == 7)
   
     exit_find_max = 1;
     					% set exit condition for while loop true
