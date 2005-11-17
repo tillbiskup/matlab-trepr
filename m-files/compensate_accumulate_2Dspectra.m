@@ -83,7 +83,7 @@ if ( exist('DEBUGGING') == 0 )
 						% in the case the debug variable is not set...
 
 	global DEBUGGING;
-	DEBUGGING = 1;		% set DEBUGGING to ON
+	DEBUGGING = 0;		% set DEBUGGING to ON
 						% if debug <> 0 then additional DEBUGGING OUTPUT is printed
 
 end;
@@ -122,8 +122,7 @@ tic;						% set starting point for calculation of used time, just for fun...
 
 fprintf( '\nThis is the file $RCSfile$, $Revision$ from $Date$\n' );
 
-fprintf('\nThis file is intended to be used to compensate and accumulate 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\nThe whole compensation process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
-
+fprintf('\nThis file is intended to be used to compensate and accumulate 2D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\nThe whole compensation process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
 
 % First of all start logging
 
@@ -136,16 +135,26 @@ dateandtime = [datestr(now, 31), ' @ ', computer];
 
 disp ( dateandtime )	% print current date and time and system
 
-fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\n---------------------------------------------------------------------------\n');
 fprintf('\nGENERAL DESCRIPTION OF THE PROGRAM\n')
 
 fprintf( '\nThis is the file $RCSfile$\n\t$Revision$ from $Date$\n' );
 
-fprintf('\nThis file is intended to be used to compensate and accumulate 3D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\n');
+fprintf('\nThis file is intended to be used to compensate and accumulate 2D spectra\nrecorded with the fsc2 software and save them as ASCII data to an output file.\n');
 fprintf('\nAlthough much effort has been made to give the user the necessary control over\nthe whole process of data manipulation there are several things that can be handled\nin a better way.\n');
-fprintf('\nThe last versions of this file can be found at:\n\thttp://physik.fu-berlin.de/~biskup/\n');
+fprintf('\nThe last versions of this file along with some documentation can be found at:\n\thttp://physik.fu-berlin.de/~biskup/\n');
+fprintf('\nNOTE:\tThe revision of any routine and script called is logged in this file.\n\tTherefore it is possible to track back any errors or problems with\n\tone specific revision of one part of the program thanks to the\n\trevision control system.\n');
 
-fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\nThe following tasks are performed by the program and repeated for every spectrum\nthe user provides. (Tasks in brackets depend on whether the user\nchooses to perform them):\n');
+fprintf('\n\t1. [Cut spectrum]');
+fprintf('\n\t2. Compensate pretrigger offset');
+fprintf('\n\t3. Evaluate maximum signal amplitude according to t');
+fprintf('\n\t4. Evaluate drift');
+fprintf('\n\t5. Save data');
+fprintf('\n\t6. Frequency compensation');
+fprintf('\n\t7. [Accumulation]\n');
+
+fprintf('\n---------------------------------------------------------------------------\n');
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
@@ -202,7 +211,8 @@ script_cut_off;
 
 % Next compensate pretrigger offset
 
-fprintf( '\nCompensate pretrigger offset\n' )
+fprintf('\n---------------------------------------------------------------------------\n');
+fprintf( '\nCompensate pretrigger offset\n' );
 
 offset_comp_data = pretrigger_offset ( data, trigger_pos );
 
@@ -216,6 +226,7 @@ script_find_max_amplitude;
 
 % Evaluate drift and possible fits
 
+fprintf('\n---------------------------------------------------------------------------\n');
 fprintf('\nEvaluate drift and possible fits...\n');
 fprintf('\nChoose between the display modes...\n');
 
@@ -237,6 +248,9 @@ end
 
 
 % Save last dataset to file
+
+fprintf('\n---------------------------------------------------------------------------\n');
+fprintf('\nSave compensated data to file\n');
 
 outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' get_file_extension(filename) ];
 								% the output filename consists of the path of the input file,
@@ -282,6 +296,9 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 
   % frequency compensation
 
+  fprintf('\n---------------------------------------------------------------------------\n');
+  fprintf('\nCompensate frequency before accumulation of the spectra\n');
+  
   drift_comp_data1 = drift_comp_data;
   drift_comp_data2 = matrix1;
   								% set the matrices according to the necessary settings for the
@@ -298,6 +315,9 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
     fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
   end;
 
+  fprintf('\n---------------------------------------------------------------------------\n');
+  fprintf('\nAccumulate spectra\n');
+  
   % After plotting the overlay of both B_0 spectra
   % ask the user whether he really wants to proceed with accumulation...
 
@@ -430,17 +450,24 @@ end						% end of main while loop
 
 % print some additional stuff to the figure
 
-figure_title = input ('Please type in a figure title\n(the number of accumulations will be added automatically)', 's');
+figure_title = '';		% default value for the figure title, in the case the user doesn't provide one...
 
-title_string = [figure_title '(accumulated from '  num2str(num_accumulated_spectra) ' measurements)'];
+fprintf('\nFIGURE TITLE\n');
+figure_title = input ('\nPlease type in a figure title - normally the sample name and the temperature\n(the number of accumulations will be added automatically):\n  ', 's');
+
+title_string = [figure_title ' (accumulated from '  num2str(num_accumulated_spectra) ' measurements)'];
+
+fprintf('\nThe complete title will be as follows:\n\n\t%s\n', title_string);
 
 title(title_string);
 xlabel('B / mT')
 ylabel('I')
 
+figure(gcf);
+
 % print some summarizing statistics and information
 
-fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\n---------------------------------------------------------------------------\n');
 fprintf('\nSUMMARY OF THE PERFORMED ACTIONS:\n')
 
 fprintf('\nTotal number of compensated spectra:\t%i', num_compensated_spectra);
@@ -456,14 +483,14 @@ if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
 
 end;
 
-fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
+fprintf('\n\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
 
 
 total_time_used = toc;
 fprintf ('\nThe total time used is %4.2f seconds\n', total_time_used);
 						% print total time used;
 
-fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\n---------------------------------------------------------------------------\n');
 
 
 % At the very end stop logging...

@@ -86,7 +86,7 @@ function varargout = start_logging
     
   end						% end while loop
   							
-  fprintf ( '\nFile %s will be used as logfile for the current session...\n\n', logfilename );
+  fprintf ( '\nFile\n  %s\nwill be used as logfile for the current session...\n\n', logfilename );
   
   diary ( logfilename );	% start logging via the 'diary' function
 

@@ -21,6 +21,7 @@
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
 
+fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 
 % To be sure no signal is cut off

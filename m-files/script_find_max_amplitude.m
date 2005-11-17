@@ -18,6 +18,8 @@
 % will be converted into a function...
 %
 
+fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
 
 % Plot B_0 spectrum and find signal maximum in t
 
