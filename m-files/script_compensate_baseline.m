@@ -21,6 +21,8 @@
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually compensate the baseline\n')
 
+fprintf('\nThe first and the last 20 data points of the B_0 spectrum together with\n one data point at the center of the spectrum - this one can be moved by the user - \nare taken to perform a quadratic fit.\n')
+
 % Plot B_0 spectrum and fit baseline from the first and last 20 data points
 
 grfhandle = figure;			% opens new graphic window
@@ -185,6 +187,8 @@ title(graph_title);
 xlabel('B / mT');
 ylabel('I');
 
+
+fprintf('\nThe polynom used for fitting the baseline is as follows:\n\n\t%2.8f x^2 + %2.8f x + %2.8f\n\n', polynom_2nd_order);
 
 % perform the compensation itself by simple subtraction of the calculated baseline
 % from the original spectrum
