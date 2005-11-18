@@ -21,7 +21,12 @@
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually compensate the baseline\n')
 
-fprintf('\nThe first and the last 20 data points of the B_0 spectrum together with\n one data point at the center of the spectrum - this one can be moved by the user - \nare taken to perform a quadratic fit.\n')
+% Set the number of data points that are used from the start and the end of the spectrum
+% to perform the fit
+
+no_points = 20;
+
+fprintf('\nThe first and the last %i data points of the B_0 spectrum together with\n one data point at the center of the spectrum - this one can be moved by the user - \nare taken to perform a quadratic fit.\n', no_points);
 
 % Plot B_0 spectrum and fit baseline from the first and last 20 data points
 
@@ -42,15 +47,15 @@ vert_x = x(round(length(x)/2));
 spectrum_center = round(length(spectrum)/2);
 
 
-% get the first and last 20 data points from the spectrum
-spectrum_first_part = spectrum ( 1:20 );
-spectrum_last_part = spectrum ( (length(spectrum)-20+1):(length(spectrum)) );
+% get the first and last no_points data points from the spectrum
+spectrum_first_part = spectrum ( 1:no_points );
+spectrum_last_part = spectrum ( (length(spectrum)-no_points+1):(length(spectrum)) );
 
 baseline_comp = [ spectrum_first_part' ; spectrum(spectrum_center) ; spectrum_last_part' ];
 
 % create a vector containing the B_0 field values according to the above gotten data points from the spectrum
-index1_baseline_comp = [(min([field_params(1) field_params(2)])) : abs(field_params(3)) : (min([field_params(1) field_params(2)])+(20*abs(field_params(3)))-abs(field_params(3)))];
-index2_baseline_comp = [(max([field_params(1) field_params(2)])-(20*abs(field_params(3)))+abs(field_params(3))) : abs(field_params(3)) : (max([field_params(1) field_params(2)]))];
+index1_baseline_comp = [(min([field_params(1) field_params(2)])) : abs(field_params(3)) : (min([field_params(1) field_params(2)])+(no_points*abs(field_params(3)))-abs(field_params(3)))];
+index2_baseline_comp = [(max([field_params(1) field_params(2)])-(no_points*abs(field_params(3)))+abs(field_params(3))) : abs(field_params(3)) : (max([field_params(1) field_params(2)]))];
 
 index_baseline_comp = [ index1_baseline_comp' ; vert_x*10 ; index2_baseline_comp' ] / 10;
 
@@ -64,7 +69,7 @@ index_baseline_comp = [ index1_baseline_comp' ; vert_x*10 ; index2_baseline_comp
 
 while ( exit_baseline_comp == 0 )
 
-  % compute 2nd order polynomial fit using the first and last 20 data points of the
+  % compute 2nd order polynomial fit using the first and last no_points data points of the
   % spectrum and a single point in the center of the spectrum.
   % polyfit finds the coefficients of a polynomial,
 

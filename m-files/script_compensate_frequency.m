@@ -17,12 +17,25 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% INPUT
+%	spectrum1, spectrum2				1D or 2D
+%	field_params1, field_params2		each consisting of three values
+%	t1, t2							REMARK: in the moment the old spectrum is just
+%									plotted with t from the new one...
+% OUTPUT
+%	spectrum1, spectrum2				1D or 2D
+%	field_params1, field_params2		each consisting of three values
+%
+% TASK
+%	- Get it work with either 1D or 2D data
+%	- change the handling of the t value (there have to be two different t values...)
+%	- convert the script to a function
+%
 
-
-  % DEBUGGING OUTPUT
-  if ( DEBUGGING )
-    fprintf('\nSTART OF $RCSfile$\n');
-  end;
+% DEBUGGING OUTPUT
+if ( DEBUGGING )
+  fprintf('\nSTART OF $RCSfile$\n');
+end;
 
 % First, evaluate difference in signal amplitude of both spectra and compensate for it
 % to improve the overlay of the B_0 spectra
@@ -99,7 +112,12 @@ while ( exit_freq_comp == 0 )
   
 end;							% end of while loop
 
-% fprintf('\nOffset1: %i; Offset2: %i\n',offset1, offset2);
+
+% DEBUGGING OUTPUT
+if ( DEBUGGING )
+  fprintf('\nOffset1: %i; Offset2: %i\n',offset1, offset2);
+end;
+
 
 if ( ( offset1 ~= 0 ) | ( offset2 ~= 0 ) )
 
