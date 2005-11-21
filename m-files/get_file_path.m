@@ -1,4 +1,4 @@
-% Copyright (C) 2004,2005 Peter J. Acklam, Till Biskup
+% Copyright (C) 2005 Till Biskup
 % 
 % This file ist free software.
 % 

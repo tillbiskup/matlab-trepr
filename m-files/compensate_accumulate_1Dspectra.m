@@ -318,6 +318,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   								% script file script_compensate_frequency.m
 								
   script_compensate_frequency;
+  
+%  [ drift_comp_data1, drift_comp_data2, field_params1, field_params2 ] = frequency_compensation(drift_comp_data1, drift_comp_data2, field_params1, field_params2, t, t)
 
 
   % DEBUGGING OUTPUT
