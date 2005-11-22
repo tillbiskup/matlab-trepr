@@ -53,9 +53,20 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   						% two input parameters
   end
   
-  [ quality_matrix1, amplitude_matrix1, std_noise_matrix1 ] = quality_of_spectrum ( matrix1, 10 );
+  if ( isvector(matrix1) && isvector(matrix2) )
+  
+    num_ts = 1;
+  
+  else
+  
+    num_ts = 10;
+  
+  end;
+  
+  
+  [ quality_matrix1, amplitude_matrix1, std_noise_matrix1 ] = quality_of_spectrum ( matrix1, num_ts );
 
-  [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, 10 );
+  [ quality_matrix2, amplitude_matrix2, std_noise_matrix2 ] = quality_of_spectrum ( matrix2, num_ts );
 
   sum_quality = ones(1,100);
   sum_amplitude = ones(1,100);
@@ -67,7 +78,7 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
     sum = summarize_matrices ( matrix1, matrix2, (i/10) );
   						% sum up the two matrices
   						
-  	[ quality, amplitude, std_noise ] = quality_of_spectrum ( sum, 10 );
+  	[ quality, amplitude, std_noise ] = quality_of_spectrum ( sum, num_ts );
   						% the quality is calculated with the first 10 off-resonance time slices
   						% as the reference (the second input parameter for the quality_of_spectrum function)
   						
@@ -89,7 +100,7 @@ function data = accumulate_measurements ( matrix1, matrix2, varargin )
   
   data = summarize_matrices ( matrix1, matrix2, (index_best_quality/10) );
   
-  [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, 10 );
+  [ quality_data, amplitude_data, std_noise_data ] = quality_of_spectrum ( data, num_ts );
   
   if ( DEBUGGING )
   

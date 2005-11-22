@@ -120,7 +120,15 @@
 
   figure;
 
-  [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
+  if (isvector(acc_meas) == 0)
+
+    [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
+    
+  else
+  
+    spectrum = acc_meas;
+  
+  end;
  
   x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
   

@@ -40,8 +40,8 @@ function [ quality, amplitude, std_noise ] = quality_of_spectrum ( data, num_ts 
   mean_ts = mean ( data ( [1:num_ts], : ) );
   						% average over the first 'num_ts' time slices
   
-  noise = data ( 5, : ) - mean_ts;
-  						% the fifth time slice is taken and the average of the first 'num_ts'
+  noise = data ( round(num_ts/2), : ) - mean_ts;
+  						% the middle time slice is taken and the average of the first 'num_ts'
   						% time slices subtracted to get a noise around zero
   						
   std_noise = std ( noise );

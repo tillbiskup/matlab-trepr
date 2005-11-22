@@ -294,7 +294,7 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
 
-  [ compensated_spectrum, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( drift_comp_data, field_params, time_params, matrix1, old_field_params, old_time_params );
+  [ compensated_spectrum, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( compensated_spectrum, field_params, time_params, matrix1, old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
 
@@ -316,10 +316,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   drift_comp_data2 = matrix1;
   								% set the matrices according to the necessary settings for the
   								% script file script_compensate_frequency.m
-								
-  script_compensate_frequency;
   
-%  [ drift_comp_data1, drift_comp_data2, field_params1, field_params2 ] = frequency_compensation(drift_comp_data1, drift_comp_data2, field_params1, field_params2, t, t)
+  [ drift_comp_data1, drift_comp_data2, field_params1, field_params2 ] = frequency_compensation(drift_comp_data1, drift_comp_data2, field_params1, field_params2, t, old_t);
 
 
   % DEBUGGING OUTPUT
