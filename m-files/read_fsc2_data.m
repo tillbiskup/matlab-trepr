@@ -21,7 +21,7 @@
 %	transient EPR, fsc2
 %
 % SYNOPSIS
-%	[ DATA, TRIGGER_POS ] = read_fsc2_data ( FILENAME )
+%	[ DATA, FREQUENCY, FIELD_PARAMS, SCOPE_PARAMS, TIME_PARAMS ] = read_fsc2_data ( FILENAME )
 %
 % DESCRIPTION
 %	This function opens the file FILENAME, looks for some

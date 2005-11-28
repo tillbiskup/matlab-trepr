@@ -87,7 +87,7 @@ if ( exist('DEBUGGING') == 0 )
 						% in the case the debug variable is not set...
 
 	global DEBUGGING;
-	DEBUGGING = 0;		% set DEBUGGING to ON
+	DEBUGGING = 1;		% set DEBUGGING to ON
 						% if debug <> 0 then additional DEBUGGING OUTPUT is printed
 
 end;
