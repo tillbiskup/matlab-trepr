@@ -40,6 +40,8 @@
 
   acc_meas = accumulate_measurements ( drift_comp_data1, drift_comp_data2 );
   								% accumulate the measurements compensated until here
+  								
+  field_params = field_params1;
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
