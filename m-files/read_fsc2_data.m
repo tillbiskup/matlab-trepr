@@ -62,14 +62,23 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
   % save opening of the file that's name is provided by the variable 'filename'
 
-  fid=0;					% set file identifier to standard value
-  while fid < 1 			% while file not opened
-    [fid,message] = fopen(filename, 'r');
+  if exist( filename )	% if the provided file exists
+
+    fid=0;				% set file identifier to standard value
+    while fid < 1 		% while file not opened
+      [fid,message] = fopen(filename, 'r');
     						% try to open file 'filename' and return fid and message
-    if fid == -1			% if there are any errors while trying to open the file
-      disp(message)		% display the message from fopen
-    end					% end "if fid"
-  end					% end while loop
+      if fid == -1		% if there are any errors while trying to open the file
+        disp(message)		% display the message from fopen
+      end				% end "if fid"
+    end					% end while loop
+    
+  else					% If the file provided by filename does not exist
+  
+    fprintf('\nERROR: File %s not found\n', filename);
+    error('');
+  
+  end;
   
   % read the leading commentary of the fsc2 file line by line
   % and extract the necessary parameters:
