@@ -100,16 +100,20 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 	  						
 	    lower_field_boundary = min( [ max(field_boundaries1) max(field_boundaries2) ] );
 	    						% gives the lower upper field boundary of both matrices
+  
+%		if ( ( isvector(matrix1) == 0 ) && ( isvector(matrix2) == 0 ) ) 
+  
+	  	% if both matrices are not 1D
 	    						
-	  	for i = 1 : (( lower_field_boundary - min(field_boundaries2))/abs(field_params2(3))+1)
+	  	  for i = 1 : (( lower_field_boundary - min(field_boundaries2))/abs(field_params2(3))+1)
 	  						% for i running from 1 to the upper boundary of the matrix
 	  						% with lower upper field boundary
 	  	
-	  	  new_matrix1 ( i , : ) = matrix1 ( i+((min(field_boundaries2)-min(field_boundaries1))/abs(field_params1(3))) , : );
+	  		new_matrix1 ( i , : ) = matrix1 ( i+((min(field_boundaries2)-min(field_boundaries1))/abs(field_params1(3))) , : );
 	  	  
-	  	  new_matrix2 ( i , : ) = matrix2 ( i , : );
+	  		new_matrix2 ( i , : ) = matrix2 ( i , : );
 	  	
-	  	end					% end of filling new matrices
+	  	  end					% end of filling new matrices
 
 		if ( field_params1(3) > 0)
 							% if spectrum1 recorded from lower to higher B_0 field
@@ -177,7 +181,7 @@ function [ new_matrix1, new_matrix2, new_field_params1, new_field_params2 ] = ad
 	  	  new_matrix2 ( i , : ) = matrix2 ( i+((min(field_boundaries1)-min(field_boundaries2))/abs(field_params2(3))) , : );
 	  	  
 	  	end					% end of filling new matrices
-	  	
+
 		if ( field_params1(3) > 0)
 							% if spectrum1 recorded from lower to higher B_0 field
 							% field_params(3) is the field step width

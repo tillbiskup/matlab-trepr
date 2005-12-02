@@ -294,9 +294,12 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
 
-  [ compensated_spectrum, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( compensated_spectrum, field_params, time_params, matrix1, old_field_params, old_time_params );
+  [ compensated_spectrum, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( compensated_spectrum', field_params, time_params, matrix1', old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
+
+  compensated_spectrum = compensated_spectrum';
+  matrix1 = matrix1';
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
