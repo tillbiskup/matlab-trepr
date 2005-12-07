@@ -373,6 +373,14 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 	filenames_accumulated = filename;
   
   end
+     
+  x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
+  
+  % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
+  x = x / 10;  
+
+  plot(x,spectrum,'-',x,zeros(1,length(x)));
+  
   
   
 else 					% if first pass of main loop
@@ -460,7 +468,10 @@ if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
 
 end;
 
-fprintf('\n\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
+fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
+fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params1);
+
+fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
 
 
 total_time_used = toc;
