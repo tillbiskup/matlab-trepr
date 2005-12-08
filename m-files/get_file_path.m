@@ -42,7 +42,7 @@ function file_path = get_file_path ( filename )
 	
   else
   
-	file_path = ''
+	file_path = '';
 						% set the file_path variable to the empty string
 
   end
