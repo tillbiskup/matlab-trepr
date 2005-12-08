@@ -51,6 +51,21 @@ function [ spectrum, max_index ] = B0_spectrum ( input_data, average_half_width,
     % one found is returned.
   
     [ max_values, max_index ] = max( max( input_data ));
+
+	% The max_index is used as center for the accumulation of several B_0 spectra.
+	% Therefore it becomes a problem when the max_index is at the end of the time axis.
+	% To avoid the problem in this case the max_index is shifted.
+
+	[ rows,cols ] = size( input_data );
+	if ( (max_index+average_half_width) > cols )
+	
+	  max_index = max_index - average_half_width;
+	  
+	elseif ( (max_index-average_half_width) < cols )
+	
+	  max_index = max_index + average_half_width;
+	
+	end;
   
     spectrum = mean( input_data( : , max_index-average_half_width : max_index+average_half_width )' );
   
