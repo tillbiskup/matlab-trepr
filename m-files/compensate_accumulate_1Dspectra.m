@@ -347,7 +347,7 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
     script_accumulate;
     						% call part of the script that does the accumulation
 
-	average_frequency = ( average_frequency * num_accumulated_spectra + frequency ) / (num_accumulated_spectra - 1);
+	average_frequency = ( average_frequency * num_accumulated_spectra + frequency ) / (num_accumulated_spectra + 1);
 
 	num_accumulated_spectra = num_accumulated_spectra + 1;
 						% increase value of counter
@@ -475,7 +475,7 @@ end;
 
 fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
 fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params1);
-fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz', average_frequency);
+fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz\n', average_frequency);
 
 fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
 
