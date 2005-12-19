@@ -86,7 +86,13 @@ while ( exit_baseline_comp == 0 )
   						% set the current figure window to the window opened
   						% just before the while loop
   
-  clf;					% clear the graphics window
+						% clear the graphics window
+  if program == 'Octave'
+    clg;
+  else
+	clf;
+  end;
+
   hold on;				% add anything to the actual graphics window
 
   % set graphics title and axis labels

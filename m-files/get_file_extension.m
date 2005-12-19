@@ -2,7 +2,7 @@
 % 
 % This file ist free software.
 % 
-%****f* auxilliary_routines/get_file_basename.m
+%****f* auxilliary_routines/get_file_extension.m
 %
 % AUTHOR
 %	Till Biskup <till.biskup@physik.fu-berlin.de>

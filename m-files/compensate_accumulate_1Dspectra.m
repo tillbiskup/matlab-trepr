@@ -18,7 +18,7 @@
 %	The file serves as an example for own scripts.
 %
 %	The big difference to the script 'accumulate_compensate_2Dspectra' is that
-%	here the only the 1D B_0 spectrum is worked on instead of the whole 2D data set
+%	here only the 1D B_0 spectrum is worked on instead of the whole 2D data set
 %
 %
 %	The script consists of several parts each of which accounts for a special

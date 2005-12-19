@@ -56,7 +56,12 @@ while ( exit_find_max == 0 )
   
   figure(grfhandle);
   
-  clf;
+
+  if program == 'Octave'
+    clg;
+  else
+	clf;
+  end;
   hold on;
   
   graph_title = [ 'B_0 spectrum for evaluating the maximum signal amplitude depending on t with t=', num2str(t) ];

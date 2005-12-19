@@ -18,7 +18,7 @@
 % MODIFICATION DATE
 %	$Date$
 % KEYWORDS
-%	transient EPR, fsc2
+%	diary, logging
 %
 % SYNOPSIS
 %	stop_logging

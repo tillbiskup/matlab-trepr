@@ -18,13 +18,13 @@
 % MODIFICATION DATE
 %	$Date$
 % KEYWORDS
-%	transient EPR, fsc2
+%	diary, logging
 %
 % SYNOPSIS
 %	[ logfilename ] = start_logging
 %
 % DESCRIPTION
-%	This function is used to begin the logging of the further processing of a script file.
+%	This function is used to start the logging of the further processing of a script file.
 %	Therefore it first asks for a filename and checks for the existence of the given file.
 %
 %	The return value logfilename is optional.
