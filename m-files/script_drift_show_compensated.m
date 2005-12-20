@@ -35,13 +35,19 @@
 								
 x = [1:1:drift_cols];		% create x-axis values 
 
-figure;					% Opens up a new plot window.
+% Plot B_0 spectrum at signal maximum in t
 
-    
+grfhandle = figure;			% opens new graphic window
+
+if program == 'Octave'			% clear graphics window contents
+  clg;							% this is especially necessary with GNU Octave
+else
+  clf;
+end;
+   
 [ spectrum, max_ind ] = B0_spectrum ( offset_comp_data, 2, t );
 x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 plot(x,spectrum,'-',x,zeros(1,length(x)));
-
 
 title('Drift and polynomic fit');
 
@@ -53,6 +59,8 @@ while ( exit_condition == 0 )
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
+  
+  figure(grfhandle);			% set graphics window to the current window
 
   if ( method_drift_comp == 1 )
 

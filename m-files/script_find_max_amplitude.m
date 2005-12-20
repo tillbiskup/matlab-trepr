@@ -17,9 +17,17 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% Especially this program depends on the variables DEBUGGING and PLOTTING3D that are
+% set in the main script in the moment.
+%
+% NOTE ACCORDING GNU OCTAVE
+% This script is fully compatible and works perfect together with GNU OCTAVE
+%
 
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
+
+
 
 % Plot B_0 spectrum and find signal maximum in t
 
@@ -54,9 +62,8 @@ while ( exit_find_max == 0 )
 
   spectrum = B0_spectrum ( offset_comp_data, 2, t );
   
-  figure(grfhandle);
+  figure(grfhandle);			% set graphics window to the current window
   
-
   if program == 'Octave'
     clg;
   else

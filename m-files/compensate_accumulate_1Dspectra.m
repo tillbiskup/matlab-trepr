@@ -453,7 +453,12 @@ title(title_string);
 xlabel('B / mT')
 ylabel('I')
 
-figure(gcf);
+if program == 'Octave'
+  
+else
+  figure(gcf);			% set figure window to current figure window (gcf)
+end;
+
 
 % print some summarizing statistics and information
 
