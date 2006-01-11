@@ -519,6 +519,42 @@ else
 end;
 
 
+% Save last plot as an EPS file
+
+user_provided_filename = input ( 'Please enter a filename for the EPS file for saving the last plot\n(if empty, the last input filename will be used with .eps as file extension):\n   ', 's' );
+
+if length( user_provided_filename ) > 0	
+						% If the user provided a filename
+
+  outputfilename = user_provided_filename;
+	
+  fprintf ( '\nFile %s will be used to store the last plot as EPS file...\n\n', outputfilename );
+  
+else					% In case the user didn't provide a filename
+
+  outputfilename = [ get_file_path(filename) get_file_basename(filename) '.eps' ];
+						% the output filename consists of the path of the input file,
+						% the basename of the input file and the extension '.eps'
+
+  fprintf ( '\nThe last plot will be stored in the EPS file\n\t%s\n', outputfilename );
+
+end
+
+fprintf('\nSaving last plot to the EPS file\n\t%s\n', outputfilename)
+						% Telling the user what's going to happen
+
+if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+
+
+else					% otherwise we assume that we're called by MATLAB(R)
+
+  print ( '-depsc2' , outputfilename );
+
+end					% end of "if program" clause
+  
+
+
 % print some summarizing statistics and information
 
 fprintf('\n---------------------------------------------------------------------------\n');
