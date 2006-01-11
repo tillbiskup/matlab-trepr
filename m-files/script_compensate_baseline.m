@@ -16,7 +16,6 @@
 %
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
-%
 
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually compensate the baseline\n')
@@ -111,7 +110,7 @@ while ( exit_baseline_comp == 0 )
   
   % plot vertical line
   y = [ min(spectrum) : ((max(spectrum)-min(spectrum))*0.01) : max(spectrum) ];
-  plot(vert_x,y);
+  plot(vert_x*ones(length(y)),y);
   
   % stop plotting all things in the actual graphics window
   hold off;

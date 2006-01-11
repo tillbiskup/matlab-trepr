@@ -252,9 +252,9 @@ end
 fprintf('\n---------------------------------------------------------------------------\n');
 fprintf('\nSave compensated data to file\n');
 
-outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp.' get_file_extension(filename) ];
+outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp2D.' get_file_extension(filename) ];
 								% the output filename consists of the path of the input file,
-								% the basename of the input file with appended '-comp'
+								% the basename of the input file with appended '-comp2D'
 								% and the extension of the input file (normally '.dat')
 
 fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
@@ -330,6 +330,64 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 
     script_accumulate;
     						% call part of the script that does the accumulation
+ 
+	% Save accumulated measurements
+
+	user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with -acc2D appended\n at the filename base):\n   ', 's' );
+
+	if length( user_provided_filename ) > 0	
+						% If the user provided a filename
+
+	  outputfilename = user_provided_filename;
+	
+	  fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
+  
+	else					% In case the user didn't provide a filename
+
+
+	  outputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc2D.' get_file_extension(filename) ];
+						% the output filename consists of the path of the input file,
+						% the basename of the input file with appended '-acc'
+						% and the extension of the input file (normally '.dat')
+
+	  fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
+
+	end
+
+	fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
+						% Telling the user what's going to happen
+
+	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+	  save ('-ascii', outputfilename, 'acc_meas');
+						% save data to ascii file
+
+	else					% otherwise we assume that we're called by MATLAB(R)
+
+	  save (outputfilename, 'acc_meas', '-ascii');
+						% save data to ascii file in a MATLAB(R) compatible way
+						% (silly MATLAB behaviour - to accept the Octave variant of
+						% calling but neither saving nor complaining all about...)
+
+	end					% end of "if program" clause
+  
+
+	% print B_0 spectrum of accumulated data
+
+%    figure;
+
+	if (isvector(acc_meas) == 0)
+
+      [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
+    
+	else
+  
+      spectrum = acc_meas;
+  
+	end;
+
+
+	average_frequency = ( average_frequency * num_accumulated_spectra + frequency ) / (num_accumulated_spectra + 1);
 
 	num_accumulated_spectra = num_accumulated_spectra + 1;
 						% increase value of counter
@@ -351,6 +409,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						% wants to proceed with the new spectrum 
   						% just compensated
   						
+	average_frequency = frequency;
+
 	fprintf('\nYou decided not to accumulate\n and to continue with the just compensated spectrum.\n')
 						
 	filenames_not_accumulated = filenames_accumulated;
@@ -362,6 +422,7 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 else 					% if first pass of main loop
 
   filenames_accumulated = filename;
+  average_frequency = frequency;
 
   if ( PLOTTING3D )		% in the case the plot3d variable is set...
 
@@ -386,24 +447,31 @@ else 					% if first pass of main loop
 
     end;
 
-  end;
-
-  % print B_0 spectrum
-
-  figure;
-
-  [spectrum,max_x] = B0_spectrum(drift_comp_data,2,t);
- 
-  x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-  
-  % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
-  x = x / 10;  
-  
-  plot(x,spectrum,x,zeros(1,length(x)));
-
+  end;					% if (PLOTTING3D)
 
 end;						% end "if exit_main_loop" clause
 
+
+% print B_0 spectrum of the last dataset
+
+figure;					% open new graphics window
+
+[spectrum,max_x] = B0_spectrum(drift_comp_data,2,t);
+						% evaluate B_0 spectrum and its maximum
+ 
+x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+						% set x axis values from field parameters
+  
+% to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
+x = x / 10;  
+
+plot(x,spectrum,x,zeros(1,length(x)));
+						% plot spectrum and line at y=0
+						
+
+% as we are now at the end of one complete compensation cycle, ask the user what to
+% do next. The two options are to continue with a new file or to stop compensation here
+% and exit the program after some additional settings.
 
 exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
 						% make menu that lets the user choose which drift compensation
@@ -449,6 +517,7 @@ end						% end of "if exit_answer" clause
 end						% end of main while loop
 
 % print some additional stuff to the figure
+hold on;
 
 figure_title = '';		% default value for the figure title, in the case the user doesn't provide one...
 
@@ -462,6 +531,8 @@ fprintf('\nThe complete title will be as follows:\n\n\t%s\n', title_string);
 title(title_string);
 xlabel('B / mT')
 ylabel('I')
+
+hold off;
 
 figure(gcf);
 
@@ -482,6 +553,10 @@ if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
   fprintf(filenames_not_accumulated);
 
 end;
+
+fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
+fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params1);
+fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz\n', average_frequency);
 
 fprintf('\n\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
 

@@ -32,10 +32,8 @@ x = [1:1:drift_cols];		% create x-axis values
 
 figure;					% Opens up a new plot window.
 
-plot(x,drift,'-');
+plot(x,drift);
 						% plot drift against x
-						% values of linear fit against x (pv1 = polyval_1st_order)
-						% values of quadratic fit against x (pv2 = polyval_2nd_order)
 
 title('Drift and polynomic fit');
 
@@ -50,11 +48,11 @@ while ( exit_condition == 0 )
 
   if ( method_drift_comp == 1 )
 
-    plot(x,drift,'-',x,pv1,'-');
+    plot(x,drift,x,pv1);
 
   elseif ( method_drift_comp == 2 )
 
-    plot(x,drift,'-',x,pv2,'-');
+    plot(x,drift,x,pv2);
 
   elseif ( method_drift_comp == 3 )
 

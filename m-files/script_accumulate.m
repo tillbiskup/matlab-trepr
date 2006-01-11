@@ -77,62 +77,6 @@
 	
   end
   
-  % Save accumulated measurements
-
-  user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with -acc appended\n at the filename base):\n   ', 's' );
-
-  if length( user_provided_filename ) > 0	
-						% If the user provided a filename
-
-	outputfilename = user_provided_filename;
-	
-	fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
-  
-  else					% In case the user didn't provide a filename
-
-
-	outputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc.' get_file_extension(filename) ];
-						% the output filename consists of the path of the input file,
-						% the basename of the input file with appended '-acc'
-						% and the extension of the input file (normally '.dat')
-
-	fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
-
-  end
-
-  fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
-						% Telling the user what's going to happen
-
-  if program == 'Octave'	% if we're called by GNU Octave (as determined above)
-
-	save ('-ascii', outputfilename, 'acc_meas');
-						% save data to ascii file
-
-  else					% otherwise we assume that we're called by MATLAB(R)
-
-	save (outputfilename, 'acc_meas', '-ascii');
-						% save data to ascii file in a MATLAB(R) compatible way
-						% (silly MATLAB behaviour - to accept the Octave variant of
-						% calling but neither saving nor complaining all about...)
-
-  end					% end of "if program" clause
-  
-
-  % print B_0 spectrum of accumulated data
-
-  figure;
-
-  if (isvector(acc_meas) == 0)
-
-    [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
-    
-  else
-  
-    spectrum = acc_meas;
-  
-  end;
-
-  
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
     fprintf('\nEND OF $RCSfile$\n');
