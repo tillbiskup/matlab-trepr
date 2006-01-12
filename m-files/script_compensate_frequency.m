@@ -17,6 +17,9 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% GNU Octave COMPATIBILITY
+% This file works perfectly with GNU Octave
+%
 % INPUT
 %	spectrum1, spectrum2				1D or 2D
 %	field_params1, field_params2		each consisting of three values
@@ -72,7 +75,12 @@ while ( exit_freq_comp == 0 )
   x1 = x1 / 10;
   x2 = x2 / 10;
   
-  clf;
+  if ( program == 'Octave' )
+  	clg;
+  else
+    	clf;
+  end;
+  
   hold on;
 
   title('Both B_0 spectra for frequency alignment')
@@ -81,7 +89,12 @@ while ( exit_freq_comp == 0 )
 
   plot(x1,spectrum1','-',x2,spectrum2','-',x1,zeros(1,length(x1)),'-')
 
-  legend( {'Spectrum 1','Spectrum 2'} )
+   
+  if ( program == 'Octave' )
+
+  else
+    legend( {'Spectrum 1','Spectrum 2'} )
+  end;
   
   hold off;
   

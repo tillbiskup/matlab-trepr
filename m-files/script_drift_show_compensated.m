@@ -22,6 +22,14 @@
 % at the maximum signal amplitude as it is used later on for further analysis. Thus
 % the drift compensation method can be fitted to the "real" spectrum.
 % 
+%
+% INPUT
+%
+% OUTPUT
+%
+% TASKS
+%	- Convert script to a function
+%
 
 
 % Evaluate drift and possible fits
@@ -39,11 +47,11 @@ x = [1:1:drift_cols];		% create x-axis values
 
 grfhandle = figure;			% opens new graphic window
 
-if program == 'Octave'			% clear graphics window contents
-  clg;							% this is especially necessary with GNU Octave
-else
-  clf;
-end;
+%if program == 'Octave'			% clear graphics window contents
+%  clg;							% this is especially necessary with GNU Octave
+%else
+%  clf;
+%end;
    
 [ spectrum, max_ind ] = B0_spectrum ( offset_comp_data, 2, t );
 x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
@@ -60,7 +68,7 @@ while ( exit_condition == 0 )
 						% method he wants to use
 
   
-  figure(grfhandle);			% set graphics window to the current window
+%  figure(grfhandle);			% set graphics window to the current window
 
   if ( method_drift_comp == 1 )
 
@@ -68,7 +76,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
     
     chosen_method = '1st order';
 
@@ -78,7 +86,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '2nd order';
 
@@ -88,7 +96,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '3rd order';
 
@@ -98,7 +106,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '4th order';
 
@@ -108,7 +116,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '5th order';
 
@@ -118,7 +126,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '6th order';
 
@@ -128,7 +136,7 @@ while ( exit_condition == 0 )
     
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = '7th order';
 
@@ -138,7 +146,7 @@ while ( exit_condition == 0 )
 
     [ spectrum, max_ind ] = B0_spectrum ( drift_comp_data, 2, t );
     x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
-    plot(x,spectrum,'-',x,zeros(1,length(x)));
+    plot(x,spectrum,x,zeros(1,length(x)));
 
     chosen_method = 'none';
 

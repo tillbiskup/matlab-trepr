@@ -17,6 +17,14 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+%
+% INPUT
+%
+% OUTPUT
+%
+% TASKS
+%	- Convert script to a function
+%
 
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices

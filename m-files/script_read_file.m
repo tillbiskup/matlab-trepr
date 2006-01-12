@@ -17,6 +17,22 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+%
+% INPUT
+%
+% OUTPUT
+%	data
+%	frequency
+%	field_params
+%	scope_params
+%	time_params
+%
+%	filename
+%	trigger_pos
+%
+% TASKS
+%	- Convert script to a function
+%
 
 
 % Ask the user for a file name to read and if file name is valid, read data
@@ -48,8 +64,10 @@ while (exist(filename) == 0)		% while there is no valid filename specified
   else							% In case the user didn't provide a filename
 
     fprintf ( 'You have not entered any file name!\n\n' );
-								% just print a short message and exit
+								% just print a short message and return to main loop
     filename = 'foo.bar';
+    								% set a default filename for the 'exist(filename)' test
+    								% needs a filename and cannot work with an empty string
   
   end
 

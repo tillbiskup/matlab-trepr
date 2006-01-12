@@ -41,10 +41,8 @@
 %	spectrum1, spectrum2				1D or 2D
 %	field_params1, field_params2		each consisting of three values
 %
-% TASK
+% TASKS
 %	- Get it work with either 1D or 2D data
-%	- change the handling of the t value (there have to be two different t values...)
-%	- convert the script to a function
 %
 %
 % SOURCE
@@ -59,6 +57,8 @@ function [ spectrum1, spectrum2, field_params1, field_params2 ] = frequency_comp
 
 
   global DEBUGGING;
+  
+  global program;
 
 
   % First, evaluate difference in signal amplitude of both spectra and compensate for it
@@ -130,7 +130,13 @@ function [ spectrum1, spectrum2, field_params1, field_params2 ] = frequency_comp
     x1 = x1 / 10;
     x2 = x2 / 10;
   
-    clf;
+
+	if program == 'Octave'			% clear graphics window contents
+	  clg;							% this is especially necessary with GNU Octave
+	else
+	  clf;
+	end;
+
     hold on;
 
     title('Both B_0 spectra for frequency alignment')
@@ -139,7 +145,10 @@ function [ spectrum1, spectrum2, field_params1, field_params2 ] = frequency_comp
 
     plot(x1,spectrum1_1D','-',x2,spectrum2_1D','-',x1,zeros(1,length(x1)),'-')
 
-    legend( {'Spectrum 1','Spectrum 2'} )
+	if program == 'Octave'
+	else
+      legend( {'Spectrum 1','Spectrum 2'} )
+  	end;
   
     hold off;
   

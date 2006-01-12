@@ -23,6 +23,14 @@
 % NOTE ACCORDING GNU OCTAVE
 % This script is fully compatible and works perfect together with GNU OCTAVE
 %
+%
+% INPUT
+%
+% OUTPUT
+%
+% TASKS
+%	- Convert script to a function
+%
 
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')

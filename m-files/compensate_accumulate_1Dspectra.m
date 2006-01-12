@@ -166,6 +166,7 @@ fprintf('\n---------------------------------------------------------------------
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
+global program;
 
 [ program, prog_version ] = discriminate_matlab_octave;
 

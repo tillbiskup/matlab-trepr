@@ -17,6 +17,14 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+%
+% INPUT
+%
+% OUTPUT
+%
+% TASKS
+%	- Convert script to a function
+%
 
 
 % Plot B_0 spectrum and find signal maximum in t

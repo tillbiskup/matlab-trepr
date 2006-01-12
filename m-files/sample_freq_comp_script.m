@@ -113,7 +113,10 @@ ylabel('I');
 
 plot(x1,spectrum1','-',x2,spectrum2','-',x1,zeros(1,length(x1)),'-')
 
-legend( { strrep(get_file_basename(filename_spectrum1),'_','\_') , strrep(get_file_basename(filename_spectrum2),'_','\_') } )
+if ( program == 'Octave' )
+else
+  legend( { strrep(get_file_basename(filename_spectrum1),'_','\_') , strrep(get_file_basename(filename_spectrum2),'_','\_') } )
+end;
   
 hold off;
   
