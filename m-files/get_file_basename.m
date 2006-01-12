@@ -28,6 +28,8 @@
 %	GET_FILE_BASENAME gets the file basename out of a complete filename
 %	with path and extension and returns it as string.
 %
+% SEE ALSO
+%	get_file_path, get_file_extension
 %
 % SOURCE
 

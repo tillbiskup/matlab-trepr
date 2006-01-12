@@ -28,6 +28,8 @@
 %	GET_FILE_EXTENSION gets the file extension out of a complete filename
 %	with path and extension and returns it as string.
 %
+% SEE ALSO
+%	get_file_basename, get_file_path
 %
 % SOURCE
 

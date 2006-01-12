@@ -20,6 +20,7 @@ items:
 	SWITCHES
 	INPUT
 	OUTPUT
+	DEPENDS ON
 	RESULT
 	RETURN VALUE
 	EXAMPLE
@@ -38,6 +39,9 @@ options:
     --html
     --multidoc
     --index
+    --cmode
+    --sections
+    --nopre
 ignore files:
     README
     CVS
