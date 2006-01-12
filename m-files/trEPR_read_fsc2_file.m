@@ -41,6 +41,10 @@
 %	filename
 %	trigger_pos
 %
+% DEPENDS ON
+%	program
+%	DEBUGGING
+%
 % PORTABILITY
 %
 %	The program is totally compatible with GNU Octave and MATLAB (TM)
@@ -50,6 +54,8 @@
 function [ data,frequency,field_params,scope_params,time_params,filename,trigger_pos ] = trEPR_read_fsc2_file
 
   fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
+
+  % set some global variables
 
   global program;
   global DEBUGGING;
@@ -104,3 +110,5 @@ function [ data,frequency,field_params,scope_params,time_params,filename,trigger
   if ( DEBUGGING )
     fprintf('\nEND OF $RCSfile$\n');
   end;
+
+%******
