@@ -17,6 +17,9 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% NOTE
+% This script has been converted to a function residing in the file
+%	trEPR_read_fsc2_file.m
 %
 % INPUT
 %

@@ -19,12 +19,19 @@
 %
 %
 % INPUT
+%	offset_comp_data
 %
 % OUTPUT
+%	drift_comp_data
 %
 % TASKS
 %	- Convert script to a function
+%	- evaluate silly behaviour of MATLAB (TM) R14 not to show the fitted line
+%	  when first invoked
 %
+% PORTABILITY
+% This script is completely compatible with GNU Octave
+
 
 
 % Evaluate drift and possible fits

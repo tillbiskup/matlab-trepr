@@ -18,9 +18,26 @@
 % will be converted into a function...
 %
 %
+% DESCRIPTION
+%
+%	Allows the user to cut off parts of the spectrum at its ends
+%	and recalculates the correct field parameters.
+%
+%	At any time in the process the user can revert to the original
+%	spectrum or just undo the last cut.
+%
+%	This should be performed after (manually) adjusting the signal maximum in time t
+%
 % INPUT
+%	data
+%	field_params
 %
 % OUTPUT
+%	data
+%
+% DEPENDS ON
+%	PLOTTING3D
+%	program
 %
 % TASKS
 %	- Convert script to a function

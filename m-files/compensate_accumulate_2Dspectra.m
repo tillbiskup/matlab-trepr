@@ -565,15 +565,7 @@ end
 fprintf('\nSaving last plot to the EPS file\n\t%s\n', outputfilename)
 						% Telling the user what's going to happen
 
-if program == 'Octave'	% if we're called by GNU Octave (as determined above)
-
-
-
-else					% otherwise we assume that we're called by MATLAB(R)
-
-  print ( '-depsc2' , outputfilename );
-
-end					% end of "if program" clause
+print ( '-depsc2' , outputfilename );
   
 
 % print some summarizing statistics and information

@@ -17,6 +17,18 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% VERY IMPORTANT NOTE!!!!!!!
+%
+%	There is another file called script_find_max_amplitude that seems to replace
+%	this file. The other one is tested for compatibility with GNU Octave, so use
+%	that one.
+%
+% DESCRIPTION
+%
+%	Gives the user the possibility to control manually the position on the time axis
+%	at which the signal amplitude of the B_0 spectrum is maximal. Therefore the user
+%	can sweep through the whole spectrum along the time axis and/or type in directly a
+%	value for t.
 %
 % INPUT
 %

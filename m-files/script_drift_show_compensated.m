@@ -17,6 +17,7 @@
 % Later on there will be a list of all these variables or perhaps the whole script
 % will be converted into a function...
 %
+% NOTE
 % The big advantage of this script over the script named script_drift.m is that here
 % not the drift at the end of the time axis is plottet but instead the B_0 spectrum
 % at the maximum signal amplitude as it is used later on for further analysis. Thus
@@ -24,8 +25,10 @@
 % 
 %
 % INPUT
+%	offset_comp_data
 %
 % OUTPUT
+%	drift_comp_data
 %
 % TASKS
 %	- Convert script to a function

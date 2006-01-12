@@ -19,8 +19,18 @@
 %
 %
 % INPUT
+%	drift_comp_data1
+%	drift_comp_data2
+%	field_params1
 %
 % OUTPUT
+%	acc_meas
+%	field_params
+%
+% DEPENDS ON
+%	DEBUGGING
+%	PLOTTING3D
+%	program
 %
 % TASKS
 %	- Convert script to a function

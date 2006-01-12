@@ -23,10 +23,25 @@
 % NOTE ACCORDING GNU OCTAVE
 % This script is fully compatible and works perfect together with GNU OCTAVE
 %
+% DESCRIPTION
+%
+%	Gives the user the possibility to control manually the position on the time axis
+%	at which the signal amplitude of the B_0 spectrum is maximal. Therefore the user
+%	can sweep through the whole spectrum along the time axis and/or type in directly a
+%	value for t.
 %
 % INPUT
+%	offset_comp_data
+%	field_params
+%	time_params
 %
 % OUTPUT
+%	t
+%	real_t
+%
+% DEPENDS ON
+%	DEBUGGING
+%	program
 %
 % TASKS
 %	- Convert script to a function

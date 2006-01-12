@@ -18,11 +18,21 @@
 % will be converted into a function...
 %
 % INPUT
+%	no_points	number of data points that ae used from the start and the end of the spectrum
+%	field_paams
+%	drift_comp_data
 %
 % OUTPUT
+%	compensated spectrum
+%
+% DEPENDS ON
+%	program
 %
 % TASKS
 %	- Convert script to a function
+%	- Allow user to select the regions at the ends of the spectrum that are used to fit
+%	  the baseline
+%	- Allow user to choose between several different polynoms for fitting the baseline
 %
 
 fprintf('\n---------------------------------------------------------------------------\n')
