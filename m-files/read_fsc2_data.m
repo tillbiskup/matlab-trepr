@@ -24,22 +24,37 @@
 %	[ DATA, FREQUENCY, FIELD_PARAMS, SCOPE_PARAMS, TIME_PARAMS ] = read_fsc2_data ( FILENAME )
 %
 % DESCRIPTION
-%	This function opens the file FILENAME, looks for some
-%	parameters necessary for the further data analysis that
-%	are written in the leading commentary and returns a matrix
-%	DATA of the raw data and a variable TRIGGER_POS with the position
-%	of the trigger pulse in the time slice.
+%	Open the FSC2 file FILENAME, look for some parameters necessary
+%	for the further data analysis that are written in the leading
+%	commentary and return a matrix DATA of the raw data, a variable
+%	FREQUENCY with the frequency the measurement was performed and
+%	the vectors FIELD_PARAMS, SCOPE_PARAMS and TIME_PARAMS.
+%
+%	A FSC2 file consists of the FSC2 program used for the data
+%	acquisition in the first part of the file, marked as a MATLAB (TM)
+%	comment with leading "%" at every line and after that the data
+%	as one long column. Advantages of this format are that the program
+%	used for data acquisition is in the same file as the data and that
+%	the data are stored in the file directly after reading out from the
+%	oscilloscope. This minimizes data loss in the case of any computer
+%	problem.
+%
+%	More information about FSC2 can be found at its authors page in the
+	internet:
+%
+%		http://www.physik.fu-berlin.de/~toerring/fsc2.phtml
 %
 %	If the measurement was taken from higher to lower magnetic field
 %	the returned matrix is rearranged to hold the time traces (rows)
 %	in increasing magnetic field strength.
 %
 % TODO:
-%	Read out the variable "Number of runs" and behave as necessary if runs > 1
+%	* Read out the variable "Number of runs" and behave as necessary
+%	  if runs > 1
 %
-%	Better error handling if data don't match the size given by the field width and
-%	time slice length parameters than just producing an error avoiding any further
-%	execution of the script
+%	* Better error handling if data don't match the size given
+%	  by the field width and time slice length parameters than just
+%	  producing an error avoiding any further execution of the script
 %
 % SOURCE
 
@@ -256,14 +271,19 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 %##############################################################
 % SUBFUNCTIONS
 
-
 %****if* read_fsc2_data/open_file
+%
+% SYNOPSIS
+%	FID = open_file ( FILENAME )
+%
+% DESCRIPTION
+%	Open file FILENAME for read and check whether file is openend
+%	if not, an error message is printed and further evaluation of the script
+%	is aborted
+%
+% SOURCE
 
 function fid = open_file ( filename )
-
-  % Open file FILENAME for read and checks whether file is openend
-  % if not, an error message is printed and further evaluation of the script
-  % is aborted
  
   fid = 0;							% set file identifier to an initial value
   
@@ -286,6 +306,14 @@ function fid = open_file ( filename )
 %******
 
 %****if* read_fsc2_data/close_file
+%
+% SYNOPSIS
+%	STATUS = close_file ( FID )
+%
+% DESCRIPTION
+%	Close the file with the handle FID.
+%
+% SOURCE
 	
 function status = close_file ( fid )
 	
@@ -298,13 +326,23 @@ function status = close_file ( fid )
 %******
 
 %****if* read_fsc2_data/read_parameter_from_fsc2
+%
+% SYNOPSIS
+%	VALUE = read_parameter_from_fsc2 ( STRING, DESCRIPTION )
+%
+% DESCRIPTION
+%	Check whether the string STRING contains the substring DESCRIPTION
+%	and in this case return the value VALUE that is printed at a defined
+%	position behind the substring DESCRIPTION in the leading commentary
+%	of the fsc2 data file.
+%
+%	Parameter values are stored in a FSC2 file as "key=value" pairs.
+%	This allows to access them easily.
+%
+% SOURCE
   
 function value = read_parameter_from_fsc2 ( string, description )
 
-  % This function checks whether the string STRING contains the substring
-  % DESCRIPTION and in this case returns the value VALUE that is printed at
-  % a defined position behind the substring DESCRIPTION in the leading commentary
-  % of the fsc2 data file.
 
     if index ( string, description ) == 3  
     								% The string DESCRIPTION is contained more than once
@@ -348,13 +386,19 @@ function value = read_parameter_from_fsc2 ( string, description )
 
 
 %****if* read_fsc2_data/read_frequency_from_fsc2
+%
+% SYNOPSIS
+%	FREQUENCY = read_frequency_from_fsc2 ( STRING, SUBSTRING )
+%
+% DESCRIPTION
+%	Check whether the string STRING contains the substring SUBSTRING
+%	and in this case return the value VALUE that is printed at 	a defined
+%	position behind the substring SUBSTRING in the leading commentary
+%	of the fsc2 data file.
+%
+% SOURCE
   
 function frequency = read_frequency_from_fsc2 ( string, substring )
-
-  % This function checks whether the string STRING contains the substring
-  % DESCRIPTION and in this case returns the value VALUE that is printed at
-  % a defined position behind the substring DESCRIPTION in the leading commentary
-  % of the fsc2 data file.
 
     if index ( string, substring ) == 3  
     								% The string SUBSTRING is contained more than once
