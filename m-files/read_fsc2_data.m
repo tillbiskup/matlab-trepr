@@ -40,7 +40,7 @@
 %	problem.
 %
 %	More information about FSC2 can be found at its authors page in the
-	internet:
+%	internet:
 %
 %		http://www.physik.fu-berlin.de/~toerring/fsc2.phtml
 %
@@ -49,10 +49,11 @@
 %	in increasing magnetic field strength.
 %
 % TODO:
-%	* Read out the variable "Number of runs" and behave as necessary
+%
+%   * Read out the variable "Number of runs" and behave as necessary
 %	  if runs > 1
 %
-%	* Better error handling if data don't match the size given
+%   * Better error handling if data don't match the size given
 %	  by the field width and time slice length parameters than just
 %	  producing an error avoiding any further execution of the script
 %
@@ -181,6 +182,11 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 	  frequency = parameter;
 	end
 	
+	parameter = read_parameter_from_fsc2 ( read, 'MW frequency' );
+	if isnumeric(parameter) ~= 0
+	  slice_length = parameter;
+	end
+	
   end								% end of while loop
   
   close_file( fid );					% calling internal function (see below) to close the file
@@ -212,12 +218,12 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   % calculations for the dimension of the 2D-matrix for finally storing the data
   
   field_width = (end_field - start_field) / field_step_width;
-  									% the field width is calculated by the difference between
-  									% upper and lower field boundaries divided through the
-  									% step width between two adjacent recorded time traces.
-  									% field_width is always positive cause of the negative sign
-  									% of the variable field_step_width in case of measurement
-  									% from high to low field
+  		% the field width is calculated by the difference between
+  		% upper and lower field boundaries divided through the
+  		% step width between two adjacent recorded time traces.
+  		% field_width is always positive cause of the negative sign
+  		% of the variable field_step_width in case of measurement
+  		% from high to low field
 
   hightolow = 0;						% set "boolean" variable to the default value (see below)
 
@@ -345,38 +351,41 @@ function value = read_parameter_from_fsc2 ( string, description )
 
 
     if index ( string, description ) == 3  
-    								% The string DESCRIPTION is contained more than once
-    								% in the leading commentary block of the fsc2 data file.
-    								% Therefore the condition here set is that the string
-    								% DESCRIPTION starts at position 3 of the string STRING.
-    								%
-    								% ATTENTION: The function INDEX is not a native MATLAB(R)
-    								% function and is therefore implemented in the file "index.m"
+    			% The string DESCRIPTION is contained more than once
+    			% in the leading commentary block of the fsc2 data file.
+    			% Therefore the condition here set is that the string
+	    		% DESCRIPTION starts at position 3 of the string STRING.
+    			%
+    			% ATTENTION: The function INDEX is not a native MATLAB(R)
+	    		% function and is therefore implemented in the file "index.m"
       res = substr ( string, 23 );
-      							% The value described by DESCRIPTION has a fixed position
-      							% from left in the fsc2 file - it starts at position 23
-      							% This position could be affected by further changes of the
-      							% fsc2 program but due to the loss of regexp functionality
-      							% in Octave this seems to be the simplest way for the moment.
+			% The value described by DESCRIPTION has a fixed position
+			% from left in the fsc2 file - it starts at position 23
+			% This position could be affected by further changes of the
+			% fsc2 program but due to the loss of regexp functionality
+			% in Octave this seems to be the simplest way for the moment.
       contains_spaces = findstr ( res, ' ' );
-      							% If the string RES contains whitespace characters
-      							% (normally at the end of the string)
-      							% than the positions of the whitespace characters
-      							% are elements of CONTAINS_SPACES
+			% If the string RES contains whitespace characters
+			% (normally at the end of the string)
+			% than the positions of the whitespace characters
+			% are elements of CONTAINS_SPACES
       if length(contains_spaces) > 1
-      							% if CONTAINS_SPACES is not empty
+      		% if CONTAINS_SPACES is not empty
         res = substr ( res, 1, contains_spaces(2)-2 );
-        							% res is overwritten with its substring, starting at the first
-        							% position and ending at the first position of whitespace character
+        		% res is overwritten with its substring, starting at the first
+        		% position and ending at the first position of whitespace character
         							
       end						% end if
       
-      value = str2num( res );		% the value (string) is converted to a number
+      value = str2num( res );		
+      		% the value (string) is converted to a number
       
-    else							% If the string DESCRIPTION is not found in the string STRING
-    								% or if DESCRIPTION starts not at position 3 of STRING
+    else			
+    			% If the string DESCRIPTION is not found in the string STRING
+    			% or if DESCRIPTION starts not at position 3 of STRING
     
-      value = 'NaN';				% set the return variable "value" to a defined nonnumeric value
+      value = 'NaN';
+      		% set the return variable "value" to a defined nonnumeric value
       
     end							% end if
 

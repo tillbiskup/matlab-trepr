@@ -2,14 +2,27 @@
 % 
 % This file ist free software.
 % 
-% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
-% Maintainer:		Till Biskup <till.biskup@physik.fu-berlin.de>
-% Created:			2005/10/26
-% Derived from:		sample_accumulation_script.m
-% Version:			$Revision$
-% Last Modification:	$Date$
-% Keywords:			transient EPR, fsc2, accumulate spectra
+%****h* global_scripts/compensate_accumulate_2Dspectra.m
 %
+% AUTHOR
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% MAINTAINER
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% COPYRIGHT
+%	(c) 2005 Till Biskup
+%	This file is free software
+% CREATION DATE
+%	2005/10/26
+% VERSION
+%	$Revision$
+% MODIFICATION DATE
+%	$Date$
+% DERIVED FROM
+%	sample_accumulation_script.m
+% KEYWORDS
+%	transient EPR, fsc2, accumulate spectra
+% 
+% DESCRIPTION
 %	This file is a sample main script that uses all the implemented functions
 %	for data analysis of trEPR data recorded with the program fsc2.
 %	Therefore it depends on these functions that reside in the m-files in the 
@@ -58,6 +71,7 @@
 %	Tasks 3 to 9 reside in one main loop that is processed until the user decides to stop it.
 %	Tasks 8 and 9 are only done beginning with the second pass of the main loop.
 %
+% SOURCE
 
 % ######################################################################
 % BEGIN setting of global variables
@@ -158,8 +172,8 @@ fprintf('\n---------------------------------------------------------------------
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
 
-
 [ program, prog_version ] = discriminate_matlab_octave;
+		% The variable "program" is in some mean a global variable as well.
 
 
 exit_main_loop = 1;				% set exit condition for while loop
@@ -587,7 +601,7 @@ if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
 end;
 
 fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
-fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params1);
+fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params);
 fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz\n', average_frequency);
 
 fprintf('\n\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
@@ -605,3 +619,5 @@ fprintf('\n---------------------------------------------------------------------
 stop_logging;
 
 % end of script
+
+%******

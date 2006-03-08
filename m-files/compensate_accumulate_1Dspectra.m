@@ -1,14 +1,28 @@
 % Copyright (C) 2005 Till Biskup
 % 
 % This file ist free software.
+%
+%****h* global_scripts/compensate_accumulate_1Dspectra.m
+%
+% AUTHOR
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% MAINTAINER
+%	Till Biskup <till.biskup@physik.fu-berlin.de>
+% COPYRIGHT
+%	(c) 2005 Till Biskup
+%	This file is free software
+% CREATION DATE
+%	2005/11/18
+% VERSION
+%	$Revision$
+% MODIFICATION DATE
+%	$Date$
+% DERIVED FROM
+%	sample_accumulate_2Dspectra.m
+% KEYWORDS
+%	transient EPR, fsc2, accumulate spectra
 % 
-% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
-% Maintainer:		Till Biskup <till.biskup@physik.fu-berlin.de>
-% Created:			2005/11/18
-% Derived from:		compensate_accumulate_2Dspectra.m
-% Version:			$Revision$
-% Last Modification:	$Date$
-% Keywords:			transient EPR, fsc2, accumulate spectra
+% DESCRIPTION
 %
 %	This file is a sample main script that uses all the implemented functions
 %	for data analysis of trEPR data recorded with the program fsc2.
@@ -62,6 +76,7 @@
 %	Tasks 3 to 10 reside in one main loop that is processed until the user decides to stop it.
 %	Tasks 9 and 10 are only done beginning with the second pass of the main loop.
 %
+% SOURCE
 
 % ######################################################################
 % BEGIN setting of global variables
@@ -593,3 +608,5 @@ fprintf('\n---------------------------------------------------------------------
 stop_logging;
 
 % end of script
+
+%******

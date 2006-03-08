@@ -14,6 +14,7 @@ items:
 	MODIFICATION DATE
 	VERSION
 	REVISION
+	DERIVED FROM
 	KEYWORDS
 	ARGUMENTS
 	PARAMETERS
@@ -42,6 +43,7 @@ options:
     --cmode
     --sections
     --nopre
+    --internal
 ignore files:
     README
     CVS
