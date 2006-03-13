@@ -589,8 +589,15 @@ if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
 
 end;
 
+if ( exist('field_params1') ~= 0)
+	% That means we haven't accumulated but only compensated one spectrum
+
+  field_params = field_params1;
+
+end;
+
 fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
-fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params1);
+fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params);
 fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz\n', average_frequency);
 
 fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);

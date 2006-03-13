@@ -184,7 +184,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 	
 	parameter = read_parameter_from_fsc2 ( read, 'MW frequency' );
 	if isnumeric(parameter) ~= 0
-	  slice_length = parameter;
+	  frequency = parameter;
 	end
 	
   end								% end of while loop
