@@ -53,7 +53,7 @@ function varargout = start_logging
 	  if exist( logfilename )
 	  						% if the file still exists
 	
-	    answer = menu('The provided file exists. Do You really want to proceed?','Yes','No');
+	    answer = menu('The provided file exists and will be overwritten. Do You really want to proceed?','Yes','No');
 	   						% ask the user what to do now
 	  
 	    if answer == 1		% if user chose to proceed anyway

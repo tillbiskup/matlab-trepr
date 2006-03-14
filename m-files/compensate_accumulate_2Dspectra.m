@@ -407,6 +407,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 						% increase value of counter
 						
 	filenames_accumulated = [ filenames_accumulated '\n\t' filename ];
+	
+	drift_comp_data = acc_meas;
     
   elseif ( really_accumulate == 2 )
   						% if the user wants to abort accumulation and
@@ -469,11 +471,12 @@ end;						% end "if exit_main_loop" clause
 % print B_0 spectrum of the last dataset
 
 figure;					% open new graphics window
-
+  
 [spectrum,max_x] = B0_spectrum(drift_comp_data,2,t);
 						% evaluate B_0 spectrum and its maximum
- 
-x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+
+x = [ min([field_params(1) field_params(2)]) : abs(field_params(3)) : max([field_params(1) field_params(2)]) ];
+% x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 						% set x axis values from field parameters
   
 % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
@@ -488,8 +491,7 @@ plot(x,spectrum,x,zeros(1,length(x)));
 % and exit the program after some additional settings.
 
 exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
-						% make menu that lets the user choose which drift compensation
-						% method he wants to use
+						% make menu that lets the user choose how he wants to continue
 						
 if exit_answer == 1
 
@@ -608,10 +610,10 @@ if ( exist('field_params1') ~= 0)
 end;
 
 fprintf('\n\nThe last displayed spectrum has been written to the file\n\t%s\n', outputfilename);
-fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f\n\tField step width:\t%2.2f\n', field_params);
+fprintf('\nThe field parameters are:\n\tfield boundaries:\t%4.2f - %4.2f G\n\tField step width:\t%2.2f G\n', field_params);
 fprintf('\nThe averaged frequency of the accumulated spectra is:\n\t%1.4f GHz\n', average_frequency);
 
-fprintf('\n\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
+fprintf('\nThe complete output of this program has been written to the file\n\t%s\n', logfilename);
 
 
 total_time_used = toc;

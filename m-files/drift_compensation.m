@@ -28,8 +28,8 @@
 %
 %	Therefore its input arguments are a matrix INPUT_DATA containing the
 %	biased data, a vector WEIGHTS with the weights for the compensation computation,
-%	and one ore more parameters for the number of time slices to be
-%	used for the compensation computation.
+%	and one ore more parameters defining the number of time slices that are
+%	used for computing the drift compensation.
 %
 %	If only one further parameter beyond the matrix with the input data and the weights vector
 %	is given both values for the number of time slices at the lower and the upper end of the
