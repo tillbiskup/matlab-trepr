@@ -31,32 +31,51 @@
 %
 %	This figure is finally saved to a file with same file basename as the input file.
 %
+% NOTE
+%
+%	This program will only run with MATLAB(TM) for several reasons: It makes use of
+%	MATLAB(TM)-specific plot commands and saves the result to a MATLAB(TM) fig file.s
+%
 % SOURCE
 
 function make_compensated_2D_plot ( filename )
 
+	% read fsc2 data file
+
 	[ data, f, fp, sp, tp ] = read_fsc2_data ( filename );
+
+	% compensate for pretrigger offset
 
 	oc_data = pretrigger_offset ( data, tp(3) );
 
+	% compensate for baseline (simple way)
+
 	bl_oc_data = baseline_subtraction_fsc2 ( oc_data, 10 );
 
-	% axis labels
+	% compute values for axes labels
 
 	b_field=[fp(1):fp(3):fp(2)]/10;
 	time=[-(tp(3)/tp(1)*tp(2)):tp(3)/tp(1):tp(3)-(tp(3)/tp(1))-(tp(3)/tp(1)*tp(2))];
 
-	mesh ( time, b_field, bl_oc_data );
+	% From MATLAB(TM) help:
+	% The imagesc function scales image data to the full range of the current
+	% colormap and displays the image.
 
-	view ( 2 );
+	imagesc ( time, b_field, bl_oc_data );
+
+	% set filename to save the figure
 
 	file_basename = get_file_basename ( filename );
-	fig_filename = sprintf( '%s-2Dmesh.fig', file_basename );
+	fig_filename = sprintf( '%s-2Dimagesc.fig', file_basename );
+
+	% set figure title and axes labels
 
 	fig_title = sprintf ( 'filename: %s', strrep ( file_basename, '_', '\_' ) );
 	title ( fig_title );
 	xlabel ( 'time / \mus' );
 	ylabel ( 'magnetic field / mT' );
+
+	% save figure as MATLAB(TM) fig file
 
 	saveas ( gcf, fig_filename );
 

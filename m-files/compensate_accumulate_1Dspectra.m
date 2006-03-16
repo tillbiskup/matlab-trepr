@@ -520,7 +520,7 @@ figure_title = '';		% default value for the figure title, in the case the user d
 fprintf('\nFIGURE TITLE\n');
 figure_title = input ('\nPlease type in a figure title - normally the sample name and the temperature\n(the number of accumulations will be added automatically):\n  ', 's');
 
-title_string = [figure_title ' (accumulated from '  num2str(num_accumulated_spectra) ' measurements)'];
+title_string = [figure_title ' (#acc: ' num2str(num_accumulated_spectra) ')'];
 
 fprintf('\nThe complete title will be as follows:\n\n\t%s\n', title_string);
 

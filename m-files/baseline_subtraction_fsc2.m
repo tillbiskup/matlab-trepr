@@ -36,7 +36,7 @@
 
 function data = baseline_subtract_fsc2 ( input_data, no_ts )
 
-  disp ( '$RCSfile$, $Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   % First of all, check number of arguments
 
