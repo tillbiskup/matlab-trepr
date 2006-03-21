@@ -561,7 +561,7 @@ fprintf('\nSaving last plot to the EPS file\n\t%s\n', outputfilename)
 
 if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-
+  print ( outputfilename, '-depsc2' );
 
 else					% otherwise we assume that we're called by MATLAB(R)
 

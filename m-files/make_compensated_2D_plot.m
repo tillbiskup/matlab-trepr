@@ -33,12 +33,31 @@
 %
 % NOTE
 %
-%	This program will only run with MATLAB(TM) for several reasons: It makes use of
-%	MATLAB(TM)-specific plot commands and saves the result to a MATLAB(TM) fig file.s
+%	This program will only run with MATLAB(TM):
+%	It saves the result to a MATLAB(TM) fig file.
 %
 % SOURCE
 
 function make_compensated_2D_plot ( filename )
+
+	% test for calling program
+	
+	if exist('discriminate_matlab_octave')
+	
+		if (exist('program') == 0)
+
+		    program = discriminate_matlab_octave;
+	    
+		end
+		
+	else
+	
+		fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\n');
+		
+		program = 'Matlab';
+	
+	end;
+	
 
 	% read fsc2 data file
 
@@ -57,6 +76,10 @@ function make_compensated_2D_plot ( filename )
 	b_field=[fp(1):fp(3):fp(2)]/10;
 	time=[-(tp(3)/tp(1)*tp(2)):tp(3)/tp(1):tp(3)-(tp(3)/tp(1))-(tp(3)/tp(1)*tp(2))];
 
+	if ( fp(3) < 0 )
+		bl_oc_data = flipud(bl_oc_data);
+	end;
+
 	% From MATLAB(TM) help:
 	% The imagesc function scales image data to the full range of the current
 	% colormap and displays the image.
@@ -67,6 +90,7 @@ function make_compensated_2D_plot ( filename )
 
 	file_basename = get_file_basename ( filename );
 	fig_filename = sprintf( '%s-2Dimagesc.fig', file_basename );
+	eps_filename = sprintf( '%s-2Dimagesc.eps', file_basename );
 
 	% set figure title and axes labels
 
@@ -75,8 +99,18 @@ function make_compensated_2D_plot ( filename )
 	xlabel ( 'time / \mus' );
 	ylabel ( 'magnetic field / mT' );
 
-	% save figure as MATLAB(TM) fig file
+	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-	saveas ( gcf, fig_filename );
+		% save figure as eps file
 
+		print ( eps_filename, '-depsc2' );
+
+	else					% otherwise we assume that we're called by MATLAB(R)
+
+		% save figure as MATLAB(TM) fig file
+
+		saveas ( gcf, fig_filename );
+
+	end					% end of "if program" clause
+  
 %******
