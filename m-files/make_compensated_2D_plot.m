@@ -132,7 +132,7 @@ function make_compensated_2D_plot ( filename )
 		
 		% make 2D plot of the data
 		
-		gsplot bl_oc_data'
+		gsplot ( bl_oc_data' );
 		
 		% save plot as eps file
 		

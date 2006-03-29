@@ -53,10 +53,6 @@
 %   * Read out the variable "Number of runs" and behave as necessary
 %	  if runs > 1
 %
-%   * Better error handling if data don't match the size given
-%	  by the field width and time slice length parameters than just
-%	  producing an error avoiding any further execution of the script
-%
 % SOURCE
 
 function [ data, frequency, field_params, scope_params, time_params ] = read_fsc2_data ( filename )
@@ -77,7 +73,8 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
   % save opening of the file that's name is provided by the variable 'filename'
 
-  if exist( filename )	% if the provided file exists
+  if ( exist( filename )	== 2 )
+  						% if the provided file exists
 
     fid=0;				% set file identifier to standard value
     while fid < 1 		% while file not opened
@@ -89,9 +86,14 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
     end					% end while loop
     
   else					% If the file provided by filename does not exist
-  
-    fprintf('\nERROR: File %s not found\n', filename);
-    error('');
+
+	% assign empty values to all output parameters
+    
+    data='';frequency='';field_params='';scope_params='';time_params='';
+
+	% display an error message and abort further operation
+
+    error('\n\tFile %s not found\n\tAbort further operation...', filename);
   
   end;
   
@@ -191,9 +193,17 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   close_file( fid );					% calling internal function (see below) to close the file
 
   if ( is_fsc2_file == 0 )
+
+	% in the case the file read is no fsc2 file
+
+	% assign empty values to all output parameters
     
-    fprintf('\nHmmm... does not look like an fsc2 file...\n')
-	error ( 'Aborting further execution...' );
+    data='';frequency='';field_params='';scope_params='';time_params='';
+
+	% display an error message and abort further operation
+
+    error('\n\tHmmm... %s does not look like an fsc2 file...\n\tAbort further operation...', filename);
+  
     
   end
 
@@ -246,9 +256,20 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   
   if size (raw_data) ~= (field_width+1) * no_points
   
-    fprintf('\nData do not match the dimensions given by the parameters!\n');
-    error ('');
-  
+    fprintf('\nWARNING: Data do not match the dimensions given by the parameters!\n         Field parameters adjusted to fix data...\n');
+
+	% set field_width to new value
+
+	field_width = abs ( round ( length(raw_data) / no_points ) * field_step_width );
+	
+    % set field parameters to new values
+
+	end_field = start_field + ( ( ( field_width / field_step_width ) + 1 ) * abs(field_step_width));
+    field_params = [ start_field, end_field, field_step_width ];
+	
+    fprintf('\nadjusted magnetic field parameters:\n');
+    fprintf('field start:\t\t%4.1f G\nfield stop:\t\t%4.1f G\nfield step width:\t%2.2f G\n', field_params);
+    
   end
 
 
