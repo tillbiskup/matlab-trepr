@@ -71,9 +71,8 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
   if nargout ~= 5		% Check number of output arguments.
   
-  	fprintf('\nWARNING: Function called with too less return values. Possibly errors might occur.\n')
-	warning('');			% get error if function is called with other than
-  						% two output parameters
+  	fprintf('\nWARNING: Function called with too less return values.\n         Errors might occur if we were called inside a program.\n         To see how we shall be called type in \"help read_fsc2_data\".\n')
+
   end
 
   % save opening of the file that's name is provided by the variable 'filename'

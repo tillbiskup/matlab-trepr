@@ -33,8 +33,14 @@
 %
 % NOTE
 %
-%	This program will only run with MATLAB(TM):
-%	It saves the result to a MATLAB(TM) fig file.
+%	This program will only run properly with MATLAB(TM).
+%
+%	If called by MATLAB(TM), it saves the result to a MATLAB(TM) fig file.
+%	If called by GNU Octave, it saves the result to an EPS file.
+%
+%	Problems with GNU Octave:
+%	* axis tics are not set properly (bug in gsplot command)
+%	* figure title is not set properly (bug with "_" character)
 %
 % SOURCE
 
@@ -80,6 +86,21 @@ function make_compensated_2D_plot ( filename )
 		bl_oc_data = flipud(bl_oc_data);
 	end;
 
+
+	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+		% set colormap to "jet"
+
+		jet_colormap;
+
+		% print some warning message telling the difficulties that occur
+		% with GNU Octave while using the imagesc function and saving coloured
+		% images.
+		
+		fprintf('\nWARNING: Function called with GNU Octave.\n         GNU Octave handles imagesc in another way as MATLAB(TM).\n         Additionally it cannot save coloured PS files.\n         Therefore the output is saved as a PPM file that can be\n         converted to ps via \"pnmtops ppmfile > psfile\".\n');
+		
+	end;
+
 	% From MATLAB(TM) help:
 	% The imagesc function scales image data to the full range of the current
 	% colormap and displays the image.
@@ -91,6 +112,8 @@ function make_compensated_2D_plot ( filename )
 	file_basename = get_file_basename ( filename );
 	fig_filename = sprintf( '%s-2Dimagesc.fig', file_basename );
 	eps_filename = sprintf( '%s-2Dimagesc.eps', file_basename );
+	ppm_filename = sprintf( '%s-2Dimagesc.ppm', file_basename );
+
 
 	% set figure title and axes labels
 
@@ -101,10 +124,29 @@ function make_compensated_2D_plot ( filename )
 
 	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-		% save figure as eps file
+		% set some gnuplot parameters
 
-		print ( eps_filename, '-depsc2' );
+		graw('set pm3d transparent;');
+		graw('set pm3d map;');
+		graw('set palette rgbformulae 33,13,10;');
+		
+		% make 2D plot of the data
+		
+		gsplot bl_oc_data'
+		
+		% save plot as eps file
+		
+		print ( eps_filename, '-depsc2');
+		
+		% save color scaled image to variable
 
+		% scaled_image = imagesc( bl_oc_data );
+
+		% save figure as ppm file
+		% cause GNU OCTAVE cannot handle coloured ps files
+		
+		% saveimage ( ppm_filename, scaled_image, 'ppm' );
+		
 	else					% otherwise we assume that we're called by MATLAB(R)
 
 		% save figure as MATLAB(TM) fig file
