@@ -435,6 +435,7 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						
 	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
   	drift_comp_data = matrix1;
+  	spectrum = matrix1;
   						% set the old matrix to the actual matrix 
 						
 	filenames_not_accumulated = [ filenames_not_accumulated '\n\t' filename ];

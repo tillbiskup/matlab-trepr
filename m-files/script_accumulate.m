@@ -22,6 +22,7 @@
 %	drift_comp_data1
 %	drift_comp_data2
 %	field_params1
+%	field_params2
 %
 % OUTPUT
 %	acc_meas
