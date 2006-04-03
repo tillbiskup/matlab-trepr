@@ -21,7 +21,7 @@
 %	transient EPR, SVD
 %
 % SYNOPSIS
-%	svd-analysis
+%	svd-analysis ( filename )
 %
 % DESCRIPTION
 %
@@ -40,6 +40,15 @@
 
 function svd_analysis ( filename )
 
+	% check for input parameters
+
+	if nargin ~= 1
+  
+		error('The function is called with the wrong number (%i) of input arguments.\nPlease use "help <function>" to get help.',nargin);
+			% get error if function is called with other than
+			% one input parameter
+	end
+
 	% test by which program we are called
 	% this is because the function makes heavy use of MATLAB(TM) specific functionality
 	
@@ -57,7 +66,7 @@ function svd_analysis ( filename )
 			% that means if the variable "program" isn't set yet and the routine
 			% performing the discrimination isn't available...
 	
-			fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\nBe aware: In the case that isn't true you can run into problems!');
+			fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\nBe aware: In the case that is not true you can run into problems!');
 		
 			program = 'Matlab';
 			

@@ -61,8 +61,10 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 
   if nargin ~= 1			% Check number of input arguments.
   
-	error('');			% get error if function is called with other than
-  						% one input parameter
+	error('The function is called with the wrong number (%i) of input arguments.\nPlease use "help <function>" to get help.',nargin);
+		% get error if function is called with other than
+		% one input parameter
+
   end
 
   if nargout ~= 5		% Check number of output arguments.

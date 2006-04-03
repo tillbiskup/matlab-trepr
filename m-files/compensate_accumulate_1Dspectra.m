@@ -200,7 +200,8 @@ while exit_main_loop > 0			% main while loop
 
 % Next ask for a file name to read and if file name is valid, read data
 
-script_read_file;
+%%% script_read_file;
+[ data,frequency,field_params,scope_params,time_params,filename,trigger_pos ] = trEPR_read_fsc2_file;
 
 % Plot raw data
 

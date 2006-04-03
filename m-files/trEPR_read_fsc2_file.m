@@ -17,6 +17,8 @@
 %	$Revision$
 % MODIFICATION DATE
 %	$Date$
+% DERIVED FROM
+%	script_read_file.m
 % KEYWORDS
 %	MATLAB(R), GNU Octave, transient EPR, fsc2, read file
 %

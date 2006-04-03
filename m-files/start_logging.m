@@ -58,7 +58,7 @@ function varargout = start_logging
 	  
 	    if answer == 1		% if user chose to proceed anyway
 	  
-		  delete ( logfile_name );
+		  delete ( logfilename );
           
 		  proceed = 1;		% set condition for while loop so that the while loop will not
 	      					% passed through once again

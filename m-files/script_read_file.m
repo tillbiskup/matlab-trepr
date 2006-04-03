@@ -33,9 +33,9 @@
 %	filename
 %	trigger_pos
 %
-% TASKS
-%	- Convert script to a function
-%
+
+% print warning message saying that this script has been replaced by a regular function
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_read_fsc2_file". For further information just typein "help trEPR_read_fsc2_file".');
 
 
 % Ask the user for a file name to read and if file name is valid, read data
