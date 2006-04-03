@@ -40,21 +40,30 @@
 
 function svd_analysis ( filename )
 
-	% test for calling program
+	% test by which program we are called
+	% this is because the function makes heavy use of MATLAB(TM) specific functionality
 	
-	if exist('discriminate_matlab_octave')
-	
-		if (exist('program') == 0)
+	if (exist('program') == 0)
+		% if the variable "program" is not set, that means the routine isn't called
+		% yet...
+
+		if exist('discriminate_matlab_octave')
+			% let's check whether the routine performing the discrimination
+			% is available...
 
 		    program = discriminate_matlab_octave;
 	    
-		end
-		
-	else
+		else
+			% that means if the variable "program" isn't set yet and the routine
+			% performing the discrimination isn't available...
 	
-		fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\n');
+			fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\nBe aware: In the case that isn't true you can run into problems!');
 		
-		program = 'Matlab';
+			program = 'Matlab';
+			
+			% set variable to default value
+	
+		end;
 	
 	end;
 
@@ -62,6 +71,9 @@ function svd_analysis ( filename )
 	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
 		error('Sorry, but this routine cannot be used with GNU Octave at the moment...');
+		
+		% If we're called by GNU Octave any further processing will be aborted due to
+		% the problems described above.
 		
 	end;
 	
@@ -72,6 +84,9 @@ function svd_analysis ( filename )
 	
 	
 	% start logging
+	
+	% NOTE: Instead of using the routine "start_logging" we do this here manually
+	% cause here we set the logfile name to a default value...
 	
 	logfile_name = sprintf( '%s-SVD.log', file_basename );
 
@@ -118,6 +133,9 @@ function svd_analysis ( filename )
 
 	subplot(2,1,1);
 	imagesc ( time, b_field, bl_oc_data );
+	
+	% NOTE: With GNU Octave we run here into problems cause imagesc is displayed
+	% as tiff image and not generated using Gnuplot...
 
 	fig_title = sprintf ( 'filename: %s', strrep ( file_basename, '_', '\_' ) );
 	title ( fig_title );
@@ -136,24 +154,34 @@ function svd_analysis ( filename )
 	fig_filename = sprintf( '%s-SVD.fig', file_basename );
 	ps_filename = sprintf( '%s-SVD.ps', file_basename );
 
+	% NOTE: The following settings are specific for MATLAB(TM) to perform
+	% a halfway useful output.
+	% To adjust the settings for a paper type other than DIN A4 please change the
+	% options "PaperType" and "rect" to the right values.
+
 	set(gcf,'PaperType','A4');
 	set(gcf,'PaperOrientation','portrait');
 	set(gcf,'PaperUnits','centimeters');
 	rect=[1.5,1.5,18,26];
+		% sets the left and upper margin and width and height of the printable
+		% area of the page
 	set(gcf,'PaperPosition',rect);
 
 	% save figure as MATLAB(TM) fig file
+	
+	% NOTE: This will lead to problems when called with another program than MATLAB(TM).
 
 	saveas ( gcf, fig_filename )
 
 	% print figure to a PS file
-
-%	saveas ( gcf, ps_filename, 'eps' );
 	
 	print( gcf, '-dpsc2', ps_filename )
 	
 	
 	% stop logging
+	
+	% NOTE: Instead of using here the routine "stop_logging" we do it manually
+	% cause we started logging manually as well (see above).
 	
 	diary ( 'off' );
   
