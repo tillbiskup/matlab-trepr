@@ -19,7 +19,7 @@
 %
 % NOTE
 % The big advantage of this script over the script named script_drift.m is that here
-% not the drift at the end of the time axis is plottet but instead the B_0 spectrum
+% not the drift at the end of the time axis is plotted but instead the B_0 spectrum
 % at the maximum signal amplitude as it is used later on for further analysis. Thus
 % the drift compensation method can be fitted to the "real" spectrum.
 % 

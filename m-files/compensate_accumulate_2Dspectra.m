@@ -233,7 +233,7 @@ fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 fprintf('\n---------------------------------------------------------------------------\n');
 fprintf( '\nCompensate pretrigger offset\n' );
 
-offset_comp_data = pretrigger_offset ( data, trigger_pos );
+data = pretrigger_offset ( data, trigger_pos );
 
 
 % Give user the possibility to manually evaluate the t value at which the signal
@@ -252,22 +252,23 @@ fprintf('\n---------------------------------------------------------------------
 fprintf('\nEvaluate drift and possible fits...\n');
 fprintf('\nChoose between the display modes...\n');
 
-drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' );
+%%% drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' );
 
-if ( drift_display == 1)
+%%% if ( drift_display == 1)
 
-  fprintf('\tShow drift and fit curve chosen\n');
+%%%  fprintf('\tShow drift and fit curve chosen\n');
   
-  script_drift;
+%%%  script_drift;
 
-else
+%%% else
 
-  fprintf('\tShow B_0 spectrum at signal maximum chosen\n');
+%%%  fprintf('\tShow B_0 spectrum at signal maximum chosen\n');
 
-  script_drift_show_compensated;
+%%%  script_drift_show_compensated;
 
-end
+%%% end
 
+drift_comp_data = trEPR_compensate_drift ( data, field_params, time_params, t )
 
 % Save last dataset to file
 
