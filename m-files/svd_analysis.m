@@ -44,7 +44,7 @@ function svd_analysis ( filename )
 
 	if nargin ~= 1
   
-		error('The function is called with the wrong number (%i) of input arguments.\nPlease use "help <function>" to get help.',nargin);
+		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help svd_analysis" to get help.',nargin);
 			% get error if function is called with other than
 			% one input parameter
 	end
