@@ -221,7 +221,11 @@ end;
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
 
-script_cut_off;
+fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
+
+%%% script_cut_off;
+[ data, field_params ] = trEPR_cut_spectrum ( data, field_params );
 
 
 % Next compensate pretrigger offset
@@ -235,8 +239,11 @@ offset_comp_data = pretrigger_offset ( data, trigger_pos );
 % Give user the possibility to manually evaluate the t value at which the signal
 % amplitude of the B_0 spectrum is maximal
 
-script_find_max_amplitude;
+fprintf('\n---------------------------------------------------------------------------\n')
+fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
 
+%%%script_find_max_amplitude;
+[ t, real_t ] = trEPR_find_maximum_amplitude ( data, field_params, time_params );
 
 
 % Evaluate drift and possible fits
