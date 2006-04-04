@@ -120,7 +120,7 @@ while ( exit_baseline_comp == 0 )
   xlabel('B / mT');
   ylabel('I');
 
-  % set axis properties so that the axes will not be rescsaled
+  % set axis properties so that the axes will not be rescaled
   axis([ (min([field_params(1) field_params(2)])/10) (max([field_params(1) field_params(2)])/10) min_values max_values]);
 
   % plot spectrum, horizontal line and baseline

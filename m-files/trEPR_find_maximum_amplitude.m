@@ -48,6 +48,7 @@
 %	DEBUGGING
 %	program
 %
+% SOURCE
 
 function [ t, real_t ] = trEPR_find_maximum_amplitude ( data, field_params, time_params )
 

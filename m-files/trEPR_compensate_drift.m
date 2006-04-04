@@ -2,7 +2,7 @@
 % 
 % This file ist free software.
 % 
-%****f* user_routines/trEPR_find_maximum_amplitude.m
+%****f* user_routines/trEPR_compensate_drift.m
 %
 % AUTHOR
 %	Till Biskup <till.biskup@physik.fu-berlin.de>
@@ -27,21 +27,24 @@
 %	[ data ] = trEPR_compensate_drift ( data, field_params, time_params, t )
 %
 % DESCRIPTION
+%	trEPR_compensate_drift lets the user choose initially between two different
+%	drift evaluation methods (show drift and fit polynom and show spectrum at
+%	maximum amplitude) and provides the possibility to choose a polynomial fit
+%	of zero to ninth order.
 %
 % NOTE ACCORDING GNU OCTAVE
-% 	This script is fully compatible and works perfect together with GNU OCTAVE
+% 	This routine is fully compatible and works perfect together with GNU OCTAVE
 %
 % INPUT
-%	data
-%	field_params
-%	time_params
-%	t
+%	data - matrix containing the 2D data
+%	field_params - row vector containing the field parameters (start, stop, step width)
+%	time_params - row vector containing the time parameters (length in points, trigger position, length in microseconds)
+%	t - integer specifying the time position for the amplitude maximum of the spectrum
 %
 % OUTPUT
-%	data
+%	data - matrix containing the drift compensated 2D data
 %
-% DEPENDS ON
-%
+% SOURCE
 
 function [ data ] = trEPR_compensate_drift ( data, field_params, time_params, t )
 

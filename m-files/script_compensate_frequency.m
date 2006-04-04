@@ -30,7 +30,6 @@
 %	field_params1, field_params2		each consisting of three values
 %
 % TASK
-%	- Get it work with either 1D or 2D data
 %	- change the handling of the t value (there have to be two different t values...)
 %	- convert the script to a function
 %
