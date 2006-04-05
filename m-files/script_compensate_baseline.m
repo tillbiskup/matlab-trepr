@@ -35,6 +35,8 @@
 %	* Allow user to choose between several different polynoms for fitting the baseline
 %
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_compensate_baseline". For further information just typein "help trEPR_compensate_baseline".');
+
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually compensate the baseline\n')
 

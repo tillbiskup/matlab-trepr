@@ -47,6 +47,8 @@
 %	- Convert script to a function
 %
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_find_maximum_amplitude". For further information just typein "help trEPR_find_maximum_amplitude".');
+
 fprintf('\n---------------------------------------------------------------------------\n')
 fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
 

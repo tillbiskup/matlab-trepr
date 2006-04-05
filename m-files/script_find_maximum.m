@@ -38,6 +38,7 @@
 %	- Convert script to a function
 %
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_find_maximum_amplitude". For further information just typein "help trEPR_find_maximum_amplitude".');
 
 % Plot B_0 spectrum and find signal maximum in t
 

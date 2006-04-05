@@ -49,11 +49,12 @@
 
 function [ spectrum1, spectrum2, field_params1, field_params2 ] = frequency_compensation ( spectrum1, spectrum2, field_params1, field_params2, t1, t2 )
 
-  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
+	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
 
+	fprintf('IMPORTANT NOTE: Please be aware that this function has been replaced by a function\ncalled "trEPR_compensate_frequency". For further information just typein "help trEPR_compensate_frequency".');
 
-  % here has to go some evaluation of the input parameters:
-  % are both spectra either 1D or 2D? Mixing is not allowed at the moment...
+	% here has to go some evaluation of the input parameters:
+	% are both spectra either 1D or 2D? Mixing is not allowed at the moment...
 
 
   global DEBUGGING;
@@ -113,7 +114,7 @@ function [ spectrum1, spectrum2, field_params1, field_params2 ] = frequency_comp
   fprintf('\nPrinting B_0 spectra for frequency compensation...\n')
 						% Telling the user what's going to happen
   
-  figure;				% opens new graphic window
+  figure(gcf);				% opens new graphic window
 
   exit_freq_comp = 0;		% set while loop exit condition to default value;
 

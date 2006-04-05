@@ -43,6 +43,8 @@
 %	- Convert script to a function
 %
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_cut_spectrum". For further information just typein "help trEPR_cut_spectrum".');
+
 % Give user the possibility to cut off the spectrum at its start or end
 % by deleting a variable amount of time slices
 

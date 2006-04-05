@@ -33,6 +33,8 @@
 % This script is completely compatible with GNU Octave
 
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_compensate_drift". For further information just typein "help trEPR_compensate_drift".');
+
 
 % Evaluate drift and possible fits
 

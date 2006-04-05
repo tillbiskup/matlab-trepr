@@ -281,12 +281,15 @@ fprintf('\nChoose between the display modes...\n');
 
 %%% end
 
-drift_comp_data = trEPR_compensate_drift ( data, field_params, time_params, t )
+data = trEPR_compensate_drift ( data, field_params, time_params, t )
 
 
 % Compensate baseline
 
-script_compensate_baseline;
+no_points = 20;
+
+data = trEPR_compensate_baseline ( data, field_params, no_points, t )
+%%% script_compensate_baseline;
 						% The variable that contains the baseline compensated
 						% B_0 spectrum is called "compensated_spectrum"
 
@@ -305,12 +308,12 @@ fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 
 if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	save ('-ascii', outputfilename, 'compensated_spectrum');
+	save ('-ascii', outputfilename, 'data');
 								% save data to ascii file
 
 else								% otherwise we assume that we're called by MATLAB(R)
 
-	save (outputfilename, 'compensated_spectrum', '-ascii');
+	save (outputfilename, 'data', '-ascii');
 								% save data to ascii file in a MATLAB(R) compatible way
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
@@ -324,18 +327,18 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 								% pass of the loop is larger than one (that means that the
 								% while loop is passed for more than one time til here)
 
-  [ compensated_spectrum, matrix1, field_params1, field_params2 ] = adjust_matrix_size ( compensated_spectrum', field_params, time_params, matrix1', old_field_params, old_time_params );
+  [ data, old_data, field_params1, field_params2 ] = adjust_matrix_size ( data', field_params, time_params, old_data', old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
 
-  compensated_spectrum = compensated_spectrum';
-  matrix1 = matrix1';
+  data = data';
+  old_data = old_data';
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
     fprintf('\nDEBUGGING OUTPUT:\n');
-    fprintf('\tSize of compensated_spectrum:\t%4.2f %4.2f\n', size(compensated_spectrum));
-    fprintf('\tSize of matrix1:\t\t%4.2f %4.2f\n', size(matrix1));
+    fprintf('\tSize of compensated_spectrum:\t%4.2f %4.2f\n', size(data));
+    fprintf('\tSize of old_data:\t\t%4.2f %4.2f\n', size(old_data));
     fprintf('\tfield parameters1:\t\t%4.2f %4.2f %2.2f\n', field_params1);
     fprintf('\tfield parameters2:\t\t%4.2f %4.2f %2.2f\n', field_params2);
   end;
@@ -345,18 +348,13 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   fprintf('\n---------------------------------------------------------------------------\n');
   fprintf('\nCompensate frequency before accumulation of the spectra\n');
   
-  drift_comp_data1 = compensated_spectrum;
-  drift_comp_data2 = matrix1;
-  								% set the matrices according to the necessary settings for the
-  								% script file script_compensate_frequency.m
-  
-  [ drift_comp_data1, drift_comp_data2, field_params1, field_params2 ] = frequency_compensation(drift_comp_data1, drift_comp_data2, field_params1, field_params2, t, old_t);
-
+  [ data, old_data, field_params1, field_params2 ] = trEPR_compensate_frequency ( data, old_data, field_params1, field_params2, t, old_t);
+%%%  [ data, old_data, field_params1, field_params2 ] = frequency_compensation ( data, old_data, field_params1, field_params2, t, old_t);
 
   % DEBUGGING OUTPUT
   if ( DEBUGGING )
     fprintf('\nDEBUGGING OUTPUT:\n');
-    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(drift_comp_data1));
+    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(data));
     fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
     fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
   end;
@@ -374,8 +372,10 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
 
 	fprintf('\nYou decided to accumulate both spectra.\n')
 
-    script_accumulate;
+    % script_accumulate;
     						% call part of the script that does the accumulation
+    						
+    	acc_meas = accumulate_measurements ( data, old_data );
   
 	% Save accumulated measurements
 
@@ -445,8 +445,8 @@ if exit_main_loop > 1				% if the exit condition for the main while loop
   						% wants to proceed with the old spectrum
   						
 	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
-  	drift_comp_data = matrix1;
-  	spectrum = matrix1;
+  	data = old_data;
+  	spectrum = old_data;
   						% set the old matrix to the actual matrix 
 						
 	filenames_not_accumulated = [ filenames_not_accumulated '\n\t' filename ];
@@ -493,13 +493,13 @@ if exit_answer == 1
   if ( exist('acc_meas') == 0)
   						% in the case that there are no accumulated data
 
-    matrix1 = compensated_spectrum;
-  						% save compensated data to matrix1
+    old_data = data;
+  						% save compensated data to old_data
   						
   else
   						% in the case that there are accumulated data
-    matrix1 = acc_meas;
-    						% save accumulated spectra to matrix1
+    old_data = acc_meas;
+    						% save accumulated spectra to old_data
   
   end;
   

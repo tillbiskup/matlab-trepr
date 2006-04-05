@@ -34,6 +34,8 @@
 %	- convert the script to a function
 %
 
+fprintf('IMPORTANT NOTE: Please be aware that this script has been replaced by a function\ncalled "trEPR_compensate_frequency". For further information just typein "help trEPR_compensate_frequency".');
+
 % DEBUGGING OUTPUT
 if ( DEBUGGING )
   fprintf('\nSTART OF $RCSfile$\n');
