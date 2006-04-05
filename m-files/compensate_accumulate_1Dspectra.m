@@ -198,332 +198,303 @@ while exit_main_loop > 0			% main while loop
 								% more than one spectrum after compensation
 								% for pretrigger offset and drift
 
-% Next ask for a file name to read and if file name is valid, read data
+	% Next ask for a file name to read and if file name is valid, read data
 
-%%% script_read_file;
-[ data,frequency,field_params,scope_params,time_params,filename,trigger_pos ] = trEPR_read_fsc2_file;
+	[ data,frequency,field_params,scope_params,time_params,filename,trigger_pos ] = trEPR_read_fsc2_file;
 
-% Plot raw data
+	% Plot raw data
 
-field_boundaries = [ field_params(1) field_params(2) ];
+	field_boundaries = [ field_params(1) field_params(2) ];
 
-if ( PLOTTING3D )		% in the case the plot3d variable is set...
+	if ( PLOTTING3D )		% in the case the plot3d variable is set...
 
-  fprintf('\nPlot raw data...\n')
+		fprintf('\nPlot raw data...\n')
 
-  [X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
+		[X,Y] = meshgrid ( min(field_boundaries) : abs(field_params(3)) : max(field_boundaries), 0 : time_params(3)/time_params(1) : time_params(3)-(time_params(3)/time_params(1)));
 						% set X and Y matrices for the mesh command
 
-  if program == 'Octave'
+		if program == 'Octave'
 						% if we're called by GNU Octave (as determined above)
 
-    gsplot ( data' );	
+			gsplot ( data' );	
 						% make simple 3D plot of the raw data
 
-  else					% otherwise we assume that we're called by MATLAB(R)
+		else					% otherwise we assume that we're called by MATLAB(R)
 
-    mesh ( data );		% make simple 3D plot of the raw data
+			mesh ( data );		% make simple 3D plot of the raw data
 
-    title('Raw data');
+			title('Raw data');
 
-  end
+		end
 
-end;
+	end;
 
-% Give user the possibility to cut off the spectrum at its start or end
-% by deleting a variable amount of time slices
+	% Give user the possibility to cut off the spectrum at its start or end
+	% by deleting a variable amount of time slices
 
-fprintf('\n---------------------------------------------------------------------------\n')
-fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
+	fprintf('\n---------------------------------------------------------------------------\n')
+	fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 
-%%% script_cut_off;
-[ data, field_params ] = trEPR_cut_spectrum ( data, field_params );
-
-
-% Next compensate pretrigger offset
-
-fprintf('\n---------------------------------------------------------------------------\n');
-fprintf( '\nCompensate pretrigger offset\n' );
-
-data = pretrigger_offset ( data, trigger_pos );
+	[ data, field_params ] = trEPR_cut_spectrum ( data, field_params );
 
 
-% Give user the possibility to manually evaluate the t value at which the signal
-% amplitude of the B_0 spectrum is maximal
+	% Next compensate pretrigger offset
 
-fprintf('\n---------------------------------------------------------------------------\n')
-fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
+	fprintf('\n---------------------------------------------------------------------------\n');
+	fprintf( '\nCompensate pretrigger offset\n' );
 
-%%%script_find_max_amplitude;
-[ t, real_t ] = trEPR_find_maximum_amplitude ( data, field_params, time_params );
+	data = pretrigger_offset ( data, trigger_pos );
 
+	% Give user the possibility to manually evaluate the t value at which the signal
+	% amplitude of the B_0 spectrum is maximal
 
+	fprintf('\n---------------------------------------------------------------------------\n')
+	fprintf('\nGive user the possibility to manually evaluate the t value at which\nthe signal amplitude of the B_0 spectrum is maximal\n')
 
-% Evaluate drift and possible fits
-
-fprintf('\n---------------------------------------------------------------------------\n');
-fprintf('\nEvaluate drift and possible fits...\n');
-fprintf('\nChoose between the display modes...\n');
-
-%%% drift_display = menu ( 'DRIFT COMPENSATION: Which display mode should be used?', 'Show drift and fit curve', 'Show B_0 spectrum at signal maximum' );
-
-%%% if ( drift_display == 1)
-
-%%%  fprintf('\tShow drift and fit curve chosen\n');
-  
-%%%  script_drift;
-
-%%% else
-
-%%%  fprintf('\tShow B_0 spectrum at signal maximum chosen\n');
-
-%%%  script_drift_show_compensated;
-
-%%% end
-
-data = trEPR_compensate_drift ( data, field_params, time_params, t )
+	[ t, real_t ] = trEPR_find_maximum_amplitude ( data, field_params, time_params );
 
 
-% Compensate baseline
+	% Evaluate drift and possible fits
 
-no_points = 20;
+	fprintf('\n---------------------------------------------------------------------------\n');
+	fprintf('\nEvaluate drift and possible fits...\n');
+	fprintf('\nChoose between the display modes...\n');
 
-data = trEPR_compensate_baseline ( data, field_params, no_points, t )
-%%% script_compensate_baseline;
-						% The variable that contains the baseline compensated
-						% B_0 spectrum is called "compensated_spectrum"
+	data = trEPR_compensate_drift ( data, field_params, time_params, t )
 
-% Save last dataset to file
 
-fprintf('\n---------------------------------------------------------------------------\n');
-fprintf('\nSave compensated data to file\n');
+	% Compensate baseline
 
-outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp1D.' get_file_extension(filename) ];
+	no_points = 20;
+
+	data = trEPR_compensate_baseline ( data, field_params, no_points, t )
+
+	% Save last dataset to file
+
+	fprintf('\n---------------------------------------------------------------------------\n');
+	fprintf('\nSave compensated data to file\n');
+
+	outputfilename = [ get_file_path(filename) get_file_basename(filename) '-comp1D.' get_file_extension(filename) ];
 								% the output filename consists of the path of the input file,
 								% the basename of the input file with appended '-comp1D'
 								% and the extension of the input file (normally '.dat')
 
-fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
+	fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 								% Telling the user what's going to happen
 
-if program == 'Octave'			% if we're called by GNU Octave (as determined above)
+	if program == 'Octave'			% if we're called by GNU Octave (as determined above)
 
-	save ('-ascii', outputfilename, 'data');
+		save ('-ascii', outputfilename, 'data');
 								% save data to ascii file
 
-else								% otherwise we assume that we're called by MATLAB(R)
+	else								% otherwise we assume that we're called by MATLAB(R)
 
-	save (outputfilename, 'data', '-ascii');
+		save (outputfilename, 'data', '-ascii');
 								% save data to ascii file in a MATLAB(R) compatible way
 								% (silly MATLAB behaviour - to accept the Octave variant of
 								% calling but neither saving nor complaining all about...)
 
-end								% end of "if program" clause
+	end								% end of "if program" clause
 
 
 
-if exit_main_loop > 1				% if the exit condition for the main while loop
-								% set at the beginning and increased at the end of every
-								% pass of the loop is larger than one (that means that the
-								% while loop is passed for more than one time til here)
-
-  [ data, old_data, field_params1, field_params2 ] = adjust_matrix_size ( data', field_params, time_params, old_data', old_field_params, old_time_params );
+	if exit_main_loop > 1				% if the exit condition for the main while loop
+									% set at the beginning and increased at the end of every
+									% pass of the loop is larger than one (that means that the
+									% while loop is passed for more than one time til here)
+	
+		[ data, old_data, field_params1, field_params2 ] = adjust_matrix_size ( data', field_params, time_params, old_data', old_field_params, old_time_params );
   						% Adjust sizes of matrices: matrix from former pass of loop
   						% and matrix just read from the new fsc2 file
 
-  data = data';
-  old_data = old_data';
+		data = data';
+		old_data = old_data';
 
-  % DEBUGGING OUTPUT
-  if ( DEBUGGING )
-    fprintf('\nDEBUGGING OUTPUT:\n');
-    fprintf('\tSize of compensated_spectrum:\t%4.2f %4.2f\n', size(data));
-    fprintf('\tSize of old_data:\t\t%4.2f %4.2f\n', size(old_data));
-    fprintf('\tfield parameters1:\t\t%4.2f %4.2f %2.2f\n', field_params1);
-    fprintf('\tfield parameters2:\t\t%4.2f %4.2f %2.2f\n', field_params2);
-  end;
+		% DEBUGGING OUTPUT
+		if ( DEBUGGING )
+			fprintf('\nDEBUGGING OUTPUT:\n');
+			fprintf('\tSize of compensated_spectrum:\t%4.2f %4.2f\n', size(data));
+			fprintf('\tSize of old_data:\t\t%4.2f %4.2f\n', size(old_data));
+			fprintf('\tfield parameters1:\t\t%4.2f %4.2f %2.2f\n', field_params1);
+			fprintf('\tfield parameters2:\t\t%4.2f %4.2f %2.2f\n', field_params2);
+		end;
 
-  % frequency compensation
+		% frequency compensation
 
-  fprintf('\n---------------------------------------------------------------------------\n');
-  fprintf('\nCompensate frequency before accumulation of the spectra\n');
+		fprintf('\n---------------------------------------------------------------------------\n');
+		fprintf('\nCompensate frequency before accumulation of the spectra\n');
   
-  [ data, old_data, field_params1, field_params2 ] = trEPR_compensate_frequency ( data, old_data, field_params1, field_params2, t, old_t);
-%%%  [ data, old_data, field_params1, field_params2 ] = frequency_compensation ( data, old_data, field_params1, field_params2, t, old_t);
+		[ data, old_data, field_params1, field_params2 ] = trEPR_compensate_frequency ( data, old_data, field_params1, field_params2, t, old_t);
 
-  % DEBUGGING OUTPUT
-  if ( DEBUGGING )
-    fprintf('\nDEBUGGING OUTPUT:\n');
-    fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(data));
-    fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
-    fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
-  end;
+		% DEBUGGING OUTPUT
+		if ( DEBUGGING )
+			fprintf('\nDEBUGGING OUTPUT:\n');
+			fprintf('\tSize of drift_comp_data1:\t%i %i\n', size(data));
+			fprintf('\tfield_params1:\t\t\t%4.2f %4.2f %2.2f\n', field_params1);
+			fprintf('\tfield_params2:\t\t\t%4.2f %4.2f %2.2f\n', field_params2);
+		end;
 
-  fprintf('\n---------------------------------------------------------------------------\n');
-  fprintf('\nAccumulate spectra\n');
+		fprintf('\n---------------------------------------------------------------------------\n');
+		fprintf('\nAccumulate spectra\n');
   
-  % After plotting the overlay of both B_0 spectra
-  % ask the user whether he really wants to proceed with accumulation...
+		% After plotting the overlay of both B_0 spectra
+		% ask the user whether he really wants to proceed with accumulation...
 
-  really_accumulate = menu( 'Do you really want to accumulate?', 'Yes, accumulate!', 'No, continue with old spectrum', 'No, continue with new spectrum' );
+		really_accumulate = menu( 'Do you really want to accumulate?', 'Yes, accumulate!', 'No, continue with old spectrum', 'No, continue with new spectrum' );
 
-  if ( really_accumulate == 1 )
+		if ( really_accumulate == 1 )
   						% if the user still wants to accumulate
 
-	fprintf('\nYou decided to accumulate both spectra.\n')
+			frintf('\nYou decided to accumulate both spectra.\n')
 
-    % script_accumulate;
-    						% call part of the script that does the accumulation
-    						
-    	acc_meas = accumulate_measurements ( data, old_data );
+			acc_meas = accumulate_measurements ( data, old_data );
   
-	% Save accumulated measurements
+			% Save accumulated measurements
 
-	user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with -acc1D appended\n at the filename base):\n   ', 's' );
+			user_provided_filename = input ( 'Please enter a filename for the ASCII file for saving the accumulated data\n(if empty, the last input filename will be used with -acc1D appended\n at the filename base):\n   ', 's' );
 
-	if length( user_provided_filename ) > 0	
+			if length( user_provided_filename ) > 0	
 						% If the user provided a filename
 
-	  outputfilename = user_provided_filename;
+				outputfilename = user_provided_filename;
 	
-	  fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
+				fprintf ( '\nFile %s will be used to store the ASCII data of the accumulated data...\n\n', outputfilename );
   
-	else					% In case the user didn't provide a filename
+			else					% In case the user didn't provide a filename
 
 
-	  outputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc1D.' get_file_extension(filename) ];
+				outputfilename = [ get_file_path(filename) get_file_basename(filename) '-acc1D.' get_file_extension(filename) ];
 						% the output filename consists of the path of the input file,
 						% the basename of the input file with appended '-acc'
 						% and the extension of the input file (normally '.dat')
 
-	  fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
+				fprintf ( '\nThe ASCII data of the accumulated data will be stored in the file\n\t%s\n', outputfilename );
 
-	end
+			end
 
-	fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
+			fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 						% Telling the user what's going to happen
 
-	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+			if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-	  save ('-ascii', outputfilename, 'acc_meas');
+				save ('-ascii', outputfilename, 'acc_meas');
 						% save data to ascii file
 
-	else					% otherwise we assume that we're called by MATLAB(R)
+			else					% otherwise we assume that we're called by MATLAB(R)
 
-	  save (outputfilename, 'acc_meas', '-ascii');
+				save (outputfilename, 'acc_meas', '-ascii');
 						% save data to ascii file in a MATLAB(R) compatible way
 						% (silly MATLAB behaviour - to accept the Octave variant of
 						% calling but neither saving nor complaining all about...)
 
-	end					% end of "if program" clause
+			end					% end of "if program" clause
   
 
-	% print B_0 spectrum of accumulated data
+			% print B_0 spectrum of accumulated data
 
-%    figure;
+			if (isvector(acc_meas) == 0)
 
-	if (isvector(acc_meas) == 0)
-
-      [spectrum,max_x] = B0_spectrum(acc_meas,2,t);
+				[spectrum,max_x] = B0_spectrum(acc_meas,2,t);
     
-	else
+			else
   
-      spectrum = acc_meas;
+				spectrum = acc_meas;
   
-	end;
+			end;
 
 
-	average_frequency = ( average_frequency * num_accumulated_spectra + frequency ) / (num_accumulated_spectra + 1);
+			average_frequency = ( average_frequency * num_accumulated_spectra + frequency ) / (num_accumulated_spectra + 1);
 
-	num_accumulated_spectra = num_accumulated_spectra + 1;
+			num_accumulated_spectra = num_accumulated_spectra + 1;
 						% increase value of counter
 						
-	filenames_accumulated = [ filenames_accumulated '\n\t' filename ];
+			filenames_accumulated = [ filenames_accumulated '\n\t' filename ];
     
-  elseif ( really_accumulate == 2 )
+		elseif ( really_accumulate == 2 )
   						% if the user wants to abort accumulation and
   						% wants to proceed with the old spectrum
   						
-	fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
-  	data = old_data;
-  	spectrum = old_data;
+			fprintf('\nYou decided not to accumulate\n and to revert to the old spectrum.\n')
+ 			data = old_data;
+			spectrum = old_data;
   						% set the old matrix to the actual matrix 
 						
-	filenames_not_accumulated = [ filenames_not_accumulated '\n\t' filename ];
+			filenames_not_accumulated = [ filenames_not_accumulated '\n\t' filename ];
   						
-  else
+		else
   						% if the user wants to abort accumulation and
   						% wants to proceed with the new spectrum 
   						% just compensated
   						
-	fprintf('\nYou decided not to accumulate\n and to continue with the just compensated spectrum.\n')
+			fprintf('\nYou decided not to accumulate\n and to continue with the just compensated spectrum.\n')
 						
-	filenames_not_accumulated = filenames_accumulated;
-	filenames_accumulated = filename;
+			filenames_not_accumulated = filenames_accumulated;
+			filenames_accumulated = filename;
 
-	average_frequency = frequency;
+			average_frequency = frequency;
   
-  end
+		end
      
-  x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
+		x = [ min([field_params1(1) field_params1(2)]) : abs(field_params1(3)) : max([field_params1(1) field_params1(2)]) ];
   
-  % to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
-  x = x / 10;  
+		% to convert from G -> mT	1 G = 10e-4 T = 10e-1 mT
+		x = x / 10;  
 
-  plot(x,spectrum,'-',x,zeros(1,length(x)));
+		plot(x,spectrum,'-',x,zeros(1,length(x)));
   
   
   
-else 					% if first pass of main loop
+	else 					% if first pass of main loop
 
-  filenames_accumulated = filename;
-  average_frequency = frequency;
+		filenames_accumulated = filename;
+		average_frequency = frequency;
 
-end;						% end "if exit_main_loop" clause
+	end;						% end "if exit_main_loop" clause
 
 
-exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
+	exit_answer = menu ( 'What do you want to do now?', 'Read new file (and accumulate data)', 'Exit program');
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 						
-if exit_answer == 1
+	if exit_answer == 1
 
-  exit_main_loop = exit_main_loop + 1;
+		exit_main_loop = exit_main_loop + 1;
   
-  if ( exist('acc_meas') == 0)
+		if ( exist('acc_meas') == 0)
   						% in the case that there are no accumulated data
 
-    old_data = data;
+			old_data = data;
   						% save compensated data to old_data
   						
-  else
+		else
   						% in the case that there are accumulated data
-    old_data = acc_meas;
+			old_data = acc_meas;
     						% save accumulated spectra to old_data
   
-  end;
+		end;
   
-  old_field_params = field_params;
-  old_time_params = time_params;
-  old_t = t;
+		old_field_params = field_params;
+		old_time_params = time_params;
+		old_t = t;
   						% save parameters for comparison with the next spectrum
   						
-  clear data drift* filename method* offset* pv* trigger_pos X Y;
+		clear data drift* filename method* offset* pv* trigger_pos X Y;
 						% clear old variables that are not used any more
 
-  fprintf('\n###############################################################\n');
-  fprintf('\n\tStarting round %i of accumulation routine...\n', exit_main_loop);
-  fprintf('\n\tNumber of accumulated spectra: %i\n', num_accumulated_spectra);
-  fprintf('\n###############################################################\n');
+		fprintf('\n###############################################################\n');
+		fprintf('\n\tStarting round %i of accumulation routine...\n', exit_main_loop);
+		fprintf('\n\tNumber of accumulated spectra: %i\n', num_accumulated_spectra);
+		fprintf('\n###############################################################\n');
 
-elseif exit_answer == 2
+	elseif exit_answer == 2
 
-  num_compensated_spectra = exit_main_loop;
-  exit_main_loop = 0;
+		num_compensated_spectra = exit_main_loop;
+		exit_main_loop = 0;
 
-end						% end of "if exit_answer" clause
+	end						% end of "if exit_answer" clause
 
 end						% end of main while loop
+
 
 % print some additional stuff to the figure
 
@@ -543,7 +514,7 @@ ylabel('I')
 if program == 'Octave'
   
 else
-  figure(gcf);			% set figure window to current figure window (gcf)
+	figure(gcf);			% set figure window to current figure window (gcf)
 end;
 
 
@@ -554,17 +525,17 @@ user_provided_filename = input ( 'Please enter a filename for the EPS file for s
 if length( user_provided_filename ) > 0	
 						% If the user provided a filename
 
-  outputfilename = user_provided_filename;
+	outputfilename = user_provided_filename;
 	
-  fprintf ( '\nFile %s will be used to store the last plot as EPS file...\n\n', outputfilename );
+	fprintf ( '\nFile %s will be used to store the last plot as EPS file...\n\n', outputfilename );
   
 else					% In case the user didn't provide a filename
 
-  outputfilename = [ get_file_path(filename) get_file_basename(filename) '.eps' ];
+	outputfilename = [ get_file_path(filename) get_file_basename(filename) '.eps' ];
 						% the output filename consists of the path of the input file,
 						% the basename of the input file and the extension '.eps'
 
-  fprintf ( '\nThe last plot will be stored in the EPS file\n\t%s\n', outputfilename );
+	fprintf ( '\nThe last plot will be stored in the EPS file\n\t%s\n', outputfilename );
 
 end
 
@@ -573,11 +544,11 @@ fprintf('\nSaving last plot to the EPS file\n\t%s\n', outputfilename)
 
 if program == 'Octave'	% if we're called by GNU Octave (as determined above)
 
-  print ( outputfilename, '-depsc2' );
+	print ( outputfilename, '-depsc2' );
 
 else					% otherwise we assume that we're called by MATLAB(R)
 
-  print ( '-depsc2' , outputfilename );
+	print ( '-depsc2' , outputfilename );
 
 end					% end of "if program" clause
   
@@ -596,15 +567,15 @@ fprintf(filenames_accumulated);
 
 if ( (num_compensated_spectra-num_accumulated_spectra) > 0 )
 
-  fprintf('\n\nThe following files were NOT accumulated:\n\t');
-  fprintf(filenames_not_accumulated);
+	fprintf('\n\nThe following files were NOT accumulated:\n\t');
+	fprintf(filenames_not_accumulated);
 
 end;
 
 if ( exist('field_params1') ~= 0)
 	% That means we haven't accumulated but only compensated one spectrum
 
-  field_params = field_params1;
+	field_params = field_params1;
 
 end;
 
