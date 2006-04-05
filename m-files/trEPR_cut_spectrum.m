@@ -75,7 +75,7 @@ function [ data, field_params ] = trEPR_cut_spectrum ( data, field_params )
 	global DEBUGGING;
 	global PLOTTING3D;
 	
-	if (exist('program') == 0)
+	if (length(program) == 0)
 		% if the variable "program" is not set, that means the routine isn't called
 		% yet...
 

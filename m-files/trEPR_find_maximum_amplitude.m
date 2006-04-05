@@ -74,6 +74,30 @@ function [ t, real_t ] = trEPR_find_maximum_amplitude ( data, field_params, time
 
 	global program;
 	global DEBUGGING;
+	
+	if (length(program) == 0)
+		% if the variable "program" is not set, that means the routine isn't called
+		% yet...
+
+		if exist('discriminate_matlab_octave')
+			% let's check whether the routine performing the discrimination
+			% is available...
+
+		    program = discriminate_matlab_octave;
+	    
+		else
+			% that means if the variable "program" isn't set yet and the routine
+			% performing the discrimination isn't available...
+	
+			fprintf('\nSorry, the function to distinguish between Matlab(TM) and GNU Octave cannot be found.\nThis function will behave as if it is called within MATLAB(TM)...\nBe aware: In the case that is not true you can run into problems!');
+		
+			program = 'Matlab';
+			
+			% set variable to default value
+	
+		end;
+	
+	end;
 
 	% Plot B_0 spectrum and find signal maximum in t
 
