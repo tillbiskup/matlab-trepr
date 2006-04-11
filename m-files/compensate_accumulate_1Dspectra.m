@@ -260,14 +260,14 @@ while exit_main_loop > 0			% main while loop
 	fprintf('\nEvaluate drift and possible fits...\n');
 	fprintf('\nChoose between the display modes...\n');
 
-	data = trEPR_compensate_drift ( data, field_params, time_params, t )
+	data = trEPR_compensate_drift ( data, field_params, time_params, t );
 
 
 	% Compensate baseline
 
 	no_points = 20;
 
-	data = trEPR_compensate_baseline ( data, field_params, no_points, t )
+	data = trEPR_compensate_baseline ( data, field_params, no_points, t );
 
 	% Save last dataset to file
 
@@ -281,22 +281,8 @@ while exit_main_loop > 0			% main while loop
 
 	fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 								% Telling the user what's going to happen
-
-	if program == 'Octave'			% if we're called by GNU Octave (as determined above)
-
-		save ('-ascii', outputfilename, 'data');
-								% save data to ascii file
-
-	else								% otherwise we assume that we're called by MATLAB(R)
-
-		save (outputfilename, 'data', '-ascii');
-								% save data to ascii file in a MATLAB(R) compatible way
-								% (silly MATLAB behaviour - to accept the Octave variant of
-								% calling but neither saving nor complaining all about...)
-
-	end								% end of "if program" clause
-
-
+								
+	ascii_save_spectrum ( outputfilename, data, field_params, time_params );
 
 	if exit_main_loop > 1				% if the exit condition for the main while loop
 									% set at the beginning and increased at the end of every
@@ -345,7 +331,7 @@ while exit_main_loop > 0			% main while loop
 		if ( really_accumulate == 1 )
   						% if the user still wants to accumulate
 
-			frintf('\nYou decided to accumulate both spectra.\n')
+			fprintf('\nYou decided to accumulate both spectra.\n')
 
 			acc_meas = accumulate_measurements ( data, old_data );
   
