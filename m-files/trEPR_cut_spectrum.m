@@ -23,7 +23,7 @@
 %	MATLAB(R), GNU Octave, transient EPR, fsc2, read file
 %
 % SYNOPSIS
-%	[ data, field_params ] = trEPR_cut_spectrum ( data, field_params )
+%	[ data, field_params ] = trEPR_cut_spectrum ( data, field_params, time_params )
 %
 % DESCRIPTION
 %
@@ -38,6 +38,7 @@
 % INPUT
 %	data
 %	field_params
+%	time_params
 %
 % OUTPUT
 %	data
@@ -49,13 +50,13 @@
 %
 % SOURCE
 
-function [ data, field_params ] = trEPR_cut_spectrum ( data, field_params )
+function [ data, field_params ] = trEPR_cut_spectrum ( data, field_params, time_params )
 
 	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
 	% check for right number of input and output parameters
 
-	if nargin ~= 2
+	if nargin ~= 3
   
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help tEPR_cut_spectrum" to get help.',nargin);
 			% get error if function is called with other than

@@ -225,7 +225,7 @@ fprintf('\n---------------------------------------------------------------------
 fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 
 %%% script_cut_off;
-[ data, field_params ] = trEPR_cut_spectrum ( data, field_params );
+[ data, field_params ] = trEPR_cut_spectrum ( data, field_params, time_params );
 
 
 % Next compensate pretrigger offset

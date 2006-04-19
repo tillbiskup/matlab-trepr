@@ -235,7 +235,7 @@ while exit_main_loop > 0			% main while loop
 	fprintf('\n---------------------------------------------------------------------------\n')
 	fprintf('\nPossibility to cut off the spectrum at its start or end...\n')
 
-	[ data, field_params ] = trEPR_cut_spectrum ( data, field_params );
+	[ data, field_params ] = trEPR_cut_spectrum ( data, field_params, time_params );
 
 
 	% Next compensate pretrigger offset
@@ -361,20 +361,7 @@ while exit_main_loop > 0			% main while loop
 			fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 						% Telling the user what's going to happen
 
-			if program == 'Octave'	% if we're called by GNU Octave (as determined above)
-
-				save ('-ascii', outputfilename, 'acc_meas');
-						% save data to ascii file
-
-			else					% otherwise we assume that we're called by MATLAB(R)
-
-				save (outputfilename, 'acc_meas', '-ascii');
-						% save data to ascii file in a MATLAB(R) compatible way
-						% (silly MATLAB behaviour - to accept the Octave variant of
-						% calling but neither saving nor complaining all about...)
-
-			end					% end of "if program" clause
-  
+			ascii_save_spectrum ( outputfilename, acc_meas, field_params, time_params );
 
 			% print B_0 spectrum of accumulated data
 

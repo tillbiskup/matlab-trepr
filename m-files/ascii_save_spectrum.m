@@ -21,24 +21,30 @@
 %	transient EPR, fsc2, ASCII save data
 %
 % SYNOPSIS
-%	ascii_save_spectrum ( filename, spectrum, field_params, time_params )
+%	ascii_save_spectrum ( filename, spectrum, field_params, time_params, [frequency] )
 %
 % DESCRIPTION
 %	This function saves an 1D spectrum as ASCII file with leading commentaries
 %
 % SOURCE
 
-function ascii_save_spectrum ( filename, spectrum, field_params, time_params )
+function ascii_save_spectrum ( filename, spectrum, field_params, time_params, varargin )
 
 	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
 	
 	% check for right number of input and output parameters
 
-	if nargin ~= 4
+	if ( nargin < 4 ) || ( nargin > 5)
   
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help ascii_save_spectrum" to get help.',nargin);
 			% get error if function is called with other than
 			% four input parameters
+	end
+	
+	if nargin == 5
+	
+		frequency = varargin{1};
+	
 	end
 	
 	
@@ -69,6 +75,13 @@ function ascii_save_spectrum ( filename, spectrum, field_params, time_params )
 	fprintf(fid, '%s\n', comment_char);
 	fprintf(fid, '%s Time parameters were:\n%s\tnumber of points: %i\n%s\ttrigger position: %i\n%s\tlength:           %i microseconds\n', comment_char,comment_char,time_params(1),comment_char,time_params(2),comment_char,time_params(3));
 	fprintf(fid, '%s\n', comment_char);
+	
+	if exist('frequency') == 1
+
+		fprintf(fid, '%s Frequency was:\n%s\t%7.5f\n', comment_char, frequency);
+		fprintf(fid, '%s\n', comment_char);
+	
+	end
 	
 
 	% write data
