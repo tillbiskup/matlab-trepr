@@ -282,7 +282,7 @@ while exit_main_loop > 0			% main while loop
 	fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 								% Telling the user what's going to happen
 								
-	ascii_save_spectrum ( outputfilename, data, field_params, time_params );
+	ascii_save_spectrum ( outputfilename, data, field_params, time_params, frequency );
 
 	if exit_main_loop > 1				% if the exit condition for the main while loop
 									% set at the beginning and increased at the end of every
@@ -361,7 +361,7 @@ while exit_main_loop > 0			% main while loop
 			fprintf('\nSaving ASCII data to the file\n\t%s\n', outputfilename)
 						% Telling the user what's going to happen
 
-			ascii_save_spectrum ( outputfilename, acc_meas, field_params, time_params );
+			ascii_save_spectrum ( outputfilename, acc_meas, field_params, time_params, frequency );
 
 			% print B_0 spectrum of accumulated data
 
