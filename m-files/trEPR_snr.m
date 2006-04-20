@@ -26,6 +26,18 @@
 % DESCRIPTION
 %	This function computes the signal to noise ratio (SNR) of a given spectrum DATA.
 %
+% INPUT PARAMETERS
+%	data	
+%		A vector or a Nx2 matrix containing the spectrum.
+%		In case of the Nx2 matrix the second row contains the spectrum.
+%
+%	noise_range
+%		A scalar or vector defining the range of the spectrum used to
+%		compute the noise amplitude.
+%		In case of a vector this vector must consist of two values that
+%		are used as lower and upper boundary for the part of the spectrum
+%		referred to as noise and used to compute the noise amplitude.
+%
 % SOURCE
 
 function snr = trEPR_snr ( data, varargin )
