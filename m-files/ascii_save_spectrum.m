@@ -78,7 +78,7 @@ function ascii_save_spectrum ( filename, spectrum, field_params, time_params, va
 	
 	if exist('frequency') == 1
 
-		fprintf(fid, '%s Frequency was:\n%s\t%7.5f\n', comment_char, frequency);
+		fprintf(fid, '%s Frequency was:\n%s\t%7.5f GHz\n', comment_char, comment_char, frequency);
 		fprintf(fid, '%s\n', comment_char);
 	
 	end
