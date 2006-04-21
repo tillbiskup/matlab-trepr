@@ -83,6 +83,11 @@ function ascii_save_spectrum ( filename, spectrum, field_params, time_params, va
 	
 	end
 	
+	fprintf(fid, '%s Description of the data:\n', comment_char);
+	fprintf(fid, '%s\t1st column: B_0 field in G\n', comment_char);
+	fprintf(fid, '%s\t2nd column: signal intensity in mV\n', comment_char);
+	fprintf(fid, '%s\n', comment_char);
+	
 
 	% write data
 	
@@ -93,7 +98,7 @@ function ascii_save_spectrum ( filename, spectrum, field_params, time_params, va
 	
 	while (j<=length(spectrum))
 	
-		fprintf(fid, '%5.1f\t%14.12f\n',field(j),spectrum(j));
+		fprintf(fid, '%6.1f\t%+016.12f\n',field(j),spectrum(j));
 		j = j + 1;
 		
 	end;
