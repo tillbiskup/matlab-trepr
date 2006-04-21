@@ -129,8 +129,11 @@ function ts = trEPR_compensate_timeslice
 	
 	out_filename = [ get_file_basename( s_filename ) '-comp.' get_file_extension( s_filename ) ];
 	
-	ascii_save_spectrum ( out_filename, comp_signal_ts, field_params, time_params, frequency );
+	ascii_save_timeslice ( out_filename, comp_signal_ts, field_params, time_params, frequency );
 	
 	fprintf('\nThe compensated time slice has been saved to the file %s\n', out_filename);
+	
+	
+	ts = comp_signal_ts;
 	
 %******
