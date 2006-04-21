@@ -46,6 +46,7 @@
 %	* pretrigger_offset
 %	* get_file_basename
 %	* get_file_extension
+%	* ascii_save_timeslice
 %
 %	The availability of these routines is checked for at each call of this routine.
 %
@@ -89,6 +90,10 @@ function ts = trEPR_compensate_timeslice
 	elseif  ( exist('get_file_extension.m') ~= 2 )
 	
 		error('\n\tThe function %s this function critically depends on is not available.\n', 'get_file_extension');
+	
+	elseif  ( exist('ascii_save_timeslice.m') ~= 2 )
+	
+		error('\n\tThe function %s this function critically depends on is not available.\n', 'ascii_save_timeslice');
 
 	end
 	
