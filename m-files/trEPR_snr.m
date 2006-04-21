@@ -29,11 +29,13 @@
 % INPUT PARAMETERS
 %	data	
 %		A vector or a Nx2 matrix containing the spectrum.
-%		In case of the Nx2 matrix the second row contains the spectrum.
+%
+%		In case of the Nx2 matrix the second column contains the spectrum.
 %
 %	noise_range
 %		A scalar or vector defining the range of the spectrum used to
 %		compute the noise amplitude.
+%
 %		In case of a vector this vector must consist of two values that
 %		are used as lower and upper boundary for the part of the spectrum
 %		referred to as noise and used to compute the noise amplitude.
@@ -51,6 +53,14 @@ function snr = trEPR_snr ( data, varargin )
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help trEPR_snd" to get help.',nargin);
 			% get error if function is called with other than
 			% one input parameter
+	end
+
+	if ( nargout > 1 )
+  
+		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help trEPR_snd" to get help.',nargout);
+			% get error if function is called with more than
+			% one output parameter. This condition makes it possible
+			% to call the function without output arguments.
 	end
 	
 	if nargin == 2
