@@ -98,7 +98,7 @@ function ascii_save_timeslice ( filename, timeslice, field_params, time_params, 
 	
 	while (j<=length(timeslice))
 	
-		fprintf(fid, '%5.1f\t%14.12f\n',time(j),timeslice(j));
+		fprintf(fid, '%+06.2f\t%+14.12f\n',time(j),timeslice(j));
 		j = j + 1;
 		
 	end;
