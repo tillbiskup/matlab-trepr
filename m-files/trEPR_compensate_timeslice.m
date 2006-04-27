@@ -30,8 +30,14 @@
 %
 %	The former is used to compensate the background for the latter.
 %
-%	Additionally the time slice is saved together with the B_0 axis values.
-%	The filename is created from the input filename of the signal time slice.
+%	The user is asked interactively for the names of these two input files.
+%
+%	Additionally the time slice is saved together with the time axis values
+%	with the trigger time t_0 set to zero (thus having negative time values for the
+%	pretrigger signal).
+%
+%	The filename is created from the input filename of the signal time slice:
+%	"<base-filename>-comp.<file-extension>".
 %
 % INPUT PARAMETERS
 %	In the moment there are no input parameters
