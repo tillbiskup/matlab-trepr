@@ -25,7 +25,12 @@
 %
 % DESCRIPTION
 %	This routine takes a time slice and tries to fit an exponential
-%	decay starting with the maximum of the signal.
+%	decay of the form
+%
+%		f(x) = a * exp ( b * x )
+%
+%	starting with the maximum of the signal. In addition thereto it calculates
+%	the time where the signal intensity has decayed to 1/e.
 %
 % INPUT PARAMETERS
 %	time_slice
