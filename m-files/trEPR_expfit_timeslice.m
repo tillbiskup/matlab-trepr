@@ -21,7 +21,7 @@
 %	trEPR, fsc2, time slice, exponential decay
 %
 % SYNOPSIS
-%	[ fit_parameters, tmax, t1e ] = trEPR_expfit_timeslice ( time_slice )
+%	[ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
 %
 % DESCRIPTION
 %	This routine takes a time slice and tries to fit an exponential
@@ -39,10 +39,13 @@
 %		the t value where the signal value is maximal
 %	t1e
 %		the t value where the signal value is decayed to 1/e
+%	fit_function
+%		an Mx2 matrix consisting of two colums containing the time axis values
+%		in the first column and the values of the fit function in the second column
 %
 % SOURCE
 
-function [ fit_parameters, tmax, t1e ] = trEPR_expfit_timeslice ( time_slice )
+function [ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
 
 	fprintf('FUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n');
 
@@ -54,7 +57,7 @@ function [ fit_parameters, tmax, t1e ] = trEPR_expfit_timeslice ( time_slice )
 
 	end
 
-	if ( nargout < 0 ) || ( nargout > 3 )
+	if ( nargout < 0 ) || ( nargout > 4 )
 
 		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help trEPR_expfit_timeslice" to get help.',nargout);
 
@@ -87,6 +90,7 @@ function [ fit_parameters, tmax, t1e ] = trEPR_expfit_timeslice ( time_slice )
 	[ max_signal, tpos_max_signal ] = max( time_slice(:,2) );
 	
 	tmax = time_slice(tpos_max_signal,1);
+		% time in microseconds where the signal is at its maximum
 	
 	% cut part of time slice that should be fitted exponentially
 	
@@ -96,13 +100,27 @@ function [ fit_parameters, tmax, t1e ] = trEPR_expfit_timeslice ( time_slice )
 	% fit exponential decay function to time slice
 	
 	fitfun = @(x,xdata)x(1)*exp(x(2)*xdata);
+		% fit function: f(x) = a * exp ( b * x )
+	
+	options = optimset('TolFun',1e-8);
+		% set tolerance of function values to e-8
 	
 	x0 = [ 1, -1 ];
+		% set start values for the two fit parameters
 	
-	[ fit_parameters ] = lsqcurvefit ( fitfun, x0, fit_ts(:,1), fit_ts(:,2));
+	lb = [-10 -10];
+		% set lower boundaries for the two fit parameters
+	ub = [10 10];
+		% set upper boundaries for the two fit parameters
 	
-%	t1e = log(maxx/exp(1)) / ( abs(fit_parameters(2)) * log(abs(fit_parameters(1))) );
-
+	[ fit_parameters ] = lsqcurvefit ( fitfun, x0, fit_ts(:,1), fit_ts(:,2),lb,ub,options);
+		% fit with lsqcurvefit
+	
 	t1e = ( log((max_signal/exp(1))/abs(fit_parameters(1))) / fit_parameters(2));
+		% time (in microseconds) where the signal has decayed to 1/e of the maximum
+	
+	fit_function = [ fit_ts(:,1) fitfun(fit_parameters,fit_ts(:,1)) ];
+		% as fourth parameter return an Mx2 matrix containing the time axis
+		% and the function values of the fitted function
 	
 %******
