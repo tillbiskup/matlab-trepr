@@ -32,6 +32,9 @@
 %
 %	The user is asked interactively for the names of these two input files.
 %
+%	Both time slices are averaged before compensation. This is something that shoud
+%	be changed in the future...
+%
 %	Additionally the time slice is saved together with the time axis values
 %	with the trigger time t_0 set to zero (thus having negative time values for the
 %	pretrigger signal).
@@ -55,6 +58,11 @@
 %	* ascii_save_timeslice
 %
 %	The availability of these routines is checked for at each call of this routine.
+%
+% TODO
+%	Replace the averaging of both time slices with possibility to choose one single
+%	spectrum of the time slice from the signal part of the spectrum or average over
+%	the entire data set.
 %
 % SOURCE
 
@@ -125,6 +133,11 @@ function ts = trEPR_compensate_timeslice
 	
 	
 	% average both time slices
+	
+	% TODO:	This should be changed and replaced with
+	% 		the possibility to choose one single spectrum of the
+	% 		time slice from the signal part of the spectrum
+	% 		or average over the entire data set.
 	
 	off_resonance_ts = mean ( off_resonance_ts );
 	
