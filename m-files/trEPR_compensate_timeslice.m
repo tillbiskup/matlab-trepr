@@ -21,7 +21,7 @@
 %	transient EPR, time slices
 %
 % SYNOPSIS
-%	ts = trEPR_compensate_timeslice
+%	[ts, t] = trEPR_compensate_timeslice
 %
 % DESCRIPTION
 %	This function compensates a given time slice with its off-resonance signal.
@@ -48,6 +48,8 @@
 % OUTPUT PARAMETERS
 %	ts
 %		compensated time slice as row vector
+%	t
+%		time axis as row vector
 %
 % DEPENDS ON
 %	The routine depends on several other routines from the trEPR toolbox:
@@ -66,7 +68,7 @@
 %
 % SOURCE
 
-function ts = trEPR_compensate_timeslice
+function [ts, t] = trEPR_compensate_timeslice
 
 	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
 	
@@ -79,7 +81,7 @@ function ts = trEPR_compensate_timeslice
 			% input parameters
 	end
 
-	if ( nargout > 1 )
+	if ( nargout > 2 )
   
 		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help trEPR_snd" to get help.',nargout);
 			% get error if function is called with more than
@@ -159,5 +161,8 @@ function ts = trEPR_compensate_timeslice
 	
 	
 	ts = comp_signal_ts;
+	
+	t = [ -time_params(3)/time_params(1)*time_params(2) + time_params(3)/time_params(1) : time_params(3)/time_params(1) : time_params(3)-time_params(3)/time_params(1)*time_params(2) ];
+	
 	
 %******
