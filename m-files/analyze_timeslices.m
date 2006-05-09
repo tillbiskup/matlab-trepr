@@ -76,6 +76,7 @@ tic;
 fprintf( '\nThis is the file $RCSfile$,\n\t$Revision$ from $Date$\n' );
 
 fprintf('\nThis file is intended to be used to analyze time slices of transient ESR spectra\nrecorded with the fsc2 software.\n\nThe whole analyzing process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
+fprintf('\nThe primary goal of this log file is to be able to reproduce every step\nthat has been performed with the given time slices.\n\nAdditionally, at the end of this file a short summary will be printed out\ncontaining all the values of interest from the analysis of the time slices.\n');
 
 % First of all start logging
 
@@ -174,14 +175,16 @@ end			% end of main while loop
 %
 %	* name of the files the figures have been saved to
 
-fprintf('\n---------------------------------------------------------------------------\n');
-fprintf('\nSUMMARY\n')
-
 % ask the user for the name of the sample that should go into the log file
 
-sample_name = input ('\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B_0 field.\nThis will show up at the end of the log file in the summary.\n      ', 's');
+sample_name = input ('\n\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B_0 field.\n\nThis will show up at the end of the log file in the summary.\n      ', 's');
 
 fprintf('\nSample: %s\n', sample_name);
+
+
+fprintf('\n\n==============================================================\n');
+fprintf('\nSUMMARY\n')
+
 
 % write table with values of interest
 
