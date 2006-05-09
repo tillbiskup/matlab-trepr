@@ -21,7 +21,7 @@
 %	transient EPR, time slices
 %
 % SYNOPSIS
-%	[ts, t] = trEPR_compensate_timeslice
+%	[ts, t, field_position] = trEPR_compensate_timeslice
 %
 % DESCRIPTION
 %	This function compensates a given time slice with its off-resonance signal.
@@ -48,8 +48,18 @@
 % OUTPUT PARAMETERS
 %	ts
 %		compensated time slice as row vector
+%		the values are given in millivolts (mV)
+%
 %	t
 %		time axis as row vector
+%		the values are given in microseconds (us)
+%
+%	field_position
+%		position of the B field where the time slice is recorded
+%		the value is given in gauss (G), NOT in millitesla (mT)
+%
+%	The function can be called with any number of output parameters in the 
+%	range of zero to three parameters.
 %
 % DEPENDS ON
 %	The routine depends on several other routines from the trEPR toolbox:
@@ -68,7 +78,7 @@
 %
 % SOURCE
 
-function [ts, t] = trEPR_compensate_timeslice
+function [ts, t, field_position] = trEPR_compensate_timeslice
 
 	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
 	
@@ -81,7 +91,7 @@ function [ts, t] = trEPR_compensate_timeslice
 			% input parameters
 	end
 
-	if ( nargout > 2 )
+	if ( nargout > 3 )
   
 		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help trEPR_snd" to get help.',nargout);
 			% get error if function is called with more than
@@ -142,6 +152,8 @@ function [ts, t] = trEPR_compensate_timeslice
 	% 		or average over the entire data set.
 	
 	off_resonance_ts = mean ( off_resonance_ts );
+	
+	field_position = mean ( [ field_params(1) field_params(2) ] );
 	
 	signal_ts = mean ( signal_ts );
 	

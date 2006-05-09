@@ -110,19 +110,51 @@ while exit_main_loop > 0			% main while loop
 
 	% here the main part of the functionality takes place
 
+	% compensate the time slice
 
+	[ts,t,field_position] = trEPR_compensate_timeslice;
+	
+	% exponential fit of compensated time slice
 
-	exit_answer = menu ( 'What do you want to do now?', 'analyze another time slice', 'Exit program');
+	[fp,tmax,t1e,dt1e,ff] = trEPR_expfit_timeslice ([t' ts']);
+	
+	% plot of fit results
+	
+	plot(ff(:,1),ff(:,2),t,ts);
+	
+	xlabel('time / \mus');
+	ylabel('intensity / mV');
+	
+	title_string = sprintf('time slice at f06.2% mT B_0 field position',field_position/10);
+	title(title_string);
+	
+	legend('exponential fit','measured time slice');
+	
+
+	% save and display values of interest
+
+	summary(exit_main_loop,:) = [field_position/10, tmax, t1e, dt1e];
+	
+	fprintf('\nfield position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
+	fprintf('--------------------------------------------------------------\n');
+	fprintf(' %06.2f                %07.4f      %07.4f      %07.4f\n',summary(exit_main_loop,:));
+	
+	% ask user what to do next: continue with another time slice or abort
+
+	exit_answer = menu ( 'What do you want to do now?', 'Analyze another time slice', 'Exit program');
 		% make menu that lets the user choose whether he wants to continue
 		% with analyzing another time slice or to quit the program.
-						
+
 	if exit_answer == 1
 
 		exit_main_loop = exit_main_loop + 1;
+			% increase the while loop exit condition by 1
+			% thus representing the current round of the loop
 
 	elseif exit_answer == 2
 
 		exit_main_loop = 0;
+			% set the while loop exit condition
 
 	end		% end of "if exit_answer" clause
 
@@ -142,17 +174,38 @@ end			% end of main while loop
 %
 %	* name of the files the figures have been saved to
 
+% ask the user for the name of the sample that should go into the log file
 
-total_time_used = toc;
-fprintf ('\nThe total time used is %4.2f seconds\n', total_time_used);
-						% print total time used;
+sample_name = input ('\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B field.\nThis will show up at the end of the log file in the summary.\n      ', 's')
 
-fprintf('\n---------------------------------------------------------------------------\n');
+fprintf('\nSample: %s\n', sample_name);
+
+% write table with values of interest
+
+fprintf('\nfield position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
+fprintf('--------------------------------------------------------------\n');
+
+[rows_summary,cols_summary] = size(summary);
+
+for m = 1:rows_summary
+
+	fprintf(' %06.2f                %07.4f      %07.4f      %07.4f\n',summary(m,:));
+
+end;
+
+fprintf('--------------------------------------------------------------\n');
 
 
 % At the very end stop logging...
 
 stop_logging;
+
+
+% print total time used;
+
+total_time_used = toc;
+fprintf ('\nThe total time used is %4.2f seconds\n', total_time_used);
+
 
 % end of script
 
