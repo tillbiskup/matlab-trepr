@@ -219,12 +219,12 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   
   fprintf('\nParameters of the file just read:\n')
   fprintf('\nmagnetic field parameters:\n');
-  fprintf('field start:\t\t%i G\nfield stop:\t\t%i G\nfield step width:\t%2.2f G\n', field_params);
+  fprintf('field start:\t\t%i G\nfield stop:\t\t\t%i G\nfield step width:\t%2.2f G\n', field_params);
   fprintf('\nscope parameters:\n');
-  fprintf('sensitivity:\t\t%i e-06 s\ntime base: \t\t%i e-06 s\naverages: \t\t%i\n', scope_params);
+  fprintf('sensitivity:\t\t%i e-06 s\ntime base: \t\t\t%i e-06 s\naverages: \t\t\t%i\n', scope_params);
   fprintf('\ntime parameters:\n');
-  fprintf('No of points:\t\t%i\ntrigger position:\t%i\nslice length:\t\t%i\n', time_params);
-  fprintf('\nfrequency:\t\t%1.5f GHz\n', frequency);
+  fprintf('No of points:\t\t%i\ntrigger position:\t%i\nslice length:\t\t%i us\n', time_params);
+  fprintf('\nMW frequency:\t\t%1.5f GHz\n', frequency);
   
   % calculations for the dimension of the 2D-matrix for finally storing the data
   

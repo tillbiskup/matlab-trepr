@@ -125,7 +125,7 @@ while exit_main_loop > 0			% main while loop
 	xlabel('time / \mus');
 	ylabel('intensity / mV');
 	
-	title_string = sprintf('time slice at f06.2% mT B_0 field position',field_position/10);
+	title_string = sprintf('time slice at %06.2f mT B_0 field position',field_position/10);
 	title(title_string);
 	
 	legend('exponential fit','measured time slice');
@@ -135,8 +135,8 @@ while exit_main_loop > 0			% main while loop
 
 	summary(exit_main_loop,:) = [field_position/10, tmax, t1e, dt1e];
 	
-	fprintf('\nfield position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
-	fprintf('--------------------------------------------------------------\n');
+	fprintf('\n field position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
+	fprintf('-------------------------------------------------------------\n');
 	fprintf(' %06.2f                %07.4f      %07.4f      %07.4f\n',summary(exit_main_loop,:));
 	
 	% ask user what to do next: continue with another time slice or abort
@@ -174,16 +174,19 @@ end			% end of main while loop
 %
 %	* name of the files the figures have been saved to
 
+fprintf('\n---------------------------------------------------------------------------\n');
+fprintf('\nSUMMARY\n')
+
 % ask the user for the name of the sample that should go into the log file
 
-sample_name = input ('\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B field.\nThis will show up at the end of the log file in the summary.\n      ', 's')
+sample_name = input ('\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B_0 field.\nThis will show up at the end of the log file in the summary.\n      ', 's');
 
 fprintf('\nSample: %s\n', sample_name);
 
 % write table with values of interest
 
-fprintf('\nfield position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
-fprintf('--------------------------------------------------------------\n');
+fprintf('\n field position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
+fprintf('-------------------------------------------------------------\n');
 
 [rows_summary,cols_summary] = size(summary);
 
@@ -193,7 +196,7 @@ for m = 1:rows_summary
 
 end;
 
-fprintf('--------------------------------------------------------------\n');
+fprintf('-------------------------------------------------------------\n');
 
 
 % At the very end stop logging...
