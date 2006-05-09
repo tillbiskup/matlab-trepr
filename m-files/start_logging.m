@@ -78,7 +78,7 @@ function varargout = start_logging
   
     else						% In case the user didn't provide a filename
 
-      logfilename = [(datestr (now,30)),'.dat']
+      logfilename = [(datestr (now,30)),'.dat'];
   							% generate logfile filename from current date and time ('now')
   							% formatted as string with 'T' as separator: YYYYMMDDTHHMMSS
   							
@@ -89,6 +89,8 @@ function varargout = start_logging
   end						% end while loop
   							
   fprintf ( '\nFile\n  %s\nwill be used as logfile for the current session...\n\n', logfilename );
+  
+  fprintf ( '\n...below this line everything that appears at the command line goes into the log file\nuntil ''stop_logging'' is called.\n' );
   
   diary ( logfilename );	% start logging via the 'diary' function
 

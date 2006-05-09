@@ -30,7 +30,7 @@
 
 function ascii_save_timeslice ( filename, timeslice, field_params, time_params, varargin )
 
-	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n' );
+	fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 	
 	% check for right number of input and output parameters
 

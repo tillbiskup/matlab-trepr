@@ -169,7 +169,7 @@ function [ts, t, field_position] = trEPR_compensate_timeslice
 	
 	ascii_save_timeslice ( out_filename, comp_signal_ts, field_params, time_params, frequency );
 	
-	fprintf('\nThe compensated time slice has been saved to the file %s\n', out_filename);
+	fprintf('\nThe compensated time slice has been saved to the file\n\t%s\n', out_filename);
 	
 	
 	ts = comp_signal_ts;

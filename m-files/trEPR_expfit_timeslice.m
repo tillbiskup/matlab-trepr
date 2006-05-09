@@ -59,7 +59,7 @@
 
 function [ fit_parameters, tmax, t1e, dt1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
 
-	fprintf('FUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n');
+	fprintf('\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n');
 
 	% check for the right number of input and output parameters
 

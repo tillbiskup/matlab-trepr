@@ -75,19 +75,23 @@ tic;
 
 fprintf( '\nThis is the file $RCSfile$,\n\t$Revision$ from $Date$\n' );
 
-fprintf('\nThis file is intended to be used to analyze time slices of transient ESR spectra\nrecorded with the fsc2 software.\n\nThe whole analyzing process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
+fprintf('\n=============================================================================\nSHORT SUMMARY\n');
+
+fprintf('\nThis file is intended to be used to analyze time slices of transient\nESR spectra recorded with the fsc2 software.\n\nThe whole analyzing process is being logged in a file that''s name he user is\nasked to provide at the very beginning of the processing of this script.\n');
 fprintf('\nThe primary goal of this log file is to be able to reproduce every step\nthat has been performed with the given time slices.\n\nAdditionally, at the end of this file a short summary will be printed out\ncontaining all the values of interest from the analysis of the time slices.\n');
+
+fprintf('\n=============================================================================\n');
 
 % First of all start logging
 
 logfilename = start_logging;
 
 
-% Then print some nice message
+% Print some information according date, time and platform
 
 dateandtime = [datestr(now, 31), ' @ ', computer];
 
-disp ( dateandtime )	% print current date and time and system
+fprintf('\nDate, time and platform this procedure took place:\n%s\n',dateandtime);
 
 fprintf( '\nThis is the file $RCSfile$,\n\t$Revision$ from $Date$\n' );
 fprintf( '\nFor a short description of what this program does\nplease type in ''help analyze_timeslices''.\n' );

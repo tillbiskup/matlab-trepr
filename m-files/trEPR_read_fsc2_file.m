@@ -55,7 +55,7 @@
 
 function [ data,frequency,field_params,scope_params,time_params,filename,trigger_pos ] = trEPR_read_fsc2_file
 
-  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$' );
+  fprintf ( '\nFUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n' );
 
   % set some global variables
 

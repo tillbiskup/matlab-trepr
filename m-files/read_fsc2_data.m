@@ -1,4 +1,5 @@
 % Copyright (C) 2005 Till Biskup
+% Copyright (C) 2005 Till Biskup
 % 
 % This file ist free software.
 % 
@@ -219,11 +220,11 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   
   fprintf('\nParameters of the file just read:\n')
   fprintf('\nmagnetic field parameters:\n');
-  fprintf('field start:\t\t%i G\nfield stop:\t\t\t%i G\nfield step width:\t%2.2f G\n', field_params);
+  fprintf('\tfield start:\t\t%i G\n\tfield stop:\t\t\t%i G\n\tfield step width:\t%2.2f G\n', field_params);
   fprintf('\nscope parameters:\n');
-  fprintf('sensitivity:\t\t%i e-06 s\ntime base: \t\t\t%i e-06 s\naverages: \t\t\t%i\n', scope_params);
+  fprintf('\tsensitivity:\t\t%i e-06 s\n\ttime base: \t\t\t%i e-06 s\n\taverages: \t\t\t%i\n', scope_params);
   fprintf('\ntime parameters:\n');
-  fprintf('No of points:\t\t%i\ntrigger position:\t%i\nslice length:\t\t%i us\n', time_params);
+  fprintf('\nNo of points:\t\t%i\n\ttrigger position:\t%i\n\tslice length:\t\t%i us\n', time_params);
   fprintf('\nMW frequency:\t\t%1.5f GHz\n', frequency);
   
   % calculations for the dimension of the 2D-matrix for finally storing the data
