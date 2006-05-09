@@ -90,7 +90,7 @@ function varargout = start_logging
   							
   fprintf ( '\nFile\n  %s\nwill be used as logfile for the current session...\n\n', logfilename );
   
-  fprintf ( '\n...below this line everything that appears at the command line goes into the log file\nuntil ''stop_logging'' is called.\n' );
+  fprintf ( '\n...below this line everything that appears at the command line\ngoes into the log file until ''stop_logging'' is called.\n' );
   
   diary ( logfilename );	% start logging via the 'diary' function
 

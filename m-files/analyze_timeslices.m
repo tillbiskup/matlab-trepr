@@ -95,6 +95,7 @@ fprintf('\nDate, time and platform this procedure took place:\n\t%s\n',dateandti
 
 fprintf( '\nThis is the file $RCSfile$,\n\t$Revision$ from $Date$\n' );
 fprintf( '\n\tFor a short description of what this program does\n\tplease type in ''help analyze_timeslices''.\n' );
+fprintf( '\n\tIf you''re reading the log file and are only\n\tinterested in the results search for the term\n\t''SUMMARY'' that is at the end of this file.\n' );
 
 
 % Find out whether we are called by MATLAB(R) or GNU Octave
@@ -155,6 +156,10 @@ while exit_main_loop > 0			% main while loop
 		exit_main_loop = exit_main_loop + 1;
 			% increase the while loop exit condition by 1
 			% thus representing the current round of the loop
+
+		fprintf('\n\n=============================================================\n');
+		fprintf('Time slice no. %i\n',exit_main_loop);
+		fprintf('=============================================================\n');
 
 	elseif exit_answer == 2
 
