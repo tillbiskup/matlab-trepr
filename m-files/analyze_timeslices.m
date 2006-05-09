@@ -91,7 +91,7 @@ logfilename = start_logging;
 
 dateandtime = [datestr(now, 31), ' @ ', computer];
 
-fprintf('\nDate, time and platform this procedure took place:\n%s\n',dateandtime);
+fprintf('\nDate, time and platform this procedure took place:\n\t%s\n',dateandtime);
 
 fprintf( '\nThis is the file $RCSfile$,\n\t$Revision$ from $Date$\n' );
 fprintf( '\nFor a short description of what this program does\nplease type in ''help analyze_timeslices''.\n' );
@@ -183,15 +183,16 @@ end			% end of main while loop
 
 sample_name = input ('\n\nPlease type in the name of the sample and the other data relevant to this measurement\nsuch as the temperature at which the measurement took place, but not the B_0 field.\n\nThis will show up at the end of the log file in the summary.\n      ', 's');
 
-fprintf('\nSample: %s\n', sample_name);
-
 
 fprintf('\n\n==============================================================\n');
 fprintf('\nSUMMARY\n')
 
+fprintf('\nSample: %s\n', sample_name);
+
 
 % write table with values of interest
 
+fprintf('-------------------------------------------------------------\n');
 fprintf('\n field position / mT   t_max / us   t_1/e / us   dt_1/e / us\n');
 fprintf('-------------------------------------------------------------\n');
 

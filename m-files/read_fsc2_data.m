@@ -224,7 +224,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
   fprintf('\nscope parameters:\n');
   fprintf('\tsensitivity:\t\t%i e-06 s\n\ttime base: \t\t\t%i e-06 s\n\taverages: \t\t\t%i\n', scope_params);
   fprintf('\ntime parameters:\n');
-  fprintf('\nNo of points:\t\t%i\n\ttrigger position:\t%i\n\tslice length:\t\t%i us\n', time_params);
+  fprintf('\tNo of points:\t\t%i\n\ttrigger position:\t%i\n\tslice length:\t\t%i us\n', time_params);
   fprintf('\nMW frequency:\t\t%1.5f GHz\n', frequency);
   
   % calculations for the dimension of the 2D-matrix for finally storing the data
