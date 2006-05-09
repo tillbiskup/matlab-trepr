@@ -37,6 +37,8 @@
 %		an Nx2 matrix consisting of two colums containing the time axis values
 %		in the first column and the signal values in the second column
 %
+%		Such a matrix is created by the routine trEPR_compensate_timeslice.
+%
 % OUTPUT PARAMETERS
 %	fit_parameters
 %		a vector containing the fit parameters from the exponential fit function
@@ -49,6 +51,9 @@
 %	fit_function
 %		an Mx2 matrix consisting of two colums containing the time axis values
 %		in the first column and the values of the fit function in the second column
+%
+%	The values of the parameters tmax and t1e are the time
+%	left since the trigger pulse.
 %
 % SOURCE
 
