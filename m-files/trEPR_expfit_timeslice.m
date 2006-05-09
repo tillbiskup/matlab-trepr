@@ -21,7 +21,7 @@
 %	trEPR, fsc2, time slice, exponential decay
 %
 % SYNOPSIS
-%	[ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
+%	[ fit_parameters, tmax, t1e, dt1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
 %
 % DESCRIPTION
 %	This routine takes a time slice and tries to fit an exponential
@@ -44,13 +44,15 @@
 %		the t value where the signal value is maximal
 %	t1e
 %		the t value where the signal value is decayed to 1/e
+%	dt1e
+%		the time starting from tmax where the signal value is decayed to 1/e
 %	fit_function
 %		an Mx2 matrix consisting of two colums containing the time axis values
 %		in the first column and the values of the fit function in the second column
 %
 % SOURCE
 
-function [ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
+function [ fit_parameters, tmax, t1e, dt1e, fit_function ] = trEPR_expfit_timeslice ( time_slice )
 
 	fprintf('FUNCTION CALL: $RCSfile$\n\t$Revision$, $Date$\n\n');
 
@@ -62,7 +64,7 @@ function [ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( 
 
 	end
 
-	if ( nargout < 0 ) || ( nargout > 4 )
+	if ( nargout < 0 ) || ( nargout > 5 )
 
 		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help trEPR_expfit_timeslice" to get help.',nargout);
 
@@ -81,18 +83,33 @@ function [ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( 
 	
 	% restore time parameters from time axis of the time slice
 	
+		% time parameters are
+		%
+		% no_points
+		%	number of points of the time slice
+		% trig_pos
+		%	position of the trigger pulse
+		% length_ts
+		%	length of the time slice in microseconds
+		
+		% remember:	the time axis starts with negative time,
+		% 			is zero at the trigger position
+		%			and continues in positive time
+	
 	length_ts = max(time_slice(:,1)-min(time_slice(:,1)));
 	
 	no_points = length(time_slice(:,1));
 	
 	[ val_trig_pos, trig_pos ] = min ( abs( time_slice(:,1) ) );
 	
-	time_params = [ no_points, trig_pos, length_ts];
+	time_params = [ no_points, trig_pos, length_ts ];
 	
 	
 	% evaluate time position for signal maximum
 	
-	[ max_signal, tpos_max_signal ] = max( time_slice(:,2) );
+	[ max_signal, tpos_max_signal ] = max( abs( time_slice(:,2) ) );
+		% using the abs() function is necessary to allow for
+		% negative signal maxima
 	
 	tmax = time_slice(tpos_max_signal,1);
 		% time in microseconds where the signal is at its maximum
@@ -123,6 +140,10 @@ function [ fit_parameters, tmax, t1e, fit_function ] = trEPR_expfit_timeslice ( 
 	
 	t1e = ( log((max_signal/exp(1))/abs(fit_parameters(1))) / fit_parameters(2));
 		% time (in microseconds) where the signal has decayed to 1/e of the maximum
+		
+	dt1e = t1e - tmax;
+		% time (in microseconds) for the signal to decay to 1/e of the maximum
+		% starting from the time where the signal is at its maximum
 	
 	fit_function = [ fit_ts(:,1) fitfun(fit_parameters,fit_ts(:,1)) ];
 		% as fourth parameter return an Mx2 matrix containing the time axis
