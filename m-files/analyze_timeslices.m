@@ -136,7 +136,51 @@ while exit_main_loop > 0			% main while loop
 	
 	legend('exponential fit','measured time slice');
 	
+	
+	% here should go in the saving of the figure
+	
+	user_provided_figure_filename = '';
+		% set filename for saving the figure to an empty string
+	
+	while length( user_provided_figure_filename ) > 0	
+		% as long as the user hasn't provided a filename
 
+		user_provided_figure_filename = input ( 'Please enter a filename for the EPS file for saving the last plot:\n   ', 's' );
+
+		if ( exist('discriminate_matlab_octave.m') == 2 )
+		
+			overwrite_file = menu ( 'The file you want so save the figure to still exists. Overwrite?', 'Yes', 'No' );
+			
+			if ( overwrite_file == 1 )
+
+				fprintf( '\nThe file %s will be overwritten.\n', user_provided_figure_filename )			
+			
+			elseif ( overwrite_file == 2 )
+			
+				user_provided_figure_filename = '';
+			
+			end
+		
+		end
+
+	end
+
+	outputfilename = user_provided_figure_filename;
+
+	fprintf('\nSaving the figure as an EPS file with the filename\n\t%s\n', outputfilename)
+		% Telling the user what's going to happen
+
+	if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+		print ( outputfilename, '-depsc2' );
+
+	else					% otherwise we assume that we're called by MATLAB(R)
+
+		print ( '-depsc2' , outputfilename );
+
+	end					% end of "if program" clause
+  
+	
 	% save and display values of interest
 
 	summary(exit_main_loop,:) = [field_position/10, tmax, t1e, dt1e];
