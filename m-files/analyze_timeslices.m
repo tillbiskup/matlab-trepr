@@ -67,6 +67,9 @@ elseif ( exist('stop_logging.m') ~= 2 )
 end;
 
 
+clear all;
+
+
 tic;
 	% set starting point for calculation of used time, just for fun...
 
@@ -142,12 +145,12 @@ while exit_main_loop > 0			% main while loop
 	user_provided_figure_filename = '';
 		% set filename for saving the figure to an empty string
 	
-	while length( user_provided_figure_filename ) > 0	
+	while length( user_provided_figure_filename ) == 0	
 		% as long as the user hasn't provided a filename
 
 		user_provided_figure_filename = input ( 'Please enter a filename for the EPS file for saving the last plot:\n   ', 's' );
 
-		if ( exist('discriminate_matlab_octave.m') == 2 )
+		if ( exist('user_provided_figure_filename') == 2 )
 		
 			overwrite_file = menu ( 'The file you want so save the figure to still exists. Overwrite?', 'Yes', 'No' );
 			
@@ -180,6 +183,21 @@ while exit_main_loop > 0			% main while loop
 
 	end					% end of "if program" clause
   
+
+	% save figure filenames for summary in the end
+
+	if ( exist('figure_filenames') == 1 )
+		% in the case the variable 'figure_filenames' still exists
+		% meaning that we have saved another figure before
+	
+		figure_filenames = [ figure_filenames '\n\t' outputfilename ];
+		
+	else
+	
+		figure_filenames = outputfilename;
+	
+	end
+
 	
 	% save and display values of interest
 
@@ -255,6 +273,8 @@ for m = 1:rows_summary
 end;
 
 fprintf('-------------------------------------------------------------\n');
+
+fprintf('\nThe filenames the figures have been saved to are:\n\n\t%s\n',figure_filenames);
 
 
 % At the very end stop logging...
