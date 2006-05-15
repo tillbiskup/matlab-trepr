@@ -274,7 +274,12 @@ end;
 
 fprintf('-------------------------------------------------------------\n');
 
-fprintf('\nThe filenames the figures have been saved to are:\n\n\t%s\n',figure_filenames);
+fprintf('\nThe filenames the figures have been saved to are:\n\n\t');
+fprintf(figure_filenames);
+fprintf('\n');
+
+fprintf('\n\nEND OF SUMMARY\n')
+fprintf('\n==============================================================\n');
 
 
 % At the very end stop logging...
