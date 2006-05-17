@@ -133,12 +133,12 @@ function [ fit_parameters, tmax, t1e, dt1e, fit_function ] = trEPR_expfit_timesl
 		% set tolerance of function values to e-8
 	
 	x0 = [ 1, -1, 0 ];
-		% set start values for the two fit parameters
+		% set start values for the three fit parameters
 	
 	lb = [-10 -10 -10];
-		% set lower boundaries for the two fit parameters
+		% set lower boundaries for the three fit parameters
 	ub = [10 10 10];
-		% set upper boundaries for the two fit parameters
+		% set upper boundaries for the three fit parameters
 	
 	[ fit_parameters ] = lsqcurvefit ( fitfun, x0, fit_ts(:,1), fit_ts(:,2),lb,ub,options);
 		% fit with lsqcurvefit
