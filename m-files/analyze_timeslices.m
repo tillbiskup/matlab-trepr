@@ -128,8 +128,8 @@ while exit_main_loop > 0			% main while loop
 	[fp,tmax,t1e,dt1e,ff] = trEPR_expfit_timeslice ([t' ts']);
 	
 	% plot of fit results
-	
-	plot(ff(:,1),ff(:,2),t,ts);
+
+	plot(t,ts,'-',ff(:,1),ff(:,2),'-');
 	
 	xlabel('time / \mus');
 	ylabel('intensity / mV');
