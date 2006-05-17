@@ -26,7 +26,7 @@
 % DESCRIPTION
 %	This function compensates a given time slice with its off-resonance signal.
 %	Therefore it reads two fsc2 data files, one with the off-resonance time slice
-%	and the other with the time slice at the maximum/minimum of the spectrum.
+%	and the other with the time slice at the maximum/minimum of the B_0 spectrum.
 %
 %	The former is used to compensate the background for the latter.
 %
@@ -176,5 +176,12 @@ function [ts, t, field_position] = trEPR_compensate_timeslice
 	
 	t = [ -time_params(3)/time_params(1)*time_params(2) + time_params(3)/time_params(1) : time_params(3)/time_params(1) : time_params(3)-time_params(3)/time_params(1)*time_params(2) ];
 	
+
+	% for direct optical control just plot the two spectra and their difference
+	
+	plot(t,signal_ts,t,off_resonance_ts,t,ts);
+	legend('(a) averaged signal time slice','(b) averaged off-resonance time slice','(c) compensated time slice (a-b)');
+	figure;
+
 	
 %******

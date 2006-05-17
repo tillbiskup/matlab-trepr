@@ -162,11 +162,11 @@ function [ data1, data2, field_params1, field_params2 ] = trEPR_compensate_frequ
 		x2 = x2 / 10;
 	
 
-	if program == 'Octave'			% clear graphics window contents
-		clg;							% this is especially necessary with GNU Octave
-	else
-		clf;
-	end;
+		if program == 'Octave'			% clear graphics window contents
+			clg;							% this is especially necessary with GNU Octave
+		else
+			clf;
+		end;
 
 		hold on;
 
@@ -176,8 +176,8 @@ function [ data1, data2, field_params1, field_params2 ] = trEPR_compensate_frequ
 
 		plot(x1,data1_1D','-',x2,data2_1D','-',x1,zeros(1,length(x1)),'-')
 
-	if program == 'Octave'
-	else
+		if program == 'Octave'
+		else
 			legend( {'Spectrum 1','Spectrum 2'} )
 		end;
 	
