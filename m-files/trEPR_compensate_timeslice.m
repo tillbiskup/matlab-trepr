@@ -180,7 +180,12 @@ function [ts, t, field_position] = trEPR_compensate_timeslice
 	% for direct optical control just plot the two spectra and their difference
 	
 	plot(t,signal_ts,t,off_resonance_ts,t,ts);
-	legend('(a) averaged signal time slice','(b) averaged off-resonance time slice','(c) compensated time slice (a-b)');
+
+	xlabel('time / \mus');
+	ylabel('intensity / mV');
+	title('Comparison of the time slices (TS) and their difference');
+	legend('(a) averaged signal TS','(b) averaged off-resonance TS','(c) compensated TS (a-b)');
+	
 	figure;
 
 	

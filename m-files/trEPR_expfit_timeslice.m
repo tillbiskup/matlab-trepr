@@ -126,18 +126,18 @@ function [ fit_parameters, tmax, t1e, dt1e, fit_function ] = trEPR_expfit_timesl
 	
 	% fit exponential decay function to time slice
 	
-	fitfun = @(x,xdata)x(1)*exp(x(2)*xdata);
-		% fit function: f(x) = a * exp ( b * x )
+	fitfun = @(x,xdata)x(1)*exp(x(2)*xdata)+x(3);
+		% fit function: f(x) = a * exp ( b * x ) + c
 	
-	options = optimset('TolFun',1e-8);
+	options = optimset('TolFun',1e-16);
 		% set tolerance of function values to e-8
 	
-	x0 = [ 1, -1 ];
+	x0 = [ 1, -1, 0 ];
 		% set start values for the two fit parameters
 	
-	lb = [-10 -10];
+	lb = [-10 -10 -10];
 		% set lower boundaries for the two fit parameters
-	ub = [10 10];
+	ub = [10 10 10];
 		% set upper boundaries for the two fit parameters
 	
 	[ fit_parameters ] = lsqcurvefit ( fitfun, x0, fit_ts(:,1), fit_ts(:,2),lb,ub,options);
