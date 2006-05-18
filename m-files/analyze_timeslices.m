@@ -64,6 +64,10 @@ elseif ( exist('stop_logging.m') ~= 2 )
 
 	error('\n\tThe function %s this function critically depends on is not available.\n', 'stop_logging');
 	
+elseif ( exist('get_file_basename.m') ~= 2 )
+
+	error('\n\tThe function %s this function critically depends on is not available.\n', 'stop_logging');
+	
 end;
 
 
@@ -182,7 +186,16 @@ while exit_main_loop > 0			% main while loop
 		print ( '-depsc2' , outputfilename );
 
 	end					% end of "if program" clause
-  
+
+
+	% save fit function values to file named similar to the eps file
+	
+%	outputfile_basename = get_file_basename (outputfilename);
+	
+%	savefittedfunction_filename = sprintf('%s-fittedfunction.dat',outputfile_basename);
+	
+	
+
 
 	% save figure filenames for summary in the end
 

@@ -25,6 +25,66 @@
 %
 % DESCRIPTION
 %	This function saves an 1D timeslice as ASCII file with leading commentaries
+%	and together with the values for the time axis.
+%
+%	This ASCII file whose name is provided as first input parameter starts
+%	with a MATLAB(TM) comment (leading '%' sign at each line) including the
+%	field and time parameters and if provided as optional fifth input argument
+%	the frequency the time slice was recorded at.
+%
+%	The data itself are written as two columns, the time position as first
+%	column, given in microseconds (%+06.2f) and separated by a TAB the signal
+%	values given in millivolts (%+14.12f). Given in brackets is the output
+%	format in c-style syntax for both columns respectively.
+%
+% INPUT PARAMETERS
+%	filename
+%		the name of the file the ASCII data should be saved in
+%
+%		In case this file still exists the user is asked interactively whether
+%		to overwrite this file or to choose a different name. If the user
+%		chooses to typein a different filename, this is checked as well for
+%		existence and handled as before.
+%
+%	timeslice
+%		a Nx1 (or 1xN) vector containing the data from the time slice
+%
+%	field_params
+%		a 3x1 vector containing of three values, the "field parameters"
+%
+%		These field parameters are:
+%
+%			start_field
+%				the start position of the field sweep given in Gauss (G)
+%			end_field
+%				the stop position of the field sweep given in Gauss (G)
+%			field_step_width
+%				the step width by which the field is swept given in Gauss (G)
+%
+%		Normally this parameter is returned by the function trEPR_read_fsc2_file.
+%
+%	time_params
+%		a 3x1 vector containing of three values, the "time parameters"
+%	
+%		These time parameters are:
+%
+%			no_points
+%				number of points of the time slice
+%			trig_pos
+%				position of the trigger pulse
+%			length_ts
+%				length of the time slice in microseconds
+%
+%		Normally this parameter is returned by the function trEPR_read_fsc2_file.
+%
+%	frequency
+%		optional parameter for the frequency at which the time slice was recorded.
+%
+%		If this parameter is given the frequency will be saved in the leading
+%		header of the output ASCII file.
+%
+% OUTPUT PARAMETERS
+%	In the moment there are no output parameters
 %
 % SOURCE
 
@@ -37,8 +97,9 @@ function ascii_save_timeslice ( filename, timeslice, field_params, time_params, 
 	if ( nargin < 4 ) || ( nargin > 5)
   
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help ascii_save_timeslice" to get help.',nargin);
-			% get error if function is called with other than
-			% four input parameters
+			% get error if function is called with less than
+			% four or more than five input parameters
+			
 	end
 	
 	if nargin == 5
@@ -47,6 +108,169 @@ function ascii_save_timeslice ( filename, timeslice, field_params, time_params, 
 	
 	end
 	
+	
+	% check for correct format of the input parameters
+	
+	% FILENAME
+	
+	if ~isstr(filename)
+	
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','filename');
+			% get error if function is called with the wrong format of the
+			% input parameter 'filename'
+	
+	elseif length(filename) == 0
+
+		error('\n\tThe function is called with an empty string as the filename %s.\n\tPlease use "help ascii_save_timeslice" to get help.','filename');
+			% get error if function is called with an empty 'filename'
+
+	% TIMESLICE
+
+	elseif ~isnumeric(timeslice)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','timeslice');
+			% get error if function is called with the wrong format of the
+			% input parameter 'timeslice'
+
+	elseif ~isvector(timeslice)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','timeslice');
+			% get error if function is called with the wrong format of the
+			% input parameter 'timeslice'
+
+	% FIELD_PARAMS
+
+	elseif ~isnumeric(field_params)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','field_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'field_params'
+
+	elseif ~isvector(field_params)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','field_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'field_params'
+
+	elseif length(field_params) ~= 3
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','field_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'field_params'
+
+	% TIME_PARAMS
+
+	elseif ~isnumeric(time_params)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','time_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'time_params'
+
+	elseif ~isvector(time_params)
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','time_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'time_params'
+
+	elseif length(time_params) ~= 3
+
+		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','time_params');
+			% get error if function is called with the wrong format of the
+			% input parameter 'time_params'
+
+	% OPTIONAL PARAMETER "FREQUENCY"
+
+	elseif nargin == 5
+		% in case function has been called with the optional fifth parameter
+	
+		if ~isnumeric(frequency)
+
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','frequency');
+				% get error if function is called with the wrong format of the
+				% input parameter 'frequency'
+	
+		elseif ~isscalar(frequency)
+
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help ascii_save_timeslice" to get help.','frequency');
+				% get error if function is called with the wrong format of the
+				% input parameter 'frequency'
+				
+		end
+
+	end
+	
+
+	% check whether output file still exists
+	
+		% if the filename exists than the user will be asked whether he wants
+		% to overwrite the file. Otherwise he has the possibility to typein a
+		% different filename that will be checked as well for existence.
+	
+	if exist( filename )
+		% if the file still exists
+	
+		menutext = sprintf('The file that is used by default to save the ascii time slice to\n(%s) seems to exist.\nDo You really want to overwrite? Otherwise you can choose another file name.',filename);
+	
+		answer = menu(menutext,'Yes','No');
+			% ask the user what to do now
+	  
+		if answer == 1
+			% if user chose to proceed anyway
+	  
+			delete ( filename );
+			filename = '';
+	  
+		else					% in the other case
+	  
+			while ( length(filename) == 0)
+				% as long as the user had not provided
+				% a filename
+  
+			    filename = input ( 'Please enter another filename for the ASCII data to be saved in:\n   ', 's' );
+    					% prompt the user for a filename for the log file
+
+			    if length( filename ) > 0	
+					% If the user provided a filename
+							
+					if exist( filename )
+	  					% if the file still exists
+	
+						menutext = sprintf('The file you provided (%s) seems to exist.\nDo You really want to overwrite? Otherwise you can choose another file name.',filename);
+	
+						answer = menu(menutext,'Yes','No');
+		   					% ask the user what to do now
+	  
+						if answer == 1
+							% if user chose to proceed anyway
+	  
+							delete ( filename );
+          
+						else
+							% in the other case
+	  
+							filename = '';
+							% set filename to the empty string
+							% thus going through the while-loop once again
+						
+						end
+							% end if answer
+	
+					else	
+						% if the file doesn't exist yet
+	  
+					end		% end if exist(filename)
+					
+				end		% end if length(filename) > 0
+				
+			end		% end while loop
+			% here should go in some functionality that allows the user
+			% to typein another file name, perhaps with displaying the
+			% filename that still exists...
+
+		end		% end if answer
+	
+	end		% end if exist(filename)
+
 	
 	% open file given by filename for write access
 	
@@ -64,6 +288,7 @@ function ascii_save_timeslice ( filename, timeslice, field_params, time_params, 
 		end				% end "if fid"
 		
 	end					% end while loop
+
 
 	% write header
 
