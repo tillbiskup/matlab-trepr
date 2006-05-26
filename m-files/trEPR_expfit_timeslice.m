@@ -27,7 +27,7 @@
 %	This routine takes a time slice and tries to fit an exponential
 %	decay of the form
 %
-%		f(x) = a * exp ( b * x )
+%		f(x) = a * exp ( b * x ) + c
 %
 %	starting with the maximum of the signal. In addition thereto it calculates
 %	the time where the signal intensity has decayed to 1/e.
@@ -54,6 +54,14 @@
 %
 %	The values of the parameters tmax and t1e are the time
 %	left since the trigger pulse.
+%
+% TODO
+%	Change fit function to biexponential fit of the form
+%
+%		f(x) = a * exp ( b * x ) + c * exp ( d * x ) + e
+%
+%	with then five parameters. This should allow a better fit in some special cases,
+%	at least if there is more than one component.
 %
 % SOURCE
 
