@@ -1,0 +1,112 @@
+%% Description of differences between MATLAB(R) and GNU Octave
+%%
+%% Author:			Till Biskup <till.biskup@physik.fu-berlin.de>
+%% Initial creation:	2005/09/29
+%% Version:			$Revision$
+%% Last modification:	$Date$
+%%
+\documentclass{article}
+\usepackage{german}
+\usepackage[paper=a4paper,margin=1in]{geometry}
+\usepackage[utf8]{inputenc}
+
+\usepackage{textcomp}
+
+\usepackage{natbib}
+
+
+\def\matlab{\textsf{MATLAB}$^\mbox{\tiny\textregistered}$}
+\def\octave{\textsf{GNU Octave}}
+
+\newcommand{\func}[1]{\texttt{#1}}
+\newcommand{\cmd}[1]{\texttt{#1}}
+\newcommand{\file}[1]{\texttt{#1}}
+\newcommand{\var}[1]{\texttt{#1}}
+
+\newenvironment{Quote}{\begin{quote}\small\vspace*{1em}\hrule\vspace*{1ex}
+}{\end{quote}\hrule\vspace*{1em}}
+%\renewenvironment{quote}{\begin{Quote}}{\end{Quote}}
+
+
+\title{Unterschiede zwischen \matlab\ und \octave}
+\author{Till Biskup}
+\date{$ $Revision$ $, $ $Date$ $}
+
+
+\begin{document}
+\maketitle\thispagestyle{empty}
+
+\begin{abstract}
+  Aus der Praxis heraus, Funktionen zu implementieren, die sowohl unter 
+  \matlab\ als auch unter \octave\ laufen, entstand und entsteht diese
+  Zusammenfassung wichtiger Unterschiede zwischen beiden Programmen, angefangen
+  von Kleinigkeiten wie Kommentarzeichen bis hin zu größeren
+  Funktionalitäts--Bereichen wie die Plot--Routinen.
+\end{abstract}
+
+\begin{small}
+\tableofcontents 
+\end{small}
+
+\section{Grundlegendes}
+
+\octave\ wurde unter anderem mit dem Ziel entwickelt, eine frei verfügbare
+Alternative zum kommerziellen \matlab\ zu haben. In weiten Teilen sind beide
+Programm--Pakete tatsächlich kompatibel. Allerdings ergeben sich in zahlreichen
+Kleinigkeiten Unterschiede, die eine Portierung von Programmen auf die jeweils
+ander Plattform und die Parallelentwicklung für beide Plattformen nicht immer
+einfach machen.
+
+
+\section{Kommentare}
+
+\octave\ kennt zwei Kommentarzeichen: ``\%'' und ``\#''. In \matlab\ ist dagegen
+nur das ``\%'' als Kommentar erlaubt. Die bei \octave\ häufig zu findenden
+doppelten Kommentarzeichen (\%\%) gerade am Beginn eines ``m--files'', die dann
+auch beim Aufruf \cmd{help <funktionsname>} ausgegeben werden, erscheinen in
+\matlab\ dann mit einem vorangestellten ``\%''--Zeichen.
+
+
+\section{String--Funktionen}
+
+\matlab\ kennt die Funktionen \cmd{substr} (Extrahiert aus einem String einen 
+Teilstring) und \cmd{index} (sucht nach dem Vorkommen eines Stringes in einem 
+String und gibt die Position des \emph{ersten Vorkommens} zurück) nicht. Beide
+Funktionen wurden im vorliegenden Projekt für \matlab\ implementiert.
+
+
+\section{m--files}
+
+\octave\ erlaubt in Skripten die Deklaration von Funktionen, \matlab\ hingegen nicht.
+
+
+\section{Interaktive Elemente}
+
+\octave\ erlaubt die Verwendung des Steuerzeichens ``$\backslash$n'' im Titel 
+des Befehls \cmd{menu} und interpretiert ihn entsprechend als Zeilenumbruch,
+\matlab\ dagegen nicht.
+
+
+\section{Grafik--Ausgabe}
+
+\begin{description}
+  \item[title] \octave\ interpretiert im String des Befehls \cmd{title} die für
+  \cmd{fprintf} üblichen ESCAPE--Sequenzen (u.a. ``$\backslash$n''), \matlab\
+  dagegen nicht. Hier wird ein mehrzeiliger Titel durch Übergabe eines \cmd{cell
+  arrays} aus mehreren Elementen erzeugt.
+\end{description}
+
+
+\section{Einzelne Befehle}
+
+\begin{description}
+  \item[isvector] in \matlab\ lautet der Befehl \cmd{isvector}, in \octave\ 
+  \cmd{is\_vector}. Es gibt aber auch in \octave\ den \matlab-kompatiblen 
+  Befehl \cmd{isvector}.
+  \item[if...endif] in \matlab\ werden alle Schleifen nur mit einem einfachen
+  \cmd{end} geschlossen, nicht mit einem \cmd{endif} wie bei \octave. Es ist
+  aber ebenfalls möglich, Schleifen bei \octave\ in der \matlab--kompatiblen
+  Weise mit \cmd{end} zu beenden.
+\end{description}
+
+\end{document}

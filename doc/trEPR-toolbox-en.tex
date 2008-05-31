@@ -1,0 +1,782 @@
+%% refart template
+%% User-defined template for using refart for documentation purposes
+\documentclass[a4paper]{refrep}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+
+
+\newcommand{\matlab}{\textsf{MATLAB$^{\mbox{\scriptsize\textregistered}}$}}
+\newcommand{\mathworks}{\textsf{The MathWorks}}
+\newcommand{\octave}{\textsf{GNU Octave}}
+\newcommand{\gnuplot}{\textsf{gnuplot}}
+\newcommand{\macOSX}{\textsf{Mac OS X 10.4}}
+
+\newcommand{\mLaTeXtb}{\textsf{Matlab--LaTeX--Toolbox}}
+\newcommand{\trEPRtb}{\textsf{trEPR--Toolbox}}
+
+\newcommand{\fsczwei}{\textsf{fsc2}}
+\newcommand{\transient}{\textsf{transient}}
+\newcommand{\speman}{\textsf{Speman}}
+
+%\newcommand{\code}[1]{\texttt{#1}}
+
+\newcommand{\bibTeX}{\textsc{bib}\TeX}
+
+\newcommand{\metaGen}{\textsf{metaGen}}
+
+\newenvironment{note}{\vspace*{2\parsep}\hrule\par\textsf{\textbf{NOTE}}}{\par\vspace*{\parsep}\hrule\par\vspace*{2\parsep}}
+
+
+\title{\trEPRtb\\[1em] {\large for use with\\ \matlab\ and \octave}\\[1em] User's
+Guide}
+\author{Till Biskup\thanks{till.biskup@physik.fu-berlin.de}}
+\date{$ $Id$ $}
+
+% Setze die Tiefe der im Inhaltsverzeichnis erscheinenden Überschriften
+% 1 = nur \section-Ebene
+% 2 = \section und \section
+\setcounter{tocdepth}{1}
+
+\pagestyle{footings}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+
+\tableofcontents
+
+
+\chapter{Preface}
+
+This chapter provides an overview of the \trEPRtb, as well as information about
+this documentation. The sections are as follows.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[What is the \trEPRtb?] The toolbox and the kinds of tasks it can perform
+  \item[Related Products] \mathworks\ products and products of the author of the
+  toolbox related to this toolbox
+  \item[Using This Guide] An overview of this guide
+  \item[Installation Information] How to determine whether the toolbox is
+  installed on your system.
+  \item[Typographical conventions] Typographical conventions that this guide uses
+\end{description}
+
+\clearpage
+
+
+\section{What Is the \trEPRtb?}
+
+The \trEPRtb\ is a collection of graphical user interfaces (GUIs) and M--file
+functions built on the \matlab\ technical computing environment, but in most
+parts compatible to \octave. The toolbox provides you with these main features:
+
+\begin{itemize}
+  \item Importing data in different formats saved by the measurement programs 
+  \fsczwei\ and \transient.
+  \item Preprocessing the raw data (e.g., offset compensation, drift 
+  compensation, accumulation).
+  \item Viewing the raw and preprocessed data (2D and 1D plots of different 
+  kinds).
+  \item Analyzing data (e.g. SNR).
+  \item Postprocessing data (e.g., saving to different file formats, saving 
+  figures).
+\end{itemize}
+
+
+\subsection{Exploring the Toolbox}
+
+The \trEPRtb\ consists of two different environments: a graphical user interface
+(GUI) environment and the usual \matlab/\octave\ command line environment.
+
+You can explore the graphical environment by typing
+
+\begin{example}
+\ldots 
+\end{example}
+
+Click the GUI Help button to learn how to proceed. Additionally, you can follow
+the examples in the tutorial sections of this guide that are GUI oriented.
+
+To explore the command line environment, you can list the toolbox functions by
+typing 
+
+\begin{example} 
+  help trEPRtoolbox
+\end{example}
+
+To view the code for any function, type
+
+\begin{example}
+  type function\_name 
+\end{example}
+
+To view the help for any function, type
+
+\begin{example}
+  help function\_name 
+\end{example}
+
+You can change the way any toolbox function works by copying and renaming the
+M--file, and then modifying your copy.
+
+You can also extend the toolbox by adding your own M--files, or by using it in
+combination with other products and toolboxes.
+
+
+\section{Related Products}
+
+The \trEPRtb\ requires \matlab\ or \octave. Additionally, both, the author of
+this toolbox and \mathworks\ provide several related products that are
+especially relevant to the kinds of tasks you can perform with the \trEPRtb. For
+more information about any of these products, see either
+
+\begin{itemize}
+  \item The online documentation for that product if it is installed
+  \item The Web site of the author of that toolbox, at
+  
+  \texttt{http://physik.fu-berlin.de/~biskup/}; see the ``toolbox'' section
+  \item \mathworks Web site, at \texttt{http://www.mathworks.com/}; see the
+  ``products'' section
+\end{itemize}
+
+\begin{note}
+The toolboxes listed below all include functions that extend the capabilities of
+\matlab/\octave.
+\end{note}
+
+
+\renewcommand\arraystretch{1.5}
+\begin{tabular*}{\textwidth}{l@{\extracolsep{\fill}}p{.6\textwidth}}
+\hline
+\textsf{\textbf{Product}}
+&
+\textsf{\textbf{Description}}
+\\
+\hline
+Optimization Toolbox 
+&
+Solve standard and large--scale optimization problems
+\\
+\mLaTeXtb 
+&
+Write \LaTeX\ output from within \matlab\ or \octave
+\\
+\hline
+\end{tabular*}
+
+
+\section{Using This Guide}
+
+\subsection{Expected Background}
+
+This guide assumes that you already have background knowledge in the subject of
+EPR and especially transient EPR. If you do not yet have this background, then
+you should read an introductory text to EPR, some of which are listed on page
+\ldots. 
+
+When learning to use the toolbox, you should start with Chapter
+\ref{ch:gettingStarted}, ``Getting started with the \trEPRtb'', which
+illustrates the major toolbox features.
+
+More detailed information about the features duscussed in this chapter is
+available elsewhere in the guide, and you should browse the documentation
+according to your needs.
+
+
+\subsection{How This Guide Is Organized}
+
+The organization of this guide is described below.
+
+
+\begin{tabular*}{\textwidth}{p{.35\textwidth}@{\extracolsep{\fill}}p{.55\textwidth}}
+\hline
+\textsf{\textbf{Chapter}}
+&
+\textsf{\textbf{Description}}
+\\
+\hline
+Getting Started with the \trEPRtb 
+&
+Describes a particular example in detail to help you get started with the toolbox.
+\\
+\ldots 
+&
+\ldots
+\\
+Function Reference 
+&
+Describes all toolbox functions in detail.
+\\
+\hline
+\end{tabular*}
+
+
+\subsection{Documentaion Examples And Data Sets}
+
+To learn how to use the \trEPRtb, you can follow the examples included in this
+guide. A quick way to locate these examples is with the example index, which you
+can access via the Help browser.
+
+Some examples use data that is generated as part of the example, while other
+examples use data sets that are included with the toolbox. These data seets are
+stored as DAT--files and are listed below.
+
+
+\begin{tabular*}{\textwidth}{p{.2\textwidth}@{\extracolsep{\fill}}p{.7\textwidth}}
+\hline
+\textsf{\textbf{Data Set}}
+&
+\textsf{\textbf{Description}}
+\\
+\hline
+\texttt{file1} 
+&
+description
+\\
+\texttt{file2} 
+&
+description
+\\
+\hline
+\end{tabular*}
+
+
+\section{Installation Information}
+
+To determine if the \trEPRtb\ is installed on your system, type
+
+\begin{example}
+  ver 
+\end{example}
+
+at the \matlab\ prompt. \matlab\ displays information about the version of
+\matlab\ you are running, including a list of installed add-on products and
+their version numbers. Check the list to see if the \trEPRtb\ appears.
+
+For information about installing the toolbox, refer to the \matlab\ Installation
+ Guide for your platform. If you experience installation difficulties and have 
+Web access, look for the installation information at \mathworks\ Web site 
+\texttt{http://www.mathworks.com/support}.
+
+
+\pagebreak
+
+\section{Typographical Conventions}
+
+This guide uses some or all of these conventions.
+
+\maxipagerulefalse
+\begin{maxipage}
+
+\begin{tabular*}{\textwidth}{p{.275\textwidth}@{\extracolsep{\fill}}p{.29\textwidth}p{.35\textwidth}}
+\hline
+\textsf{\textbf{Item}}
+&
+\textsf{\textbf{Convention}}
+&
+\textsf{\textbf{Example}}
+\\
+\hline
+example code 
+&
+\texttt{Monospace} font
+&
+To assign the value 5 to A, enter
+\begin{example}
+A = 5 
+\end{example}
+\\[-2\parsep]
+Function names, syntax, filenames, directory/folder names, and user input
+&
+\texttt{Monospace} font
+&
+The \texttt{cos} function finds the cosine of each array element.
+\linebreak
+Syntax line example is
+\begin{example}
+MLGetVar ML\_var\_name 
+\end{example}
+\\[-2\parsep]
+Buttons and keys
+&
+\textbf{Boldface} with book title caps
+&
+Press the \textbf{Enter} key.
+\\
+Literal strings (in syntax descriptions in reference chapters)
+&
+\textbf{\texttt{Monospace bold}} for literals
+&
+\texttt{f = freqspace(n,'\textbf{whole}')}
+\\
+Mathematical expressions
+&
+\textit{Italics} for variables
+\linebreak
+Standard text font for functions, operators, and constants
+&
+This vector represents the polynomial $p = x^2 + 2x + 3$.
+\\
+\matlab\ output
+&
+\texttt{Monospace} font
+&
+\matlab\ responds with
+\begin{example}
+A = \linebreak
+\quad 5
+\end{example}
+\\[-2\parsep]
+Menu and dialog box titles
+&
+\textbf{Boldface} with book title caps
+&
+Choose the \textbf{File Options} menu.
+\\
+New terms and for emphasis
+&
+\emph{Italics}
+&
+An \emph{array} is an ordered collection of information.
+\\
+Omitted input arguments
+&
+(\ldots) ellipsis denotes all of the input/output arguments from preceeding syntaxes.
+&
+\texttt{[c,ia,ib] = union(\ldots)}
+\\
+String variables (from a finite list)
+&
+\texttt{\textsl{Monospace italics}}
+&
+\texttt{sysc = d2c(sysd,'\textsl{method}')}
+\\
+\hline
+\end{tabular*}
+
+\end{maxipage}
+\maxipageruletrue
+
+
+\chapter{Getting Startet with the \trEPRtb}
+\label{ch:gettingStarted}
+
+This chapter describes a particular example in detail to help you get started
+with the \trEPRtb. In this example, you will\ldots
+
+In doing so, the basic steps involved in any \ldots scenario are illustrated.
+These steps include
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[Step 1] Description of step 1 
+  \item[Step 2] Description of step 2
+  \item[Step 3] Description of step 3 
+  \item[Step 4] Description of step 4 
+\end{description}
+
+\clearpage
+
+
+\section{\ldots}
+
+
+\chapter{Importing, Viewing, and Preprocessing Data}
+
+This chapter describes how to import, view, and preprocess data with the 
+\trEPRtb.
+
+The sections are as follows.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[Importing Data Sets] Select workspace variables that compose the data
+  set, list all imported and generated data sets, and delete one or more data
+  sets.
+  \item[Viewing Data] View the data graphically.
+  \item[Preprocessing Data] Compensate the offset, drift, etcetera, accumulate
+  several measurements, \ldots
+\end{description}
+
+\clearpage
+
+
+\section{Importing Data Sets}
+
+\begin{description}
+  \item[\texttt{read\_fsc2\_file}] Description of the function
+  \item[\texttt{ascii\_read\_2Dspectrum}] Description of the function
+  \item[\texttt{ascii\_read\_spectrum}] Description of the function
+  \item[\texttt{ascii\_read\_timeslice}] Description of the function
+  \item[\texttt{trEPR\_read}]
+  \item[\texttt{trEPR\_read\_fsc2\_file}]
+  \item[\texttt{spemanAscii2trEPR2Ddata}]
+\end{description}
+
+
+\section{Viewing Data}
+
+\begin{description}
+  \item[\texttt{B0\_spectrum}] Description of the function
+  \item[\texttt{make\_compensated\_2D\_plot}] Description of the function
+  \item[\texttt{make\_reduced\_2D\_plot}] Description of the function
+  \item[\texttt{trEPR\_timeAxis}] Description of the function
+\end{description}
+
+
+\section{Preprocessing Data}
+
+\begin{description}
+  \item[\texttt{reduce\_datapoints\_1D}] Description of the function
+  \item[\texttt{running\_average}] Description of the function
+  \item[\texttt{trEPR\_compensate\_baseline}] Description of the function
+  \item[\texttt{trEPR\_compensate\_drift}] Description of the function
+  \item[\texttt{trEPR\_compensate\_frequency}] Description of the function
+  \item[\texttt{trEPR\_compensate\_timeslice}] Description of the function
+  \item[\texttt{trEPR\_cut\_spectrum}] Description of the function
+  \item[\texttt{trEPR\_find\_maximum\_amplitude}] Description of the function
+  \item[\texttt{trEPR\_integrated\_bl\_comp}] Description of the function
+\end{description}
+
+
+\chapter{Analyzing Data}
+
+This chapter describes how to analyze data with the 
+\trEPRtb.
+
+The sections are as follows.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[\ldots] Short description.
+\end{description}
+
+\clearpage
+
+
+\section{\ldots}
+
+\begin{description}
+  \item[\texttt{SNR\_analysis}] Description of the function
+  \item[\texttt{trEPR\_snr}] Description of the function
+  \item[\texttt{svd\_analysis}] Description of the function
+  \item[\texttt{trEPR\_expfit\_timeslice}] Description of the function
+\end{description}
+
+
+\chapter{Postprocessing Data}
+
+This chapter describes how to postprocess data with the 
+\trEPRtb.
+
+The sections are as follows.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[Saving Figures] Short description.
+  \item[Saving Data] Short description.
+\end{description}
+
+\clearpage
+
+
+\section{\ldots}
+
+\begin{description}
+  \item[\texttt{asciiSaveData}] Description of the function
+  \item[\texttt{ascii\_save\_2Dspectrum}] Description of the function
+  \item[\texttt{ascii\_save\_spectrum}] Description of the function
+  \item[\texttt{ascii\_save\_timeslice}] Description of the function
+  \item[\texttt{save\_figure}]
+\end{description}
+
+
+\chapter{Using the GUI}
+
+This chapter describes how to use the graphical users interface (GUI) that comes
+with the \trEPRtb.
+
+The sections are as follows.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[Starting the GUI] Short description.
+  \item[Loading Data] Short description.
+  \item[Preprocess Data] Short description.
+  \item[Viewing Data] Short description.
+  \item[Saving Data] Short description.
+\end{description}
+
+\clearpage
+
+
+\section{Starting the GUI}
+
+To invoke the GUI that comes with the \trEPRtb, type
+
+\begin{example}
+  trEPRGUI
+\end{example}
+
+at the \matlab\ prompt.
+
+
+
+\begin{description}
+  \item[\texttt{GUI\_fsc2\_display}] Description of the function
+  \item[\texttt{trEPR\_fsc2\_display}] Description of the function
+\end{description}
+
+
+\chapter{Function Reference}
+
+This chapter describes the toolbox M--file functions that you use directly. A
+number of other M--file helper functions are provided with this toolbox to
+support the functions listed below. These helper functions are not documented
+because they are not intended for direct use.
+
+\vspace*{3\parsep}
+
+\begin{description}\descriptioncolonfalse
+  \item[Functions --- By Category] Contains a series of tables that group
+  functions by category.
+  \item[Functions --- Alphabetical List] Lists all the functions alphabetically 
+\end{description}
+
+\clearpage
+
+
+\section{Functions --- By Category}
+
+\subsection{Importing Data}
+
+\begin{description}
+  \item[\texttt{read\_fsc2\_file}] Description of the function
+  \item[\texttt{ascii\_read\_2Dspectrum}] Description of the function
+  \item[\texttt{ascii\_read\_spectrum}] Description of the function
+  \item[\texttt{ascii\_read\_timeslice}] Description of the function
+  \item[\texttt{trEPR\_read}]
+  \item[\texttt{trEPR\_read\_fsc2\_file}]
+  \item[\texttt{spemanAscii2trEPR2Ddata}]
+\end{description}
+
+
+\subsection{Viewing Data}
+
+\begin{description}
+  \item[\texttt{B0\_spectrum}] Description of the function
+  \item[\texttt{make\_compensated\_2D\_plot}] Description of the function
+  \item[\texttt{make\_reduced\_2D\_plot}] Description of the function
+  \item[\texttt{trEPR\_timeAxis}] Description of the function
+\end{description}
+
+
+\subsection{Preprocessing Data}
+
+\begin{description}
+  \item[\texttt{reduce\_datapoints\_1D}] Description of the function
+  \item[\texttt{running\_average}] Description of the function
+  \item[\texttt{trEPR\_compensate\_baseline}] Description of the function
+  \item[\texttt{trEPR\_compensate\_drift}] Description of the function
+  \item[\texttt{trEPR\_compensate\_frequency}] Description of the function
+  \item[\texttt{trEPR\_compensate\_timeslice}] Description of the function
+  \item[\texttt{trEPR\_cut\_spectrum}] Description of the function
+  \item[\texttt{trEPR\_find\_maximum\_amplitude}] Description of the function
+  \item[\texttt{trEPR\_integrated\_bl\_comp}] Description of the function
+\end{description}
+
+
+\subsection{Analyzing Data}
+
+\begin{description}
+  \item[\texttt{SNR\_analysis}] Description of the function
+  \item[\texttt{trEPR\_snr}] Description of the function
+  \item[\texttt{svd\_analysis}] Description of the function
+  \item[\texttt{trEPR\_expfit\_timeslice}] Description of the function
+\end{description}
+
+
+\subsection{Postprocessing Data}
+
+\begin{description}
+  \item[\texttt{asciiSaveData}] Description of the function
+  \item[\texttt{ascii\_save\_2Dspectrum}] Description of the function
+  \item[\texttt{ascii\_save\_spectrum}] Description of the function
+  \item[\texttt{ascii\_save\_timeslice}] Description of the function
+  \item[\texttt{save\_figure}]
+\end{description}
+
+
+\subsection{GUI Functions}
+
+\begin{description}
+  \item[\texttt{GUI\_fsc2\_display}] Description of the function
+  \item[\texttt{trEPR\_fsc2\_display}] Description of the function
+\end{description}
+
+
+\subsection{General Purpose}
+
+\begin{description}
+  \item[\texttt{index}] Description of the function
+  \item[\texttt{substr}] Description of the function
+  \item[\texttt{start\_logging}] Description of the function
+  \item[\texttt{stop\_logging}] Description of the function
+  \item[\texttt{get\_file\_basename}]
+  \item[\texttt{get\_file\_extension}]
+  \item[\texttt{get\_file\_path}]
+\end{description}
+
+
+\subsection{Toolbox Functions}
+
+\begin{description}
+  \item[\texttt{trEPRinfo}] Description of the function
+  \item[\texttt{trEPRinstall}] Description of the function
+%  \item[\texttt{trEPRtoolboxRevision}] Description of the function
+\end{description}
+
+
+\clearpage
+
+\section{Functions --- Alphabetical List}
+
+
+This section contains detailed descriptions of all toolbox functions. Each
+function reference page contains some or all of this information:
+
+\begin{itemize}
+  \item The function name
+  \item The purpose of the function
+  \item The function syntax
+  
+  All valid input arguments and output argument combinations are shown. In some
+  cases, an ellipsis (\ldots) is used for the input arguments. This means that
+  all preceding input argument combinations are valid for the specified output
+  argument(s).
+  
+  \item A description of each argument
+  \item A description of the function
+  \item Additional remarks about usage
+  \item An example of usage
+  \item Related functions
+\end{itemize}
+
+
+\clearpage
+
+\renewcommand{\subsectionmark}[1]{ 
+	\markboth{#1}{#1}
+} 
+
+\subsection{Functionname}
+
+\subsubsection{Purpose}
+
+One sentence telling what the function is good for.
+
+
+\subsubsection{Syntax}
+
+\begin{example}
+[ output ] = functionname ( input1, input2, input3, \ldots ) 
+\end{example}
+
+
+\subsubsection{Arguments}
+
+\begin{description}
+  \item[\texttt{input1}] Description of the argument 
+  \item[\texttt{input2}] Description of the argument 
+  \item[\texttt{input3}] Description of the argument 
+  \item[\texttt{output}] Description of the argument 
+\end{description}
+
+
+\subsubsection{Description}
+
+\texttt{functionname} does something.
+
+
+\subsubsection{Remarks}
+
+Some remarks about the function.
+
+
+\subsubsection{Example}
+
+Some introductory text\ldots
+
+\begin{example}
+  [ output ] = functioname ( inputa, inputb, inputc ); 
+\end{example}
+
+
+\subsubsection{See Also}
+
+\texttt{functionNameA, functionNameB}
+
+
+\clearpage
+
+
+\subsection{Functionname2}
+
+\subsubsection{Purpose}
+
+One sentence telling what the function is good for.
+
+
+\subsubsection{Syntax}
+
+\begin{example}
+[ output ] = functionname ( input1, input2, input3, \ldots ) 
+\end{example}
+
+
+\subsubsection{Arguments}
+
+\begin{description}
+  \item[\texttt{input1}] Description of the argument 
+  \item[\texttt{input2}] Description of the argument 
+  \item[\texttt{input3}] Description of the argument 
+  \item[\texttt{output}] Description of the argument 
+\end{description}
+
+
+\subsubsection{Description}
+
+\texttt{functionname} does something.
+
+
+\subsubsection{Remarks}
+
+Some remarks about the function.
+
+
+\subsubsection{Example}
+
+Some introductory text\ldots
+
+\begin{example}
+  [ output ] = functioname ( inputa, inputb, inputc ); 
+\end{example}
+
+
+\subsubsection{See Also}
+
+\texttt{functionNameA, functionNameB}
+
+
+%\clearpage
+
+
+\end{document}

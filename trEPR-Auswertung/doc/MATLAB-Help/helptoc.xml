@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+
+<toc version="1.0">
+
+<tocitem target="docmain.html" image="img/eslogo-16.gif">trEPR Toolbox
+  <tocitem target="gettingstarted.html" image="$toolbox/matlab/icons/greencircleicon.gif">Getting Started
+    <tocitem target="gettingstarted.html#whatis">What Is trEPR Toolbox?</tocitem>
+  </tocitem>
+  <tocitem target="examplesmain.html" image="$toolbox/matlab/icons/demoicon.gif">Examples
+    <tocitem target="examples/2DDatasets.html">2D Datasets
+      <tocitem target="examples/2DDatasetsGUI.html">GUI for 2D datasets</tocitem>
+    </tocitem>
+    <tocitem target="examples/B0Spectra.html">B0 spectra
+      <tocitem target="examples/B0SpectraAccumulate.html">Accumulate B0 spectra</tocitem>
+      <tocitem target="examples/B0SpectraTimeEvolution.html">Time evolution of the B0 spectra</tocitem>
+    </tocitem>
+    <tocitem target="examples/timeSlices.html">Time Slices
+      <tocitem target="examples/timeSlicesOverviewFigure.html">Overview at Different Field Positions</tocitem>
+      <tocitem target="examples/timeSlicesB1Dependence.html">B1-Dependence of the Kinetics</tocitem>
+    </tocitem>
+  </tocitem>
+  <tocitem target="tutorialmain.html" image="$toolbox/matlab/icons/pagesicon.gif">Tutorial</tocitem>
+  <tocitem target="funcsalphabet.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Alphabetical List</tocitem>
+  <tocitem target="funcscategory.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Categorical List</tocitem>
+  <tocitem target="releases.html" image="$toolbox/matlab/icons/notesicon.gif">Release Notes</tocitem>
+  <tocitem target="http://physik.fu-berlin.de/~biskup/forschung/datenauswertung/trEPR-toolbox/" image="$toolbox/matlab/icons/webicon.gif">trEPR Toolbox Web Site</tocitem>
+</tocitem>
+
+</toc>
+

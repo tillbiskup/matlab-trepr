@@ -1,11 +1,13 @@
 #TeXlipse project settings
-#Mon Oct 31 16:05:36 CET 2005
+#Thu Feb 21 11:42:57 CET 2008
 builderNum=2
 outputDir=doc/
+makeIndSty=
+bibrefDir=
 outputFormat=pdf
 tempDir=doc/tmp
-mainTexFile=Unterschiede-MATLAB-Octave.tex
-outputFile=Unterschiede-MATLAB-Octave.pdf
+mainTexFile=trEPR-toolbox-en.tex
+outputFile=trEPR-toolbox-en.pdf
 langSpell=
 markDer=true
 srcDir=doc

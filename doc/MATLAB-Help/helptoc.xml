@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+
+<toc version="1.0">
+
+<tocitem target="docmain.html" image="img/eslogo-16.gif">LaTeX Toolbox
+  <tocitem target="gettingstarted.html" image="$toolbox/matlab/icons/greencircleicon.gif">Getting Started
+    <tocitem target="gettingstarted.html#whatis">What Is The LaTeX Toolbox?</tocitem>
+  </tocitem>
+  <tocitem target="tutorialmain.html" image="$toolbox/matlab/icons/pagesicon.gif">Tutorial</tocitem>
+  <tocitem target="funcsalphabet.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Alphabetical List</tocitem>
+  <tocitem target="funcscategory.html" image="$toolbox/matlab/icons/reficon.gif">Functions - Categorical List</tocitem>
+  <tocitem target="releases.html" image="$toolbox/matlab/icons/notesicon.gif">Release Notes</tocitem>
+  <tocitem target="http://physik.fu-berlin.de/~biskup/toolbox/LaTeX/" image="$toolbox/matlab/icons/webicon.gif">LaTeX Toolbox Web Site</tocitem>
+</tocitem>
+
+</toc>
+

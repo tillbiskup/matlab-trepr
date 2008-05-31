@@ -1,0 +1,29 @@
+<productinfo
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="http://www.mathworks.com/namespace/info/v1/info.xsd">
+<?xml-stylesheet type="text/xsl" href="http://www.mathworks.com/namespace/info/v1/info.xsl"?>
+
+<matlabrelease>14</matlabrelease>
+<name>trEPR</name>
+<type>toolbox</type>
+
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+<help_location>../documentation</help_location>
+
+<list>
+
+<listitem>
+<label>Help</label>
+<callback>doc trEPR</callback>
+<icon>$toolbox/matlab/icons/book_mat.gif</icon>
+</listitem>
+
+<listitem>
+<label>Web site</label>
+<callback>web http://physik.fu-berlin.de/~biskup/forschung/datenauswertung/trEPR-toolbox/ -browser;</callback>
+<icon>$toolbox/matlab/icons/webicon.gif</icon>
+</listitem>
+
+</list>
+
+</productinfo>

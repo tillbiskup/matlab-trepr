@@ -1,0 +1,257 @@
+\documentclass[a4paper]{refart}
+\usepackage{german}
+\usepackage[utf8]{inputenc}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\pagestyle{footings}
+
+% Definitionen eigener Befehle
+\newcommand{\matlab}{\textsf{MATLAB}$^\mbox{\small\circledR}$}
+\newcommand{\octave}{\textsf{GNU Octave}}
+\newcommand{\toolbox}{\textsf{trEPR--Toolbox}}
+\newcommand{\fsczwei}{\textsf{fsc2}}
+\newcommand{\robodoc}{\textsf{ROBODoc}}
+
+\title{Die trEPR--Toolbox für \matlab/\octave}
+\author{Till Biskup}
+\date{$ $Id$ $}
+
+\begin{document} 
+\maketitle
+
+\begin{abstract}
+  Die \toolbox\ wurde dazu geschrieben, um mittels transienter EPR gemessene
+  Daten aufzuarbeiten und einer anschließenden Auswertung zugänglich zu machen.
+  Sie dient werder der Simulation noch der anderweitigen konkreten Auswertung,
+  sondern stellt die Spektren dafür zur Verfügung. Die \toolbox\ wurde
+  grundsätzlich von einem spezifischen Meßaufbau ausgehend entwickelt, die
+  einzelnen Funktionen sind aber allgemein genug gehalten, so daß sie auch mit
+  anderen Meßdaten verwendet werden können.
+\end{abstract}
+
+
+\section{Einführung}
+
+\subsection{Grundlegendes zur Toolbox}
+
+\begin{itemize}
+  \item modular aufgebaut: pro Aufgabe eine eigene Funktion
+  \item grundsätzlich kompatibel zu \octave
+  \item jede Funktion dokumentiert
+  \item Toolbox liegt in Versionsverwaltung (SVN)\\ D.h. es kann über die
+  Logdatei einer Datenaufbereitung jederzeit nachvollzogen werden, mit welcher
+  Version einer Funktion die Daten aufbereitet wurden.
+\end{itemize}
+
+
+\subsection{Spezifika des Meßaufbaus}
+
+\begin{itemize}
+  \item \fsczwei\ als Meß--Software
+\end{itemize}
+
+
+\section{Datenaufbereitung}
+
+Gemessen werden in der Regel zweidimensionale Datensätze (2D)\footnote{Die
+Bezeichnung dieser als 3D--Graph darstellbaren Datensätze als
+\emph{zwei}dimensional beruht darauf, daß es sich dabei um Daten handelt, die
+von \emph{zwei} Variablen (Magnetfeld, Zeit) abhängt.}, von denen dann jeweils
+Spektren in einer Dimension (Magnetfeld oder Zeit) aufgetragen und ausgewertet
+werden. Daher läßt sich die Datenaufbereitung ebenfalls in diese beiden Fälle
+unterscheiden. Es sei aber schon hier erwähnt, daß die Aufnahme von Zeitkurven
+auch von Details bei den Meßparametern her von der Aufnahme über den breiteren
+B$_0$--Bereich unterschiedlich ist (höhere Dämpfung der Mikrowelle, sehr
+schmaler B$_0$--Bereich).
+
+\subsection{B$_0$--Spektren}
+
+Die Datenaufbereitung der B$_0$--Spektren läßt sich grob in die folgenden Schritte
+untergliedern:
+
+\begin{enumerate}
+  \item Einlesen der Rohdaten
+  \item Offset--Korrektur über das Pretrigger--Signal
+  \item Drift--Korrektur
+  \item Akkumulation mehrerer (gemessener) Spektren
+\end{enumerate}
+
+Für jeden dieser Schritte stehen entsprechende Funktionen zur Verfügung. Der
+gesamte Prozeß der Datenaufarbeitung und Akkumulation mehrerer Messungen wird
+durch zwei interaktive Programme, die ihrerseits auf diese Funktionen
+zurückgreifen, zusätzlich vereinfacht.
+
+
+\subsubsection{Einlesen der Rohdaten}
+
+Das Meßprogramm \fsczwei\ schreibt die Daten als reine ASCII--Dateien in einer
+\matlab--kompatiblen Weise, so daß sie grundsätzlich sehr einfach in \matlab\
+eingelesen werden können. Jede dieser Daten--Dateien enthält neben den reinen
+Meßdaten in \emph{einer} einzigen Spalte als Dateikopf das gesamte
+\fsczwei--Programm, mit dem gemessen wurde, in einem \matlab--Kommentar und an
+dessen Ende eine Zusammenfassung der wichtigsten Meßparameter.
+
+Eine mit \fsczwei\ geschriebene Datei läßt sich leicht an der UNIX--typischen
+ersten Zeile des als Kommentar am Beginn der Datei enthaltenen
+\fsczwei--Skriptes\footnote{der sogenannten ``shebang'', auch ``hashbang'',
+bestehend aus der Zeichenfolge \texttt{\#!}, gefolgt von dem Pfad zum
+Interpreter des Skriptes, der aufgerufen werden soll, um das Skript abzuarbeiten} 
+erkennen: Die erste nichtleere Zeile beginnt (vom \matlab--Kommentarzeichen '\%'
+einmal abgesehen) mit der Zeichenfolge
+
+\begin{verbatim}
+#!/usr/local/bin/fsc2
+\end{verbatim}
+
+Das wird zur Erkennung des Dateityps genutzt. Anschließend liest die
+entsprechende \matlab--Funktion aus dem Kommentarkopf der Datei die wichtigen
+Meßparameter aus und gibt diese als weitere Parameter zusammen mit den
+eigentlichen Daten (als NxM--Matrix) zurück.
+
+
+\subsubsection{Offset--Korrektur}
+
+Die einzelnen aufgenommenen Zeitkurven weisen kleine Unterschiede in der Lage
+ihrer Null--Linie auf. Da die Daten allerdings so aufgenommen werden, daß ein
+kleiner Teil der Zeitkurve vor dem Trigger (Laser--Puls) liegt, kann dieser
+Bereich des Signals (Pretrigger--Signal) verwendet werden, um das Offset der
+einzelnen Zeitkurven herauszurechnen. Dazu wird der Mittelwert des Rauschens des
+Pretrigger--Signals jeder einzelnen Zeitkurve auf Null gesetzt.
+
+
+\subsubsection{Drift--Korrektur}
+
+Aus verschiedenen Gründen (bei Radikalpaarsignalen das darunterliegende
+Triplett--Signal, allgemein der exponentielle Zerfall der Signalintensität durch
+die fortwirkende Einwirkung des Lasers auf die Probe während einer Messung)
+können die Spektren in Richtung des Magnet--Feldes eine Drift aufweisen.
+Außerdem kommt es durch den Laserblitz zu einer kurzzeitigen Erwärmung des
+Resonators und damit zu einer Störung des Systems, die sich in einer
+Signalveränderung (Signalanstieg direkt nach dem Laserpuls) niederschlägt.
+
+Um beide Effekte aus den vorliegenden, offset--korrigierten Daten
+herauszurechnen, wird über eine kleine Zahl von Zeitkurven zu Beginn und am Ende
+des Spektrums (im sogenannten offresonanten Bereich, da hier keine
+EPR--Übergänge in der Probe in Resonanz sind) gemittelt und die gewichtete Summe
+dieser beiden gemittelten Zeitkurven von jeder einzelnen Zeitkurve abgezogen.
+
+Für die Wichtung kommt die Drift des Spektrums in Magnetfeld--Richtung zur
+Verwendung, die durch einen Polynomfit über die letzten zehn B$_0$--Spektren in
+der Zeitdomäne (da, wo das EPR--Signal in aller Regel schon abgefallen ist)
+errechnet wird. Auch wenn für das Anfitten dieser Drift Polynome der ersten bis
+siebten Ordnung zur Verfügung stehen, reicht in der Regel ein Fit erster Ordnung
+aus.
+
+
+\subsubsection{Akkumulation}
+
+Zur Verbesserung des Signal--Rausch--Abstandes (SNR) ist es meist notwendig,
+mehrere Messungen aufzuakkumulieren. Diese Akkumulation erfolgt in zwei
+Schritten:
+ 
+\begin{enumerate}
+  \item Korrektur der Mikrowellen--Frequenz
+  \item gewichtete Akkumulation beider Spektren
+\end{enumerate}
+
+Die \marginlabel{Frequenz--Korrektur} Korrektur der MW--Frequenz ist notwendig,
+da einzelne Messungen meist nicht bei exakt derselben MW--Frequenz aufgenommen
+wurden und die Lage des Spektrums (um $g=2$) sowohl von der MW--Frequenz als auch vom
+Magnetfeld abhängt:
+
+\begin{align*} 
+g &= \frac{h\nu}{\mu_{\beta}B_0}
+\end{align*}
+
+Hinzu kommt eine Ungenauigkeit in der Bestimmung des Magnetfeldes bei dem
+gegebenen Meßaufbau. Die Korrektur der Frequenz erfolgt durch manuelles
+Verschieben der beiden zu akkumulierenden Spektren gegeneinander.
+
+Die \marginlabel{gewichtete Akkumulation} Akkumulation der Spektren erfolgt
+nicht als einfache Aufsummierung, sondern gewichtet, so daß die Qualität des
+resultierenden Spektrums maximal wird.
+
+\begin{align*}
+  \text{Spectrum}_\text{acc} &= \text{Spectrum}_1 + A \; \text{Spectrum}_2
+\end{align*}
+
+Dazu wird die Qualität der beiden Spektren für einen definierten Bereich des 
+Wichtungsfaktors ($A = 0.1 \dots 10$) bestimmt.
+
+Die Qualität eines Spektrums wird aus dem Verhältnis seiner maximalen Amplitude
+zur Standardabweichung des offresonanten Rauschens, berechnet aus einer
+festlegbaren Zahl von Datenpunkten, bestimmt.
+
+
+\subsection{Zeitkurven}
+
+
+
+
+\section{Die einzelnen Funktionen der Toolbox}
+
+\subsection{Grundlegende Funktionen}
+
+\subsubsection{Dateihandhabung}
+
+...\marginlabel{Dateiname}
+
+...\marginlabel{Dateiendung}
+
+...\marginlabel{Dateipfad}
+
+
+\subsubsection{Logging}
+
+...\marginlabel{start\_logging}
+
+...\marginlabel{stop\_logging}
+
+
+\subsubsection{String--Operationen}
+
+...\marginlabel{index}
+
+...\marginlabel{substr}
+
+
+\subsection{Funktionen zum Umgang mit Dateien}
+
+\subsubsection{fsc2--Dateien}
+
+
+\subsubsection{B$_0$--Spektren (1D und 2D)}
+
+
+\subsubsection{Zeitkurven}
+
+
+\subsection{Datenaufbereitung in 2D}
+
+
+\subsection{Datenaufbereitung in 1D}
+
+
+\subsection{Interaktive Programme}
+
+
+\begin{appendix}
+
+\begin{fullpage}
+
+\section{Dokumentation der einzelnen Funktionen}
+
+Die folgende Dokumentation wurde mittels \robodoc\ automatisch direkt aus den 
+Kommentaren der einzelnen Dateien erstellt und an dieser Stelle eingebunden. 
+Aus diesem Grund ist die Dokumentation in englischer Sprache verfaßt.
+
+
+\scriptsize
+\input{ROBODoc}
+
+\end{fullpage}
+\end{appendix}
+
+\end{document}
