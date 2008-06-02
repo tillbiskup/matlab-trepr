@@ -283,7 +283,9 @@ while exit_main_loop > 0			% main while loop
 	fprintf('\n%% ---------------------------------------------------------------------------\n%%')
 	fprintf('\n%% Give the user the possibility to cut off the spectrum at its start or end...\n%%')
 
-	if ( exist('old_t') == 0)
+	[ dataRows, dataCols ] = size(data);
+
+	if ( ( exist('old_t') == 0 ) || ( old_t > dataCols ) )
 
 		[ data, field_params ] = trEPR_cut_spectrum ( data, field_params, time_params, B0_halfwidth );
 
@@ -305,7 +307,7 @@ while exit_main_loop > 0			% main while loop
 	% amplitude of the B_0 spectrum is maximal, BUT ONLY in case that hasn't been
 	% performed before - otherwise the same parameters for 't' are used.
 
-	if ( exist('old_t') == 0)
+	if ( ( exist('old_t') == 0 ) || ( old_t > dataCols ) )
 
 		fprintf('\n%% ---------------------------------------------------------------------------\n%%')
 		fprintf('\n%% Give the user the possibility to manually evaluate the t value at which\n%% the signal amplitude of the B_0 spectrum is maximal\n%%')
