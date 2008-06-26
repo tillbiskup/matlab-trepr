@@ -230,14 +230,17 @@ function [ data, varargout ] = make_reduced_2D_plot ( data, field_params, time_p
 	end
 	
 	fp = field_params;
-	bOffset = (((fp(2)-(b_reduction_stepwidth*b_reduction*fp(3)))-fp(1))/fp(3))/2;
-	
+	bOffset = floor((((fp(2)-(b_reduction_stepwidth*b_reduction*fp(3)))-fp(1))/fp(3))/2);
+    if (bOffset < 0)
+        bOffset = 0
+    end
+    
 	% Reduce the number of data points per B_0 profile from 151 to 50.
 	for i=1:t_reduction
 		for j=1:b_reduction
 			sum = 0.0;
 			for k=1:b_reduction_stepwidth
-				sum = sum + tred_data(k+((j-1)*b_reduction_stepwidth)+bOffset, i);
+                sum = sum + tred_data(k+((j-1)*b_reduction_stepwidth)+bOffset, i);
 			end
 			btred_data(j, i) = sum/b_reduction_stepwidth;
 		end
