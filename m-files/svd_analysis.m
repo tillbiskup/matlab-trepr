@@ -287,6 +287,16 @@ function [ varargout ] = svd_analysis ( filename, varargin )
         fprintf('\n\t%s\n\t%s\n',mkdirmess,mkdirmessid);
         
     end
+
+    if ( ( ismember({'params'},who) ~= 0 ) && ( isfield(params,'printSValues') ) )
+    
+        printSValues = params.printSValues;
+
+    else
+    
+        printSValues = 20;
+
+    end
 	
 
 	% read base filename from filename
@@ -525,14 +535,18 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% and print them together with the singular values both at the command line
 	% and - if specified - as LaTeX table.
 	
-	accU = acc(U);
-	accV = acc(V);
+	accU = acc(U(:,1:printSValues));
+	accV = acc(V(:,1:printSValues));
 	vecS = diag(S);
 	
 	fprintf('\n %s\t%s\t\t%s\t%s\n','i','S value','autocorr(U)','autocorr(V)');
 	fprintf('====================================================\n');
 
-	for k = 1 : length(accV)
+	% Originally, the program printed the S values for all existing accV values.
+	% Due to the fact that there should be never more than five to six components
+	% in a spectrum, reduce that to plotSValues, that defaults to 20.
+	% for k = 1 : length(accV)
+	for k = 1 : printSValues
 	
 		fprintf(' %i\t%f\t%f\t%f\n',k,vecS(k),accU(k),accV(k));
 	
