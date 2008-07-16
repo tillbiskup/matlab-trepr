@@ -78,6 +78,12 @@
 %			the singular values together with the autocorrelation coefficients
 %			of the U and V vectors.
 %
+%           'LaTeXpart'
+%           Creates a LaTeX file as output that can be included into another LaTeX
+%           file (without header and \begin{document}-\end{document}). This file 
+%           includes the results as figures and and a table with the singular values
+%           together with the autocorrelation coefficients of the U and V vectors.
+%
 % OUTPUT
 %	U (MATRIX, OPTIONAL)
 %		matrix containing the U vectors
@@ -309,7 +315,11 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	
 		outputFormat = 'LaTeX';
 	
-	else
+	elseif ( ( nargin > 1 ) && ( isfield(params,'outputFormat') ) && ( strcmp(params.outputFormat,'LaTeXpart') ) )
+    
+        outputFormat = 'LaTeXpart';
+    
+    else
 	
 		outputFormat = '';
 	
@@ -346,6 +356,14 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 		LaTeXfid = LaTeXheader(LaTeXfileName,LaTeXheaderParams);
 	
 	end
+    
+    if ( strcmp(outputFormat,'LaTeXpart') )
+    
+        LaTeXfileName = sprintf('%s/%s-SVD.input.tex', subdirname, file_basename);
+
+        [LaTeXfid,message] = fopen(LaTeXfileName, 'wt');
+    
+    end
 
 
 	% In case the LaTeX output option is set,
@@ -430,10 +448,15 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
 	% In case the LaTeX output option is set,
 	% include a section named "Results"
-	
-	if ( strcmp(outputFormat,'LaTeX') )
+    
+    if ( strcmp(outputFormat,'LaTeX') )
 
-		LaTeXsection(LaTeXfid,'section','Results');
+        LaTeXsection(LaTeXfid,'section','Results');
+
+    end
+	
+	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
+
 		fprintf(LaTeXfid,'The recorded 2D dataset of the TREPR spectrum stored in the file \\texttt{%s} has been read in. Starting with the trigger pulse (laser flash), every %s $B_0$ spectrum has been taken along the time axis and from that set of spectra the SVD has been computed.', strrep(filename,'_','\_'), char(ordinal(timesteps)) );
 
 	end
@@ -462,7 +485,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% In case the LaTeX output option is set,
 	% print first two figures and save as pdf files
 	
-	if ( strcmp(outputFormat,'LaTeX') )
+	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
 	
 		saveFigureParams.outputFormat = 'LaTeXhalfWidth';
 	
@@ -556,7 +579,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% print a table with the singular values together with the autocorrelation
 	% coefficients of the U and V matrices
 	
-	if ( strcmp(outputFormat,'LaTeX') )
+	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
 	
  		LaTeXtableParams.positioning = 'b';
 		LaTeXtableParams.width = '\textwidth'; 		
@@ -566,7 +589,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
  		
  		LaTeXtableHeader = {'Index','c';'Singular values','c';'U autocorrelations','c';'V autocorrelations','c'};
  		
-		LaTeXtableData = [ [1:1:20]', vecS(1:20), accU(1:20)', accV(1:20)' ];
+		LaTeXtableData = [ [1:1:15]', vecS(1:15), accU(1:15)', accV(1:15)' ];
  		
  		LaTeXtab1Label = LaTeXtable (LaTeXfid,LaTeXtableData,'crrr',LaTeXtableHeader,LaTeXtableParams);
  		
@@ -585,7 +608,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% In case the LaTeX output option is set,
 	% print first two figures and save as pdf files
 	
-	if ( strcmp(outputFormat,'LaTeX') )
+	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
 
 		plots_per_page = 4;
 
