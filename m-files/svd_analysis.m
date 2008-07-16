@@ -84,6 +84,13 @@
 %           includes the results as figures and and a table with the singular values
 %           together with the autocorrelation coefficients of the U and V vectors.
 %
+%       params.LaTeXfid (FID)
+%           FID (file identifier) of a LaTeX file to write to
+%
+%           Only valid in combination with the params.outputFormat set to 'LaTeXpart'.
+%           In this case instead of writing the LaTeX output to a separate file, it will
+%           be written to the file specified with the 'FID'.
+%
 % OUTPUT
 %	U (MATRIX, OPTIONAL)
 %		matrix containing the U vectors
@@ -187,6 +194,12 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help svd_analysis" to get help.','params.outputFormat');
 
 		end
+
+        if ( isfield(params,'LaTeXfid') && ~isnumeric(params.LaTeXfid) )
+    
+            error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help svd_analysis" to get help.','params.LaTeXfid');
+
+        end
 
 %		if ( isfield(params,'###') && ~isstr(params.###) )
 %	
@@ -361,7 +374,15 @@ function [ varargout ] = svd_analysis ( filename, varargin )
     
         LaTeXfileName = sprintf('%s/%s-SVD.input.tex', subdirname, file_basename);
 
-        [LaTeXfid,message] = fopen(LaTeXfileName, 'wt');
+        if  ( ( nargin > 1 ) && ( isfield(params,'LaTeXfid') ) )
+        
+            LaTeXfid = params.LaTeXfid;
+        
+        else
+
+            [LaTeXfid,message] = fopen(LaTeXfileName, 'wt');
+            
+        end
     
     end
 
