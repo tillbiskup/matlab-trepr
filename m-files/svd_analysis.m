@@ -512,6 +512,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	
 		figHandle = figure;
 		imagesc ( time, b_field, data );
+		set(gca,'YDir','normal'); % this reverts the reversed y axis
 		xlabel ( 'time / \mus' );
 		ylabel ( 'magnetic field / mT' );
 		saveFileBaseName1 = sprintf( '%s-LaTeX-SVD01', file_basename );
@@ -551,6 +552,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
 		figHandle = subplot(2,1,1);
 		imagesc ( time, b_field, data );
+		set(gca,'YDir','normal'); % this reverts the reversed y axis
 	
 		% NOTE: With GNU Octave we run here into problems cause imagesc is displayed
 		% as tiff image and not generated using Gnuplot...
