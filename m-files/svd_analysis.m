@@ -57,6 +57,14 @@
 %	params (STRUCT, OPTIONAL)
 %		structure containing optional additional parameters
 %
+%		params.numComponents (INTEGER)
+%			number of components to show the U and V vectors for
+%
+%			This gives the user the possibility to make the function
+%			noninteractively, e.g. for running within automated scripts
+%			where most probably one knows the maximum number of components
+%			that are useful to be displayed.
+%
 %       params.subdir (STRING)
 %           directory to write all files to that are generated during the run
 %           of this function
@@ -188,6 +196,12 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 				% input parameter 'params'
 	
 		end
+
+        if ( isfield(params,'numComponents') && ~isnumeric(params.numComponents) )
+    
+            error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help svd_analysis" to get help.','params.numComponents');
+
+        end
 
 		if ( isfield(params,'outputFormat') && ~isstr(params.outputFormat) )
 	
@@ -418,7 +432,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% that allows to read fsc2 files as well as compensated files from the
 	% trEPR toolbox.
 
-	[data, params, file_format] = trEPR_read ( filename );
+	[data, readParams, file_format] = trEPR_read ( filename );
 	
 	if (strcmp(file_format,'fsc2 file') == 0) && (strcmp(file_format,'trEPR ASCII 2Dspec file') == 0)
 	
@@ -426,9 +440,9 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	
 	end
 
-	fp = [ params.field_start params.field_stop params.field_stepwidth ];
-	tp = [ params.points params.trig_pos params.length_ts ];
-	fq = params.frequency;
+	fp = [ readParams.field_start readParams.field_stop readParams.field_stepwidth ];
+	tp = [ readParams.points readParams.trig_pos readParams.length_ts ];
+	fq = readParams.frequency;
 
 	% compensate for pretrigger offset
 	% but only if the input file is a (non-compensated) fsc2 file
@@ -623,9 +637,18 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	% plot U and S columns
 	
 	% first, decide how many columns to plot - ask the user for that
-	
-	num_values = input('\nHow many vectors should be shown? ','s');
-	num_values = str2num(num_values);
+	% except of the parameter params.numComponents is set
+
+    if ( ( ismember({'params'},who) ~= 0 ) && ( isfield(params,'numComponents') ) )
+    
+        num_values = params.numComponents;
+
+    else
+    
+		num_values = input('\nHow many vectors should be shown? ','s');
+		num_values = str2num(num_values);
+
+    end
 
 
 	% In case the LaTeX output option is set,
