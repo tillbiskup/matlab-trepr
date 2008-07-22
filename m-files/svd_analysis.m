@@ -99,6 +99,13 @@
 %           In this case instead of writing the LaTeX output to a separate file, it will
 %           be written to the file specified with the 'FID'.
 %
+%		params.appendToLabels (STRING)
+%			in case you use the 'LaTeXpart' output format, it might be useful
+%			to be able to append a string to the labels used for referencing
+%			tables and figures within LaTeX. This is especially useful if you
+%			want to include two SVD analysis outputs in one LaTeX file. Otherwise
+%			you'll run into troubles caused by "multiply defined labels".
+%
 % OUTPUT
 %	U (MATRIX, OPTIONAL)
 %		matrix containing the U vectors
@@ -214,6 +221,12 @@ function [ varargout ] = svd_analysis ( filename, varargin )
             error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help svd_analysis" to get help.','params.LaTeXfid');
 
         end
+
+		if ( isfield(params,'appendToLabels') && ~isstr(params.appendToLabels) )
+	
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help svd_analysis" to get help.','params.appendToLabels');
+
+		end
 
 %		if ( isfield(params,'###') && ~isstr(params.###) )
 %	
@@ -352,6 +365,17 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	
 	end
 	
+
+    if ( ( ismember({'params'},who) ~= 0 ) && ( isfield(params,'appendToLabels') ) )
+    
+        appendToLabels = params.appendToLabels;
+
+    else
+    
+        appendToLabels = '';
+
+    end
+	
 	
 	% start logging
 
@@ -420,7 +444,18 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	if ( strcmp(outputFormat,'LaTeX') )
 
 		LaTeXsection(LaTeXfid,'section','Introduction');
-		fprintf(LaTeXfid,'In some cases, in a spectrum recorded with trEPR a mixture of different species, or components is present. Thus the spectrum is the sum of the contributions of each component. As the individual spectra are oftenly not known, singular value decomposition (SVD) can be used to find these individual spectra together with the coefficients that specify how to mix them to yield the recorded spectrum. For the moment there is no fully featured SVD, but only the S values and the first few U and V vectors are plotted. ');
+		fprintf(LaTeXfid,...
+		  [ ...
+		    'In some cases, in a spectrum recorded with trEPR a mixture of ' ...
+		    'different species, or components is present. Thus the spectrum is ' ...
+		    'the sum of the contributions of each component. As the individual ' ...
+		    'spectra are oftenly not known, singular value decomposition (SVD) ' ...
+		    'can be used to find these individual spectra together with the ' ...
+		    'coefficients that specify how to mix them to yield the recorded ' ...
+		    'spectrum. For the moment there is no fully featured SVD, but only ' ...
+		    'the S values and the first few U and V vectors are plotted.' ...
+		  ] ...
+		);
         fprintf(LaTeXfid,'\n\n To perform a fully featured SVD you need to figure out a model of how the different components are related to each other (e.g. one component decays and leads to the formation of the second one, or two components are independent of each other, but with different kinetics).');
 		fprintf(LaTeXfid,'\n\nFor an overview of that method and to get an idea of how to apply it to the data under investigation, the reader is referred to a very well written introduction to SVD: Hendler and Shrager, J Biochem Biophys Meth 28(1994):1--3.');
 		
@@ -492,7 +527,16 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	
 	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
 
-		fprintf(LaTeXfid,'The recorded 2D dataset of the TREPR spectrum stored in the file \\texttt{%s} has been read in. Starting with the trigger pulse (laser flash), every %s $B_0$ spectrum has been taken along the time axis and from that set of spectra the SVD has been computed.', strrep(filename,'_','\_'), char(ordinal(timesteps)) );
+		fprintf(LaTeXfid, [ ...
+		  'The recorded 2D dataset of the TREPR spectrum stored in the file ' ...
+		  '\\begin{center}%s\\end{center} has been read in. Starting with the ' ...
+		  'trigger pulse (laser flash), every %s $B_0$ spectrum has been taken ' ...
+		  'along the time axis and from that set of spectra the SVD has been ' ...
+		  'computed.' ...
+		  ], ...
+		  strrep(filename,'_','\_'), ...
+		  char(ordinal(timesteps)) ...
+		);
 
 	end
 	
@@ -551,16 +595,28 @@ function [ varargout ] = svd_analysis ( filename, varargin )
         saveFileBaseNameWithPath2 = sprintf( '%s/%s', subdirname, saveFileBaseName2 );
 		save_figure(saveFileBaseNameWithPath2,saveFigureParams);
 		
- 		LaTeXfigureParams.positioning = 't';
+		if ( strcmp(outputFormat,'LaTeXpart') )
+ 		  LaTeXfigureParams.positioning = 'h';
+ 		else
+ 		  LaTeXfigureParams.positioning = 't';
+ 		end
  		LaTeXfigureParams.caption = 'Original data (left) and singular values (right). The singular values are the diagonal elements of the S matrix of the SVD. The plot of the singular values allows to roughly estimate the number of different components the spectra consist of.';
  		LaTeXfigureParams.shortCaption = 'Original data and singular values.';
- 		LaTeXfigureParams.label = 'origData_Svalues';
+ 		LaTeXfigureParams.label = sprintf('origData_Svalues%s',appendToLabels);
  		
  		LaTeXfigNames = {[saveFileBaseName1 '.pdf'],'width=.49\textwidth','\hfill';[saveFileBaseName2 '.pdf'],'width=.49\textwidth',''};
  		
  		LaTeXfig1Label = LaTeXfigure (LaTeXfid,LaTeXfigNames,LaTeXfigureParams);
  		
- 		fprintf(LaTeXfid,'\n\nFor the original data used to perform the SVD and for a plot of the singular values refer to fig. \\ref{%s}, page \\pageref{%s}.', LaTeXfig1Label, LaTeXfig1Label);
+ 		fprintf(LaTeXfid, ...
+ 		  [ ...
+ 		    '\n\nFor the original data used to perform the SVD and for a plot ' ...
+ 		    'of the singular values refer to fig. \\ref{%s}, page ' ...
+ 		    '\\pageref{%s}.'
+ 		  ], ...
+ 		  LaTeXfig1Label, ...
+ 		  LaTeXfig1Label ...
+ 		);
  		
  	else
 
@@ -622,7 +678,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 		LaTeXtableParams.width = '\textwidth'; 		
  		LaTeXtableParams.caption = 'Output from SVD operation: Singular values and autocorrelations for the U and V vectors. The singular values (clearly non--zero) together with the autocorrelations of U and V (bigger than 0.5) give a hint of the rank (r) for the dataset.';
  		LaTeXtableParams.shortCaption = 'Singular values and autocorrelations for the U and V vectors.';
- 		LaTeXtableParams.label = 'Svalues_UVautocorrelations';
+ 		LaTeXtableParams.label = sprintf('Svalues_UVautocorrelations%s',appendToLabels);
  		
  		LaTeXtableHeader = {'Index','c';'Singular values','c';'U autocorrelations','c';'V autocorrelations','c'};
  		
@@ -630,7 +686,15 @@ function [ varargout ] = svd_analysis ( filename, varargin )
  		
  		LaTeXtab1Label = LaTeXtable (LaTeXfid,LaTeXtableData,'crrr',LaTeXtableHeader,LaTeXtableParams);
  		
- 		fprintf(LaTeXfid,'The singular values itself together with the corresponding autocorrelation coefficients of the U and V vectors can be looked up in table \\ref{%s}, page \\pageref{%s}.', LaTeXtab1Label, LaTeXtab1Label);
+ 		fprintf(LaTeXfid, ...
+ 		  [ ...
+ 		    'The singular values itself together with the corresponding ' ...
+ 		    'autocorrelation coefficients of the U and V vectors can be looked ' ...
+ 		    'up in table \\ref{%s}, page \\pageref{%s}.'
+ 		  ], ...
+ 		  LaTeXtab1Label, ...
+ 		  LaTeXtab1Label ...
+ 		);
  		
  	end
 	
@@ -695,7 +759,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
  		LaTeXfigureParams.positioning = 'p';
  		LaTeXfigureParams.caption = sprintf('The first %i U (left) and V (right) vectors that result from the SVD. Note: The U vectors correspond to the $B_0$ spectra and the V vectors correspond to the time slices, but \\emph{these spectra are not identical with the singular components} the spectra consist of. Nevertheless they can be used to fit a model that allows to compute the real singular components.',num_values);
  		LaTeXfigureParams.shortCaption = sprintf('The first %i U (left) and V (right) vectors that result from the SVD.', num_values);
- 		LaTeXfigureParams.label = 'U_Vvalues';
+ 		LaTeXfigureParams.label = sprintf('U_Vvalues%s', appendToLabels);
  		
  		fprintf(LaTeXfid,'\n\\clearpage\n');
  		LaTeXfig2Label = LaTeXfigure (LaTeXfid,LaTeXfigNames,LaTeXfigureParams);
