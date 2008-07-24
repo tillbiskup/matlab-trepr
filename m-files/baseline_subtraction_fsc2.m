@@ -95,19 +95,40 @@ function data = baseline_subtract_fsc2 ( data, no_ts )
 
 	% First step: Compute mean values for lower and upper end of B_0 field
 	
-	baseline = mean ( data ( [1:no_ts], : ) );
-							% average over the first 'no_ts' time slices
-	
 	[ rows_data, cols_data ] = size ( data );
 							% evaluate size of the input data
-	 
-	for i = 1:rows_data		% for each time slice
 	
-		data ( i, : ) = data ( i, : ) - ( baseline );
+	% Perform only baseline correction if the number of time traces is more than
+	% five times bigger than the number of time traces to average for the baseline
+	% correction.
+	
+	if ( rows_data > (no_ts * 5) )
+
+		baseline = mean ( data ( [1:no_ts], : ) );
+							% average over the first 'no_ts' time slices
+	 
+		for i = 1:rows_data		% for each time slice
+	
+			data ( i, : ) = data ( i, : ) - ( baseline );
 							% Compensate drift through weighted subtraction of the first (lower)
 							% and last (upper) averaged time slices.
 							% This works for every kind of weights (linear and nonlinear).
 	
-	end					% end of for loop
+		end					% end of for loop
+	
+	else
+	
+		fprintf( ...
+		  [ ...
+		    '\n' ...
+		    'WARNING: The number of time traces of the data given to compensate\n' ...
+		    '         is less than five times the number of time traces to\n' ...
+		    '         accumulate for the baseline subtraction.\n\n' ...
+		    '         Therefore, no baseline subtraction has been performed.' ...
+		    '\n' ...
+		  ] ...
+		);
+		
+	end
 
 %******
