@@ -308,7 +308,7 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 	
 	% print table with parameters to output
 	
-	fprintf('\n%% Parameters of the file just read:\n%% ')
+	fprintf('\n%% Parameters of the file just read:\n%% ');
 	fprintf('\n%%   magnetic field parameters:\n%% ');
 	fprintf('    field start:       %6.1f G\n%%     field stop:        %6.1f G\n%%     field step width:  %2.2f G\n%% ', field_params);
 	fprintf('\n%%   scope parameters:\n%% ');
@@ -333,23 +333,39 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 		hightolow = 1;					% set "boolean" variable
 	end								% end if
 	
-	matrix = zeros (field_width, no_points);
-										% for faster computing of octave initialize empty matrix
-										% with the above calculated final dimensions
 	
 	% now read the actual data
 	
 	raw_data = load ( filename );		% read fsc2 data file (automatically ignore comments)
 
+	% ppscan means "points per scan"
+	% As fsc2 writes the data as one long column, even if you store several
+	% scans in one file, you should know how many values belong to one scan.
+	
+	ppscan = (field_width + 1) * no_points;
+	
+	% countViF means "count of values in file"
+	[countViF, cols] = size(raw_data);
 
-	% Test whether raw_data size fits in dimensions calculated by parameters of the input file
+
+	% Test whether raw_data size fits in dimensions calculated by parameters 
+	% of the input file.
 	% That can happen if a measurement has been aborted before its completion.
-	%
-	% TODO: Better handling that just producing an error that stops immediately any further execution
+	% Another situation would be to have more than one scan stored in one file.
+
+	% If the number of values of the data read in is less than the number of
+	% values of one scan, meaning that the measurement was aborted before 
+	% one scan was finished, print a warning and truncate the field parameters
 	
-	if size (raw_data) ~= (field_width+1) * no_points
+	if ( countViF < ppscan )
 	
-		fprintf('\nWARNING: Data do not match the dimensions given by the parameters!\n				 Field parameters adjusted to fix data...\n');
+        fprintf( ...
+          [ ...
+            '\n' ...
+            'WARNING: Data do not match the dimensions given by the parameters!\n' ...
+            '         Field parameters adjusted to fix data...\n' ...
+          ] ...
+        );
 
 		% set field_width to new value
 
@@ -362,15 +378,59 @@ function [ data, frequency, field_params, scope_params, time_params ] = read_fsc
 	
 		fprintf('\nadjusted magnetic field parameters:\n');
 		fprintf('field start:\t\t%4.1f G\nfield stop:\t\t%4.1f G\nfield step width:\t%2.2f G\n', field_params);
+	
+        % for faster computing of octave initialize empty matrix
+        % with the above calculated final dimensions
+        matrix = zeros (field_width, no_points);
+
+        for i = 1:(field_width+1)
+          matrix (i,:) = raw_data(1+((i-1)*no_points):i*no_points)';
+        end
 		
-	end
+	% If the number of values of the data read in exceeds the number of values
+	% of one scan, meaning that there is more than one scan stored in the file,
+	% in a first step, try to get out, how many complete scans are there 
+	% in the file, and in a second step, average over the scans.
 
+	elseif ( countViF > ppscan )
+	
+	  % get number of completed scans
+	  num_scans = floor( countViF/ppscan );
 
-	% fill the previously initialized empty matrix with the data read from the file
+      % for faster computing of octave initialize empty matrix
+      % with the above calculated final dimensions
+      matrix = zeros (field_width+1, no_points);
 
-	for i = 1:(field_width+1)
-		matrix (i,:) = raw_data(1+((i-1)*no_points):i*no_points)';
-	end
+      fprintf( ...
+        [ ...
+          '\n' ...
+          'WARNING: There seem to be %i complete scans saved in the file.\n' ...
+          '         These scans will be averaged and the average returned...\n' ...
+        ], ...
+        num_scans ...
+      );
+	  
+	  sum_matrix = matrix;
+	  
+	  for k = 1 : num_scans
+	  
+        for l = 1:(field_width+1)
+          matrix (l,:) = raw_data(1+((l-1)*no_points):l*no_points)';
+        end
+	    
+	    sum_matrix = sum_matrix + matrix;
+	  
+	  end
+	  
+	  matrix = sum_matrix / num_scans;
+
+	elseif countViF == ppscan
+
+      for i = 1:(field_width+1)
+        matrix (i,:) = raw_data(1+((i-1)*no_points):i*no_points)';
+      end
+      
+    end
 
 
 	% return the data as matrix
