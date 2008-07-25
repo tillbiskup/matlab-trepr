@@ -28,38 +28,14 @@
 %	to select time and B_0 slices. It makes use of the MATLAB(TM)
 %	GUI possibilities.
 %
+%	After improving a lot it is now possible to save the different kinds of
+%	views (B_0 spectrum, time slice, 2D data) as ASCII data as well as to set
+%	an integration window for the 1D views.
+%
 %	This function appeared in version > 0.1.0 of the trEPR toolbox.
 %
 % INPUT PARAMETERS
-%	data
-%		NxM matrix containing the measured data
-%
-%	field_params
-%		a 3x1 vector containing of three values, the "field parameters"
-%
-%		These field parameters are:
-%
-%			start_field
-%				the start position of the field sweep given in Gauss (G)
-%			end_field
-%				the stop position of the field sweep given in Gauss (G)
-%			field_step_width
-%				the step width by which the field is swept given in Gauss (G)
-%
-%	time_params
-%		a 3x1 vector containing of three values, the "time parameters"
-%	
-%		These time parameters are:
-%
-%			no_points
-%				number of points of the time slice
-%			trig_pos
-%				position of the trigger pulse
-%			length_ts
-%				length of the time slice in microseconds
-%
-%	titlestring
-%		a string that is used to set the title
+%	there are currently no input parameters
 %
 % OUTPUT PARAMETERS
 %	no output parameters yet
@@ -69,24 +45,22 @@
 %	baseline_subtraction_fsc2.m
 %
 % EXAMPLE
-%	Normally, GUI_fsc2_display is called with the function fsc2_display, but
-%	one can call it directly like this:
+%	To start the GUI, just type at the MATLAB(TM) command line:
 %
-%		GUI_fsc2_display (data, field_params, time_params, titlestring)
+%		GUI_fsc2_display
 %
-%	DATA, FIELD_PARAMS, and TIME_PARAMS are best read from an fsc2 file with the
-%	function trEPR_read_fsc2_file, TITLESTRING is a simple string that is used to
-%	display in the GUI what data are shown, normally the file name of the data file.
+%	To open a fsc2 file, select "File > Open" or use the shortcut, "Ctrl+O", or
+%	"Apple+O" on the Mac.
 %
 % SOURCE
 
-function GUI_fsc2_display (data, field_params, time_params, titlestring)
+function GUI_fsc2_display
  
 	fprintf('\nFUNCTION CALL: $Id$\n\n');
 
 	% check for the right number of input and output parameters
 
-	if ( nargin ~= 4 )
+	if ( nargin ~= 0 )
 
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help GUI_fsc2_display" to get help.',nargin);
 
@@ -96,60 +70,6 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 
 		error('\n\tThe function is called with the wrong number (%i) of output arguments.\n\tPlease use "help GUI_fsc2_display" to get help.',nargout);
 
-	end
-
-
-	% check for correct format of the input parameters
-	
-	% DATA
-	
-	if ( ~isnumeric(data) || isscalar(data) )
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','data');
-			% get error if function is called with the wrong format of the
-			% input parameter 'data'
-
-	% FIELD_PARAMS
-
-	elseif ~isnumeric(field_params)
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','field_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'field_params'
-
-	elseif ~isvector(field_params)
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','field_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'field_params'
-
-	elseif length(field_params) ~= 3
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','field_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'field_params'
-
-
-	% TIME_PARAMS
-
-	elseif ~isnumeric(time_params)
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','time_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'time_params'
-
-	elseif ~isvector(time_params)
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','time_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'time_params'
-
-	elseif length(time_params) ~= 3
-
-		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help GUI_fsc2_display" to get help.','time_params');
-			% get error if function is called with the wrong format of the
-			% input parameter 'time_params'
-			
 	end
 
 	% test by which program we are called
@@ -210,36 +130,38 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
  	global disp_style;
 	global disp_data;
 	global disp_field;
+	global orig_data;
+	global oc_data;
+	global bl_oc_data;
+	global time;
+	global field;
+	global field_params;
+	global time_params;
+	global frequency;
 	global slider_val_time;
 	global slider_val_timestep;
 	global slider_val_field;
 	
+	global time_integrationWindow;
+	global field_integrationWindow
+	
 	% set some of the globals to defined values	
 	disp_style = '2D display';
+	field_integrationWindow = 1;
+	time_integrationWindow = 1;
+	
+	% in case there is no data loaded, set default values for some variables
+	% DIRTY TRICK - TO BE CHANGED!
+	if ( length(disp_data) == 0 )
+		time_params = [ 1 1 1 ];
+	end
+
 	slider_val_time = time_params(2);
 	slider_val_field = 1;
 	GUItitle = 'fsc2-like display of transient EPR spectra';
-
-	% Derive some additional parameters from the input parameters
-	field_min = min([field_params(1) field_params(2)]);
-	field_max = max([field_params(1) field_params(2)]);
-	field = [field_min : abs(field_params(3)) : field_max];
-	time_min = time_params(3)/time_params(1)*(time_params(2)-1);
-	time_max = time_params(3)-(time_params(3)/time_params(1)*time_params(2));
-	time = [ -time_min : time_params(3)/time_params(1) : time_max];
-	timestep_min = 1;
-	timestep_max = time_params(1);
-	timestep = 1;
-
-	orig_data = (data);
 	
-	% generate offset compensated and drift compensated data similar to fsc2
-	oc_data = pretrigger_offset ( orig_data, time_params(3) );
-	bl_oc_data = baseline_subtraction_fsc2 ( oc_data, 10 );
-	
-	% set the displayed data and field variables
-	disp_data = orig_data;
-	disp_field = field;
+	titlestring = 'No file loaded, use "File > Open"...';
+
 	
 	% CREATING THE GUI
 	%
@@ -276,13 +198,13 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 	h_togglebutton_disp = uibuttongroup('visible','off','Position',[0 0 .18 1]);
 	u0 = uicontrol('Style','Toggle','String','2D display',...
 		'TooltipString','display 2D data',...
-		'pos',[10 125 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
+		'pos',[10 175 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
 	u1 = uicontrol('Style','Toggle','String','time slice',...
 		'TooltipString','display time slice',...
-		'pos',[10 75 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
+		'pos',[10 125 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
 	u2 = uicontrol('Style','Toggle','String','B_0 slice',...
 		'TooltipString','display B_0 spectrum',...
-		'pos',[10 25 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
+		'pos',[10 75 100 30],'parent',h_togglebutton_disp,'HandleVisibility','off');
 	set(h_togglebutton_disp,'SelectionChangeFcn',@seldispcbk);
 	set(h_togglebutton_disp,'SelectedObject',u0);  % No selection
 	set(h_togglebutton_disp,'Visible','on');
@@ -310,6 +232,23 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 	set(htext_slider_value2,'BackgroundColor',get(f,'Color'));
 	set(htext_slider_measure2,'BackgroundColor',get(f,'Color'));
 
+	% TEXT FIELD AND INPUT FOR THE INTEGRATION WINDOW
+	htext_integration_window_text = uicontrol( ...
+	    'Style','text',...
+	    'String','Integration window:',...
+		'TooltipString','Integration window',...
+		'Position',[10 35 100 15] ...
+	);
+	set(htext_integration_window_text,'BackgroundColor',get(f,'Color'));
+	htext_integration_window = uicontrol( ...
+	    'Style','edit',...
+		'TooltipString','',...
+		'Position',[10 20 100 15], ...
+		'Callback',{@integrationWindow_Callback} ...
+	);
+	set(htext_integration_window,'BackgroundColor',get(f,'Color'));
+	set([htext_integration_window_text, htext_integration_window],'Visible','off');
+	
 	% TEXT FIELD for the title
 	htext_title = uicontrol('Style','text','String',titlestring,...
 		'FontSize',14,...
@@ -318,20 +257,44 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 
 	% GRAPHICS WINDOW, called "axes" in MATLAB(TM), for displaying the data
 	ha = axes('Units','Pixels','Position',[200,50,400,400]); 
+
+    % MENU
+	% Create menubar
+	fmh = uimenu(f,'Label','File');
+	efmh1 = uimenu(fmh,'Label','Open...','Accelerator','o','Callback',{@openSpectrum_Callback});
+	efmh2 = uimenu(fmh,'Label','Save','Accelerator','s','Callback',{@saveSpectrum_Callback},'Enable','off');
+%	efmh3 = uimenu(fmh,'Label','Save as...');
+	efmh4 = uimenu(fmh,'Label','Close window','Accelerator','w','Callback','close');
+	set(efmh2,'Separator','on');
+	set(efmh4,'Separator','on');
+    hHelpMenu = uimenu(f,'Label','Help');
+    hHelpHelpMenu = uimenu(hHelpMenu,'Label','Help','Callback','doc GUI_fsc2_display');
+    hHelpMatlabMenu = uimenu(hHelpMenu,'Label','MATLAB Help','Callback','doc');
+    hHelpAboutMenu = uimenu(hHelpMenu,'Label','About','Callback',{@helpAbout_Callback},'Separator','on');
+    
    
 	% STEP 3: Initialize the GUI.
 	% Change units to normalized so components resize automatically.
 	set([f,ha,hslider,htext_slider_value,htext_slider_value2,h_togglebutton_comp,h_togglebutton_disp,htext_title,htext_slider_measure,htext_slider_measure2],'Units','normalized');
 	% Create a plot in the axes.
-	display_data ( time, disp_field/10, disp_data );
+	% display_data ( time, disp_field/10, disp_data );
 	% Assign the GUI a name to appear in the window title.
 	set(f,'Name',GUItitle)
 	% Disable the builtin menus in the menu bar.
-	set(f,'MenuBar','none');
+	set(f,'MenuBar','none');	
+	% according to the MATLAB(TM) documentation,
+	% set the "HandleVisibility" properties of all menus to "off"
+	menuhandles = findall(f,'type','uimenu');
+    set(menuhandles,'HandleVisibility','off');
+    
+	% Enable the builtin toolbar.
+	% set(f,'Toolbar','figure');
 	% Move the GUI to the center of the screen.
-	movegui(f,'center')
+	movegui(f,'north');
 	% Set the slider to inactive
 	set(hslider,'Enable','inactive');
+	% Set the buttons to inactive
+	set([h_togglebutton_comp, h_togglebutton_disp, hslider],'Visible','Off');
 	% Make the GUI visible.
 	set(f,'Visible','on');
  
@@ -391,16 +354,24 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 		
 		switch disp_style
 			case {'time slice'}
+				set(hslider,'Visible','on');
 				set(hslider,'Enable','on');
+				set([htext_integration_window_text, htext_integration_window], ...
+				  'Visible','on');
 				set(htext_slider_measure,'String','B_0 / mT');
 				set(hslider,'Min',0);
 				set(hslider,'Max',length(field)-1);
 				set(hslider,'SliderStep',[1/(length(field)-1),(1/(length(field)-1))*10]);
 				set(hslider,'Value',slider_val_field-1);
 				set(htext_slider_value,'String',num2str(field(slider_val_field)/10));
+				set([htext_slider_value2 htext_slider_measure2],'Visible','Off');
+				set(htext_integration_window,'String',field_integrationWindow);
 				display_data ( time, disp_field/10, disp_data );
 			case {'B_0 slice'}
+				set(hslider,'Visible','on');
 				set(hslider,'Enable','on');
+				set([htext_integration_window_text, htext_integration_window], ...
+				  'Visible','on');
 				set(htext_slider_measure,'String','time / us');
 				set(htext_slider_measure2,'String','timestep');
 				set(hslider,'Min',0);
@@ -408,14 +379,239 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 				set(hslider,'SliderStep',[1/(length(time)-1),(1/(length(time)-1))*10]);
 				set(hslider,'Value',slider_val_time-1);
 				set(htext_slider_value,'String',num2str(time(slider_val_time)));
+				set([htext_slider_value2 htext_slider_measure2],'Visible','On');
 				set(htext_slider_value2,'String',num2str(slider_val_time));
+				set(htext_integration_window,'String',time_integrationWindow);
 				display_data ( time, disp_field/10, disp_data );
 			case {'2D display'}
+				set(hslider,'Visible','off');
+				set([htext_slider_value2 htext_slider_measure2],'Visible','Off');
+				set([htext_integration_window_text, htext_integration_window], ...
+				  'Visible','Off');
 				set(hslider,'Enable','inactive');
 				set(htext_slider_measure,'String','');
 				set(htext_slider_value,'String','');
 				display_data ( time, disp_field/10, disp_data );
 		end
+	end
+   
+	% INTEGRATION WINDOW CALLBACK
+	% Each callback plots the data at the point defined by the slider position
+	% if we are in the 1D display modes, otherwise the slider is not accessible.
+ 
+	function integrationWindow_Callback(source,eventdata) 
+		val = get(htext_integration_window,'String');
+		
+		switch disp_style
+			case {'time slice'}
+			  field_integrationWindow = str2num(val);
+			  display_data ( time, disp_field/10, disp_data );
+			case {'B_0 slice'}
+			  time_integrationWindow = str2num(val);
+			  display_data ( time, disp_field/10, disp_data );
+		end
+      
+	end
+    
+    % OPEN SPECTRUM CALLBACK
+    
+    function openSpectrum_Callback(source,eventdata)
+    		% open file selection dialog for reading file
+		[filename, pathname,filterIndex] = uigetfile({'*.dat;*.txt;*.asc;*.ASC','ASCII files (*.dat,*.txt,*.asc,*.ASC)'}, 'Pick an M-file');
+		% creating cell array with the different file formats
+		% used as input for the (internal) loadSpectrum function
+		fileFormat = {'ASCII'};
+        
+        fprintf('Filename: %s%s\n',pathname,filename);
+		
+		if isequal(filename,0)
+			% in case the user doesn't choose a filename
+			%disp('User selected Cancel')
+			% do nothing loop :)
+		else
+			% load spectrum, use therefore an internal function
+			% doing all the "real stuff"
+			char(fileFormat(filterIndex));
+            file = sprintf('%s%s',pathname,filename);
+			[ spectrum, time, field ] = loadSpectrum(file,char(fileFormat(filterIndex)));
+
+			if ( max(size(spectrum)) ~= 0 )
+				% In case the loadSpectrum function got into troubles
+				% cause of some file format problems, it will return an empty
+				% matrix "spectrum". Thus perform the following steps only in case
+				% that hasn't happen.
+
+				orig_data = (spectrum);
+	
+				% generate offset compensated and drift compensated data similar to fsc2
+				oc_data = pretrigger_offset ( orig_data, time_params(3) );
+				bl_oc_data = baseline_subtraction_fsc2 ( oc_data, 10 );
+
+				disp_field = field;
+				disp_data = spectrum;
+				
+				% set title of the figure
+				titlestring = sprintf('File currently displayed: %s',filename);
+				set(htext_title,'String',titlestring);
+
+				% make togglebuttons visible, enable "Save" menu
+				set([h_togglebutton_comp, h_togglebutton_disp],'Visible','On');
+				set(efmh2,'Enable','on');
+
+				% plot spectrum
+				display_data ( time, disp_field/10, disp_data );
+				
+			end
+		end
+		
+    end
+
+	% LOAD SPECTRUM
+	
+	function [ spectrum, time, field ] = loadSpectrum(filename,fileFormat)
+        
+		if strcmp(fileFormat,'BES3T')
+			% Test for the existence of the function "eprload" in the MATLAB(R)
+			% search path and depending on that load the Bruker file or display
+			% an error message. 
+			% NOTE: The easyspin toolbox stores all functions in so-called
+			% "p files" (not m files) that have the code "6" when checked for 
+			% via the "exist" function.
+			if ( (exist('eprload') ~= 2) && (exist('eprload') ~= 6) )
+				% Assign the empty matrix to the return value "spectrum".
+				% NOTE: Therefore, the size of the returned "spectrum" matrix
+				% has to be checked after the call of loadSpectrum to proceed
+				% accordingly.
+				spectrum = [];
+				fprintf('\n WARNING: The function eprload from the easyspin toolbox that is used\n to load Bruker BES3T files could not be found.\n')
+				return;
+			else
+				% Use "eprload" from the easyspin toolbox to load Bruker BES3T file
+				[ data,pars,absc ] = eprload(filename);
+				% Assign the abscissa to the first column of the matrix "spectrum"
+				spectrum(:,1) = absc;
+				% Assign the real part of the data to the second column of the
+				% matrix "spectrum"
+				spectrum(:,2) = real(data);
+			end
+		else
+			% In all other cases (according the file format)
+			% assume ASCII data that are loadable via the "trEPR_read" function.
+			[ data, parameters, fileFormat ] = trEPR_read(filename);
+			
+			if strcmp(fileFormat,'fsc2 file')
+			
+				time_params = [ ...
+				  parameters.points ...
+				  parameters.trig_pos ...
+				  parameters.length_ts ...
+				];
+
+				time = trEPR_timeAxis ( time_params );
+				
+				field = [ ...
+				  min([parameters.field_start parameters.field_stop]) : ...
+				  abs(parameters.field_stepwidth) : ...
+				  max([parameters.field_start parameters.field_stop]) ...
+				];
+				
+				field_params = [ ...
+				  parameters.field_start ...
+				  parameters.field_stop ...
+				  parameters.field_stepwidth ...
+				];
+				
+				frequency = parameters.frequency;
+				
+				spectrum = data;
+				
+				% Derive some additional parameters from the input parameters
+				field_min = min([parameters.field_start parameters.field_stop]);
+				field_max = max([parameters.field_start parameters.field_stop]);
+				time_min = time_params(3)/time_params(1)*(time_params(2)-1);
+				time_max = time_params(3)-(time_params(3)/time_params(1)*time_params(2));
+				timestep_min = 1;
+				timestep_max = time_params(1);
+				timestep = 1;
+			
+			end
+		end
+	
+	end
+    
+    % SAVE SPECTRUM CALLBACK
+    
+    function saveSpectrum_Callback(source,eventdata)
+
+		switch disp_style
+			case {'time slice'}
+				SaveDialogTitle = sprintf('Save time slice to file');
+			case {'B_0 slice'}
+				SaveDialogTitle = sprintf('Save B_0 spectrum to file');
+			case {'2D display'}
+				SaveDialogTitle = sprintf('Save 2D spectrum to file');
+		end
+    
+	    [FileName,PathName,FilterIndex] = uiputfile( ...
+	      {'*.dat','ASCII data file (*.dat)'; ...
+	       '*.*','All files (*.*)'}, ...
+	      SaveDialogTitle...
+	    );
+
+		if ( isstr(FileName) )
+		
+			[ disp_data_rows, disp_data_cols ] = size(disp_data);
+		
+			switch disp_style
+				case {'time slice'}
+				    int_ub = slider_val_field + field_integrationWindow - 1;
+					if ( (field_integrationWindow > 1) && (int_ub <= disp_data_rows) )
+						saveData = mean(disp_data(slider_val_field : int_ub,:));
+					else
+						saveData = disp_data(slider_val_field,:);
+					end
+					ascii_save_timeslice ( ...
+					  FileName, ...
+					  saveData, ...
+					  field_params, ...
+					  time_params, ...
+					  frequency ...
+					);
+				case {'B_0 slice'}
+				    int_ub = slider_val_time + time_integrationWindow - 1;
+					if ( (time_integrationWindow > 1) && (int_ub <= disp_data_rows) )
+						saveData = mean(disp_data(:,slider_val_time : int_ub)');
+					else
+						saveData = disp_data(:,slider_val_time);
+					end
+					ascii_save_spectrum ( ...
+					  FileName, ...
+					  saveData, ...
+					  field_params, ...
+					  time_params, ...
+					  frequency ...
+					);
+				case {'2D display'}
+					ascii_save_2Dspectrum ( ...
+					  FileName, ...
+					  disp_data, ...
+					  field_params, ...
+					  time_params, ...
+					  frequency ...
+					);
+			end
+
+		end
+						
+    end
+
+
+ 	% HELP ABOUT callback
+	
+	function helpAbout_Callback(source, eventdata)
+		rev = revision;
+		aboutString = sprintf('This is revision %s of GUI_fsc2_display.\n\n(c) 2007/08, Till Biskup',rev);
+		msgbox(aboutString,'About','modal');
 	end
 	
 	% FUNCTION FOR DISPLAYING THE DATA
@@ -425,26 +621,50 @@ function GUI_fsc2_display (data, field_params, time_params, titlestring)
 	% actual display style.
 	
 	function display_data(dtime,dfield,ddata)
+	
+		[ ddata_rows, ddata_cols ] = size(ddata);
 
 		switch disp_style
 			case {'time slice'}
-				plot(dtime,ddata(slider_val_field,:));
+			    int_ub = slider_val_field + field_integrationWindow - 1;
+				if ( (field_integrationWindow > 1) && (int_ub <= ddata_rows) )
+					plot( ...
+					  dtime, ...
+					  mean(ddata(slider_val_field : int_ub,:)) ...
+					);
+				else
+					plot(dtime,ddata(slider_val_field,:));
+				end
 				ylim([min(min(ddata)) max(max(ddata))]);
 				xlim([min(dtime) max(dtime)]);
-				xlabel('time / us');ylabel('intensity / a.u.');
+				xlabel('{\it time} / \mus');ylabel('{\it intensity} / a.u.');
 			case {'B_0 slice'}
-				plot(dfield,ddata(:,slider_val_time));
+			    int_ub = slider_val_time + time_integrationWindow - 1;
+				if ((time_integrationWindow > 1) && (int_ub <= ddata_cols))
+				    plot_data = mean(ddata(:, slider_val_time : int_ub)');
+					plot( ...
+					  dfield, ...
+					  plot_data ...
+					);
+				else
+					plot(dfield,ddata(:,slider_val_time));
+				end
 				ylim([min(min(ddata)) max(max(ddata))]);
 				xlim([min(dfield) max(dfield)]);
-				xlabel('B_0 field / mT');ylabel('intensity / a.u.');
+				xlabel('{\it magnetic field} / mT');ylabel('{\it intensity} / a.u.');
 			case {'2D display'}
 				mesh(dtime,dfield,ddata);
 				view(2);
 				xlim([min(dtime) max(dtime)]);
 				ylim([min(dfield) max(dfield)]);
-				xlabel('time / us');ylabel('B_0 field / mT');
+				xlabel('{\it time} / \mus');ylabel('{\it magnetic field} / mT');
 		end
 	
+	end
+	
+	function revision = revision
+		revision = strrep(strrep('$Revision$','Revision: ',''),'$','');
+		revision = revision(1:length(revision)-1);
 	end
 
 end
