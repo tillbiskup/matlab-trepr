@@ -57,6 +57,22 @@
 %	params (STRUCT, OPTIONAL)
 %		structure containing optional additional parameters
 %
+%		params.timeSteps (INTEGER)
+%			size of the steps on the time axis between two B_0 slices taken for
+%			the SVD analysis.
+%
+%			Defaults to 5, meaning that every fifth B_0 slice in time is taken
+%			for the SVD analysis.
+%
+%		params.timeStart (INTEGER)
+%			position on the time slice (in points) where to start with the
+%			B_0 slices to take for the SVD.
+%
+%			Defaults to the trigger position on the time slice.
+%
+%			This parameter gives you the possibility to start the SVD analysis at
+%			a position in time where there is no rise in the kinetics any more.
+%
 %		params.numComponents (INTEGER)
 %			number of components to show the U and V vectors for
 %
@@ -376,6 +392,16 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
     end
 	
+
+    if ( ( ismember({'params'},who) ~= 0 ) && ( isfield(params,'timeSteps') ) )
+    
+        timesteps = params.timeSteps;
+
+    else
+    
+        timesteps = 5;
+
+    end
 	
 	% start logging
 
@@ -479,6 +505,17 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 	tp = [ readParams.points readParams.trig_pos readParams.length_ts ];
 	fq = readParams.frequency;
 
+    if ( ( ismember({'params'},who) ~= 0 ) && ( isfield(params,'timeStart') ) )
+    
+        timestart = params.timeStart;
+
+    else
+    
+        timestart = tp(2);
+
+    end
+	
+
 	% compensate for pretrigger offset
 	% but only if the input file is a (non-compensated) fsc2 file
 
@@ -514,8 +551,6 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
 	ordinal = {'first','second','third','fourth','fifth','sixth','seventh','eighth','nineth','tenth','eleventh','twelveth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth'};
 
-	timesteps = 5;
-
 	% In case the LaTeX output option is set,
 	% include a section named "Results"
     
@@ -524,23 +559,34 @@ function [ varargout ] = svd_analysis ( filename, varargin )
         LaTeXsection(LaTeXfid,'section','Results');
 
     end
+    
+    if ( timestart == tp(2) )
+    
+      startPosText = 'the trigger pulse (laser flash)';
+      
+    else
+    
+      startPosText = sprintf('t = %5.2f $\\mu$s', time(timestart+1));
+    
+    end
 	
 	if ( strcmp(outputFormat,'LaTeX') || strcmp(outputFormat,'LaTeXpart') )
 
 		fprintf(LaTeXfid, [ ...
 		  'The recorded 2D dataset of the TREPR spectrum stored in the file ' ...
-		  '\\begin{center}%s\\end{center} has been read in. Starting with the ' ...
-		  'trigger pulse (laser flash), every %s $B_0$ spectrum has been taken ' ...
+		  '\\begin{center}%s\\end{center} has been read in. Starting with %s, ' ...
+		  'every %s $B_0$ spectrum has been taken ' ...
 		  'along the time axis and from that set of spectra the SVD has been ' ...
 		  'computed.' ...
 		  ], ...
 		  strrep(filename,'_','\_'), ...
+		  startPosText, ...
 		  char(ordinal(timesteps)) ...
 		);
 
 	end
 	
-	tpos = [tp(2) : timesteps : tp(1)-timesteps];
+	tpos = [timestart : timesteps : tp(1)-timesteps];
 
 	for k = 1 : length(tpos)
 	
@@ -548,8 +594,8 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 		
 	end
 	
-	SVD_input = data;
-	tpos = 1:tp(1);
+%	SVD_input = data;
+%	tpos = 1:tp(1);
 
 	% From the MATLAB(TM) help:
 	%
