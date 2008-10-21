@@ -84,8 +84,8 @@ function [ varargout ] = trEPRtoolboxRevision
 	% If you have questions, call the trEPRinfo routine at the command prompt and
 	% contact the maintainer via the email address given there.
 	
-	trEPRtoolboxRevisionNumber = '0.1.2';
-	trEPRtoolboxRevisionDate = '2007-07-27';
+	trEPRtoolboxRevisionNumber = '0.1.3';
+	trEPRtoolboxRevisionDate = '2008-10-21';
 	
 	if (nargout == 1)
 		% in case the function is called with one output parameter
