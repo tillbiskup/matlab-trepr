@@ -483,7 +483,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 		  ] ...
 		);
         fprintf(LaTeXfid,'\n\n To perform a fully featured SVD you need to figure out a model of how the different components are related to each other (e.g. one component decays and leads to the formation of the second one, or two components are independent of each other, but with different kinetics).');
-		fprintf(LaTeXfid,'\n\nFor an overview of that method and to get an idea of how to apply it to the data under investigation, the reader is referred to a very well written introduction to SVD: Hendler and Shrager, J Biochem Biophys Meth 28(1994):1--3.');
+		fprintf(LaTeXfid,'\n\nFor an overview of that method and to get an idea of how to apply it to the data under investigation, the reader is referred to a very well written introduction to SVD: Hendler and Shrager, J Biochem Biophys Meth 28(1994):1--33.');
 		
 	end
 
