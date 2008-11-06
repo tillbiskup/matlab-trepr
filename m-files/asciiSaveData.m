@@ -243,9 +243,21 @@ function [ varargout ] = asciiSaveData ( varargin )
 		keys = fieldnames (params);
 		
 		for k = 1 : length(keys)
-		
-			fprintf(fid, '%s%s %s: %s\n', comment_char, comment_char, char(keys(k)), getfield(params,char(keys(k))));
-		
+            
+            val = getfield(params,char(keys(k)));
+            if (isnumeric(val))
+                val = num2str(val);
+    			fprintf(fid, '%s%s %s: %s\n', comment_char, comment_char, char(keys(k)), val);
+            elseif (isstruct(val))
+                kkeys = fieldnames(val);
+                for l = 1 : length(kkeys)
+                    vval = getfield(val,char(kkeys(l)));
+                    fprintf(fid, '%s%s %s.%s: %s\n', comment_char, comment_char, char(keys(k)), char(kkeys(l)), char(vval));
+                end
+            else
+    			fprintf(fid, '%s%s %s: %s\n', comment_char, comment_char, char(keys(k)), val);
+            end
+
 		end
 
 	end	
