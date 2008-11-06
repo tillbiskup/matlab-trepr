@@ -499,7 +499,9 @@ function GUI_fsc2_display
 			% assume ASCII data that are loadable via the "trEPR_read" function.
 			[ data, parameters, fileFormat ] = trEPR_read(filename);
 			
-			if strcmp(fileFormat,'fsc2 file')
+            fileFormat
+            
+			if ( strcmp(fileFormat,'fsc2 file') || strcmp(fileFormat,'trEPR ASCII 2Dspec file') )
 			
 				time_params = [ ...
 				  parameters.points ...
