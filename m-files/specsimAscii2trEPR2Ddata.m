@@ -15,9 +15,9 @@
 % CREATION DATE
 %	2007/07/06
 % VERSION
-%	$Revision: 616 $
+%	$Revision$
 % MODIFICATION DATE
-%	$Date: 2008-04-28 11:43:09 +0200 (Mo, 28 Apr 2008) $
+%	$Date$
 % KEYWORDS
 %	SPEMAN, ASCII, trEPR toolbox, 2D ASCII
 %
@@ -72,7 +72,7 @@
 
 function [ varargout ] = specsimAscii2trEPR2Ddata ( filebasename, varargin )
 
-	fprintf('\nFUNCTION CALL: $Id: specsimAscii2trEPR2Ddata.m 616 2008-04-28 09:43:09Z till $\n\n');
+	fprintf('\nFUNCTION CALL: $Id$\n\n');
 
 	% check for the right number of input and output parameters
 
