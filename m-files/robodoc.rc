@@ -44,9 +44,6 @@ options:
     --multidoc
     --cmode
     --sections
-    --headless
-    --footless
-    --nopre
     --nosource
 ignore files:
     README
