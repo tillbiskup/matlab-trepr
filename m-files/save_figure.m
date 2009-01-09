@@ -77,6 +77,10 @@
 %			PDF file with the size 8x6 inches for use with pdfLaTeX and with one
 %			figure covering the whole width of the page.
 %
+%			LaTeXfullWidthSmallHeight
+%			PDF file with the size 6.25x2.8 inches for use with pdfLaTeX and with one
+%			figure covering the whole width of the page, but with reduced height.
+%
 %			LaTeXfullPage
 %			PDF file with the size 7x9 inches for use with pdfLaTeX and with one
 %			figure that fills a complete DIN A4 page.
@@ -358,7 +362,9 @@ function save_figure ( varargin )
 
 		end					% end of "if program" clause
 	
-	elseif ( strcmp(params.outputFormat,'LaTeXhalfWidth') )
+	elseif( isfield(params,'outputFormat') )
+	
+	  if ( strcmp(params.outputFormat,'LaTeXhalfWidth') )
 
 		% save figure as PDF file
 
@@ -393,7 +399,7 @@ function save_figure ( varargin )
 
 		end					% end of "if program" clause
 		
-	elseif ( strcmp(params.outputFormat,'LaTeXhalfWidthSmallHeight') )
+	  elseif ( strcmp(params.outputFormat,'LaTeXhalfWidthSmallHeight') )
 
 		% save figure as PDF file
 
@@ -428,7 +434,7 @@ function save_figure ( varargin )
 
 		end					% end of "if program" clause
 	
-	elseif ( strcmp(params.outputFormat,'LaTeXfullWidth') )
+	  elseif ( strcmp(params.outputFormat,'LaTeXfullWidth') )
 
 		% save figure as PDF file
 
@@ -462,8 +468,43 @@ function save_figure ( varargin )
 			set(gcf,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
+	
+	  elseif ( strcmp(params.outputFormat,'LaTeXfullWidthSmallHeight') )
+
+		% save figure as PDF file
+
+		pdf_filename = sprintf ('%s.pdf',filename);
+
+		if program == 'Octave'	% if we're called by GNU Octave (as determined above)
+
+%			print ( eps_filename, '-depsc2' );
+
+		else					% otherwise we assume that we're called by MATLAB(R)
+
+			% get original values that will be changed (to reset them at the end)
+			OldPaperUnits = get(gcf,'PaperUnits');
+			OldPaperSize = get(gcf,'PaperSize');
+			OldPaperPosition = get(gcf,'PaperPosition');
+			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+
+			set(gcf,'PaperUnits','inches');
+			PaperWidth = 6.25;
+			PaperHeight = 2.8;
+			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
+			set(gcf,'PaperPosition',[0,0.05,PaperWidth, PaperHeight]);
+			set(gcf,'PaperPositionMode','manual');
+		
+			print ( '-dpdf' , pdf_filename );
+
+			% set changed values back to original values
+			set(gcf,'PaperUnits',OldPaperUnits);
+			set(gcf,'PaperSize',OldPaperSize);
+			set(gcf,'PaperPosition',OldPaperPosition);
+			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+
+		end					% end of "if program" clause
     
-    elseif ( strcmp(params.outputFormat,'LaTeXbeamerSlide') )
+      elseif ( strcmp(params.outputFormat,'LaTeXbeamerSlide') )
 
         % save figure as PDF file
 
@@ -498,7 +539,7 @@ function save_figure ( varargin )
 
         end                 % end of "if program" clause
 		
-	elseif ( strcmp(params.outputFormat,'LaTeXfullPage') )
+	  elseif ( strcmp(params.outputFormat,'LaTeXfullPage') )
 
 		% save figure as PDF file
 
@@ -532,6 +573,8 @@ function save_figure ( varargin )
 			set(gcf,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
+		
+	  end
 		
 	else
 	
@@ -594,11 +637,8 @@ function save_figure ( varargin )
 		%PaperWidth = 8;
 		%PaperHeight = 11;
 		
-		PaperWidth
-		PaperHeight
-		
 		set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-		set(gcf,'PaperPosition',[-0.5,-0.5,1.1*PaperWidth, 1.1*PaperHeight]);
+		set(gcf,'PaperPosition',[0,0,PaperWidth, PaperHeight]);
 		set(gcf,'PaperPositionMode','manual');
 		
 		print ( PrinterDriver , print_filename );
