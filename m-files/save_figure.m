@@ -533,6 +533,83 @@ function save_figure ( varargin )
 
 		end					% end of "if program" clause
 		
+	else
+	
+		if ( isfield(params,'PaperWidth') )
+		
+			PaperWidth = params.PaperWidth;
+			
+		else
+		
+			set(gcf,'PaperUnits','inches');
+			PaperWidth = 8.5;
+		
+		end
+	
+		if ( isfield(params,'PaperHeight') )
+		
+			PaperHeight = params.PaperHeight;
+			
+		else
+		
+			set(gcf,'PaperUnits','inches');
+			PaperHeight = 11;
+		
+		end
+	
+		if ( isfield(params,'PaperUnits') )
+		
+			PaperUnits = params.PaperUnits;
+			set(gcf,'PaperUnits',PaperUnits);
+			
+		else
+		
+			set(gcf,'PaperUnits','inches');
+		
+		end
+	
+		if ( isfield(params,'PrinterDriver') )
+		
+			if ( strcmpi(params.PrinterDriver,'pdf') )
+			
+				PrinterDriver = '-dpdf'
+				print_filename = sprintf ('%s.pdf',filename);
+				
+			elseif ( strcmpi(params.PrinterDriver,'ps') )
+			
+				PrinterDriver = '-depsc2'
+				print_filename = sprintf ('%s.eps',filename);
+				
+			end 
+			
+		end
+		
+		% get original values that will be changed (to reset them at the end)
+		OldPaperUnits = get(gcf,'PaperUnits');
+		OldPaperSize = get(gcf,'PaperSize');
+		OldPaperPosition = get(gcf,'PaperPosition');
+		OldPaperPositionMode = get(gcf,'PaperPositionMode');
+
+		%set(gcf,'PaperUnits','inches');
+		%PaperWidth = 8;
+		%PaperHeight = 11;
+		
+		PaperWidth
+		PaperHeight
+		
+		set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
+		set(gcf,'PaperPosition',[-0.5,-0.5,1.1*PaperWidth, 1.1*PaperHeight]);
+		set(gcf,'PaperPositionMode','manual');
+		
+		print ( PrinterDriver , print_filename );
+
+		% set changed values back to original values
+		set(gcf,'PaperUnits',OldPaperUnits);
+		set(gcf,'PaperSize',OldPaperSize);
+		set(gcf,'PaperPosition',OldPaperPosition);
+		set(gcf,'PaperPositionMode',OldPaperPositionMode);
+		
+	
 	end
 
 %******
