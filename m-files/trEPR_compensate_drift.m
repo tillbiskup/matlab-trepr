@@ -262,7 +262,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 
 	% Evaluate drift and possible fits
 
-	[drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (data,20);
+	[drift,pv0,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (data,20);
 
 
 	[ drift_rows, drift_cols ] = size ( drift );
@@ -282,44 +282,48 @@ function data = compensate_drift ( data, field_params, time_params, t )
 
 	while ( exit_condition == 0 )
 
-		method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none', 'Compensate with chosen method...');
+		method_drift_comp = menu ( 'Choose an option for drift compensation', '0th oder', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none', 'Compensate with chosen method...');
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
 
 		if ( method_drift_comp == 1 )
 
-			plot(x,drift,x,pv1);
+			plot(x,drift,x,pv0);
 
 		elseif ( method_drift_comp == 2 )
 
-			plot(x,drift,x,pv2);
+			plot(x,drift,x,pv1);
 
 		elseif ( method_drift_comp == 3 )
 
-			plot(x,drift,'-',x,pv3,'-');
+			plot(x,drift,x,pv2);
 
 		elseif ( method_drift_comp == 4 )
 
-			plot(x,drift,'-',x,pv4,'-');
+			plot(x,drift,'-',x,pv3,'-');
 
 		elseif ( method_drift_comp == 5 )
 
-			plot(x,drift,'-',x,pv5,'-');
+			plot(x,drift,'-',x,pv4,'-');
 
 		elseif ( method_drift_comp == 6 )
 
-			plot(x,drift,'-',x,pv6,'-');
+			plot(x,drift,'-',x,pv5,'-');
 
 		elseif ( method_drift_comp == 7 )
 
-			plot(x,drift,'-',x,pv7,'-');
+			plot(x,drift,'-',x,pv6,'-');
 
 		elseif ( method_drift_comp == 8 )
 
-			exit_condition = 1;
+			plot(x,drift,'-',x,pv7,'-');
 
 		elseif ( method_drift_comp == 9 )
+
+			exit_condition = 1;
+
+		elseif ( method_drift_comp == 10 )
 
 			exit_condition = 1;
 
@@ -349,10 +353,18 @@ function data = compensate_drift ( data, field_params, time_params, t )
 
 		fprintf('\n%% Linear drift compensation method chosen...\n%% ');
 
+%		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv0);
+		data = drift_compensation(data, pv0, 10);
+
+	elseif ( method_drift_comp == 2 )
+						% if the user chose quadratic fit
+
+		fprintf('\n%% Quadratic drift compensation method chosen...\n%% ');
+
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv1);
 		data = drift_compensation(data, pv1, 10);
 
-	elseif ( method_drift_comp == 2 )
+	elseif ( method_drift_comp == 3 )
 						% if the user chose quadratic fit
 
 		fprintf('\n%% Quadratic drift compensation method chosen...\n%% ');
@@ -360,7 +372,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv2);
 		data = drift_compensation(data, pv2, 10);
 
-	elseif ( method_drift_comp == 3 )
+	elseif ( method_drift_comp == 4 )
 						% if the user chose cubic fit
 
 		fprintf('\n%% Cubic drift compensation method chosen...\n%% ');
@@ -368,7 +380,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv3);
 		data = drift_compensation(data, pv3, 10);
 
-	elseif ( method_drift_comp == 4 )
+	elseif ( method_drift_comp == 5 )
 						% if the user chose 4th order fit
 
 		fprintf('\n%% 4th order drift compensation method chosen...\n%% ');
@@ -376,7 +388,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv4);
 		data = drift_compensation(data, pv4, 10);
 
-	elseif ( method_drift_comp == 5 )
+	elseif ( method_drift_comp == 6 )
 						% if the user chose 5th order fit
 
 		fprintf('\n%% 5th order drift compensation method chosen...\n%% ');
@@ -384,7 +396,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv5);
 		data = drift_compensation(data, pv5, 10);
 
-	elseif ( method_drift_comp == 6 )
+	elseif ( method_drift_comp == 7 )
 						% if the user chose 6th order fit
 
 		fprintf('\n%% 6th order drift compensation method chosen...\n%% ');
@@ -392,7 +404,7 @@ function data = compensate_drift ( data, field_params, time_params, t )
 %		data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv6);
 		data = drift_compensation(data, pv6, 10);
 
-	elseif ( method_drift_comp == 7 )
+	elseif ( method_drift_comp == 8 )
 						% if the user chose 7th order fit
 
 		fprintf('\n%% 7th order drift compensation method chosen...\n%% ');
@@ -429,7 +441,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 	% Evaluate drift and possible fits
 
-	[drift,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (data,20);
+	[drift,pv0,pv1,pv2,pv3,pv4,pv5,pv6,pv7] = drift_evaluation (data,20);
 
 	[ drift_rows, drift_cols ] = size ( drift );
 						% evaluate the size of the drift vector
@@ -449,12 +461,23 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 	while ( exit_condition == 0 )
 
-		method_drift_comp = menu ( 'Choose an option for drift compensation', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none', 'Continue with chosen method...');
+		method_drift_comp = menu ( 'Choose an option for drift compensation', '0th oder', '1st oder', '2nd order', '3rd order', '4th order', '5th order', '6th order', '7th order', 'none', 'Continue with chosen method...');
 						% make menu that lets the user choose which drift compensation
 						% method he wants to use
 
   
 		if ( method_drift_comp == 1 )
+
+%				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv0);
+    				data = drift_compensation(data, pv0, 10);
+    
+				[ spectrum, max_ind ] = B0_spectrum ( data, B0_halfwidth, t );
+				x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
+				plot(x,spectrum,x,zeros(1,length(x)));
+    
+				chosen_method = '0th order';
+
+		elseif ( method_drift_comp == 2 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv1);
     				data = drift_compensation(data, pv1, 10);
@@ -462,10 +485,10 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 				[ spectrum, max_ind ] = B0_spectrum ( data, B0_halfwidth, t );
 				x = [ min(field_boundaries) : abs(field_params(3)) : max(field_boundaries) ];
 				plot(x,spectrum,x,zeros(1,length(x)));
-    
+
 				chosen_method = '1st order';
 
-		elseif ( method_drift_comp == 2 )
+		elseif ( method_drift_comp == 3 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv2);
     				data = drift_compensation(data, pv2, 10);
@@ -476,7 +499,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '2nd order';
 
-		elseif ( method_drift_comp == 3 )
+		elseif ( method_drift_comp == 4 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv3);
     				data = drift_compensation(data, pv3, 10);
@@ -487,7 +510,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '3rd order';
 
-		elseif ( method_drift_comp == 4 )
+		elseif ( method_drift_comp == 5 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv4);
     				data = drift_compensation(data, pv4, 10);
@@ -498,7 +521,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '4th order';
 
-		elseif ( method_drift_comp == 5 )
+		elseif ( method_drift_comp == 6 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv5);
     				data = drift_compensation(data, pv5, 10);
@@ -509,7 +532,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '5th order';
 
-		elseif ( method_drift_comp == 6 )
+		elseif ( method_drift_comp == 7 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv6);
     				data = drift_compensation(data, pv6, 10);
@@ -520,7 +543,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '6th order';
 
-		elseif ( method_drift_comp == 7 )
+		elseif ( method_drift_comp == 8 )
 
 %				data = drift_compensation_along_t(data, trigger_pos, 100, 10, pv7);
     				data = drift_compensation(data, pv7, 10);
@@ -531,7 +554,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = '7th order';
 
-		elseif ( method_drift_comp == 8 )
+		elseif ( method_drift_comp == 9 )
 
 				data = data;
 
@@ -541,7 +564,7 @@ function data = compensate_drift_show_compensated ( data, field_params, time_par
 
 				chosen_method = 'none';
 
-		elseif ( method_drift_comp == 9 )
+		elseif ( method_drift_comp == 10 )
 
 			if ( exist('chosen_method') == 0 )
 						% in the case the user hits 'Continue...' before choosing an option...

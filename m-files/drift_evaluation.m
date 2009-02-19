@@ -66,7 +66,7 @@ function [ drift, varargout ] = drift_evaluation ( data, no_slices )
 			% two input parameters
 	end
 
-	if ( ( nargout ~= 2 ) && ( nargout ~= 8 ) )
+	if ( ( nargout ~= 2 ) && ( nargout ~= 9 ) )
 		% for compatibility reasons with former versions of this function it is still
 		% possible to provide eight output parameters. These return values will be
 		% assigned at the end of the function.
@@ -106,6 +106,12 @@ function [ drift, varargout ] = drift_evaluation ( data, no_slices )
 
 	x = [1:1:data_rows];		
 							% create x-axis values
+	
+	polynom_0th_order = polyfit(x,drift,0);
+							% compute 0th order polynomial fit
+
+	polyval_0th_order = polyval(polynom_0th_order,x);
+							% get values from 0th order polynomial fit
 	
 	polynom_1st_order = polyfit(x,drift,1);
 							% compute 1st order polynomial fit
@@ -161,6 +167,24 @@ function [ drift, varargout ] = drift_evaluation ( data, no_slices )
 							
 	fprintf('drift\t\t%i\n%% ', mean_drift);
 							% print first row of statistical data
+	
+	% Now some statistics for the zeroth order fit
+	
+	zeroth_order_fit = drift - polyval_0th_order;
+							% compute first order fit as difference of drift and
+							% first order polynom
+	
+	mean_0th_order_fit = mean ( zeroth_order_fit );
+							% compute (arithmetic) mean of first order fit
+									
+	var_0th_order_fit = var ( zeroth_order_fit );
+							% compute (real) variance of first order fit
+									
+	std_0th_order_fit = std ( zeroth_order_fit );
+						% compute standard deviation of first order fit	
+
+	fprintf('0th order fit\t%i\t%i\t%i\n%% ', mean_0th_order_fit, var_0th_order_fit, std_0th_order_fit);
+							% print statistical data
 	
 	% Now some statistics for the first order fit
 	
@@ -301,19 +325,20 @@ function [ drift, varargout ] = drift_evaluation ( data, no_slices )
 		% assemble all fitted data in one matrix containing each fit in one column
 		% resulting in a Nx7 matrix
 		
-		varargout{1} = [ polyval_1st_order' polyval_2nd_order' polyval_3rd_order' polyval_4th_order' polyval_5th_order' polyval_6th_order' polyval_7th_order' ];
+		varargout{1} = [ polyval_0th_order' polyval_1st_order' polyval_2nd_order' polyval_3rd_order' polyval_4th_order' polyval_5th_order' polyval_6th_order' polyval_7th_order' ];
 	
-	elseif ( nargout == 8 )
+	elseif ( nargout == 9 )
 		% For compatibility reasons: If the function is called with 8 output params
 		% just assign each polynomial fit to one output parameter.
 
-		varargout{1} = polyval_1st_order;
-		varargout{2} = polyval_2nd_order;
-		varargout{3} = polyval_3rd_order;
-		varargout{4} = polyval_4th_order;
-		varargout{5} = polyval_5th_order;
-		varargout{6} = polyval_6th_order;
-		varargout{7} = polyval_7th_order;
+		varargout{1} = polyval_0th_order;
+		varargout{2} = polyval_1st_order;
+		varargout{3} = polyval_2nd_order;
+		varargout{4} = polyval_3rd_order;
+		varargout{5} = polyval_4th_order;
+		varargout{6} = polyval_5th_order;
+		varargout{7} = polyval_6th_order;
+		varargout{8} = polyval_7th_order;
 	
 	end
 %******

@@ -267,10 +267,20 @@ function [ varargout ] = asciiSaveData ( varargin )
 	[ datarows, datacols ] = size(data);
 	
 	for i = 1 : datarows
+	
+		if (max(data(:,2)) > 1e-9)
 
-		fprintf(fid, '%+016.12f\t',data(i,1:datacols-1));
-		fprintf(fid, '%+016.12f',data(i,datacols));
-		fprintf(fid,'\n');
+			fprintf(fid, '%+016.12f\t',data(i,1:datacols-1));
+			fprintf(fid, '%+016.12f',data(i,datacols));
+			fprintf(fid,'\n');
+			
+		else
+		
+			fprintf(fid, '%e\t',data(i,1:datacols-1));
+			fprintf(fid, '%e',data(i,datacols));
+			fprintf(fid,'\n');
+		
+		end
 	
 	end
 
