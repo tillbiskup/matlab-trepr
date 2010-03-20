@@ -1,0 +1,79 @@
+
+trEPR toolbox
+---
+A MATLAB(TM) toolbox for analyzing transient EPR data
+
+GUI: v. 0.0.1
+Toolbox: v. 0.1.4
+
+(c) 2005-2010, Till Biskup
+<till@till-biskup.de>
+
+For more information
+check the corresponding web page:
+
+http://till-biskup.de/projekte/matlab/trepr/
+
+
+This toolbox and especially the GUI
+would not have been possible without many persons
+who contributed in some or the other way.
+
+
+A very special thanks for many things goes to:
+
+Stefan Weber
+&
+Erik Schleicher
+
+
+Several persons - besides the two mentioned above -
+contributed ideas, helped with tips&tricks, ...
+
+
+Ringo Wenzel
+(with his 'cw_ana' toolbox)
+
+Martin Hussels
+
+Thomas Berthold
+
+
+I apologize for the incompleteness of this list.
+If someone thinks that he or she should be added,
+please drop me a note.
+
+
+Besides that, I learned a great deal from other people
+that did and do a lot more work with MATLAB.
+
+Parts of the code are based heavily on code written by
+other people. Where this is the case, I tried to mention
+it directly in the respective files.
+
+Nevertheless, to mention the most important
+sources of inspiration:
+
+
+The Matlab(TM) documentation and examples
+(c) The MathWorks, Inc.
+
+
+Todd Pataky
+(uitable)
+
+
+The people from blinkdagger
+(http://blinkdagger.com/)
+
+
+Yair Altman from undocumentedmatlab
+(http://undocumentedmatlab.com/)
+
+
+Boris Epel and Alexey Silakov
+(KAZAN viewer)
+
+
+Stefan Stoll
+(EasySpin toolbox)
