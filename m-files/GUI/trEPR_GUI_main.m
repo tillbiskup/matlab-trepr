@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 18-Mar-2010 13:41:22
+% Last Modified by GUIDE v2.5 21-Mar-2010 10:13:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -223,15 +223,6 @@ function loadButton_Callback(hObject, eventdata, handles)
 % hObject    handle to loadButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in loadMultipleCheckbox.
-function loadMultipleCheckbox_Callback(hObject, eventdata, handles)
-% hObject    handle to loadMultipleCheckbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of loadMultipleCheckbox
 
 
 % --- Executes on button press in spectraOffsetCorrectionCheckbox.
@@ -680,14 +671,13 @@ function spectraLoadButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-multiple = get(handles.spectraLoadMultipleCheckbox,'Value');
 directory = get(handles.spectraLoadDirectoryCheckbox,'Value');
 
 if directory
     FileName = uigetdir(...
         '',...
         'Select directory to load the files from');
-elseif multiple
+else %if multiple
     [FileName,PathName,FilterIndex] = uigetfile(...
         '*.*',...
         'Select files to load',...
@@ -697,23 +687,11 @@ elseif multiple
             FileName{k} = fullfile(PathName,FileName{k});
         end
     end
-else
-    [FileName,PathName,FilterIndex] = uigetfile(...
-        '*.*',...
-        'Select file to load',...
-        'MultiSelect','off');
-    FileName = fullfile(PathName,FileName);
 end
 
-if_loadSpectra(FileName);
-
-% --- Executes on button press in spectraLoadMultipleCheckbox.
-function spectraLoadMultipleCheckbox_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraLoadMultipleCheckbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of spectraLoadMultipleCheckbox
+if ~isnumeric(FileName)            % uigetfile returns 0 if cancelled
+    if_loadSpectra(FileName);
+end
 
 
 % --- Executes on button press in spectraLoadPretriggerOffsetCorrectionCheckbox.
@@ -732,6 +710,15 @@ function spectraLoadDirectoryCheckbox_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of spectraLoadDirectoryCheckbox
+
+
+% --- Executes on button press in spectraCombineFilesCheckbox.
+function spectraCombineFilesCheckbox_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraCombineFilesCheckbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of spectraCombineFilesCheckbox
 
 
 % --- Executes on button press in spectraLoadBackgroundCorrectionCheckbox.
@@ -1472,7 +1459,7 @@ end
 % Refresh the appdata field 'control.spectra'
 %   => It's only necessary to update the field control.spectra.invisible
 invSpectra = [...
-   cell2mat(appdata.control.spectra.invisible),
+   cell2mat(appdata.control.spectra.invisible), ...
    iLoadedSpectra
    ];
 invSpectraCell = cell(1,length(invSpectra));
@@ -1759,3 +1746,5 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
+
+

@@ -25,9 +25,21 @@ function varargout = trEPRload(filename, varargin)
 
     if iscell(filename)
         for k=1:length(filename)
-            content{k} = loadFile(filename{k});
+            switch exist(filename{k})
+                case 0
+                    % If name does not exist.
+                    fprintf('%s does not exist...\n',filename{k});
+                case 2
+                    % If name is an M-file on your MATLAB search path. It also
+                    % returns 2 when name is the full pathname to a file or the
+                    % name of an ordinary file on your MATLAB search path.
+                    content{k} = loadFile(filename{k});
+                otherwise
+                    % If none of the above possibilities match
+                    fprintf('%s could not be loaded...\n',filename{k});
+            end
         end
-        if ~nargout
+        if ~nargout && exist('content','var')
             % of no output argument is given, assign content to a
             % variable in the workspace with the same name as the
             % file
@@ -37,14 +49,16 @@ function varargout = trEPRload(filename, varargin)
                 name = cleanFileName([name ext]);
                 assignin('base',name,content{k});
             end
-        else
+        elseif exist('content','var')
             varargout{1} = content;
+        else
+            varargout{1} = 0;
         end
     else    
     switch exist(filename)
         case 0
             % If name does not exist.
-            fprintf('Nothing found to load...\n');
+            fprintf('%s does not exist...\n',filename);
         case 2
             % If name is an M-file on your MATLAB search path. It also
             % returns 2 when name is the full pathname to a file or the
@@ -85,8 +99,12 @@ function varargout = trEPRload(filename, varargin)
             end
         otherwise
             % If none of the above possibilities match
-            fprintf('Nothing found to load...\n');
+            fprintf('%s could not be loaded...\n',filename);
     end
+    end
+    
+    if ~exist('content','var') && nargout
+        varargout{1} = 0;
     end
     
 end
