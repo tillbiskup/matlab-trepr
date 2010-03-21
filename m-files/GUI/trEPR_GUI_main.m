@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 21-Mar-2010 10:13:29
+% Last Modified by GUIDE v2.5 21-Mar-2010 17:53:22
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -65,10 +65,9 @@ handles = setfield(handles,mfilename,hObject);
 % Update handles structure
 guidata(hObject, handles);
 
-xLabelString = sprintf('{\\it time} / \\mus');
-yLabelString = sprintf('{\\it magnetic field} / mT');
-xlabel(handles.axes1,xLabelString);
-ylabel(handles.axes1,yLabelString);
+% Some initialization of the axes
+set(handles.axes1,'XTick',[]);
+set(handles.axes1,'YTick',[]);
 
 % UIWAIT makes trEPR_GUI_main wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -83,6 +82,13 @@ control = struct(...
     'visible',cell(1),...
     'invisible',cell(1),...
     'modified',cell(1)...
+    ),...
+    'measure', struct(...
+    'point',1,...
+    'x1val',1,...
+    'y1val',1,...
+    'x1ind',1,...
+    'y1ind',1 ...
     ));
 
 displayTypes = get(handles.displayTypePopupmenu,'String');
@@ -160,9 +166,29 @@ function spectraVisibleListbox_Callback(hObject, eventdata, handles)
 appdata = getappdata(handles.figure1);
 
 % Set currently active spectrum
-appdata.control.spectra.active = appdata.control.spectra.visible{...
-    get(handles.spectraVisibleListbox,'Value')...
-    };
+if ~isempty(appdata.control.spectra.visible)
+    appdata.control.spectra.active = appdata.control.spectra.visible{...
+        get(handles.spectraVisibleListbox,'Value')...
+        };
+    % Set slider values for the active spectrum
+    % Get current display type
+    currentDisplayType = appdata.control.axis.displayType;
+    
+    switch currentDisplayType
+        case 'B0 spectra'
+            set(handles.spectraScrollSlider,'Value',...
+                appdata.data{...
+                get(handles.spectraVisibleListbox,'Value')...
+                }.t ...
+                );
+        case 'transients'
+            set(handles.spectraScrollSlider,'Value',...
+                appdata.data{...
+                get(handles.spectraVisibleListbox,'Value')...
+                }.b0 ...
+                );
+    end
+end
 
 % Refresh appdata of the current GUI
 appdataFieldnames = fieldnames(appdata);
@@ -274,18 +300,15 @@ function pushbutton8_Callback(hObject, eventdata, handles)
 
 
 % --- Executes on slider movement.
-function spectraToggleSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraToggleSlider (see GCBO)
+function spectraScrollSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraScrollSlider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
+if_axis_Refresh;
 
 % --- Executes during object creation, after setting all properties.
-function spectraToggleSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to spectraToggleSlider (see GCBO)
+function spectraScrollSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to spectraScrollSlider (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -297,12 +320,7 @@ end
 
 % --- Executes on slider movement.
 function scaleXSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to scaleXSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -319,12 +337,7 @@ end
 
 % --- Executes on slider movement.
 function scaleYSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to scaleYSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -341,12 +354,7 @@ end
 
 % --- Executes on slider movement.
 function displaceYSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to displaceYSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -363,39 +371,12 @@ end
 
 % --- Executes on slider movement.
 function displaceXSlider_Callback(hObject, eventdata, handles)
-% hObject    handle to displaceXSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
 function displaceXSlider_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to displaceXSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
-end
-
-
-% --- Executes on slider movement.
-function slider6_Callback(hObject, eventdata, handles)
-% hObject    handle to slider6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'Value') returns position of slider
-%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
-
-
-% --- Executes during object creation, after setting all properties.
-function slider6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to slider6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -459,29 +440,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-% Hints: contents = get(hObject,'String') returns displayTypePopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from displayTypePopupmenu
-contents = get(hObject,'String');
-switch char(contents{get(hObject,'Value')})
-    case '2D plot'
-        xLabelString = sprintf('{\\it time} / s');
-        yLabelString = sprintf('{\\it magnetic field} / mT');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-        set(handles.axes1,'XLim',[-1.96e-6 18e-6],'YLim',[340 350]);
-    case 'B0 spectra'
-        xLabelString = sprintf('{\\it magnetic field} / mT');
-        yLabelString = sprintf('{\\it intensity} / a.u.');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-        set(handles.axes1,'XLim',[340 350],'YLim',[-1 1]);
-    case 'transients'
-        xLabelString = sprintf('{\\it time} / s');
-        yLabelString = sprintf('{\\it intensity} / a.u.');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-        set(handles.axes1,'XLim',[-1.96e-6 18e-6],'YLim',[-1e-6 1e-6]);
-end
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -552,12 +511,20 @@ function menuFileSaveAs_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 function dxEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to dxEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of dxEdit as text
-%        str2double(get(hObject,'String')) returns contents of dxEdit as a double
+value = str2double(get(hObject,'String'));
+min = get(handles.displaceXSlider,'Min');
+max = get(handles.displaceXSlider,'Max');
+
+if value>=min && value<=max
+    set(handles.displaceXSlider,'Value',value);
+elseif value<min
+    set(handles.displaceXSlider,'Value',min);
+else
+    set(handles.displaceXSlider,'Value',max);
+end    
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -575,12 +542,20 @@ end
 
 
 function dyEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to dyEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of dyEdit as text
-%        str2double(get(hObject,'String')) returns contents of dyEdit as a double
+value = str2double(get(hObject,'String'));
+min = get(handles.displaceYSlider,'Min');
+max = get(handles.displaceYSlider,'Max');
+
+if value>=min && value<=max
+    set(handles.displaceYSlider,'Value',value);
+elseif value<min
+    set(handles.displaceYSlider,'Value',min);
+else
+    set(handles.displaceYSlider,'Value',max);
+end    
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -598,12 +573,25 @@ end
 
 
 function sxEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to sxEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of sxEdit as text
-%        str2double(get(hObject,'String')) returns contents of sxEdit as a double
+value = str2double(get(hObject,'String'));
+if value < 1
+    sliderValue = -(1/value)+1
+else
+    sliderValue = value-1;
+end
+min = 1/abs(get(handles.scaleXSlider,'Min')-1);
+max = get(handles.scaleXSlider,'Max')+1;
+
+if value>=min && value<=max
+    set(handles.scaleXSlider,'Value',sliderValue);
+elseif value<min
+    set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Min'));
+else
+    set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Max'));
+end
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -621,12 +609,25 @@ end
 
 
 function syEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to syEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of syEdit as text
-%        str2double(get(hObject,'String')) returns contents of syEdit as a double
+value = str2double(get(hObject,'String'));
+if value < 1
+    sliderValue = -(1/value)+1
+else
+    sliderValue = value-1;
+end
+min = 1/abs(get(handles.scaleYSlider,'Min')-1);
+max = get(handles.scaleYSlider,'Max')+1;
+
+if value>=min && value<=max
+    set(handles.scaleYSlider,'Value',sliderValue);
+elseif value<min
+    set(handles.scaleYSlider,'Value',get(handles.scaleYSlider,'Min'));
+else
+    set(handles.scaleYSlider,'Value',get(handles.scaleYSlider,'Max'));
+end    
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -778,12 +779,20 @@ end
 
 
 function timeEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to timeEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of timeEdit as text
-%        str2double(get(hObject,'String')) returns contents of timeEdit as a double
+value = str2double(get(hObject,'String'));
+min = get(handles.spectraScrollSlider,'Min');
+max = get(handles.spectraScrollSlider,'Max');
+
+if value>=min && value<=max
+    set(handles.spectraScrollSlider,'Value',value);
+elseif value<min
+    set(handles.spectraScrollSlider,'Value',min);
+else
+    set(handles.spectraScrollSlider,'Value',max);
+end    
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -801,12 +810,20 @@ end
 
 
 function b0Edit_Callback(hObject, eventdata, handles)
-% hObject    handle to b0Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of b0Edit as text
-%        str2double(get(hObject,'String')) returns contents of b0Edit as a double
+value = str2double(get(hObject,'String'));
+min = get(handles.spectraScrollSlider,'Min');
+max = get(handles.spectraScrollSlider,'Max');
+
+if value>=min && value<=max
+    set(handles.spectraScrollSlider,'Value',value);
+elseif value<min
+    set(handles.spectraScrollSlider,'Value',min);
+else
+    set(handles.spectraScrollSlider,'Value',max);
+end    
+
+if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -904,18 +921,18 @@ function pushbutton16_Callback(hObject, eventdata, handles)
 
 
 
-function measureFirstXedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureFirstXedit (see GCBO)
+function measureX1edit_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX1edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureFirstXedit as text
-%        str2double(get(hObject,'String')) returns contents of measureFirstXedit as a double
+% Hints: get(hObject,'String') returns contents of measureX1edit as text
+%        str2double(get(hObject,'String')) returns contents of measureX1edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureFirstXedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureFirstXedit (see GCBO)
+function measureX1edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX1edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -950,18 +967,18 @@ end
 
 
 
-function measureSecondXedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureSecondXedit (see GCBO)
+function measureX2edit_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX2edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureSecondXedit as text
-%        str2double(get(hObject,'String')) returns contents of measureSecondXedit as a double
+% Hints: get(hObject,'String') returns contents of measureX2edit as text
+%        str2double(get(hObject,'String')) returns contents of measureX2edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureSecondXedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureSecondXedit (see GCBO)
+function measureX2edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX2edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -973,18 +990,18 @@ end
 
 
 
-function measureSecondYedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureSecondYedit (see GCBO)
+function measureY2edit_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY2edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureSecondYedit as text
-%        str2double(get(hObject,'String')) returns contents of measureSecondYedit as a double
+% Hints: get(hObject,'String') returns contents of measureY2edit as text
+%        str2double(get(hObject,'String')) returns contents of measureY2edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureSecondYedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureSecondYedit (see GCBO)
+function measureY2edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY2edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1042,18 +1059,18 @@ end
 
 
 
-function measureFirstYedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureFirstYedit (see GCBO)
+function measureY1edit_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY1edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureFirstYedit as text
-%        str2double(get(hObject,'String')) returns contents of measureFirstYedit as a double
+% Hints: get(hObject,'String') returns contents of measureY1edit as text
+%        str2double(get(hObject,'String')) returns contents of measureY1edit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureFirstYedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureFirstYedit (see GCBO)
+function measureY1edit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY1edit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1070,12 +1087,60 @@ function measurePickButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+appdata.control.measure.point = 1;
+set(handles.figure1,'WindowButtonMotionFcn',@if_trackPointer);
+set(handles.figure1,'WindowButtonDownFcn',@if_switchMeasurementPoint);
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 % --- Executes on button press in measureClearButton.
 function measureClearButton_Callback(hObject, eventdata, handles)
 % hObject    handle to measureClearButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+set(handles.figure1,'WindowButtonMotionFcn','');
+set(handles.figure1,'WindowButtonDownFcn','');
+
+set(handles.measureX1edit,'String','1/1');
+set(handles.measureY1edit,'String','1/1');
+set(handles.measureX2edit,'String','1/1');
+set(handles.measureY2edit,'String','1/1');
+set(handles.measureDeltaXedit,'String','0/0');
+set(handles.measureDeltaYedit,'String','0/0');
+
+appdata.control.measure.x1val = 1;
+appdata.control.measure.x1ind = 1;
+appdata.control.measure.y1val = 1;
+appdata.control.measure.y1ind = 1;
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 
 % --- Executes on button press in spectraAccumulateButton.
@@ -1437,10 +1502,22 @@ if isempty(appdata.data{1})    % No data loaded to the GUI yet
     if iscell(spectra)         % Multiple spectra loaded
         for k=1:length(spectra)
             appdata.data{k} = spectra{k};
+            appdata.data{k}.Dx = 0;
+            appdata.data{k}.Dy = 0;
+            appdata.data{k}.Sx = 1;
+            appdata.data{k}.Sy = 1;
+            appdata.data{k}.t = 1;
+            appdata.data{k}.b0 = 1;
         end
         iLoadedSpectra = [ 1:1:length(spectra) ];
     else                       % Single spectrum loaded
         appdata.data{1} = spectra;
+        appdata.data{1}.Dx = 0;
+        appdata.data{1}.Dy = 0;
+        appdata.data{1}.Sx = 1;
+        appdata.data{1}.Sy = 1;
+        appdata.data{1}.t = 1;
+        appdata.data{1}.b0 = 1;
         iLoadedSpectra = [ 1 ];
     end
 else                           % GUI contains already data
@@ -1448,10 +1525,22 @@ else                           % GUI contains already data
     if iscell(spectra)         % Multiple spectra loaded
         for k=nSpectra+1:nSpectra+length(spectra)
             appdata.data{k} = spectra{k-nSpectra};
+            appdata.data{k}.Dx = 0;
+            appdata.data{k}.Dy = 0;
+            appdata.data{k}.Sx = 1;
+            appdata.data{k}.Sy = 1;
+            appdata.data{k}.t = 1;
+            appdata.data{k}.b0 = 1;
         end
         iLoadedSpectra = [nSpectra+1:1:nSpectra+length(spectra)];
     else                       % Single spectrum loaded
         appdata.data{nSpectra+1} = spectra;
+        appdata.data{nSpectra+1}.Dx = 0;
+        appdata.data{nSpectra+1}.Dy = 0;
+        appdata.data{nSpectra+1}.Sx = 1;
+        appdata.data{nSpectra+1}.Sy = 1;
+        appdata.data{nSpectra+1}.t = 1;
+        appdata.data{nSpectra+1}.b0 = 1;
         iLoadedSpectra = [ nSpectra+1 ];
     end
 end
@@ -1495,7 +1584,11 @@ appdata = getappdata(handles.figure1);
 invSpectraNames = cell(1);
 if isempty(appdata.control.spectra.invisible{1})
     invSpectraNames = cell(1);
+    set(handles.spectraShowButton,'Enable','Off');
+    set(handles.spectraInvisibleListbox,'Enable','Inactive');
 else
+    set(handles.spectraShowButton,'Enable','On');
+    set(handles.spectraInvisibleListbox,'Enable','On');
     for k=1:length(appdata.control.spectra.invisible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
@@ -1539,7 +1632,14 @@ visSpectraNames = cell(1);
 if isempty(appdata.control.spectra.visible{1})
     visSpectraNames = cell(1);
     appdata.control.spectra.active = 0;
+    set(handles.spectraHideButton,'Enable','Off');
+    set(handles.displayTypePopupmenu,'Enable','Inactive');
+    set(handles.spectraVisibleListbox,'Enable','Inactive');
+    cla(handles.axes1,'reset');
 else
+    set(handles.spectraHideButton,'Enable','On');
+    set(handles.displayTypePopupmenu,'Enable','On');
+    set(handles.spectraVisibleListbox,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
@@ -1694,7 +1794,7 @@ if_spectraVisibleListbox_Refresh;
 if_axis_Refresh;
 
 
-% --- Refresh visible spectra listbox
+% --- Refresh plot window (axis)
 function if_axis_Refresh
 
 % Get handles and appdata of the current GUI
@@ -1704,36 +1804,120 @@ appdata = getappdata(handles.figure1);
 % Get current display type
 currentDisplayType = appdata.control.axis.displayType;
 
+if isempty(appdata.control.spectra.visible{1})
+    cla(handles.axes1,'reset');
+    return
+end
+
 % Get visible spectra
 
 % Plot visible spectra
+data = appdata.data{appdata.control.spectra.active}.data;
+[ yDim, xDim ] = size(data);
+
+set(handles.displaceYSlider,'Min',min(min(data)));
+set(handles.displaceYSlider,'Max',max(max(data)));
+appdata.data{appdata.control.spectra.active}.Dx = ...
+    get(handles.displaceXSlider,'Value');
+appdata.data{appdata.control.spectra.active}.Dy = ...
+	get(handles.displaceYSlider,'Value');
+
+appdata.data{appdata.control.spectra.active}.Sx = ...
+	get(handles.scaleXSlider,'Value');
+appdata.data{appdata.control.spectra.active}.Sy = ...
+	get(handles.scaleYSlider,'Value');
+set(handles.dxEdit,'String',...
+	num2str(get(handles.displaceXSlider,'Value'))...
+    );
+set(handles.dyEdit,'String',...
+	num2str(get(handles.displaceYSlider,'Value'))...
+    );
+
+Dx = appdata.data{appdata.control.spectra.active}.Dx;
+Dy = appdata.data{appdata.control.spectra.active}.Dy;
+Sx = appdata.data{appdata.control.spectra.active}.Sx;
+if get(handles.scaleYSlider,'Value') > 0
+    Sy = get(handles.scaleYSlider,'Value')+1;
+else
+    Sy = 1/abs(get(handles.scaleYSlider,'Value')-1);
+end
+set(handles.syEdit,'String',num2str(Sy));
+if get(handles.scaleXSlider,'Value') > 0
+    Sx = get(handles.scaleXSlider,'Value')+1;
+else
+    Sx = 1/abs(get(handles.scaleXSlider,'Value')-1);
+end
+set(handles.sxEdit,'String',num2str(Sx));
+
 switch currentDisplayType
     case '2D plot'
         % Get currently active spectrum
         
         % Plot with imagesc (in this case, 2D plot, only active one...)
-        imagesc(...
-            appdata.data{...
-            appdata.control.spectra.active...
-            }.data...
+        set(handles.axes1,'XTick',[],'YTick',[]);     % default if no plot
+        set(handles.spectraScrollSlider,'Enable','Off');
+        set(handles.scaleYSlider,'Enable','Off');
+        set(handles.displaceYSlider,'Enable','Off');
+        set(handles.scaleXSlider,'Enable','Off');
+        set(handles.displaceXSlider,'Enable','Off');
+
+        imagesc(data);
+        set(handles.axes1,'YDir','normal');
+
+        xlabel(handles.axes1,sprintf('{\\it time} / s'));
+        ylabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
+    case 'B0 spectra'        
+        set(handles.spectraScrollSlider,'Enable','On');
+        set(handles.spectraScrollSlider,'Min',1);
+        set(handles.spectraScrollSlider,'Max',xDim);
+        set(handles.spectraScrollSlider,'SliderStep',[1/xDim, 10/xDim]);
+        set(handles.scaleYSlider,'Enable','On');
+        set(handles.displaceYSlider,'Enable','On');
+        set(handles.scaleXSlider,'Enable','On');
+        set(handles.displaceXSlider,'Enable','On');
+
+        set(handles.timeEdit,'String',...
+            num2str(floor(get(handles.spectraScrollSlider,'Value')))...
             );
-        xLabelString = sprintf('{\\it time} / s');
-        yLabelString = sprintf('{\\it magnetic field} / mT');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-%        set(handles.axes1,'XLim',[-1.96e-6 18e-6],'YLim',[340 350]);
-    case 'B0 spectra'
-        xLabelString = sprintf('{\\it magnetic field} / mT');
-        yLabelString = sprintf('{\\it intensity} / a.u.');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-%        set(handles.axes1,'XLim',[340 350],'YLim',[-1 1]);
+        appdata.data{appdata.control.spectra.active}.t = ...
+            floor(get(handles.spectraScrollSlider,'Value'));
+        
+        plot(...
+            data(...
+            :,floor(get(handles.spectraScrollSlider,'Value'))...
+            )*Sy+Dy...
+            );
+        set(handles.axes1,'YLim',[min(min(data))*1.05 max(max(data))*1.05]);
+
+        xlabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
+        ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
     case 'transients'
-        xLabelString = sprintf('{\\it time} / s');
-        yLabelString = sprintf('{\\it intensity} / a.u.');
-        xlabel(handles.axes1,xLabelString);
-        ylabel(handles.axes1,yLabelString);
-%        set(handles.axes1,'XLim',[-1.96e-6 18e-6],'YLim',[-1e-6 1e-6]);
+        set(handles.axes1,'XTick',[],'YTick',[]);     % default if no plot
+        set(handles.spectraScrollSlider,'Enable','On');
+        set(handles.spectraScrollSlider,'Min',1);
+        set(handles.spectraScrollSlider,'Max',yDim);
+        set(handles.spectraScrollSlider,'SliderStep',[1/yDim, 10/yDim]);
+
+        set(handles.scaleYSlider,'Enable','On');
+        set(handles.displaceYSlider,'Enable','On');
+        set(handles.scaleXSlider,'Enable','On');
+        set(handles.displaceXSlider,'Enable','On');
+
+        plot(...
+            data(...
+            floor(get(handles.spectraScrollSlider,'Value')),:...
+            )*Sy+Dy...
+            );
+        set(handles.axes1,'YLim',[min(min(data))*1.05 max(max(data))*1.05]);
+
+        set(handles.b0Edit,'String',...
+            num2str(floor(get(handles.spectraScrollSlider,'Value')))...
+            );
+        appdata.data{appdata.control.spectra.active}.b0 = ...
+            floor(get(handles.spectraScrollSlider,'Value'));
+
+        xlabel(handles.axes1,sprintf('{\\it time} / s'));
+        ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
 end
 
 % Refresh handles and appdata of the current GUI
@@ -1748,3 +1932,127 @@ for k=1:length(appdataFieldnames)
 end
 
 
+% --- Get pointer position in current axis
+function if_switchMeasurementPoint(hObject,event)
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+% Get current point to measure (1 or 2)
+currentPoint = appdata.control.measure.point;
+
+% Get x and y values
+x = str2num(strrep(get(handles.measureX1edit,'String'),'/',' '));
+y = str2num(strrep(get(handles.measureY1edit,'String'),'/',' '));
+
+switch currentPoint
+    case 1
+        appdata.control.measure.point = 2;
+%        appdata.control.measure.x1val = x(1);
+%        appdata.control.measure.y1val = y(1);
+        appdata.control.measure.x1ind = x(1);
+        appdata.control.measure.y1ind = y(1);
+    case 2
+        appdata.control.measure.point = 1;
+        set(handles.figure1,'WindowButtonMotionFcn','');
+        set(handles.figure1,'WindowButtonDownFcn','');
+        set(handles.figure1,'Pointer','arrow');
+        refresh;
+end
+
+% Refresh appdata of the current GUI
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+
+% --- Get pointer position in current axis
+function if_trackPointer(hObject,event)
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+% Get current display type
+currentDisplayType = appdata.control.axis.displayType;
+
+% Get current point to measure (1 or 2)
+currentPoint = appdata.control.measure.point;
+
+% Get values of first point if any
+if currentPoint == 2
+    x1val = appdata.control.measure.x1val;
+    y1val = appdata.control.measure.y1val;
+    x1ind = appdata.control.measure.x1ind;
+    y1ind = appdata.control.measure.y1ind;
+end
+
+cp = get(hObject,'CurrentPoint');
+axisPosition = get(handles.axes1,'Position');
+ac = [...
+    axisPosition(1)...
+    axisPosition(2)...
+    axisPosition(1)+axisPosition(3)...
+    axisPosition(2)+axisPosition(4)];
+
+if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
+    set(hObject,'Pointer','fullcrosshair');
+    if ~isempty(get(handles.axes1,'Children'))
+        % if there are some data displayed
+
+        % Get X and Y data vector
+        % TODO: Get this from the appdata, not from the axes handle due to
+        %       problems once having more then one plot there!
+        xdata = get(get(handles.axes1,'Children'),'XData');
+        ydata = get(get(handles.axes1,'Children'),'YData');
+        
+        switch currentDisplayType
+            case '2D plot'
+                indx=interp1(...
+                    linspace(1,axisPosition(3),xdata(2)),...
+                    xdata(1):xdata(2),...
+                    cp(1)-ac(1),'nearest');
+                indy=interp1(...
+                    linspace(1,axisPosition(4),ydata(2)),...
+                    ydata(1):ydata(2),...
+                    cp(2)-ac(2),'nearest');
+                %get values for current indices
+%                xvalues=xdata(indx);
+%                yvalues=ydata(indy);
+                % Set display of value
+                switch currentPoint
+                    case 1
+                        set(handles.measureX1edit,'String',...
+                            sprintf('/%s',num2str(indx)));
+                        set(handles.measureY1edit,'String',...
+                            sprintf('/%s',num2str(indy)));
+                    case 2
+                        set(handles.measureX2edit,'String',...
+                            sprintf('/%s',num2str(indx)));
+                        set(handles.measureY2edit,'String',...
+                            sprintf('/%s',num2str(indy)));
+                        set(handles.measureDeltaXedit,'String',...
+                            sprintf('/%s',num2str(indx-x1ind)));
+                        set(handles.measureDeltaYedit,'String',...
+                            sprintf('/%s',num2str(indy-y1ind)));
+                end
+            case 'B0 spectra'
+                %get indices of nearest values
+                indx=interp1(xdata,1:length(xdata),cp(1),'nearest');
+                indy=interp1(ydata,1:length(ydata),cp(2),'nearest');
+                %get values for current indices
+                %-%xvalues=xdata(indx);
+                %-%yvalues=ydata(indy);
+            case 'transients'
+                
+        end
+    end
+else
+    set(hObject,'Pointer','arrow');
+end
