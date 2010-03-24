@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 21-Mar-2010 17:53:22
+% Last Modified by GUIDE v2.5 22-Mar-2010 17:48:39
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -429,6 +429,17 @@ appdata = getappdata(handles.figure1);
 
 contents = get(hObject,'String');
 appdata.control.axis.displayType = char(contents{get(hObject,'Value')});
+
+switch appdata.control.axis.displayType
+    case 'B0 spectra'
+        set(handles.spectraScrollSlider,'Value',...
+            appdata.data{...
+            appdata.control.spectra.active}.t);
+    case 'transients'
+        set(handles.spectraScrollSlider,'Value',...
+            appdata.data{...
+            appdata.control.spectra.active}.b0);
+end
 
 % Refresh appdata of the current GUI
 appdataFieldnames = fieldnames(appdata);
@@ -1160,9 +1171,9 @@ trEPR_GUI_export(...
     'callerFunction',mfilename,...
     'callerHandle',hObject);
 
-% --- Executes on button press in pushbutton22.
-function pushbutton22_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton22 (see GCBO)
+% --- Executes on button press in axisResetButton.
+function axisResetButton_Callback(hObject, eventdata, handles)
+% hObject    handle to axisResetButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1228,27 +1239,6 @@ else
     trEPR_GUI_BC(...
         'callerFunction',mfilename,...
         'callerHandle',hObject);
-end
-
-function edit18_Callback(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit18 as text
-%        str2double(get(hObject,'String')) returns contents of edit18 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit18_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
 end
 
 
@@ -1817,6 +1807,11 @@ data = appdata.data{appdata.control.spectra.active}.data;
 
 set(handles.displaceYSlider,'Min',min(min(data)));
 set(handles.displaceYSlider,'Max',max(max(data)));
+if get(handles.displaceYSlider,'Value') < min(min(data))
+    set(handles.displaceYSlider,'Value',min(min(data)));
+elseif get(handles.displaceYSlider,'Value') > max(max(data))
+    set(handles.displaceYSlider,'Value',max(max(data)));
+end
 appdata.data{appdata.control.spectra.active}.Dx = ...
     get(handles.displaceXSlider,'Value');
 appdata.data{appdata.control.spectra.active}.Dy = ...
