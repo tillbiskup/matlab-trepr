@@ -146,7 +146,7 @@ function content = loadFile(filename)
     if isBinary
        fprintf('%s is a binary file!',filename); 
     else
-        % else try to handle it with importdata
+        % else try to find a matching function from the ini file
         for k = 1 : length(asciiFileFormats)
             if findstr(asciiFileFormats{k},firstLine)
                 functionHandle = str2func(getfield(...
