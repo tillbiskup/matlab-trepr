@@ -698,6 +698,8 @@ else %if multiple
         for k=1:length(FileName)
             FileName{k} = fullfile(PathName,FileName{k});
         end
+    else
+        FileName = fullfile(PathName,FileName);
     end
 end
 
@@ -1626,10 +1628,22 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.displayTypePopupmenu,'Enable','Inactive');
     set(handles.spectraVisibleListbox,'Enable','Inactive');
     cla(handles.axes1,'reset');
+    set(handles.dxEdit,'Enable','Inactive');
+    set(handles.dyEdit,'Enable','Inactive');
+    set(handles.sxEdit,'Enable','Inactive');
+    set(handles.syEdit,'Enable','Inactive');
+    set(handles.timeEdit,'Enable','Inactive');
+    set(handles.b0Edit,'Enable','Inactive');
 else
     set(handles.spectraHideButton,'Enable','On');
     set(handles.displayTypePopupmenu,'Enable','On');
     set(handles.spectraVisibleListbox,'Enable','On');
+    set(handles.dxEdit,'Enable','On');
+    set(handles.dyEdit,'Enable','On');
+    set(handles.sxEdit,'Enable','On');
+    set(handles.syEdit,'Enable','On');
+    set(handles.timeEdit,'Enable','On');
+    set(handles.b0Edit,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
@@ -1804,6 +1818,12 @@ end
 % Plot visible spectra
 data = appdata.data{appdata.control.spectra.active}.data;
 [ yDim, xDim ] = size(data);
+xaxis = appdata.data{appdata.control.spectra.active}.axes.xaxis.values;
+yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
+% Convert G -> mT
+if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
+    yaxis = yaxis / 10;
+end
 
 set(handles.displaceYSlider,'Min',min(min(data)));
 set(handles.displaceYSlider,'Max',max(max(data)));
@@ -1856,7 +1876,7 @@ switch currentDisplayType
         set(handles.scaleXSlider,'Enable','Off');
         set(handles.displaceXSlider,'Enable','Off');
 
-        imagesc(data);
+        imagesc(xaxis,yaxis,data);
         set(handles.axes1,'YDir','normal');
 
         xlabel(handles.axes1,sprintf('{\\it time} / s'));
@@ -1878,6 +1898,7 @@ switch currentDisplayType
             floor(get(handles.spectraScrollSlider,'Value'));
         
         plot(...
+            yaxis,...
             data(...
             :,floor(get(handles.spectraScrollSlider,'Value'))...
             )*Sy+Dy...
@@ -1899,6 +1920,7 @@ switch currentDisplayType
         set(handles.displaceXSlider,'Enable','On');
 
         plot(...
+            xaxis,...
             data(...
             floor(get(handles.spectraScrollSlider,'Value')),:...
             )*Sy+Dy...

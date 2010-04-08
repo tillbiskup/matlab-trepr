@@ -126,19 +126,29 @@ function content = loadFile(filename)
     % Initialize switch resembling binary or ascii data
     isBinary = logical(false);
     
-    % read first characters of the file and try to determine whether it is
+    % Read first characters of the file and try to determine whether it is
     % binary
     firstChars = fread(fid,5);
     for k=1:length(firstChars)
-        if firstChars(k) < 32 
+        if firstChars(k) < 32 && firstChars(k) ~= 10 && firstChars(k) ~= 13
             isBinary = logical(true);
         end
     end
     
-    % reset file pointer, then read first line and try to determine from
+    % Reset file pointer, then read first line and try to determine from
     % that the filetype
+    % PROBLEM: fsc2 files tend to have a single empty comment line as the
+    % first line. Therefore, check whether the first line is too short for
+    % an identifier string, and in this case, read a second line.
     fseek(fid,0,'bof');
     firstLine = fgetl(fid);
+    
+    if isempty(regexp(firstLine,'[a-zA-Z]'))
+        % If first line does not contain any characters necessary for an
+        % identifier string (problem with fsc2 files, see comment above),
+        % read another line. 
+        firstLine = fgetl(fid);
+    end
     
     % close file
     fclose(fid);

@@ -30,7 +30,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
                 name = cleanFileName([name ext]);
                 assignin('base',name,content);
             else
-                varargout = content;
+                varargout{1} = content;
             end
         case 7
             % If name is a directory.
@@ -41,7 +41,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
     end
 
     if ~exist('content','var') && nargout
-        varargout = [];
+        varargout{1} = [];
     end
 
 end
@@ -282,7 +282,10 @@ end
 % --- Cleaning up filename so that it can be used as variable name in the
 % MATLAB workspace 
 function cleanName = cleanFileName(filename)
-    cleanName = regexprep(filename,{'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''});
+    cleanName = regexprep(...
+        filename,...
+        {'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''}...
+        );
 end
 
 
