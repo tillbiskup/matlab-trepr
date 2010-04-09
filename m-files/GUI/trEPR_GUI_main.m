@@ -244,12 +244,6 @@ function spectraHideButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 if_spectraHide;
 
-% --- Executes on button press in loadButton.
-function loadButton_Callback(hObject, eventdata, handles)
-% hObject    handle to loadButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 
 % --- Executes on button press in spectraOffsetCorrectionCheckbox.
 function spectraOffsetCorrectionCheckbox_Callback(hObject, eventdata, handles)
@@ -683,9 +677,11 @@ function spectraLoadButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-directory = get(handles.spectraLoadDirectoryCheckbox,'Value');
+if if_checkCompensationMethods
+    return;
+end
 
-if directory
+if get(handles.spectraLoadDirectoryCheckbox,'Value');
     FileName = uigetdir(...
         '',...
         'Select directory to load the files from');
@@ -698,7 +694,7 @@ else %if multiple
         for k=1:length(FileName)
             FileName{k} = fullfile(PathName,FileName{k});
         end
-    else
+    elseif ~isnumeric(FileName)
         FileName = fullfile(PathName,FileName);
     end
 end
@@ -1491,6 +1487,33 @@ appdata = getappdata(handles.figure1);
 % Load spectra using the wrapper function trEPRload
 spectra = trEPRload(filename);
 
+% Compensate as set
+if get(handles.spectraLoadPretriggerOffsetCorrectionCheckbox,'Value')
+    if iscell(spectra)         % Multiple spectra loaded
+        for k=1:length(spectra)
+            spectra{k}.data = trEPRPOC(...
+                spectra{k}.data,...
+                spectra{k}.parameters.transient.triggerPosition...
+                );
+        end
+    else                       % Single spectrum loaded
+        spectra.data = trEPRPOC(...
+            spectra.data,...
+            spectra.parameters.transient.triggerPosition...
+            );
+    end
+end
+
+if get(handles.spectraLoadBackgroundCorrectionCheckbox,'Value')
+    if iscell(spectra)         % Multiple spectra loaded
+        for k=1:length(spectra)
+            spectra{k}.data = trEPRBGC(spectra{k}.data);
+        end
+    else                       % Single spectrum loaded
+        spectra.data = trEPRBGC(spectra.data);
+    end
+end
+
 iLoadedSpectra = [];   % index of loaded spectra in data cell array;
 % Assign the data to the appdata field 'data'
 if isempty(appdata.data{1})    % No data loaded to the GUI yet
@@ -2122,4 +2145,38 @@ for k=1:length(appdataFieldnames)
       appdataFieldnames{k},...
       getfield(appdata,appdataFieldnames{k})...
       );
+end
+
+
+% --- Check Order of Compensation Methods
+function TF = if_checkCompensationMethods
+
+% Get handles of the current GUI
+handles = guidata(gcbo);
+
+% Set warning message
+warningMessage = sprintf(...
+    '%s\n%s',...
+    'Warning: It is not a good idea to perform only BGC, but not POC.',...
+    'Proceed to load files and compensate only for the background?'...
+    );
+
+% If BGC is set, but not POC, display warning dialogue
+if get(handles.spectraLoadBackgroundCorrectionCheckbox,'Value') && ...
+    ~get(handles.spectraLoadPretriggerOffsetCorrectionCheckbox,'Value')
+    selection = questdlg(...
+        warningMessage,...
+        'Problem with Order of Corrections',...
+        'Yes',...
+        'No',...
+        'No');
+
+    switch selection,
+        case 'Yes',
+            TF = logical(false);
+        case 'No'
+            TF = logical(true);
+    end
+else
+    TF = logical(false);
 end
