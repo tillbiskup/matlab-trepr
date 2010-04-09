@@ -1450,6 +1450,8 @@ function menuToolsCorrectionsBackground_Callback(hObject, eventdata, handles)
 % hObject    handle to menuToolsCorrectionsBackground (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+if_BGC;
+if_axis_Refresh;
 
 
 % --------------------------------------------------------------------
@@ -2086,6 +2088,29 @@ appdata.data{appdata.control.spectra.active}.data = ...
     trEPRPOC(...
     appdata.data{appdata.control.spectra.active}.data,...
     appdata.data{appdata.control.spectra.active}.parameters.transient.triggerPosition...
+    );
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% --- Background Compensation (BGC)
+function if_BGC
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+appdata.data{appdata.control.spectra.active}.data = ...
+    trEPRBGC(...
+    appdata.data{appdata.control.spectra.active}.data...
     );
 
 % Refresh handles and appdata of the current GUI
