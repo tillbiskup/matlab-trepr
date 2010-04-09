@@ -892,7 +892,8 @@ function menuToolsCorrectionsPretriggerOffset_Callback(hObject, eventdata, handl
 % hObject    handle to menuToolsCorrectionsPretriggerOffset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+if_POC;
+if_axis_Refresh;
 
 % --------------------------------------------------------------------
 function menuToolsCorrectionsDrift_Callback(hObject, eventdata, handles)
@@ -2072,4 +2073,28 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
     end
 else
     set(hObject,'Pointer','arrow');
+end
+
+% --- Pretrigger Offset Compensation (POC)
+function if_POC
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+appdata.data{appdata.control.spectra.active}.data = ...
+    trEPRPOC(...
+    appdata.data{appdata.control.spectra.active}.data,...
+    appdata.data{appdata.control.spectra.active}.parameters.transient.triggerPosition...
+    );
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
 end
