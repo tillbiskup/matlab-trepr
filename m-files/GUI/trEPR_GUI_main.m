@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 22-Mar-2010 17:48:39
+% Last Modified by GUIDE v2.5 09-Apr-2010 11:13:04
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -787,7 +787,7 @@ end
 
 
 
-function timeEdit_Callback(hObject, eventdata, handles)
+function timeEditIndex_Callback(hObject, eventdata, handles)
 
 value = str2double(get(hObject,'String'));
 min = get(handles.spectraScrollSlider,'Min');
@@ -805,8 +805,8 @@ if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
-function timeEdit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to timeEdit (see GCBO)
+function timeEditIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to timeEditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -818,7 +818,7 @@ end
 
 
 
-function b0Edit_Callback(hObject, eventdata, handles)
+function b0EditIndex_Callback(hObject, eventdata, handles)
 
 value = str2double(get(hObject,'String'));
 min = get(handles.spectraScrollSlider,'Min');
@@ -836,8 +836,8 @@ if_axis_Refresh;
 
 
 % --- Executes during object creation, after setting all properties.
-function b0Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to b0Edit (see GCBO)
+function b0EditIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to b0EditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -931,18 +931,18 @@ function pushbutton16_Callback(hObject, eventdata, handles)
 
 
 
-function measureX1edit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureX1edit (see GCBO)
+function measureX1editIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX1editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureX1edit as text
-%        str2double(get(hObject,'String')) returns contents of measureX1edit as a double
+% Hints: get(hObject,'String') returns contents of measureX1editIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureX1editIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureX1edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureX1edit (see GCBO)
+function measureX1editIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX1editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -977,18 +977,18 @@ end
 
 
 
-function measureX2edit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureX2edit (see GCBO)
+function measureX2editIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX2editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureX2edit as text
-%        str2double(get(hObject,'String')) returns contents of measureX2edit as a double
+% Hints: get(hObject,'String') returns contents of measureX2editIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureX2editIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureX2edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureX2edit (see GCBO)
+function measureX2editIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX2editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1000,18 +1000,18 @@ end
 
 
 
-function measureY2edit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureY2edit (see GCBO)
+function measureY2editIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY2editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureY2edit as text
-%        str2double(get(hObject,'String')) returns contents of measureY2edit as a double
+% Hints: get(hObject,'String') returns contents of measureY2editIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureY2editIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureY2edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureY2edit (see GCBO)
+function measureY2editIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY2editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1023,18 +1023,18 @@ end
 
 
 
-function measureDeltaXedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureDeltaXedit (see GCBO)
+function measureDeltaXeditIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureDeltaXeditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureDeltaXedit as text
-%        str2double(get(hObject,'String')) returns contents of measureDeltaXedit as a double
+% Hints: get(hObject,'String') returns contents of measureDeltaXeditIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureDeltaXeditIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureDeltaXedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureDeltaXedit (see GCBO)
+function measureDeltaXeditIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureDeltaXeditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1046,18 +1046,18 @@ end
 
 
 
-function measureDeltaYedit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureDeltaYedit (see GCBO)
+function measureDeltaYeditIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureDeltaYeditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureDeltaYedit as text
-%        str2double(get(hObject,'String')) returns contents of measureDeltaYedit as a double
+% Hints: get(hObject,'String') returns contents of measureDeltaYeditIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureDeltaYeditIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureDeltaYedit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureDeltaYedit (see GCBO)
+function measureDeltaYeditIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureDeltaYeditIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1069,18 +1069,18 @@ end
 
 
 
-function measureY1edit_Callback(hObject, eventdata, handles)
-% hObject    handle to measureY1edit (see GCBO)
+function measureY1editIndex_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY1editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of measureY1edit as text
-%        str2double(get(hObject,'String')) returns contents of measureY1edit as a double
+% Hints: get(hObject,'String') returns contents of measureY1editIndex as text
+%        str2double(get(hObject,'String')) returns contents of measureY1editIndex as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function measureY1edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to measureY1edit (see GCBO)
+function measureY1editIndex_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY1editIndex (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1129,12 +1129,19 @@ appdata = getappdata(handles.figure1);
 set(handles.figure1,'WindowButtonMotionFcn','');
 set(handles.figure1,'WindowButtonDownFcn','');
 
-set(handles.measureX1edit,'String','1/1');
-set(handles.measureY1edit,'String','1/1');
-set(handles.measureX2edit,'String','1/1');
-set(handles.measureY2edit,'String','1/1');
-set(handles.measureDeltaXedit,'String','0/0');
-set(handles.measureDeltaYedit,'String','0/0');
+set(handles.measureX1editIndex,'String','1');
+set(handles.measureY1editIndex,'String','1');
+set(handles.measureX2editIndex,'String','1');
+set(handles.measureY2editIndex,'String','1');
+set(handles.measureDeltaXeditIndex,'String','0');
+set(handles.measureDeltaYeditIndex,'String','0');
+
+set(handles.measureX1editValue,'String','1');
+set(handles.measureY1editValue,'String','1');
+set(handles.measureX2editValue,'String','1');
+set(handles.measureY2editValue,'String','1');
+set(handles.measureDeltaXeditValue,'String','0');
+set(handles.measureDeltaYeditValue,'String','0');
 
 appdata.control.measure.x1val = 1;
 appdata.control.measure.x1ind = 1;
@@ -1658,8 +1665,8 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.dyEdit,'Enable','Inactive');
     set(handles.sxEdit,'Enable','Inactive');
     set(handles.syEdit,'Enable','Inactive');
-    set(handles.timeEdit,'Enable','Inactive');
-    set(handles.b0Edit,'Enable','Inactive');
+    set(handles.timeEditIndex,'Enable','Inactive');
+    set(handles.b0EditIndex,'Enable','Inactive');
 else
     set(handles.spectraHideButton,'Enable','On');
     set(handles.displayTypePopupmenu,'Enable','On');
@@ -1668,8 +1675,8 @@ else
     set(handles.dyEdit,'Enable','On');
     set(handles.sxEdit,'Enable','On');
     set(handles.syEdit,'Enable','On');
-    set(handles.timeEdit,'Enable','On');
-    set(handles.b0Edit,'Enable','On');
+    set(handles.timeEditIndex,'Enable','On');
+    set(handles.b0EditIndex,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
@@ -1917,7 +1924,7 @@ switch currentDisplayType
         set(handles.scaleXSlider,'Enable','On');
         set(handles.displaceXSlider,'Enable','On');
 
-        set(handles.timeEdit,'String',...
+        set(handles.timeEditIndex,'String',...
             num2str(floor(get(handles.spectraScrollSlider,'Value')))...
             );
         appdata.data{appdata.control.spectra.active}.t = ...
@@ -1953,7 +1960,7 @@ switch currentDisplayType
             );
         set(handles.axes1,'YLim',[min(min(data))*1.05 max(max(data))*1.05]);
 
-        set(handles.b0Edit,'String',...
+        set(handles.b0EditIndex,'String',...
             num2str(floor(get(handles.spectraScrollSlider,'Value')))...
             );
         appdata.data{appdata.control.spectra.active}.b0 = ...
@@ -1986,16 +1993,18 @@ appdata = getappdata(handles.figure1);
 currentPoint = appdata.control.measure.point;
 
 % Get x and y values
-x = str2num(strrep(get(handles.measureX1edit,'String'),'/',' '));
-y = str2num(strrep(get(handles.measureY1edit,'String'),'/',' '));
+xind = str2num(get(handles.measureX1editIndex,'String'));
+yind = str2num(get(handles.measureY1editIndex,'String'));
+xval = str2num(get(handles.measureX1editValue,'String'));
+yval = str2num(get(handles.measureY1editValue,'String'));
 
 switch currentPoint
     case 1
         appdata.control.measure.point = 2;
-%        appdata.control.measure.x1val = x(1);
-%        appdata.control.measure.y1val = y(1);
-        appdata.control.measure.x1ind = x(1);
-        appdata.control.measure.y1ind = y(1);
+        appdata.control.measure.x1val = xval(1);
+        appdata.control.measure.y1val = yval(1);
+        appdata.control.measure.x1ind = xind(1);
+        appdata.control.measure.y1ind = yind(1);
     case 2
         appdata.control.measure.point = 1;
         set(handles.figure1,'WindowButtonMotionFcn','');
@@ -2055,45 +2064,112 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
         xdata = get(get(handles.axes1,'Children'),'XData');
         ydata = get(get(handles.axes1,'Children'),'YData');
         
+        indx=interp1(...
+            linspace(1,axisPosition(3),length(xdata)),...
+            1:length(xdata),...
+            cp(1)-ac(1),'nearest');
+        indy=interp1(...
+            linspace(1,axisPosition(4),length(ydata)),...
+            1:length(ydata),...
+            cp(2)-ac(2),'nearest');
+        valx=interp1(...
+            linspace(1,axisPosition(3),length(xdata)),...
+            xdata,...
+            cp(1)-ac(1),'nearest');
+        valy=interp1(...
+            linspace(1,axisPosition(4),length(ydata)),...
+            ydata,...
+            cp(2)-ac(2),'nearest');
+                
         switch currentDisplayType
             case '2D plot'
-                indx=interp1(...
-                    linspace(1,axisPosition(3),xdata(2)),...
-                    xdata(1):xdata(2),...
-                    cp(1)-ac(1),'nearest');
-                indy=interp1(...
-                    linspace(1,axisPosition(4),ydata(2)),...
-                    ydata(1):ydata(2),...
-                    cp(2)-ac(2),'nearest');
-                %get values for current indices
-%                xvalues=xdata(indx);
-%                yvalues=ydata(indy);
                 % Set display of value
                 switch currentPoint
                     case 1
-                        set(handles.measureX1edit,'String',...
-                            sprintf('/%s',num2str(indx)));
-                        set(handles.measureY1edit,'String',...
-                            sprintf('/%s',num2str(indy)));
+                        set(handles.measureX1editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY1editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureX1editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY1editValue,'String',...
+                            sprintf('%s',num2str(valy)));
                     case 2
-                        set(handles.measureX2edit,'String',...
-                            sprintf('/%s',num2str(indx)));
-                        set(handles.measureY2edit,'String',...
-                            sprintf('/%s',num2str(indy)));
-                        set(handles.measureDeltaXedit,'String',...
-                            sprintf('/%s',num2str(indx-x1ind)));
-                        set(handles.measureDeltaYedit,'String',...
-                            sprintf('/%s',num2str(indy-y1ind)));
+                        set(handles.measureX2editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY2editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureDeltaXeditIndex,'String',...
+                            sprintf('%s',num2str(indx-x1ind)));
+                        set(handles.measureDeltaYeditIndex,'String',...
+                            sprintf('%s',num2str(indy-y1ind)));
+                        set(handles.measureX2editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY2editValue,'String',...
+                            sprintf('%s',num2str(valy)));
+                        set(handles.measureDeltaXeditValue,'String',...
+                            sprintf('%s',num2str(valx-x1val)));
+                        set(handles.measureDeltaYeditValue,'String',...
+                            sprintf('%s',num2str(valy-y1val)));
                 end
             case 'B0 spectra'
-                %get indices of nearest values
-                indx=interp1(xdata,1:length(xdata),cp(1),'nearest');
-                indy=interp1(ydata,1:length(ydata),cp(2),'nearest');
-                %get values for current indices
-                %-%xvalues=xdata(indx);
-                %-%yvalues=ydata(indy);
+                switch currentPoint
+                    case 1
+                        set(handles.measureX1editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY1editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureX1editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY1editValue,'String',...
+                            sprintf('%5.2f',valy));
+                    case 2
+                        set(handles.measureX2editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY2editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureDeltaXeditIndex,'String',...
+                            sprintf('%s',num2str(indx-x1ind)));
+                        set(handles.measureDeltaYeditIndex,'String',...
+                            sprintf('%s',num2str(indy-y1ind)));
+                        set(handles.measureX2editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY2editValue,'String',...
+                            sprintf('%5.2f',valy));
+                        set(handles.measureDeltaXeditValue,'String',...
+                            sprintf('%s',num2str(valx-x1val)));
+                        set(handles.measureDeltaYeditValue,'String',...
+                            sprintf('%5.2f',valy-y1val));
+                end
             case 'transients'
-                
+                switch currentPoint
+                    case 1
+                        set(handles.measureX1editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY1editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureX1editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY1editValue,'String',...
+                            sprintf('%5.2f',valy));
+                    case 2
+                        set(handles.measureX2editIndex,'String',...
+                            sprintf('%s',num2str(indx)));
+                        set(handles.measureY2editIndex,'String',...
+                            sprintf('%s',num2str(indy)));
+                        set(handles.measureDeltaXeditIndex,'String',...
+                            sprintf('%s',num2str(indx-x1ind)));
+                        set(handles.measureDeltaYeditIndex,'String',...
+                            sprintf('%s',num2str(indy-y1ind)));
+                        set(handles.measureX2editValue,'String',...
+                            sprintf('%s',num2str(valx)));
+                        set(handles.measureY2editValue,'String',...
+                            sprintf('%5.2f',valy));
+                        set(handles.measureDeltaXeditValue,'String',...
+                            sprintf('%s',num2str(valx-x1val)));
+                        set(handles.measureDeltaYeditValue,'String',...
+                            sprintf('%5.2f',valy-y1val));
+                end                
         end
     end
 else
@@ -2180,3 +2256,189 @@ if get(handles.spectraLoadBackgroundCorrectionCheckbox,'Value') && ...
 else
     TF = logical(false);
 end
+
+
+
+function timeEditValue_Callback(hObject, eventdata, handles)
+% hObject    handle to timeEditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of timeEditValue as text
+%        str2double(get(hObject,'String')) returns contents of timeEditValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function timeEditValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to timeEditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function b0EditValue_Callback(hObject, eventdata, handles)
+% hObject    handle to b0EditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of b0EditValue as text
+%        str2double(get(hObject,'String')) returns contents of b0EditValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function b0EditValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to b0EditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureDeltaYeditValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureDeltaYeditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureDeltaYeditValue as text
+%        str2double(get(hObject,'String')) returns contents of measureDeltaYeditValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureDeltaYeditValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureDeltaYeditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureDeltaXeditValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureDeltaXeditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureDeltaXeditValue as text
+%        str2double(get(hObject,'String')) returns contents of measureDeltaXeditValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureDeltaXeditValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureDeltaXeditValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureY2editValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY2editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureY2editValue as text
+%        str2double(get(hObject,'String')) returns contents of measureY2editValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureY2editValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY2editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureX2editValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX2editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureX2editValue as text
+%        str2double(get(hObject,'String')) returns contents of measureX2editValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureX2editValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX2editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureY1editValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureY1editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureY1editValue as text
+%        str2double(get(hObject,'String')) returns contents of measureY1editValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureY1editValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureY1editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function measureX1editValue_Callback(hObject, eventdata, handles)
+% hObject    handle to measureX1editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of measureX1editValue as text
+%        str2double(get(hObject,'String')) returns contents of measureX1editValue as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function measureX1editValue_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to measureX1editValue (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
