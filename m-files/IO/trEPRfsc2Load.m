@@ -1,6 +1,11 @@
 function varargout = trEPRfsc2Load(filename, varargin)
-% Load fsc2 files measured at the transient spectrometer, save the header
-% and try to extract from the header necessary functions such as the axes.
+% Load fsc2 files measured at the transient spectrometer in Berlin, save
+% the header and try to extract from the header necessary functions such as
+% the axes.
+%
+% NOTE: This is not a general routine to read fsc2 files as there exists
+%       no such format. fsc2 files are in general simple ASCII files with 
+%       varying headers depending on the actual script used to record them.
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
