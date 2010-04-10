@@ -1,5 +1,5 @@
-function varargout = trEPRspeksimLoad(filename, varargin)
-% Load data measured at the transient spectrometer in Freiburg (speksim),
+function varargout = trEPRgnuplotLoad(filename, varargin)
+% Load data measured at the transient spectrometer in Freiburg (gnuplot),
 % save the header and try to extract from the header necessary functions
 % such as the axes.
 %
@@ -99,8 +99,8 @@ function content = loadFile(filename,varargin)
         for k = 1 : length(fileNames)
             if exist(fileNames(k).name,'file') && ...
                     checkFileFormat(fileNames(k).name)
-                files{k} = importdata(fileNames(k).name,'',5);
-                content.data(k,:) = files{k}.data;
+                files{k} = importdata(fileNames(k).name,' ',3);
+                content.data(k,:) = files{k}.data(:,2);
                 B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
                 content.axes.yaxis.values(k) = str2double(B0{1});
             end
@@ -115,22 +115,20 @@ function content = loadFile(filename,varargin)
         content.axes.yaxis.measure = 'magnetic field';
         content.axes.yaxis.unit = 'G';
 
-        timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
+        content.parameters.transient.points = length(files{1}.data(:,1));
         content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
+            (abs(files{1}.data(1,1)) + files{1}.data(end,1)) / ...
+            (length(files{1}.data(:,1)) - 1) * length(files{1}.data(:,1));
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
+            floor(abs(files{1}.data(1,1)) / ...
+            (content.parameters.transient.length / ...
+            length(files{1}.data(:,1))));
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
-        % Create axis informations from parameters
-        content.axes.xaxis.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
+        content.axes.xaxis.values = files{1}.data(:,1);
         content.axes.xaxis.measure = 'time';
         content.axes.xaxis.unit = 's';
     
@@ -139,8 +137,8 @@ function content = loadFile(filename,varargin)
         for k = 1 : length(filename)
             if exist(filename{k},'file') && ...
                     checkFileFormat(filename{k})
-                files{k} = importdata(filename{k},'',5);
-                content.data(k,:) = files{k}.data;
+                files{k} = importdata(filename{k},' ',3);
+                content.data(k,:) = files{k}.data(:,2);
                 B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
                 content.axes.yaxis.values(k) = str2double(B0{1});
             end
@@ -155,82 +153,79 @@ function content = loadFile(filename,varargin)
         content.axes.yaxis.measure = 'magnetic field';
         content.axes.yaxis.unit = 'G';
 
-        timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
+        content.parameters.transient.points = length(files{1}.data(:,1));
         content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
+            (abs(files{1}.data(1,1)) + files{1}.data(end,1)) / ...
+            (length(files{1}.data(:,1)) - 1) * length(files{1}.data(:,1));
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
+            floor(abs(files{1}.data(1,1)) / ...
+            (content.parameters.transient.length / ...
+            length(files{1}.data(:,1))));
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
-        % Create axis informations from parameters
-        content.axes.xaxis.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
+        content.axes.xaxis.values = files{1}.data(:,1);
         content.axes.xaxis.measure = 'time';
         content.axes.xaxis.unit = 's';
 
     else
         % If only a single filename is provided as input argument
-        % Check whether file is in speksim format.
+        % Check whether file is in Freiburg gnuplot format.
         if ~checkFileFormat(filename)
             warning(...
-                'trEPRspeksimLoad:wrongformat',...
-                'File %s seems not to be in speksim format...',...
+                'trEPRgnuplotLoad:wrongformat',...
+                'File %s seems not to be in Freiburg gnuplot format...',...
                 filename);
             return
         end
 
-        file = importdata(filename,'',5);
-        content.data = file.data;
+        file = importdata(filename,' ',3);
+        content.data = file.data(:,2);
         B0 = regexp(file.textdata{2},'B0 = ([0-9.]*)','tokens');
         content.parameters.field.start = str2double(B0{1});
         content.parameters.field.stop = str2double(B0{1});
         content.parameters.field.step = 0;
         
-        timeParams = textscan(file.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
+        content.parameters.transient.points = length(file.data(:,1));
         content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
+            (abs(file.data(1,1)) + file.data(end,1)) / ...
+            (length(file.data(:,1)) - 1) * length(file.data(:,1));
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
+            floor(abs(file.data(1,1)) / ...
+            (content.parameters.transient.length / ...
+            length(file.data(:,1))));
         MWfreq = regexp(file.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
         % Create axis informations from parameters
-        content.axes.xaxis.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
+        content.axes.xaxis.values = file.data(:,1);
         content.axes.xaxis.measure = 'time';
         content.axes.xaxis.unit = 's';
 
         content.axes.yaxis.values = [];
         content.axes.yaxis.measure = '';
         content.axes.yaxis.unit = '';
-    end
+    end    
 end
 
-% --- Check whether the file is in speksim format
+% --- Check whether the file is in Freiburg gnuplot format
 function TF = checkFileFormat(filename)
-    % Check whether file is in speksim format.
-    % This is done with looking for the string "Source : transient" at
+    % Check whether file is in Freiburg gnuplot format.
+    % This is done with looking for the string "# Source : transient" at
     % the beginning of the first line of the file.
     %
-    % NOTE: The same string can be found in the corresponding gnuplot
-    % files derived from the speksim files, but there it is preceded by
-    % "# ".
+    % NOTE: The same string can be found in the corresponding speksim
+    % files the gnuplot files are derived from, but these files lack the
+    % leading "# ".
     fid = fopen(filename);
     firstHeaderLine = fgetl(fid);
     fclose(fid);
     
-    if strfind(firstHeaderLine,'Source : transient;') == 1
+    if strfind(firstHeaderLine,'# Source : transient;') == 1
         TF = logical(true);
     else
         TF = logical(false);
