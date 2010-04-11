@@ -36,7 +36,7 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
             case 0
                 % If name does not exist.
                 % Check whether it is only a file basename
-                if isempty(dir(sprintf('%s*',filename)))
+                if isempty(dir(sprintf('%s.*',filename)))
                     fprintf('%s does not exist...\n',filename);
                 else
                     % Read all files and combine them
