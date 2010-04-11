@@ -1492,7 +1492,16 @@ handles = guidata(gcbo);
 appdata = getappdata(handles.figure1);
 
 % Load spectra using the wrapper function trEPRload
-spectra = trEPRload(filename);
+%if get(handles.spectraCombineFilesCheckbox,'Value')
+%    spectra = trEPRload(filename,'combine',logical(true));
+%else
+%    spectra = trEPRload(filename);
+%end
+spectra = trEPRload(...
+    filename,...
+    'combine',...
+    logical(get(handles.spectraCombineFilesCheckbox,'Value'))...
+    );
 
 % Compensate as set
 if get(handles.spectraLoadPretriggerOffsetCorrectionCheckbox,'Value')

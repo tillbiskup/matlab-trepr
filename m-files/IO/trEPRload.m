@@ -330,26 +330,15 @@ function content = combineFile(filename)
                     content = data;
                 end
                 if ~isfield(content,'filename')
-                    content.filename = filename;
+                    content.filename = sprintf(...
+                        '%s-%s',...
+                        filename{1},...
+                        filename{end}...
+                        );
                 end
                 break;
             end
         end
-        % else try to handle it with importdata
-        if ~exist('content')
-            data = importdata(filename);
-            if isfield(data,'textdata')
-                content.header = data.textdata;
-                if isfield(data,'colheaders')
-                    content.colheaders = data.colheaders;
-                end
-                content.data = data.data;
-            else
-                content.data = data;
-            end
-            content.filename = filename;
-        end
-        
     end
     if ~exist('content') 
         content = []; 
