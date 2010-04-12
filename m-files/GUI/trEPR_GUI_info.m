@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 17-Mar-2010 23:20:01
+% Last Modified by GUIDE v2.5 12-Apr-2010 07:52:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,6 +55,58 @@ function trEPR_GUI_info_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for trEPR_GUI_info
 handles.output = hObject;
 
+% set window title
+set(hObject,'Name','trEPR toolbox : Information about spectrum');
+
+% Add the name of the current mfile to the handles structure
+% Used e.g. in the closeGUI function to conveniently determine whether it
+% is called from within this function (see there for details).
+handles.mfilename = mfilename;
+
+% register function handle for closing function
+set(handles.figure1,'CloseRequestFcn',@closeGUI);
+
+% Add command line arguments to the handles structure assuming that these
+% are property value pairs. Used to get callerFunction and callerHandle.
+if iscell(varargin)
+    for k=2 : 2 : length(varargin)
+        handles = setfield(handles,varargin{k-1},varargin{k});
+    end
+end
+
+% add handle of this GUI to handles structure of the calling gui in case
+% this function has been called from another GUI
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    callerHandles = setfield(...
+        callerHandles,...
+        mfilename,...
+        hObject);
+    guidata(handles.callerHandle,callerHandles);
+end
+
+% Display Information of currently active spectrum on opening
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)
+
+        % Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+
+        % Display only something if there is something to display
+        if parentAppdata.control.spectra.active > 0
+            set(...
+                handles.headerEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.header);
+        else
+            set(handles.headerEdit,'String',cell(0));
+        end
+
+    end
+    guidata(handles.callerHandle,callerHandles);
+end
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -74,18 +126,18 @@ varargout{1} = handles.output;
 
 
 
-function edit1_Callback(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function headerEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to headerEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit1 as text
-%        str2double(get(hObject,'String')) returns contents of edit1 as a double
+% Hints: get(hObject,'String') returns contents of headerEdit as text
+%        str2double(get(hObject,'String')) returns contents of headerEdit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
+function headerEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to headerEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -105,18 +157,18 @@ function closePushbutton_Callback(hObject, eventdata, handles)
 close;
 
 
-function edit2_Callback(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function dscFilenameEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to dscFilenameEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit2 as text
-%        str2double(get(hObject,'String')) returns contents of edit2 as a double
+% Hints: get(hObject,'String') returns contents of dscFilenameEdit as text
+%        str2double(get(hObject,'String')) returns contents of dscFilenameEdit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit2 (see GCBO)
+function dscFilenameEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to dscFilenameEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -127,17 +179,53 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in pushbutton2.
-function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
+% --- Executes on button press in savePushbutton.
+function savePushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to savePushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in pushbutton3.
-function pushbutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3 (see GCBO)
+% --- Executes on button press in newPushbutton.
+function newPushbutton_Callback(hObject, eventdata, handles)
+% hObject    handle to newPushbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
+
+% --------------------------------------------------------------------
+function closeGUI(varargin)
+% hObject    handle to hideAllDisplayContextMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% handle variable input arguments, because the 'CloseRequestFcn' does not
+% accept to get additional parameters passed by the function call
+if nargin == 3
+    hObject = varargin{1};
+    eventdata = varargin{2};
+    handles = varargin{3};
+else
+    handles = guidata(gcbo);
+end
+
+% removes handle of this GUI from handles structure of the calling gui in
+% case this function has been called from another GUI
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)
+        ownHandle = getfield(callerHandles,mfilename);
+        callerHandles = rmfield(...
+            callerHandles,...
+            mfilename);
+    end
+    guidata(handles.callerHandle,callerHandles);
+    delete(ownHandle);
+elseif isfield(handles,'mfilename') && strcmpi(handles.mfilename,mfilename)
+    delete(gcf);
+else
+    delete(getfield(handles,mfilename));
+    handles = rmfield(handles,mfilename);
+    guidata(hObject,handles);
+end

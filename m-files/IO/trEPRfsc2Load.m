@@ -62,14 +62,14 @@ function content = loadFile(filename)
     fid = fopen(filename);
     
     % Save comment header of the file
-    content.comment{1} = fgetl(fid);
+    content.header{1} = fgetl(fid);
     k=2;
     
-    while strmatch(content.comment{k-1}(1),'%')% == 1
-        content.comment{k} = fgetl(fid);
+    while strmatch(content.header{k-1}(1),'%')% == 1
+        content.header{k} = fgetl(fid);
         k=k+1;
     end
-    content.comment(length(content.comment)) = '';
+    content.header(length(content.header)) = '';
     
     % Close file
     fclose(fid);
@@ -80,7 +80,7 @@ function content = loadFile(filename)
     % "#!/usr/local/bin/fsc2".
     fsc2File = logical(false);
     for k = 1 : 5
-        if strfind(content.comment{k},'fsc2')
+        if strfind(content.header{k},'fsc2')
             fsc2File = logical(true);
         end
     end
@@ -134,14 +134,14 @@ function content = loadFile(filename)
     % Extract information from header. Use therefore only the last n lines
     % of the header because it is known that the crucial information is
     % summed up there.
-    for k=length(content.comment)-30:length(content.comment)
+    for k=length(content.header)-30:length(content.header)
         for l=1:length(matching) % length(matching) = nRows of matching
-            if ~isempty(strfind(content.comment{k},matching{l,1})) ...
+            if ~isempty(strfind(content.header{k},matching{l,1})) ...
                     && isempty(getCascadedField(...
                     content.parameters,...
                     matching{l,2}));
                 [tokens names] = regexp(...
-                    char(content.comment{k}),...
+                    char(content.header{k}),...
                     '(?<value>[0-9.]+)\s*(?<unit>\w*)',...
                     'tokens','names');
                 content.parameters = setCascadedField(...

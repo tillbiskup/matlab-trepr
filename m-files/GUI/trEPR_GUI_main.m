@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 09-Apr-2010 11:13:04
+% Last Modified by GUIDE v2.5 12-Apr-2010 08:11:29
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -888,8 +888,30 @@ function menuToolsCorrectionsPretriggerOffset_Callback(hObject, eventdata, handl
 % hObject    handle to menuToolsCorrectionsPretriggerOffset (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-if_POC;
-if_axis_Refresh;
+
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Call functions only if there is something to compensate
+if appdata.control.spectra.active > 0
+    if_POC;
+    if_axis_Refresh;
+end
+
+% --------------------------------------------------------------------
+function menuToolsCorrectionsBackground_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsCorrectionsBackground (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Call functions only if there is something to compensate
+if appdata.control.spectra.active > 0
+    if_BGC;
+    if_axis_Refresh;
+end
 
 % --------------------------------------------------------------------
 function menuToolsCorrectionsDrift_Callback(hObject, eventdata, handles)
@@ -897,6 +919,14 @@ function menuToolsCorrectionsDrift_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Call functions only if there is something to compensate
+if appdata.control.spectra.active > 0
+%    if_POC;
+%    if_axis_Refresh;
+end
 
 % --------------------------------------------------------------------
 function menuToolsCorrectionsBaseline_Callback(hObject, eventdata, handles)
@@ -1217,6 +1247,12 @@ else
     set(handles.menuViewPlotProperties, 'Checked', 'off');
 end
 
+if isfield(handles,'trEPR_GUI_info')
+    set(handles.menuViewInformation, 'Checked', 'on');
+else
+    set(handles.menuViewInformation, 'Checked', 'off');
+end
+
 
 % --------------------------------------------------------------------
 function menuViewAccumulate_Callback(hObject, eventdata, handles)
@@ -1261,6 +1297,24 @@ else
     set(gcbo, 'Checked', 'on');
 
     trEPR_GUI_plotproperties(...
+        'callerFunction',mfilename,...
+        'callerHandle',hObject);
+end
+
+% --------------------------------------------------------------------
+function menuViewInformation_Callback(hObject, eventdata, handles)
+% hObject    handle to menuViewInformation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if strcmp(get(gcbo, 'Checked'),'on')
+    set(gcbo, 'Checked', 'off');
+    
+    trEPR_GUI_info('closeGUI',hObject, eventdata, handles);
+else 
+    set(gcbo, 'Checked', 'on');
+
+    trEPR_GUI_info(...
         'callerFunction',mfilename,...
         'callerHandle',hObject);
 end
@@ -1446,15 +1500,6 @@ function menuFileExport_Callback(hObject, eventdata, handles)
 trEPR_GUI_export(...
     'callerFunction',mfilename,...
     'callerHandle',hObject);
-
-
-% --------------------------------------------------------------------
-function menuToolsCorrectionsBackground_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsCorrectionsBackground (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-if_BGC;
-if_axis_Refresh;
 
 
 % --------------------------------------------------------------------
@@ -2192,11 +2237,13 @@ function if_POC
 handles = guidata(gcbo);
 appdata = getappdata(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.data = ...
-    trEPRPOC(...
-    appdata.data{appdata.control.spectra.active}.data,...
-    appdata.data{appdata.control.spectra.active}.parameters.transient.triggerPosition...
-    );
+if appdata.control.spectra.active > 0
+    appdata.data{appdata.control.spectra.active}.data = ...
+        trEPRPOC(...
+        appdata.data{appdata.control.spectra.active}.data,...
+        appdata.data{appdata.control.spectra.active}.parameters.transient.triggerPosition...
+        );
+end
 
 % Refresh handles and appdata of the current GUI
 guidata(gcbo,handles);
@@ -2449,5 +2496,4 @@ function measureX1editValue_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
