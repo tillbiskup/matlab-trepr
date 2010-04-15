@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 12-Apr-2010 07:52:56
+% Last Modified by GUIDE v2.5 15-Apr-2010 08:43:21
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -92,6 +92,17 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
 
         % Get appdata of the parent GUI
         parentAppdata = getappdata(callerHandles.figure1);
+        
+        [path name ext] = fileparts(...
+            parentAppdata.data{parentAppdata.control.spectra.active}.filename...
+            );
+        
+        set(handles.headlineText,'String',...
+            strrep(...
+            get(handles.headlineText,'String'),...
+            'FILENAME',...
+            sprintf('"%s"',name)...
+            ));
 
         % Display only something if there is something to display
         if parentAppdata.control.spectra.active > 0
