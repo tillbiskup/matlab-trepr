@@ -844,8 +844,6 @@ if_axis_Refresh(handles.figure1);
 if_fitArea_Refresh(handles.figure1);
 if_fitPoints_Refresh(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.blc
-appdata.data{appdata.control.spectra.active}.blc.area
 
 % --- Executes on button press in correctionResetButton.
 function correctionResetButton_Callback(hObject, eventdata, handles)
@@ -871,9 +869,6 @@ end
 if_axis_Refresh(handles.figure1);
 if_fitArea_Refresh(handles.figure1);
 if_fitPoints_Refresh(handles.figure1);
-
-appdata.data{appdata.control.spectra.active}.blc
-appdata.data{appdata.control.spectra.active}.blc.area
 
 
 % --- Executes on selection change in spectraVisibleListbox.
@@ -1190,6 +1185,12 @@ if isfield(appdata.data{appdata.control.spectra.active}.blc,'method')
             degree, ...
             appdata.data{appdata.control.spectra.active}.blc.area.left, ...
             appdata.data{appdata.control.spectra.active}.blc.area.right);
+        % Assign fit parameters to respective structures of currently
+        % displayed spectrum (will be retransferred to main GUI)
+        appdata.data{appdata.control.spectra.active}.blc.coefficients = p;
+        appdata.data{appdata.control.spectra.active}.blc.statistics.S = S;
+        appdata.data{appdata.control.spectra.active}.blc.statistics.mu = mu;
+        appdata.data{appdata.control.spectra.active}.blc.statistics.delta = delta;
         plot(...
             handles.axes2,...
             yaxis,...
