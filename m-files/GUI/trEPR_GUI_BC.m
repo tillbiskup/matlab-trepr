@@ -852,8 +852,10 @@ guidata(hObject, handles);
 appdata = getappdata(handles.figure1);
 
 % Reset struct containing the parameters of the correction
-appdata.data{appdata.control.spectra.active}.blc = ...
-    rmfield(appdata.data{appdata.control.spectra.active}.blc,'method');
+if isfield(appdata.data{appdata.control.spectra.active}.blc,'method')
+    appdata.data{appdata.control.spectra.active}.blc = ...
+        rmfield(appdata.data{appdata.control.spectra.active}.blc,'method');
+end
 
 % Refresh handles and appdata of the current GUI
 guidata(hObject,handles);
@@ -1106,16 +1108,24 @@ if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint1)
     set(handles.additionalFitPoint1Slider,'Enable','Off');
     set(handles.additionalFitPoint1Position,'Enable','Off');
     set(handles.additionalFitPoint1PickButton,'Enable','Off');
-%     set(appdata.handles.axes1Point1,'Visible','Off');
-%     set(appdata.handles.axes2Point1,'Visible','Off');
 end
 if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint2)
     set(handles.additionalFitPoint2Checkbox,'Value',0)
     set(handles.additionalFitPoint2Slider,'Enable','Off');
     set(handles.additionalFitPoint2Position,'Enable','Off');
     set(handles.additionalFitPoint2PickButton,'Enable','Off');
-%     set(appdata.handles.axes1Point2,'Visible','Off');
-%     set(appdata.handles.axes2Point2,'Visible','Off');
+end
+
+if isfield(appdata.data{appdata.control.spectra.active}.blc,'method')
+    if ~isempty(strfind(...
+            appdata.data{appdata.control.spectra.active}.blc.method,...
+            'poly'))
+        set(handles.correctionMethodPopupmenu,'Value',...
+            str2num(...
+            appdata.data{appdata.control.spectra.active}.blc.method(1))+1);
+    end
+else
+    set(handles.correctionMethodPopupmenu,'Value',1);
 end
 
 % Refresh handles and appdata of the current GUI
