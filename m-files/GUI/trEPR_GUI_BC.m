@@ -124,6 +124,9 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     guidata(handles.callerHandle,callerHandles);
 end
 
+% Set reload button inactive
+set(handles.reloadButton,'Enable','Off');
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -848,7 +851,7 @@ if_fitPoints_Refresh(handles.figure1);
 % --- Executes on button press in correctionResetButton.
 function correctionResetButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 % Reset struct containing the parameters of the correction
@@ -922,9 +925,6 @@ end
 
 % --------------------------------------------------------------------
 function closeGUI(varargin)
-% hObject    handle to hideAllDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 % handle variable input arguments, because the 'CloseRequestFcn' does not
 % accept to get additional parameters passed by the function call
@@ -934,6 +934,68 @@ if nargin == 3
     handles = varargin{3};
 else
     handles = guidata(gcbo);
+end
+
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+modified = [];
+for k = 1 : length(appdata.data)
+    if isfield(appdata.data{k},'blc') && ...
+            isfield(appdata.data{k}.blc,'method')
+        modified(end+1) = k;
+    end
+end
+
+if ~isempty(modified)
+    selection = questdlg(...
+        sprintf('%s %s\n - %s\n - %s\n - %s',...
+        'There exist modified spectra in the GUI.',...
+        'Do you want to',...
+        'discard the modifications,',...
+        'cancel the closing of the GUI, or do you want to ',...
+        'apply the changes and close?'),...
+        'Modifications exist. Really quit?',...
+        'Discard',...
+        'Cancel',...
+        'Apply & Close',...
+        'Apply & Close');
+
+    switch selection,
+        case 'Cancel',
+            return;
+        case 'Apply & Close'
+            % Get appdata from parent window necessary for BLC
+            if isfield(handles,'callerFunction') && ...
+                    isfield(handles,'callerHandle')
+                callerHandles = guidata(handles.callerHandle);
+                if isfield(callerHandles,mfilename)
+                    % Get appdata of the parent GUI
+                    parentAppdata = getappdata(callerHandles.figure1);
+                    for k = 1:length(modified)
+                        [x y] = size(appdata.data{modified(k)}.data)
+                        for l = 1:y
+                            appdata.data{modified(k)}.data(:,l) = ...
+                                appdata.data{modified(k)}.data(:,l) - ...
+                                appdata.control.fit{modified(k)};
+                        end
+                        parentAppdata.data{modified(k)} = ...
+                            appdata.data{modified(k)};
+                    end
+                    % Refresh appdata of the parent GUI
+                    parentAppdataFieldnames = fieldnames(parentAppdata);
+                    for k=1:length(parentAppdataFieldnames)
+                      setappdata(...
+                          callerHandles.figure1,...
+                          parentAppdataFieldnames{k},...
+                          getfield(parentAppdata,...
+                          parentAppdataFieldnames{k})...
+                          );
+                    end
+                end
+            end
+        case 'Discard'
+    end
 end
 
 % removes handle of this GUI from handles structure of the calling gui in
@@ -1201,6 +1263,10 @@ if isfield(appdata.data{appdata.control.spectra.active}.blc,'method')
         appdata.data{appdata.control.spectra.active}.blc.statistics.S = S;
         appdata.data{appdata.control.spectra.active}.blc.statistics.mu = mu;
         appdata.data{appdata.control.spectra.active}.blc.statistics.delta = delta;
+        % Assign fit to control structure of the BLC GUI (used for the
+        % final regression before the data are retransferred to the main
+        % GUI)
+        appdata.control.fit{appdata.control.spectra.active} = f;
         plot(...
             handles.axes2,...
             yaxis,...
