@@ -111,10 +111,10 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         data = parentAppdata.data;
         % Assign necessary control parameters to data structure
         for k = 1:length(data)
-            data{k}.left = 10;
-            data{k}.right = 10;
-            data{k}.addPoint1 = [];
-            data{k}.addPoint2 = [];
+            data{k}.blc.area.left = 10;
+            data{k}.blc.area.right = 10;
+            data{k}.blc.area.addPoint1 = [];
+            data{k}.blc.area.addPoint2 = [];
         end
         control.spectra = parentAppdata.control.spectra;
         setappdata(handles.figure1,'data',data);
@@ -196,12 +196,31 @@ end
 
 % --- Executes on selection change in correctionMethodPopupmenu.
 function correctionMethodPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to correctionMethodPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns correctionMethodPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from correctionMethodPopupmenu
+methods = get(hObject,'String');
+switch methods{get(hObject,'Value')}
+    case '0th polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '0poly';
+    case '1st polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '1poly';
+    case '2nd polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '2poly';
+    case '3rd polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '3poly';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -246,7 +265,7 @@ function leftFitAreaSlider_Callback(hObject, eventdata, handles)
 handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.left = ...
+appdata.data{appdata.control.spectra.active}.blc.area.left = ...
     get(hObject,'Value');
 set(handles.leftFitAreaEdit,'String',num2str(get(hObject,'Value')));
 
@@ -283,21 +302,21 @@ appdata = getappdata(handles.figure1);
 
 value = floor(str2double(get(hObject,'String')));
 if value < get(handles.leftFitAreaSlider,'Min')
-    appdata.data{appdata.control.spectra.active}.left = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.left = ...
         get(handles.leftFitAreaSlider,'Min');
     set(handles.leftFitAreaSlider,'Value',...
         get(handles.leftFitAreaSlider,'Min'));
     set(handles.leftFitAreaEdit,'String',...
         num2str(get(handles.leftFitAreaSlider,'Min')));
 elseif value > get(handles.leftFitAreaSlider,'Max')
-    appdata.data{appdata.control.spectra.active}.left = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.left = ...
         get(handles.leftFitAreaSlider,'Max');
     set(handles.leftFitAreaSlider,'Value',...
         get(handles.leftFitAreaSlider,'Max'));
     set(handles.leftFitAreaEdit,'String',...
         num2str(get(handles.leftFitAreaSlider,'Max')));
 else
-    appdata.data{appdata.control.spectra.active}.left = value;
+    appdata.data{appdata.control.spectra.active}.blc.area.left = value;
     set(handles.leftFitAreaSlider,'Value',value);
 end
 
@@ -335,7 +354,7 @@ function rightFitAreaSlider_Callback(hObject, eventdata, handles)
 handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.right = ...
+appdata.data{appdata.control.spectra.active}.blc.area.right = ...
     get(hObject,'Value');
 set(handles.rightFitAreaEdit,'String',num2str(get(hObject,'Value')));
 
@@ -373,21 +392,21 @@ appdata = getappdata(handles.figure1);
 
 value = floor(str2double(get(hObject,'String')));
 if value < get(handles.rightFitAreaSlider,'Min')
-    appdata.data{appdata.control.spectra.active}.right = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.right = ...
         get(handles.rightFitAreaSlider,'Min');
     set(handles.rightFitAreaSlider,'Value',...
         get(handles.rightFitAreaSlider,'Min'));
     set(handles.rightFitAreaEdit,'String',...
         num2str(get(handles.rightFitAreaSlider,'Min')));
 elseif value > get(handles.rightFitAreaSlider,'Max')
-    appdata.data{appdata.control.spectra.active}.right = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.right = ...
         get(handles.rightFitAreaSlider,'Max');
     set(handles.rightFitAreaSlider,'Value',...
         get(handles.rightFitAreaSlider,'Max'));
     set(handles.rightFitAreaEdit,'String',...
         num2str(get(handles.rightFitAreaSlider,'Max')));
 else
-    appdata.data{appdata.control.spectra.active}.right = value;
+    appdata.data{appdata.control.spectra.active}.blc.area.right = value;
     set(handles.rightFitAreaSlider,'Value',value);
 end
 
@@ -469,7 +488,7 @@ function additionalFitPoint1Slider_Callback(hObject, eventdata, handles)
 handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.addPoint1 = ...
+appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = ...
     get(hObject,'Value');
 set(handles.additionalFitPoint1Position,'String',...
     num2str(get(hObject,'Value')));
@@ -508,11 +527,11 @@ appdata = getappdata(handles.figure1);
 
 value = floor(str2double(get(hObject,'String')));
 if value < 1
-    appdata.data{appdata.control.spectra.active}.addPoint1 = 1;
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = 1;
     set(handles.additionalFitPoint1Slider,'Value',1);
     set(handles.additionalFitPoint1Position,'String','1');
 elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)
-    appdata.data{appdata.control.spectra.active}.addPoint1 = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = ...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values);
     set(handles.additionalFitPoint1Slider,'Value',...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values));
@@ -520,7 +539,7 @@ elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.va
         num2str(...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)));
 else
-    appdata.data{appdata.control.spectra.active}.addPoint1 = value;
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = value;
     set(handles.additionalFitPoint1Slider,'Value',value);
 end
 
@@ -558,7 +577,7 @@ function additionalFitPoint2Slider_Callback(hObject, eventdata, handles)
 handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
-appdata.data{appdata.control.spectra.active}.addPoint2 = ...
+appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = ...
     get(hObject,'Value');
 set(handles.additionalFitPoint2Position,'String',...
     num2str(get(hObject,'Value')));
@@ -597,11 +616,11 @@ appdata = getappdata(handles.figure1);
 
 value = floor(str2double(get(hObject,'String')));
 if value < 1
-    appdata.data{appdata.control.spectra.active}.addPoint2 = 1;
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = 1;
     set(handles.additionalFitPoint2Slider,'Value',1);
     set(handles.additionalFitPoint2Position,'String','1');
 elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)
-    appdata.data{appdata.control.spectra.active}.addPoint2 = ...
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = ...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values);
     set(handles.additionalFitPoint2Slider,'Value',...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values));
@@ -609,7 +628,7 @@ elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.va
         num2str(...
         length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)));
 else
-    appdata.data{appdata.control.spectra.active}.addPoint2 = value;
+    appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = value;
     set(handles.additionalFitPoint2Slider,'Value',value);
 end
 
@@ -653,12 +672,12 @@ switch get(hObject,'Value')
         set(handles.additionalFitPoint1PickButton,'Enable','Off');
         set(appdata.handles.axes1Point1,'Visible','Off');
         set(appdata.handles.axes2Point1,'Visible','Off');
-        appdata.data{appdata.control.spectra.active}.addPoint1 = [];
+        appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = [];
     case 1
         set(handles.additionalFitPoint1Slider,'Enable','On');
         set(handles.additionalFitPoint1Position,'Enable','On');
         set(handles.additionalFitPoint1PickButton,'Enable','On');
-        appdata.data{appdata.control.spectra.active}.addPoint1 = ...
+        appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = ...
             get(handles.additionalFitPoint1Slider,'Value');
 end
 
@@ -688,12 +707,12 @@ switch get(hObject,'Value')
         set(handles.additionalFitPoint2PickButton,'Enable','Off');
         set(appdata.handles.axes1Point2,'Visible','Off');
         set(appdata.handles.axes2Point2,'Visible','Off');
-        appdata.data{appdata.control.spectra.active}.addPoint2 = [];
+        appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = [];
     case 1
         set(handles.additionalFitPoint2Slider,'Enable','On');
         set(handles.additionalFitPoint2Position,'Enable','On');
         set(handles.additionalFitPoint2PickButton,'Enable','On');
-        appdata.data{appdata.control.spectra.active}.addPoint2 = ...
+        appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = ...
             get(handles.additionalFitPoint2Slider,'Value');
 end
 
@@ -794,16 +813,67 @@ function reloadButton_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in correctionGoButton.
 function correctionGoButton_Callback(hObject, eventdata, handles)
-% hObject    handle to correctionGoButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
 
+methods = get(handles.correctionMethodPopupmenu,'String');
+switch methods{get(handles.correctionMethodPopupmenu,'Value')}
+    case '0th polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '0poly';
+    case '1st polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '1poly';
+    case '2nd polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '2poly';
+    case '3rd polynomial'
+        appdata.data{appdata.control.spectra.active}.blc.method = '3poly';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
+if_fitArea_Refresh(handles.figure1);
+if_fitPoints_Refresh(handles.figure1);
+
+appdata.data{appdata.control.spectra.active}.blc
+appdata.data{appdata.control.spectra.active}.blc.area
 
 % --- Executes on button press in correctionResetButton.
 function correctionResetButton_Callback(hObject, eventdata, handles)
-% hObject    handle to correctionResetButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+% Reset struct containing the parameters of the correction
+appdata.data{appdata.control.spectra.active}.blc = ...
+    rmfield(appdata.data{appdata.control.spectra.active}.blc,'method');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
+if_fitArea_Refresh(handles.figure1);
+if_fitPoints_Refresh(handles.figure1);
+
+appdata.data{appdata.control.spectra.active}.blc
+appdata.data{appdata.control.spectra.active}.blc.area
 
 
 % --- Executes on selection change in spectraVisibleListbox.
@@ -1036,7 +1106,7 @@ set(handles.additionalFitPoint2Position,'String',...
     appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2)...
     ));
 
-if isempty(appdata.data{appdata.control.spectra.active}.addPoint1)
+if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint1)
     set(handles.additionalFitPoint1Checkbox,'Value',0)
     set(handles.additionalFitPoint1Slider,'Enable','Off');
     set(handles.additionalFitPoint1Position,'Enable','Off');
@@ -1044,7 +1114,7 @@ if isempty(appdata.data{appdata.control.spectra.active}.addPoint1)
 %     set(appdata.handles.axes1Point1,'Visible','Off');
 %     set(appdata.handles.axes2Point1,'Visible','Off');
 end
-if isempty(appdata.data{appdata.control.spectra.active}.addPoint2)
+if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint2)
     set(handles.additionalFitPoint2Checkbox,'Value',0)
     set(handles.additionalFitPoint2Slider,'Enable','Off');
     set(handles.additionalFitPoint2Position,'Enable','Off');
@@ -1104,23 +1174,54 @@ if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
 else
     yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
 end
-plot(...
-    handles.axes1,...
-    yaxis,...
-    appdata.data{appdata.control.spectra.active}.data(...
-    :,floor(appdata.data{appdata.control.spectra.active}.t)...
-    )...
-    );
 endOfSpectrum = mean(...
     appdata.data{appdata.control.spectra.active}.data(...
     :,length(xaxis)-10:length(xaxis)...
     ),...
     2);
-plot(...
-    handles.axes2,...
-    yaxis,...
-    endOfSpectrum...
-    );
+if isfield(appdata.data{appdata.control.spectra.active}.blc,'method')
+    if ~isempty(strfind(...
+            appdata.data{appdata.control.spectra.active}.blc.method,...
+            'poly'))
+        degree = str2num(...
+            appdata.data{appdata.control.spectra.active}.blc.method(1));
+        [f,p,delta,mu,S] = polyFit(...
+            [yaxis' endOfSpectrum], ...
+            degree, ...
+            appdata.data{appdata.control.spectra.active}.blc.area.left, ...
+            appdata.data{appdata.control.spectra.active}.blc.area.right);
+        plot(...
+            handles.axes2,...
+            yaxis,...
+            endOfSpectrum,...
+            yaxis,...
+            f...
+            );
+    end
+else
+    plot(...
+        handles.axes2,...
+        yaxis,...
+        endOfSpectrum...
+        );
+end
+if exist('f','var')
+    plot(...
+        handles.axes1,...
+        yaxis,...
+        appdata.data{appdata.control.spectra.active}.data(...
+        :,floor(appdata.data{appdata.control.spectra.active}.t)...
+        )-f...
+        );
+else
+    plot(...
+        handles.axes1,...
+        yaxis,...
+        appdata.data{appdata.control.spectra.active}.data(...
+        :,floor(appdata.data{appdata.control.spectra.active}.t)...
+        )...
+        );
+end
 xLimits = [...
     yaxis(1) ...
     yaxis(end) ...                
@@ -1183,59 +1284,57 @@ appdata = getappdata(handles.figure1);
 % Get y axis (field axis) and convert G -> mT
 if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
     yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values / 10;
-    left = appdata.data{appdata.control.spectra.active}.left/10;
-    right = appdata.data{appdata.control.spectra.active}.right/10;
 else
     yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
-    left = appdata.data{appdata.control.spectra.active}.left;
-    right = appdata.data{appdata.control.spectra.active}.right;
 end
+left = appdata.data{appdata.control.spectra.active}.blc.area.left;
+right = appdata.data{appdata.control.spectra.active}.blc.area.right;
 
 % Refresh sliders and edit fields
 set(handles.leftFitAreaSlider,'Value',...
-    appdata.data{appdata.control.spectra.active}.left);
+    appdata.data{appdata.control.spectra.active}.blc.area.left);
 set(handles.rightFitAreaSlider,'Value',...
-    appdata.data{appdata.control.spectra.active}.right);
+    appdata.data{appdata.control.spectra.active}.blc.area.right);
 set(handles.leftFitAreaEdit,'String',num2str(...
-    appdata.data{appdata.control.spectra.active}.left));
+    appdata.data{appdata.control.spectra.active}.blc.area.left));
 set(handles.rightFitAreaEdit,'String',num2str(...
-    appdata.data{appdata.control.spectra.active}.right));
+    appdata.data{appdata.control.spectra.active}.blc.area.right));
 
 
 if isfield(appdata.handles,'axes1Left') && isfield(appdata.handles,'axes1Right') && ...
         isfield(appdata.handles,'axes2Left') && isfield(appdata.handles,'axes2Right')
     set(appdata.handles.axes1Left,...
         'XData',...
-        [yaxis(1) yaxis(1)+left]);
+        [yaxis(1) yaxis(1+left)]);
     set(appdata.handles.axes1Right,...
         'XData',...
-        [yaxis(end)-right yaxis(end)]);
+        [yaxis(end-right) yaxis(end)]);
     set(appdata.handles.axes2Left,...
         'XData',...
-        [yaxis(1) yaxis(1)+left]);
+        [yaxis(1) yaxis(1+left)]);
     set(appdata.handles.axes2Right,...
         'XData',...
-        [yaxis(end)-right yaxis(end)]);
+        [yaxis(end-right) yaxis(end)]);
     refreshdata(handles.figure1);
 else
     axes(handles.axes1);
     yval = get(handles.axes1,'YLim');
     appdata.handles.axes1Left = line(...
-        [yaxis(1) yaxis(1)+left],...
+        [yaxis(1) yaxis(1+left)],...
         [yval(1) yval(1)],...
         'Color','r','LineWidth',6);
     appdata.handles.axes1Right = line(...
-        [yaxis(end)-right yaxis(end)],...
+        [yaxis(end-right) yaxis(end)],...
         [yval(1) yval(1)],...
         'Color','r','LineWidth',6);
     axes(handles.axes2);
     yval = get(handles.axes2,'YLim');
     appdata.handles.axes2Left = line(...
-        [yaxis(1) yaxis(1)+left],...
+        [yaxis(1) yaxis(1+left)],...
         [yval(1) yval(1)],...
         'Color','r','LineWidth',6);
     appdata.handles.axes2Right = line(...
-        [yaxis(end)-right yaxis(end)],...
+        [yaxis(end-right) yaxis(end)],...
         [yval(1) yval(1)],...
         'Color','r','LineWidth',6);
 end
@@ -1267,11 +1366,11 @@ else
 end
 
 % Set values for additional points
-if isempty(appdata.data{appdata.control.spectra.active}.addPoint1)
+if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint1)
     addPoint1 = floor(length(...
         appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2);
 else
-    addPoint1 = appdata.data{appdata.control.spectra.active}.addPoint1;
+    addPoint1 = appdata.data{appdata.control.spectra.active}.blc.area.addPoint1;
     set(handles.additionalFitPoint1Checkbox,'Value',1)
     set(handles.additionalFitPoint1Slider,'Value',addPoint1)
     set(handles.additionalFitPoint1Slider,'Enable','On');
@@ -1279,11 +1378,11 @@ else
     set(handles.additionalFitPoint1Position,'String',num2str(addPoint1))
     set(handles.additionalFitPoint1PickButton,'Enable','On');
 end
-if isempty(appdata.data{appdata.control.spectra.active}.addPoint2)
+if isempty(appdata.data{appdata.control.spectra.active}.blc.area.addPoint2)
     addPoint2 = floor(length(...
         appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2);
 else
-    addPoint2 = appdata.data{appdata.control.spectra.active}.addPoint2;
+    addPoint2 = appdata.data{appdata.control.spectra.active}.blc.area.addPoint2;
     set(handles.additionalFitPoint2Checkbox,'Value',1)
     set(handles.additionalFitPoint2Slider,'Value',addPoint2)
     set(handles.additionalFitPoint2Slider,'Enable','On');
@@ -1315,6 +1414,11 @@ if get(handles.additionalFitPoint1Checkbox,'Value')
             [yval(1) yval(end)],...
             'Color','r','LineWidth',1);
     end
+    if isfield(appdata.handles,'axes1Point1') && ...
+            isfield(appdata.handles,'axes2Point1')
+        set(appdata.handles.axes1Point1,'Visible','On');
+        set(appdata.handles.axes2Point1,'Visible','On');
+    end
 else
     if isfield(appdata.handles,'axes1Point1') && ...
             isfield(appdata.handles,'axes2Point1')
@@ -1344,6 +1448,11 @@ if get(handles.additionalFitPoint2Checkbox,'Value')
             [yaxis(addPoint2) yaxis(addPoint2)],...
             [yval(1) yval(end)],...
             'Color','r','LineWidth',1);
+    end
+    if isfield(appdata.handles,'axes1Point2') && ...
+            isfield(appdata.handles,'axes2Point2')
+        set(appdata.handles.axes1Point2,'Visible','On');
+        set(appdata.handles.axes2Point2,'Visible','On');
     end
 else
     if isfield(appdata.handles,'axes1Point2') && ...
@@ -1422,21 +1531,21 @@ if ~isempty(get(handles.axes1,'Children'))
     switch appdata.control.point
         case 'left'
             if value < get(handles.leftFitAreaSlider,'Min')
-                appdata.data{appdata.control.spectra.active}.left = ...
+                appdata.data{appdata.control.spectra.active}.blc.area.left = ...
                     get(handles.leftFitAreaSlider,'Min');
                 set(handles.leftFitAreaSlider,'Value',...
                     get(handles.leftFitAreaSlider,'Min'));
                 set(handles.leftFitAreaEdit,'String',...
                     num2str(get(handles.leftFitAreaSlider,'Min')));
             elseif value > get(handles.leftFitAreaSlider,'Max')
-                appdata.data{appdata.control.spectra.active}.left = ...
+                appdata.data{appdata.control.spectra.active}.blc.area.left = ...
                     get(handles.leftFitAreaSlider,'Max');
                 set(handles.leftFitAreaSlider,'Value',...
                     get(handles.leftFitAreaSlider,'Max'));
                 set(handles.leftFitAreaEdit,'String',...
                     num2str(get(handles.leftFitAreaSlider,'Max')));
             else
-                appdata.data{appdata.control.spectra.active}.left = value;
+                appdata.data{appdata.control.spectra.active}.blc.area.left = value;
                 set(handles.leftFitAreaSlider,'Value',value);
                 set(handles.leftFitAreaEdit,'String',num2str(value));
             end
@@ -1444,30 +1553,30 @@ if ~isempty(get(handles.axes1,'Children'))
             value = length(...
                 appdata.data{appdata.control.spectra.active}.axes.yaxis.values) - value;
             if value < get(handles.rightFitAreaSlider,'Min')
-                appdata.data{appdata.control.spectra.active}.right = ...
+                appdata.data{appdata.control.spectra.active}.blc.area.right = ...
                     get(handles.rightFitAreaSlider,'Min');
                 set(handles.rightFitAreaSlider,'Value',...
                     get(handles.rightFitAreaSlider,'Min'));
                 set(handles.rightFitAreaEdit,'String',...
                     num2str(get(handles.rightFitAreaSlider,'Min')));
             elseif value > get(handles.rightFitAreaSlider,'Max')
-                appdata.data{appdata.control.spectra.active}.right = ...
+                appdata.data{appdata.control.spectra.active}.blc.area.right = ...
                     get(handles.rightFitAreaSlider,'Max');
                 set(handles.rightFitAreaSlider,'Value',...
                     get(handles.rightFitAreaSlider,'Max'));
                 set(handles.rightFitAreaEdit,'String',...
                     num2str(get(handles.rightFitAreaSlider,'Max')));
             else
-                appdata.data{appdata.control.spectra.active}.right = value;
+                appdata.data{appdata.control.spectra.active}.blc.area.right = value;
                 set(handles.rightFitAreaSlider,'Value',value);
                 set(handles.rightFitAreaEdit,'String',num2str(value));
             end
         case 'addPoint1'
-            appdata.data{appdata.control.spectra.active}.addPoint1 = value;
+            appdata.data{appdata.control.spectra.active}.blc.area.addPoint1 = value;
             set(handles.additionalFitPoint1Slider,'Value',value);
             set(handles.additionalFitPoint1Position,'String',num2str(value));
         case 'addPoint2'
-            appdata.data{appdata.control.spectra.active}.addPoint2 = value;
+            appdata.data{appdata.control.spectra.active}.blc.area.addPoint2 = value;
             set(handles.additionalFitPoint2Slider,'Value',value);
             set(handles.additionalFitPoint2Position,'String',num2str(value));
     end
@@ -1489,3 +1598,4 @@ for k=1:length(appdataFieldnames)
 end
 
 if_fitArea_Refresh(handles.figure1);
+if_fitPoints_Refresh(handles.figure1);
