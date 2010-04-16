@@ -113,8 +113,8 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         for k = 1:length(data)
             data{k}.left = 10;
             data{k}.right = 10;
-            data{k}.addPoint1 = length(data{k}.axes.yaxis.values)/2;
-            data{k}.addPoint2 = length(data{k}.axes.yaxis.values)/2;
+            data{k}.addPoint1 = [];
+            data{k}.addPoint2 = [];
         end
         control.spectra = parentAppdata.control.spectra;
         setappdata(handles.figure1,'data',data);
@@ -535,6 +535,9 @@ for k=1:length(appdataFieldnames)
       );
 end
 
+if_fitPoints_Refresh(handles.figure1);
+
+
 % --- Executes during object creation, after setting all properties.
 function additionalFitPoint1Position_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to additionalFitPoint1Position (see GCBO)
@@ -621,6 +624,8 @@ for k=1:length(appdataFieldnames)
       );
 end
 
+if_fitPoints_Refresh(handles.figure1);
+
 
 % --- Executes during object creation, after setting all properties.
 function additionalFitPoint2Position_CreateFcn(hObject, eventdata, handles)
@@ -648,14 +653,13 @@ switch get(hObject,'Value')
         set(handles.additionalFitPoint1PickButton,'Enable','Off');
         set(appdata.handles.axes1Point1,'Visible','Off');
         set(appdata.handles.axes2Point1,'Visible','Off');
+        appdata.data{appdata.control.spectra.active}.addPoint1 = [];
     case 1
         set(handles.additionalFitPoint1Slider,'Enable','On');
         set(handles.additionalFitPoint1Position,'Enable','On');
         set(handles.additionalFitPoint1PickButton,'Enable','On');
         appdata.data{appdata.control.spectra.active}.addPoint1 = ...
             get(handles.additionalFitPoint1Slider,'Value');
-        set(appdata.handles.axes1Point1,'Visible','On');
-        set(appdata.handles.axes2Point1,'Visible','On');
 end
 
 % Refresh appdata of the current GUI
@@ -668,8 +672,8 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-appdata.handles
 if_fitPoints_Refresh(handles.figure1);
+
 
 % --- Executes on button press in additionalFitPoint2Checkbox.
 function additionalFitPoint2Checkbox_Callback(hObject, eventdata, handles)
@@ -682,10 +686,15 @@ switch get(hObject,'Value')
         set(handles.additionalFitPoint2Slider,'Enable','Off');
         set(handles.additionalFitPoint2Position,'Enable','Off');
         set(handles.additionalFitPoint2PickButton,'Enable','Off');
+        set(appdata.handles.axes1Point2,'Visible','Off');
+        set(appdata.handles.axes2Point2,'Visible','Off');
+        appdata.data{appdata.control.spectra.active}.addPoint2 = [];
     case 1
         set(handles.additionalFitPoint2Slider,'Enable','On');
         set(handles.additionalFitPoint2Position,'Enable','On');
         set(handles.additionalFitPoint2PickButton,'Enable','On');
+        appdata.data{appdata.control.spectra.active}.addPoint2 = ...
+            get(handles.additionalFitPoint2Slider,'Value');
 end
 
 % Refresh appdata of the current GUI
@@ -697,6 +706,8 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
+
+if_fitPoints_Refresh(handles.figure1);
 
 
 % --- Executes on button press in additionalFitPoint1PickButton.
@@ -824,6 +835,7 @@ end
 
 if_axis_Refresh(handles.figure1);
 if_fitArea_Refresh(handles.figure1);
+if_fitPoints_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -859,7 +871,6 @@ end
 
 % removes handle of this GUI from handles structure of the calling gui in
 % case this function has been called from another GUI
-
 if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     callerHandles = guidata(handles.callerHandle);
     if isfield(callerHandles,mfilename)
@@ -1025,6 +1036,23 @@ set(handles.additionalFitPoint2Position,'String',...
     appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2)...
     ));
 
+if isempty(appdata.data{appdata.control.spectra.active}.addPoint1)
+    set(handles.additionalFitPoint1Checkbox,'Value',0)
+    set(handles.additionalFitPoint1Slider,'Enable','Off');
+    set(handles.additionalFitPoint1Position,'Enable','Off');
+    set(handles.additionalFitPoint1PickButton,'Enable','Off');
+%     set(appdata.handles.axes1Point1,'Visible','Off');
+%     set(appdata.handles.axes2Point1,'Visible','Off');
+end
+if isempty(appdata.data{appdata.control.spectra.active}.addPoint2)
+    set(handles.additionalFitPoint2Checkbox,'Value',0)
+    set(handles.additionalFitPoint2Slider,'Enable','Off');
+    set(handles.additionalFitPoint2Position,'Enable','Off');
+    set(handles.additionalFitPoint2PickButton,'Enable','Off');
+%     set(appdata.handles.axes1Point2,'Visible','Off');
+%     set(appdata.handles.axes2Point2,'Visible','Off');
+end
+
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
 appdataFieldnames = fieldnames(appdata);
@@ -1067,7 +1095,8 @@ set(handles.spectraScrollSlider,'Max',xDim);
 set(handles.spectraScrollSlider,'SliderStep',[1/xDim, 10/xDim]);
 
 % Reset current axis
-cla(handles.axes1,'reset');
+%cla(handles.axes1,'reset');
+%cla(handles.axes2,'reset');
 appdata.handles = struct();
 % Convert G -> mT
 if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
@@ -1162,6 +1191,17 @@ else
     right = appdata.data{appdata.control.spectra.active}.right;
 end
 
+% Refresh sliders and edit fields
+set(handles.leftFitAreaSlider,'Value',...
+    appdata.data{appdata.control.spectra.active}.left);
+set(handles.rightFitAreaSlider,'Value',...
+    appdata.data{appdata.control.spectra.active}.right);
+set(handles.leftFitAreaEdit,'String',num2str(...
+    appdata.data{appdata.control.spectra.active}.left));
+set(handles.rightFitAreaEdit,'String',num2str(...
+    appdata.data{appdata.control.spectra.active}.right));
+
+
 if isfield(appdata.handles,'axes1Left') && isfield(appdata.handles,'axes1Right') && ...
         isfield(appdata.handles,'axes2Left') && isfield(appdata.handles,'axes2Right')
     set(appdata.handles.axes1Left,...
@@ -1188,7 +1228,6 @@ else
         [yaxis(end)-right yaxis(end)],...
         [yval(1) yval(1)],...
         'Color','r','LineWidth',6);
-
     axes(handles.axes2);
     yval = get(handles.axes2,'YLim');
     appdata.handles.axes2Left = line(...
@@ -1223,50 +1262,95 @@ appdata = getappdata(handles.figure1);
 % Get y axis (field axis) and convert G -> mT
 if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
     yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values / 10;
-    addPoint1 = appdata.data{appdata.control.spectra.active}.addPoint1/10;
-    addPoint2 = appdata.data{appdata.control.spectra.active}.addPoint2/10;
 else
     yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
-    addPoint1 = appdata.data{appdata.control.spectra.active}.addPoint1;
-    addPoint2 = appdata.data{appdata.control.spectra.active}.addPoint2;
 end
 
-if isfield(appdata.handles,'axes1Point1') && isfield(appdata.handles,'axes1Point1') && ...
-        isfield(appdata.handles,'axes2Point1') && isfield(appdata.handles,'axes2Point2')
-    set(appdata.handles.axes1Point1,...
-        'XData',...
-        [addPoint1 addPoint1]);
-    set(appdata.handles.axes1Point2,...
-        'XData',...
-        [addPoint2 addPoint2]);
-    set(appdata.handles.axes2Point1,...
-        'XData',...
-        [addPoint1 addPoint1]);
-    set(appdata.handles.axes2Point2,...
-        'XData',...
-        [addPoint2 addPoint2]);
-    refreshdata(handles.figure1);
+% Set values for additional points
+if isempty(appdata.data{appdata.control.spectra.active}.addPoint1)
+    addPoint1 = floor(length(...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2);
 else
-    axes(handles.axes1);
-    yval = get(handles.axes1,'YLim');
-    appdata.handles.axes1Point1 = line(...
-        [addPoint1 addPoint1],...
-        [yval(1) yval(end)],...
-        'Color','r','LineWidth',2);
-    appdata.handles.axes1Point2 = line(...
-        [addPoint2 addPoint2],...
-        [yval(1) yval(end)],...
-        'Color','r','LineWidth',2);
-    axes(handles.axes2);
-    yval = get(handles.axes2,'YLim');
-    appdata.handles.axes2Point1 = line(...
-        [addPoint1 addPoint1],...
-        [yval(1) yval(end)],...
-        'Color','r','LineWidth',2);
-    appdata.handles.axes2Point2 = line(...
-        [addPoint2 addPoint2],...
-        [yval(1) yval(end)],...
-        'Color','r','LineWidth',2);
+    addPoint1 = appdata.data{appdata.control.spectra.active}.addPoint1;
+    set(handles.additionalFitPoint1Checkbox,'Value',1)
+    set(handles.additionalFitPoint1Slider,'Value',addPoint1)
+    set(handles.additionalFitPoint1Slider,'Enable','On');
+    set(handles.additionalFitPoint1Position,'Enable','On');
+    set(handles.additionalFitPoint1Position,'String',num2str(addPoint1))
+    set(handles.additionalFitPoint1PickButton,'Enable','On');
+end
+if isempty(appdata.data{appdata.control.spectra.active}.addPoint2)
+    addPoint2 = floor(length(...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values)/2);
+else
+    addPoint2 = appdata.data{appdata.control.spectra.active}.addPoint2;
+    set(handles.additionalFitPoint2Checkbox,'Value',1)
+    set(handles.additionalFitPoint2Slider,'Value',addPoint2)
+    set(handles.additionalFitPoint2Slider,'Enable','On');
+    set(handles.additionalFitPoint2Position,'Enable','On');
+    set(handles.additionalFitPoint2Position,'String',num2str(addPoint2))
+    set(handles.additionalFitPoint2PickButton,'Enable','On');
+end
+
+if get(handles.additionalFitPoint1Checkbox,'Value')
+    if isfield(appdata.handles,'axes1Point1') && ...
+            isfield(appdata.handles,'axes2Point1')
+        set(appdata.handles.axes1Point1,...
+            'XData',...
+            [yaxis(addPoint1) yaxis(addPoint1)]);
+        set(appdata.handles.axes2Point1,...
+            'XData',...
+            [yaxis(addPoint1) yaxis(addPoint1)]);
+    else
+        axes(handles.axes1);
+        yval = get(handles.axes1,'YLim');
+        appdata.handles.axes1Point1 = line(...
+            [yaxis(addPoint1) yaxis(addPoint1)],...
+            [yval(1) yval(end)],...
+            'Color','r','LineWidth',1);
+        axes(handles.axes2);
+        yval = get(handles.axes2,'YLim');
+        appdata.handles.axes2Point1 = line(...
+            [yaxis(addPoint1) yaxis(addPoint1)],...
+            [yval(1) yval(end)],...
+            'Color','r','LineWidth',1);
+    end
+else
+    if isfield(appdata.handles,'axes1Point1') && ...
+            isfield(appdata.handles,'axes2Point1')
+        set(appdata.handles.axes1Point1,'Visible','Off');
+        set(appdata.handles.axes2Point1,'Visible','Off');
+    end
+end
+if get(handles.additionalFitPoint2Checkbox,'Value')
+    if isfield(appdata.handles,'axes1Point2') && ...
+            isfield(appdata.handles,'axes2Point2')
+        set(appdata.handles.axes1Point2,...
+            'XData',...
+            [yaxis(addPoint2) yaxis(addPoint2)]);
+        set(appdata.handles.axes2Point2,...
+            'XData',...
+            [yaxis(addPoint2) yaxis(addPoint2)]);
+    else
+        axes(handles.axes1);
+        yval = get(handles.axes1,'YLim');
+        appdata.handles.axes1Point2 = line(...
+            [yaxis(addPoint2) yaxis(addPoint2)],...
+            [yval(1) yval(end)],...
+            'Color','r','LineWidth',1);
+        axes(handles.axes2);
+        yval = get(handles.axes2,'YLim');
+        appdata.handles.axes2Point2 = line(...
+            [yaxis(addPoint2) yaxis(addPoint2)],...
+            [yval(1) yval(end)],...
+            'Color','r','LineWidth',1);
+    end
+else
+    if isfield(appdata.handles,'axes1Point2') && ...
+            isfield(appdata.handles,'axes2Point2')
+        set(appdata.handles.axes1Point2,'Visible','Off');
+        set(appdata.handles.axes2Point2,'Visible','Off');
+    end
 end
 
 % Refresh handles and appdata of the current GUI
