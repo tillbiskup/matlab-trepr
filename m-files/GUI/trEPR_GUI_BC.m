@@ -240,12 +240,46 @@ end
 
 
 function positionInTimePointsEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to positionInTimePointsEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of positionInTimePointsEdit as text
-%        str2double(get(hObject,'String')) returns contents of positionInTimePointsEdit as a double
+value = floor(str2double(get(hObject,'String')));
+if value < 1
+    appdata.data{appdata.control.spectra.active}.t = 1;
+    set(handles.positionInTimePointsEdit,'String','1');
+    set(handles.positionInTimeValueEdit,'String',...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1));
+elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)
+    appdata.data{appdata.control.spectra.active}.t = ...
+        length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values);
+    set(handles.positionInTimePointsEdit,'String',...
+        num2str(...
+        length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)));
+    set(handles.positionInTimeValueEdit,'String',...
+        num2str(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(end)));
+else
+    appdata.data{appdata.control.spectra.active}.t = value;
+    set(handles.positionInTimePointsEdit,'String',num2str(value));
+    set(handles.positionInTimeValueEdit,'String',...
+        num2str(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(...
+        value)));
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -973,7 +1007,7 @@ if ~isempty(modified)
                     % Get appdata of the parent GUI
                     parentAppdata = getappdata(callerHandles.figure1);
                     for k = 1:length(modified)
-                        [x y] = size(appdata.data{modified(k)}.data)
+                        [x y] = size(appdata.data{modified(k)}.data);
                         for l = 1:y
                             appdata.data{modified(k)}.data(:,l) = ...
                                 appdata.data{modified(k)}.data(:,l) - ...
@@ -992,6 +1026,8 @@ if ~isempty(modified)
                           parentAppdataFieldnames{k})...
                           );
                     end
+                    % Refresh axes in main GUI
+                    %trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
                 end
             end
         case 'Discard'
