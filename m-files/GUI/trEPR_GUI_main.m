@@ -1170,7 +1170,7 @@ function menuToolsCorrectionsBaseline_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-trEPR_GUI_BC(...
+trEPR_GUI_BLC(...
     'callerFunction',mfilename,...
     'callerHandle',hObject);
 
@@ -1420,7 +1420,7 @@ else
     set(handles.menuViewAccumulate, 'Checked', 'off');
 end    
 
-if isfield(handles,'trEPR_GUI_BC')
+if isfield(handles,'trEPR_GUI_BLC')
     set(handles.menuViewBaselineCorrection, 'Checked', 'on');
 else
     set(handles.menuViewBaselineCorrection, 'Checked', 'off');
@@ -1465,11 +1465,11 @@ function menuViewBaselineCorrection_Callback(hObject, eventdata, handles)
 if strcmp(get(gcbo, 'Checked'),'on')
     set(gcbo, 'Checked', 'off');
     
-    trEPR_GUI_BC('closeGUI',hObject, eventdata, handles);
+    trEPR_GUI_BLC('closeGUI',hObject, eventdata, handles);
 else 
     set(gcbo, 'Checked', 'on');
 
-    trEPR_GUI_BC(...
+    trEPR_GUI_BLC(...
         'callerFunction',mfilename,...
         'callerHandle',hObject);
 end
