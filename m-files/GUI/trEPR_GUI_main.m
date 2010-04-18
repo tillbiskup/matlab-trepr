@@ -1918,6 +1918,13 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.syEdit,'Enable','Inactive');
     set(handles.timeEditIndex,'Enable','Inactive');
     set(handles.b0EditIndex,'Enable','Inactive');
+    set(handles.spectraInfoButton,'Enable','Off');
+    set(handles.spectraRemoveButton,'Enable','Off');
+    set(handles.spectraAccumulateButton,'Enable','Off');
+    set(handles.axisResetButton,'Enable','Off');
+    set(handles.axisExportButton,'Enable','Off');
+    set(handles.measureClearButton,'Enable','Off');
+    set(handles.measurePickButton,'Enable','Off');
 else
     set(handles.spectraHideButton,'Enable','On');
     set(handles.displayTypePopupmenu,'Enable','On');
@@ -1928,6 +1935,13 @@ else
     set(handles.syEdit,'Enable','On');
     set(handles.timeEditIndex,'Enable','On');
     set(handles.b0EditIndex,'Enable','On');
+    set(handles.spectraInfoButton,'Enable','On');
+    set(handles.spectraRemoveButton,'Enable','On');
+    set(handles.spectraAccumulateButton,'Enable','On');
+    set(handles.axisResetButton,'Enable','On');
+    set(handles.axisExportButton,'Enable','On');
+    set(handles.measureClearButton,'Enable','On');
+    set(handles.measurePickButton,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
