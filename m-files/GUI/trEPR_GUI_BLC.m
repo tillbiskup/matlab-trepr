@@ -1008,7 +1008,7 @@ if ~isempty(modified)
                     parentAppdata = getappdata(callerHandles.figure1);
                     for k = 1:length(modified)
                         [x y] = size(appdata.data{modified(k)}.data);
-                        for l = 1:y
+                        for l = appdata.data{modified(k)}.parameters.transient.triggerPosition:y
                             appdata.data{modified(k)}.data(:,l) = ...
                                 appdata.data{modified(k)}.data(:,l) - ...
                                 appdata.control.fit{modified(k)};
@@ -1027,7 +1027,7 @@ if ~isempty(modified)
                           );
                     end
                     % Refresh axes in main GUI
-                    %trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
+                    trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
                 end
             end
         case 'Discard'

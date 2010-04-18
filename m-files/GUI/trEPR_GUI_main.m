@@ -185,7 +185,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -286,7 +286,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 % --- Executes during object creation, after setting all properties.
 function spectraScrollSlider_CreateFcn(hObject, eventdata, handles)
@@ -332,7 +332,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -373,7 +373,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -410,7 +410,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -455,7 +455,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -565,7 +565,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -606,9 +606,31 @@ end
 
 % --------------------------------------------------------------------
 function menuFileLoad_Callback(hObject, eventdata, handles)
-% hObject    handle to menuFileLoad (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+if if_checkCompensationMethods
+    return;
+end
+
+if get(handles.spectraLoadDirectoryCheckbox,'Value');
+    FileName = uigetdir(...
+        '',...
+        'Select directory to load the files from');
+else %if multiple
+    [FileName,PathName,FilterIndex] = uigetfile(...
+        '*.*',...
+        'Select files to load',...
+        'MultiSelect','on');
+    if iscell(FileName)
+        for k=1:length(FileName)
+            FileName{k} = fullfile(PathName,FileName{k});
+        end
+    elseif ~isnumeric(FileName)
+        FileName = fullfile(PathName,FileName);
+    end
+end
+
+if ~isnumeric(FileName)            % uigetfile returns 0 if cancelled
+    if_loadSpectra(FileName);
+end
 
 
 % --------------------------------------------------------------------
@@ -682,7 +704,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -752,7 +774,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -807,7 +829,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -883,7 +905,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1024,7 +1046,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1075,7 +1097,7 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1131,7 +1153,7 @@ appdata = getappdata(handles.figure1);
 % Call functions only if there is something to compensate
 if appdata.control.spectra.active > 0
     if_POC;
-    if_axis_Refresh;
+    if_axis_Refresh(handles.figure1);
 end
 
 % --------------------------------------------------------------------
@@ -1146,7 +1168,7 @@ appdata = getappdata(handles.figure1);
 % Call functions only if there is something to compensate
 if appdata.control.spectra.active > 0
     if_BGC;
-    if_axis_Refresh;
+    if_axis_Refresh(handles.figure1);
 end
 
 % --------------------------------------------------------------------
@@ -1161,7 +1183,7 @@ appdata = getappdata(handles.figure1);
 % Call functions only if there is something to compensate
 if appdata.control.spectra.active > 0
 %    if_POC;
-%    if_axis_Refresh;
+%    if_axis_Refresh(handles.figure1);
 end
 
 % --------------------------------------------------------------------
@@ -1339,12 +1361,8 @@ end
 
 % --- Executes on button press in measureClearButton.
 function measureClearButton_Callback(hObject, eventdata, handles)
-% hObject    handle to measureClearButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 set(handles.figure1,'WindowButtonMotionFcn','');
@@ -1400,10 +1418,36 @@ trEPR_GUI_export(...
 
 % --- Executes on button press in axisResetButton.
 function axisResetButton_Callback(hObject, eventdata, handles)
-% hObject    handle to axisResetButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
+set(handles.db0Edit,'String','0');
+set(handles.dtEdit,'String','0');
+set(handles.dyEdit,'String','0');
+%set(handles.sb0Edit,'String','1');
+%set(handles.stEdit,'String','1');
+set(handles.syEdit,'String','1');
+
+appdata.data{appdata.control.spectra.active}.Db0 = 0;
+appdata.data{appdata.control.spectra.active}.Dt = 0;
+appdata.data{appdata.control.spectra.active}.Dy = 0;
+%appdata.data{appdata.control.spectra.active}.Sb0 = 0;
+%appdata.data{appdata.control.spectra.active}.St = 0;
+appdata.data{appdata.control.spectra.active}.Sy = 1;
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 % --------------------------------------------------------------------
 function menuView_Callback(hObject, eventdata, handles)
@@ -2179,7 +2223,7 @@ end
 if_spectraInvisibleListbox_Refresh;
 if_spectraVisibleListbox_Refresh;
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Move currently selected spectrum to invisible spectra
@@ -2238,14 +2282,14 @@ end
 if_spectraInvisibleListbox_Refresh;
 if_spectraVisibleListbox_Refresh;
 
-if_axis_Refresh;
+if_axis_Refresh(handles.figure1);
 
 
 % --- Refresh plot window (axis)
-function if_axis_Refresh
+function if_axis_Refresh(hObject)
 
 % Get handles and appdata of the current GUI
-handles = guidata(gcbo);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 % Get current display type
@@ -2318,6 +2362,7 @@ switch currentDisplayType
                 Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
             end
             plot(...
+                handles.axes1,...
                 yaxis + Db0,...
                 appdata.data{appdata.control.spectra.visible{k}}.data(...
                 :,floor(appdata.data{appdata.control.spectra.visible{k}}.t)...
@@ -2372,6 +2417,7 @@ switch currentDisplayType
                 plotStyle = 'k-';
             end
             plot(...
+                handles.axes1,...
                 appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values,...
                 appdata.data{appdata.control.spectra.visible{k}}.data(...
                 floor(appdata.data{appdata.control.spectra.visible{k}}.b0),:...
@@ -2406,7 +2452,7 @@ switch currentDisplayType
 end
 
 % Refresh handles and appdata of the current GUI
-guidata(gcbo,handles);
+guidata(hObject,handles);
 appdataFieldnames = fieldnames(appdata);
 for k=1:length(appdataFieldnames)
   setappdata(...
