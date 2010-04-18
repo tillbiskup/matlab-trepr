@@ -249,16 +249,21 @@ if value < 1
     appdata.data{appdata.control.spectra.active}.t = 1;
     set(handles.positionInTimePointsEdit,'String','1');
     set(handles.positionInTimeValueEdit,'String',...
-        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1));
-elseif value > length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)
+        num2str(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1)));
+    set(handles.spectraScrollSlider,'Value',...
+        get(handles.spectraScrollSlider,'Min'));
+elseif value > length(appdata.data{appdata.control.spectra.active}.axes.xaxis.values)
     appdata.data{appdata.control.spectra.active}.t = ...
-        length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values);
+        length(appdata.data{appdata.control.spectra.active}.axes.xaxis.values);
     set(handles.positionInTimePointsEdit,'String',...
         num2str(...
-        length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values)));
+        length(appdata.data{appdata.control.spectra.active}.axes.xaxis.values)));
     set(handles.positionInTimeValueEdit,'String',...
         num2str(...
         appdata.data{appdata.control.spectra.active}.axes.xaxis.values(end)));
+    set(handles.spectraScrollSlider,'Value',...
+        get(handles.spectraScrollSlider,'Max'));
 else
     appdata.data{appdata.control.spectra.active}.t = value;
     set(handles.positionInTimePointsEdit,'String',num2str(value));
@@ -266,7 +271,9 @@ else
         num2str(...
         appdata.data{appdata.control.spectra.active}.axes.xaxis.values(...
         value)));
+    set(handles.spectraScrollSlider,'Value',value);
 end
+
 
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
@@ -280,6 +287,8 @@ for k=1:length(appdataFieldnames)
 end
 
 if_axis_Refresh(handles.figure1);
+if_fitArea_Refresh(handles.figure1);
+if_fitPoints_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1370,11 +1379,18 @@ set(...
     ]...
     );
 
+% Add horizontal line at position 0 in upper axis
+axes(handles.axes1)
+line([yaxis(1) yaxis(end)],[0 0],...
+    'Color',[0.75 0.75 0.75],...
+    'LineWidth',1,...
+    'LineStyle','--');
+
 xlabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
 ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
 xlabel(handles.axes2,sprintf('{\\it magnetic field} / mT'));
 ylabel(handles.axes2,sprintf('{\\it intensity} / a.u.'));
-
+    
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
 appdataFieldnames = fieldnames(appdata);
