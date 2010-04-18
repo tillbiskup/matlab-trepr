@@ -477,7 +477,7 @@ end
 % --- Executes on button press in leftFitAreaPickButton.
 function leftFitAreaPickButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 appdata.control.point = 'left';
@@ -499,7 +499,7 @@ end
 % --- Executes on button press in rightFitAreaPickButton.
 function rightFitAreaPickButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 appdata.control.point = 'right';
@@ -769,7 +769,7 @@ if_fitPoints_Refresh(handles.figure1);
 % --- Executes on button press in additionalFitPoint1PickButton.
 function additionalFitPoint1PickButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 appdata.control.point = 'addPoint1';
@@ -791,7 +791,7 @@ end
 % --- Executes on button press in additionalFitPoint2PickButton.
 function additionalFitPoint2PickButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 appdata.control.point = 'addPoint2';
@@ -851,7 +851,7 @@ function reloadButton_Callback(hObject, eventdata, handles)
 % --- Executes on button press in correctionGoButton.
 function correctionGoButton_Callback(hObject, eventdata, handles)
 % Get handles and appdata of the current GUI
-guidata(hObject, handles);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 methods = get(handles.correctionMethodPopupmenu,'String');
