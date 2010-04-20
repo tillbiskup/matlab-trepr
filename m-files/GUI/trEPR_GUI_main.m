@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 14-Apr-2010 21:59:33
+% Last Modified by GUIDE v2.5 20-Apr-2010 22:41:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1126,6 +1126,10 @@ function menuToolsAccumulate_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+trEPR_GUI_ACC(...
+    'callerFunction',mfilename,...
+    'callerHandle',hObject);
+
 
 % --------------------------------------------------------------------
 function menuToolsCorrections_Callback(hObject, eventdata, handles)
@@ -1401,16 +1405,14 @@ end
 
 % --- Executes on button press in spectraAccumulateButton.
 function spectraAccumulateButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraAccumulateButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+trEPR_GUI_ACC(...
+    'callerFunction',mfilename,...
+    'callerHandle',hObject);
 
 
 % --- Executes on button press in axisExportButton.
 function axisExportButton_Callback(hObject, eventdata, handles)
-% hObject    handle to axisExportButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 trEPR_GUI_export(...
     'callerFunction',mfilename,...
