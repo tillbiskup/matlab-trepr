@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_ACC(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_ACC
 
-% Last Modified by GUIDE v2.5 20-Apr-2010 21:33:18
+% Last Modified by GUIDE v2.5 21-Apr-2010 23:49:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,9 +79,9 @@ configuration = struct(); % store the configuration information for the GUI
 control = struct(...
     'spectra', struct(...
     'active',0,...
-    'visible',cell(1)...
-    ),...
+    'visible',cell(1),...
     'filenames',cell(1)...
+    )...
 );
 appdataHandles = struct();
 
@@ -127,22 +127,29 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
                     data{k}.axes.yaxis.values(1) + (...
                     data{k}.parameters.field.step * data{k}.Db0);
             end
+            % Assign filenames (basename) to control.filenames cell array
             [path name ext] = fileparts(data{k}.filename);
-            control.filenames{k} = name;
+            filenames{k} = name;
             clear path name ext;
+            % Assign field parameters to control structure
+            control.spectra.field.start(k) = data{k}.parameters.field.start;
+            control.spectra.field.stop(k) = data{k}.parameters.field.stop;
+            control.spectra.field.step(k) = data{k}.parameters.field.step;
         end
         control.spectra = parentAppdata.control.spectra;
+        control.spectra.filenames = filenames;
         setappdata(handles.figure1,'data',data);
         setappdata(handles.figure1,'control',control);
- 
+    
+        % Set suggestion for filename of accumulated spectra
         set(handles.filenameEdit,'String',...
-            sprintf('%s.dat',commonString(control.filenames,1)));
+            sprintf('%sacc.dat',commonString(control.spectra.filenames,1)));
     end
     guidata(handles.callerHandle,callerHandles);
 end
 
 % Set reload button inactive
-set(handles.reloadButton,'Enable','Off');
+set(handles.resizeButton,'Enable','Off');
 
 % Update handles structure
 guidata(hObject, handles);
@@ -355,9 +362,9 @@ function closeButton_Callback(hObject, eventdata, handles)
 closeGUI(hObject, eventdata, handles);
 
 
-% --- Executes on button press in reloadButton.
-function reloadButton_Callback(hObject, eventdata, handles)
-% hObject    handle to reloadButton (see GCBO)
+% --- Executes on button press in resizeButton.
+function resizeButton_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -641,6 +648,61 @@ set(handles.spectraScrollSlider,'Max',...
 set(handles.spectraScrollSlider,'Value',...
     appdata.data{appdata.control.spectra.active}.t);
 
+% Set Infobox fields
+set(handles.infoFieldStepsizeEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.field.step));
+set(handles.infoFieldStartEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.field.start));
+set(handles.infoFieldStopEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.field.stop));
+set(handles.infoFieldMeasureText,'String',...
+    appdata.data{appdata.control.spectra.active}.axes.yaxis.unit);
+set(handles.infoTimeLengthValueEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.transient.length));
+set(handles.infoTimeLengthPointsEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.transient.points));
+set(handles.infoTimeMeasureText,'String',...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.unit);
+if isfield(appdata.data{appdata.control.spectra.active}.parameters,'recorder')
+    set(handles.infoNoScansEdit,'String',...
+        num2str(...
+        appdata.data{appdata.control.spectra.active}.parameters.recorder.averages));
+else
+    set(handles.infoNoScansEdit,'String','N/A');
+end
+
+% Set current values for resize fields
+set(handles.resizeFieldStepsizeEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.field.step));
+set(handles.resizeFieldStartEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.field.start));
+set(handles.resizeFieldMeasureText,'String',...
+    appdata.data{appdata.control.spectra.active}.axes.yaxis.unit);
+set(handles.resizeTimeStartEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1)));
+set(handles.resizeTimeStepsizeEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.values(2)-...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1)));
+set(handles.resizeTimeLengthValueEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.transient.length));
+set(handles.resizeTimeLengthPointsEdit,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.parameters.transient.points));
+set(handles.resizeTimeMeasureText1,'String',...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.unit);
+set(handles.resizeTimeMeasureText2,'String',...
+    appdata.data{appdata.control.spectra.active}.axes.xaxis.unit);
+
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
 appdataFieldnames = fieldnames(appdata);
@@ -797,18 +859,6 @@ if ~isempty(appdata.control.spectra.visible)
     appdata.control.spectra.active = appdata.control.spectra.visible{...
         get(handles.spectraAccumulatedListbox,'Value')...
         };
-    set(handles.infoStepsizeEdit,'String',...
-        num2str(...
-        appdata.data{appdata.control.spectra.active}.parameters.field.step));
-    if isfield(appdata.data{appdata.control.spectra.active}.parameters,'recorder')
-        set(handles.infoNoScansEdit,'String',...
-            num2str(...
-            appdata.data{appdata.control.spectra.active}.parameters.recorder.averages));
-    else
-        set(handles.infoNoScansEdit,'String','N/A');
-    end
-    set(handles.infoStepsizeMeasureEdit,'String',...
-        appdata.data{appdata.control.spectra.active}.axes.yaxis.unit);
     if_spectraAccumulatedListbox_Refresh(hObject);
 end
 
@@ -871,18 +921,294 @@ end
 
 
 
-function infoStepsizeEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to infoStepsizeEdit (see GCBO)
+function infoFieldStepsizeEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to infoFieldStepsizeEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of infoStepsizeEdit as text
-%        str2double(get(hObject,'String')) returns contents of infoStepsizeEdit as a double
+% Hints: get(hObject,'String') returns contents of infoFieldStepsizeEdit as text
+%        str2double(get(hObject,'String')) returns contents of infoFieldStepsizeEdit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function infoStepsizeEdit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to infoStepsizeEdit (see GCBO)
+function infoFieldStepsizeEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to infoFieldStepsizeEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function infoFieldStartEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to infoFieldStartEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of infoFieldStartEdit as text
+%        str2double(get(hObject,'String')) returns contents of infoFieldStartEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function infoFieldStartEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to infoFieldStartEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function infoFieldStopEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to infoFieldStopEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of infoFieldStopEdit as text
+%        str2double(get(hObject,'String')) returns contents of infoFieldStopEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function infoFieldStopEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to infoFieldStopEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit21_Callback(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit21 as text
+%        str2double(get(hObject,'String')) returns contents of edit21 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit21 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function infoTimeLengthValueEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to infoTimeLengthValueEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of infoTimeLengthValueEdit as text
+%        str2double(get(hObject,'String')) returns contents of infoTimeLengthValueEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function infoTimeLengthValueEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to infoTimeLengthValueEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function infoTimeLengthPointsEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to infoTimeLengthPointsEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of infoTimeLengthPointsEdit as text
+%        str2double(get(hObject,'String')) returns contents of infoTimeLengthPointsEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function infoTimeLengthPointsEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to infoTimeLengthPointsEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeFieldStepsizeEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeFieldStepsizeEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeFieldStepsizeEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeFieldStepsizeEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeFieldStepsizeEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeFieldStepsizeEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeFieldStartEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeFieldStartEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeFieldStartEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeFieldStartEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeFieldStartEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeFieldStartEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function edit26_Callback(hObject, eventdata, handles)
+% hObject    handle to edit26 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit26 as text
+%        str2double(get(hObject,'String')) returns contents of edit26 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit26_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit26 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeTimeLengthValueEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeTimeLengthValueEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeTimeLengthValueEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeTimeLengthValueEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeTimeLengthValueEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeTimeLengthValueEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeTimeLengthPointsEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeTimeLengthPointsEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeTimeLengthPointsEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeTimeLengthPointsEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeTimeLengthPointsEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeTimeLengthPointsEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeTimeStepsizeEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeTimeStepsizeEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeTimeStepsizeEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeTimeStepsizeEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeTimeStepsizeEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeTimeStepsizeEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function resizeTimeStartEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to resizeTimeStartEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of resizeTimeStartEdit as text
+%        str2double(get(hObject,'String')) returns contents of resizeTimeStartEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function resizeTimeStartEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to resizeTimeStartEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
