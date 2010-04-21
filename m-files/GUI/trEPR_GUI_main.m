@@ -1983,7 +1983,11 @@ else
     set(handles.b0EditIndex,'Enable','On');
     set(handles.spectraInfoButton,'Enable','On');
     set(handles.spectraRemoveButton,'Enable','On');
-    set(handles.spectraAccumulateButton,'Enable','On');
+    if length(appdata.control.spectra.visible) > 1
+        set(handles.spectraAccumulateButton,'Enable','On');
+    else
+        set(handles.spectraAccumulateButton,'Enable','Off');
+    end    
     set(handles.axisResetButton,'Enable','On');
     set(handles.axisExportButton,'Enable','On');
     set(handles.measureClearButton,'Enable','On');
@@ -2745,12 +2749,67 @@ end
 
 
 function timeEditValue_Callback(hObject, eventdata, handles)
-% hObject    handle to timeEditValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of timeEditValue as text
-%        str2double(get(hObject,'String')) returns contents of timeEditValue as a double
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+value = str2double(get(hObject,'String'));
+min = appdata.data{appdata.control.spectra.active}.axes.xaxis.values(1);
+max = appdata.data{appdata.control.spectra.active}.axes.xaxis.values(end);
+    
+if value>=min && value<=max
+    if strcmp(appdata.control.axis.displayType,'B0 spectra')
+        set(handles.spectraScrollSlider,'Value',...
+            interp1(...
+            appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
+            1:length(...
+            appdata.data{appdata.control.spectra.active}.axes.xaxis.values),...
+            value,'nearest'));
+    end
+    set(handles.timeEditValue,'String',...
+        num2str(interp1(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
+        value,'nearest')));
+    appdata.data{appdata.control.spectra.active}.t = ...
+        interp1(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
+        1:length(appdata.data{appdata.control.spectra.active}.axes.xaxis.values),...
+        value,'nearest');
+elseif value<min
+    if strcmp(appdata.control.axis.displayType,'B0 spectra')
+        set(handles.spectraScrollSlider,'Value',...
+            get(handles.spectraScrollSlider,'Min'));
+    end
+    set(handles.timeEditValue,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.t = 1;
+else
+    if strcmp(appdata.control.axis.displayType,'B0 spectra')
+        set(handles.spectraScrollSlider,'Value',...
+            get(handles.spectraScrollSlider,'Max'));
+    end
+    set(handles.timeEditValue,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.t = length(...
+        appdata.data{appdata.control.spectra.active}.axes.xaxis.values);
+end    
+
+set(handles.timeEditIndex,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.t)...
+    );
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -2768,12 +2827,67 @@ end
 
 
 function b0EditValue_Callback(hObject, eventdata, handles)
-% hObject    handle to b0EditValue (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of b0EditValue as text
-%        str2double(get(hObject,'String')) returns contents of b0EditValue as a double
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+value = str2double(get(hObject,'String'));
+min = appdata.data{appdata.control.spectra.active}.axes.yaxis.values(1);
+max = appdata.data{appdata.control.spectra.active}.axes.yaxis.values(end);
+    
+if value>=min && value<=max
+    if strcmp(appdata.control.axis.displayType,'transients')
+        set(handles.spectraScrollSlider,'Value',...
+            interp1(...
+            appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
+            1:length(...
+            appdata.data{appdata.control.spectra.active}.axes.yaxis.values),...
+            value,'nearest'));
+    end
+    set(handles.b0EditValue,'String',...
+        num2str(interp1(...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
+        value,'nearest')));
+    appdata.data{appdata.control.spectra.active}.b0 = ...
+        interp1(...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
+        1:length(appdata.data{appdata.control.spectra.active}.axes.yaxis.values),...
+        value,'nearest');
+elseif value<min
+    if strcmp(appdata.control.axis.displayType,'transients')
+        set(handles.spectraScrollSlider,'Value',...
+            get(handles.spectraScrollSlider,'Min'));
+    end
+    set(handles.b0EditValue,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.b0 = 1;
+else
+    if strcmp(appdata.control.axis.displayType,'transients')
+        set(handles.spectraScrollSlider,'Value',...
+            get(handles.spectraScrollSlider,'Max'));
+    end
+    set(handles.b0EditValue,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.b0 = length(...
+        appdata.data{appdata.control.spectra.active}.axes.yaxis.values);
+end    
+
+set(handles.b0EditIndex,'String',...
+    num2str(...
+    appdata.data{appdata.control.spectra.active}.b0)...
+    );
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
