@@ -2239,7 +2239,7 @@ function if_spectraHide
 handles = guidata(gcbo);
 appdata = getappdata(handles.figure1);
 
-% Return immediately if there is no invisible spectrum
+% Return immediately if there is no visible spectrum
 if isempty(appdata.control.spectra.visible)
     return
 elseif isempty(appdata.control.spectra.visible{1})

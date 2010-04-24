@@ -91,7 +91,7 @@ appdataHandles = struct();
 
 setappdata(handles.figure1,'data',data);
 setappdata(handles.figure1,'olddata',data);
-setappdata(handles.figure1,'acc',data);
+setappdata(handles.figure1,'acc',acc);
 setappdata(handles.figure1,'configuration',configuration);
 setappdata(handles.figure1,'control',control);
 setappdata(handles.figure1,'handles',appdataHandles);
@@ -108,9 +108,9 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
 end
 
 % Get appdata from parent window necessary for ACC
-if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')    
     callerHandles = guidata(handles.callerHandle);
-    if isfield(callerHandles,mfilename)
+    if isfield(callerHandles,mfilename)        
 
         % Get appdata of the parent GUI
         parentAppdata = getappdata(callerHandles.figure1);
@@ -137,6 +137,7 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         control.spectra = parentAppdata.control.spectra;
         control.spectra.accumulated = ...
             parentAppdata.control.spectra.visible;
+        control.spectra.notaccumulated = cell(1);
         setappdata(handles.figure1,'data',data);
         setappdata(handles.figure1,'olddata',data);
         setappdata(handles.figure1,'control',control);
@@ -166,6 +167,10 @@ guidata(hObject, handles);
 if ~isempty(control.spectra.accumulated)
     if_spectraAccumulatedListbox_Refresh(hObject);
     if_axis_Refresh(hObject);
+end
+
+if ~isempty(control.spectra.notaccumulated)
+    if_spectraNotAccumulatedListbox_Refresh(hObject);
 end
 
 % UIWAIT makes trEPR_GUI_ACC wait for user response (see UIRESUME)
@@ -439,9 +444,29 @@ if_fitPoints_Refresh(handles.figure1);
 
 % --- Executes on selection change in spectraNotAccumulatedListbox.
 function spectraNotAccumulatedListbox_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraNotAccumulatedListbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Set currently active spectrum
+if ~isempty(appdata.control.spectra.notaccumulated)
+    appdata.control.spectra.active = appdata.control.spectra.notaccumulated{...
+        get(handles.spectraNotAccumulatedListbox,'Value')...
+        };
+    if_spectraNotAccumulatedListbox_Refresh(hObject);
+end
+
+% Refresh appdata of the current GUI
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -460,16 +485,121 @@ end
 
 % --- Executes on button press in spectraRemoveButton.
 function spectraRemoveButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraRemoveButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Move currently selected spectrum to not accumulated spectra
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Return immediately if there is no accumulated spectrum
+if isempty(appdata.control.spectra.accumulated)
+    return
+elseif isempty(appdata.control.spectra.accumulated{1})
+    return
+end
+
+% Get value of currently selected item
+iSelected = appdata.control.spectra.accumulated{...
+    get(handles.spectraAccumulatedListbox,'Value')...
+    };
+
+% Add selected to not accumulated
+naccSpectra = length(appdata.control.spectra.notaccumulated);
+if naccSpectra == 1 && isempty(appdata.control.spectra.notaccumulated{1})
+    appdata.control.spectra.notaccumulated{1} = iSelected;
+else
+    appdata.control.spectra.notaccumulated{naccSpectra+1} = iSelected;
+end
+
+% Remove selected from accumulated
+accSpectra = length(appdata.control.spectra.accumulated);
+for k=1:accSpectra
+    if appdata.control.spectra.accumulated{k} == iSelected
+        appdata.control.spectra.accumulated(k) = [];
+        break;  % !!! above statement manipulates cell array length
+    end
+end
+% Prevent empty cell array
+if isempty(appdata.control.spectra.accumulated)
+    appdata.control.spectra.accumulated{1} = [];
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% Call to internal function refreshing the spectra listboxes and axes
+%     => important to do it after refreshing handles and appdata!
+if_spectraNotAccumulatedListbox_Refresh(handles.figure1);
+if_spectraAccumulatedListbox_Refresh(handles.figure1);
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes on button press in spectraAddButton.
 function spectraAddButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraAddButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Return immediately if there is no not accumulated spectrum
+if isempty(appdata.control.spectra.notaccumulated)
+    return
+elseif isempty(appdata.control.spectra.notaccumulated{1})
+    return
+end
+
+% Get value of currently selected item
+iSelected = appdata.control.spectra.notaccumulated{...
+    get(handles.spectraNotAccumulatedListbox,'Value')...
+    };
+
+% Add selected to accumulated
+accSpectra = length(appdata.control.spectra.accumulated);
+if accSpectra == 1 && isempty(appdata.control.spectra.accumulated{1})
+    appdata.control.spectra.accumulated{1} = iSelected;
+else
+    appdata.control.spectra.accumulated{accSpectra+1} = iSelected;
+end
+
+% Remove selected from not accumulated
+naccSpectra = length(appdata.control.spectra.notaccumulated);
+for k=1:naccSpectra
+    if appdata.control.spectra.notaccumulated{k} == iSelected
+        appdata.control.spectra.notaccumulated(k) = [];
+        break;  % !!! above statement manipulates cell array length
+    end
+end
+% Prevent empty cell array
+if isempty(appdata.control.spectra.notaccumulated)
+    appdata.control.spectra.notaccumulated{1} = [];
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% Call to internal function refreshing the spectra listboxes and axes
+%     => important to do it after refreshing handles and appdata!
+if_spectraNotAccumulatedListbox_Refresh(handles.figure1);
+if_spectraAccumulatedListbox_Refresh(handles.figure1);
+
+if_axis_Refresh(handles.figure1);
 
 
 
@@ -502,8 +632,8 @@ function spectraAccumulatedListbox_Callback(hObject, eventdata, handles)
 appdata = getappdata(handles.figure1);
 
 % Set currently active spectrum
-if ~isempty(appdata.control.spectra.visible)
-    appdata.control.spectra.active = appdata.control.spectra.visible{...
+if ~isempty(appdata.control.spectra.accumulated)
+    appdata.control.spectra.active = appdata.control.spectra.accumulated{...
         get(handles.spectraAccumulatedListbox,'Value')...
         };
     if_spectraAccumulatedListbox_Refresh(hObject);
@@ -929,7 +1059,7 @@ end
 
 
 
-% --- Refresh visible spectra listbox
+% --- Refresh accumulated spectra listbox
 function if_spectraAccumulatedListbox_Refresh(hObject)
 
 % Get handles and appdata of the current GUI
@@ -937,29 +1067,31 @@ handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 % Extract names of visible Spectra from appdata
-visSpectraNames = cell(1);
-if isempty(appdata.control.spectra.visible{1})
-    visSpectraNames = cell(1);
+accSpectraNames = cell(1);
+if isempty(appdata.control.spectra.accumulated{1})
+    accSpectraNames = cell(1);
     appdata.control.spectra.active = 0;
     set(handles.spectraAccumulatedListbox,'Enable','Inactive');
     cla(handles.axes1,'reset');
-    cla(handles.axes2,'reset');
-    set(handles.timeEditIndex,'Enable','Inactive');
+    set(handles.positionInTimePointsEdit,'Enable','Inactive');
+    set(handles.positionInTimeValueEdit,'Enable','Inactive');
+    set(handles.spectraRemoveButton,'Enable','Off');
 else
     set(handles.spectraAccumulatedListbox,'Enable','On');
     set(handles.positionInTimePointsEdit,'Enable','On');
     set(handles.positionInTimeValueEdit,'Enable','On');
-    for k=1:length(appdata.control.spectra.visible)
+    set(handles.spectraRemoveButton,'Enable','On');
+    for k=1:length(appdata.control.spectra.accumulated)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
-            appdata.control.spectra.visible{k}}.filename...
+            appdata.control.spectra.accumulated{k}}.filename...
             );
-        visSpectraNames{k} = [name ext];
+        accSpectraNames{k} = [name ext];
     end
 end
 
 % Fix problem with currently selected item
-maxValue = length(visSpectraNames);
+maxValue = length(accSpectraNames);
 selectedValue = get(handles.spectraAccumulatedListbox,'Value');
 if selectedValue > maxValue
     set(handles.spectraAccumulatedListbox,'Value',maxValue);
@@ -972,13 +1104,13 @@ if isempty(get(handles.spectraAccumulatedListbox,'String'))
         'Value',...
         appdata.control.spectra.active);
 else
-    appdata.control.spectra.active = appdata.control.spectra.visible{...
+    appdata.control.spectra.active = appdata.control.spectra.accumulated{...
         get(handles.spectraAccumulatedListbox,'Value')...
         };
 end
 
 % Set listbox display
-set(handles.spectraAccumulatedListbox,'String',visSpectraNames);
+set(handles.spectraAccumulatedListbox,'String',accSpectraNames);
 
 % If there are no visible spectra any more, set appdata, turn off elements
 % and return 
@@ -986,12 +1118,11 @@ if isempty(appdata.control.spectra.active)
     appdata.control.spectra.active = 0;
     set(handles.spectraAccumulatedListbox,'Enable','Inactive');
     cla(handles.axes1,'reset');
-    cla(handles.axes2,'reset');
     set(handles.positionInTimePointsEdit,'Enable','Off');
     set(handles.positionInTimeValueEdit,'Enable','Off');
     set(handles.spectraScrollSlider,'Enable','Off');
     % Refresh handles and appdata of the current GUI
-    guidata(gcbo,handles);
+    guidata(hObject,handles);
     appdataFieldnames = fieldnames(appdata);
     for k=1:length(appdataFieldnames)
       setappdata(...
@@ -1075,6 +1206,53 @@ for k=1:length(appdataFieldnames)
 end
 
 
+% --- Refresh not accumulated spectra listbox
+function if_spectraNotAccumulatedListbox_Refresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Extract names of not accumulated spectra from appdata
+invSpectraNames = cell(1);
+if isempty(appdata.control.spectra.notaccumulated{1})
+    naccSpectraNames = cell(1);
+    set(handles.spectraAddButton,'Enable','Off');
+    set(handles.spectraNotAccumulatedListbox,'Enable','Inactive');
+else
+    set(handles.spectraAddButton,'Enable','On');
+    set(handles.spectraNotAccumulatedListbox,'Enable','On');
+    for k=1:length(appdata.control.spectra.notaccumulated)
+        [pathstr, name, ext, versn] = fileparts(...
+            appdata.data{...
+            appdata.control.spectra.notaccumulated{k}}.filename...
+            );
+        naccSpectraNames{k} = [name ext];
+    end
+end
+
+% Fix problem with currently selected item
+maxValue = length(naccSpectraNames);
+selectedValue = get(handles.spectraNotAccumulatedListbox,'Value');
+if selectedValue > maxValue
+    set(handles.spectraNotAccumulatedListbox,'Value',maxValue);
+end
+
+% Set listbox display
+set(handles.spectraNotAccumulatedListbox,'String',naccSpectraNames);
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+
 % --- Refresh plot window (axis)
 function if_axis_Refresh(hObject)
 
@@ -1094,55 +1272,17 @@ if isempty(appdata.control.spectra.visible{1})
     return
 end
 
-% Adjust field axes
-for k = 1 : length(appdata.control.spectra.accumulated)
-    field.start(k) = ...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values(1);
-    field.stop(k) = ...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values(end);
-end
-yaxis = [...
-    max(field.start) : ...
-    appdata.data{appdata.control.spectra.accumulated{1}}.parameters.field.step : ...
-    min(field.stop)...
-    ];
-
 % Accumulate spectra
 
-% Preassign matrix to speed up
-acc = zeros(...
-    length(yaxis),...
-    length(appdata.data{appdata.control.spectra.active}.axes.xaxis.values));
-
-for k = 1 : length(appdata.control.spectra.accumulated)
-    if isfield(appdata.data{appdata.control.spectra.accumulated{k}}.parameters,'recorder')
-        scans(k) = appdata.data{appdata.control.spectra.accumulated{k}}.parameters.recorder.averages;
-    else
-        scans(k) = 1;
-    end
-    acc = acc + ...
-        appdata.data{appdata.control.spectra.accumulated{k}}.data(...
-        interp1(...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values,...
-        [1:length(...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values)],...
-        max(field.start)) : ...
-        interp1(...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values,...
-        [1:length(...
-        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values)],...
-        min(field.stop)), ...
-        :) * scans(k);
-end
-
-% "Normalize" accumulated spectra
-acc = acc / sum(scans);
+if_accumulateSpectra(handles.figure1);
+appdata = getappdata(handles.figure1);
 
 % Plot accumulated spectra
-[ yDim, xDim ] = size(acc);
-xaxis = appdata.data{appdata.control.spectra.accumulated{1}}.axes.xaxis.values;
+[ yDim, xDim ] = size(appdata.acc.data);
+xaxis = appdata.acc.axes.xaxis.values;
+yaxis = appdata.acc.axes.yaxis.values;
 % Convert G -> mT
-if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
+if strcmp(appdata.acc.axes.yaxis.unit,'G')
     yaxis = yaxis / 10;
 end
 
@@ -1157,14 +1297,14 @@ if get(handles.spectraScrollSlider,'Value') < get(handles.spectraScrollSlider,'M
         num2str(floor(get(handles.spectraScrollSlider,'Value')))...
         );
     set(handles.positionInTimeValueEdit,'String',...
-        appdata.data{appdata.control.spectra.active}.axes.xaxis.values(...
+        appdata.acc.axes.xaxis.values(...
         floor(get(handles.spectraScrollSlider,'Value'))));
 end
 
 plot(...
     handles.axes1,...
     yaxis,...
-    acc(...
+    appdata.acc.data(...
     :,floor(get(handles.spectraScrollSlider,'Value'))...
     )...
     );
@@ -1177,8 +1317,8 @@ set(...
     handles.axes1,...
     'YLim',...
     [...
-    min(min(acc))*1.05 ...
-    max(max(acc))*1.05 ...                
+    min(min(appdata.acc.data))*1.05 ...
+    max(max(appdata.acc.data))*1.05 ...                
     ]...
     );
 
@@ -1191,7 +1331,7 @@ line([yaxis(1) yaxis(end)],[0 0],...
 
 xlabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
 ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
-    
+
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
 appdataFieldnames = fieldnames(appdata);
@@ -1216,6 +1356,11 @@ appdata = getappdata(handles.figure1);
 %     - npts, length, unit
 %   - step widths (time, field)
 %   - field unit
+
+if isempty(appdata.control.spectra.accumulated{1})
+    TF = logical(false);
+    return
+end
 
 for k = 1 : length(appdata.control.spectra.accumulated)
     % Sum time parameters to compare
@@ -1296,3 +1441,214 @@ for k=1:length(appdataFieldnames)
       );
 end
 
+
+% --- Accumulate spectra
+function if_accumulateSpectra(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Adjust field axes
+for k = 1 : length(appdata.control.spectra.accumulated)
+    field.start(k) = ...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values(1);
+    field.stop(k) = ...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values(end);
+end
+yaxis = [...
+    max(field.start) : ...
+    appdata.data{appdata.control.spectra.accumulated{1}}.parameters.field.step : ...
+    min(field.stop)...
+    ];
+
+% Preassign matrix to speed up
+acc = zeros(...
+    length(yaxis),...
+    length(appdata.data{appdata.control.spectra.accumulated{1}}.axes.xaxis.values));
+filenames = cell(length(appdata.control.spectra.accumulated));
+
+for k = 1 : length(appdata.control.spectra.accumulated)
+    if isfield(appdata.data{appdata.control.spectra.accumulated{k}}.parameters,'recorder')
+        scans(k) = appdata.data{appdata.control.spectra.accumulated{k}}.parameters.recorder.averages;
+    else
+        scans(k) = 1;
+    end
+    acc = acc + ...
+        appdata.data{appdata.control.spectra.accumulated{k}}.data(...
+        interp1(...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values,...
+        [1:length(...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values)],...
+        max(field.start)) : ...
+        interp1(...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values,...
+        [1:length(...
+        appdata.data{appdata.control.spectra.accumulated{k}}.axes.yaxis.values)],...
+        min(field.stop)), ...
+        :) * scans(k);
+    % Extract data necessary for the acc structure
+    % NOTE: The "isempty" is necessary due to the fact that MATLAB uses
+    % assigning an empty vector, "[]", to remove the element, and thus
+    % produces errors in case the element is empty.
+    filenames{k} = appdata.data{appdata.control.spectra.accumulated{k}}.filename;
+    if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.MWfrequency)
+        MWfrequencies(k) = 0;
+    else
+        MWfrequenies(k) = ...
+           appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.MWfrequency;
+    end
+    if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.attenuation)
+        attenuations(k) = 0;
+    else
+        attenuations(k) = ...
+            appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.attenuation;
+    end
+    if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.temperature)
+        temperatures(k) = 0;
+    else
+        temperatures(k) = ...
+            appdata.data{appdata.control.spectra.accumulated{k}}.parameters.temperature;
+    end
+    if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.laser.wavelength)
+        wavelengths(k) = 0;
+    else
+        wavelengths(k) = ...
+            appdata.data{appdata.control.spectra.accumulated{k}}.parameters.laser.wavelength;
+    end
+    if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.laser.repetitionRate)
+        repetitionRates(k) = 0;
+    else
+        repetitionRates(k) = ...
+            appdata.data{appdata.control.spectra.accumulated{k}}.parameters.laser.repetitionRate;
+    end
+end
+
+% Check identity of additional parameters to be stored in acc structure
+warnings = cell(1);
+
+if min(MWfrequencies)~=max(MWfrequencies)
+    warnings{end+1} = sprintf(...
+        'different frequencies: \n\t%s',...
+        num2str(MWfrequencies));
+    MWfrequency = MWfrequencies(1);
+    appdata.acc.acc.MWfrequency = MWfrequencies;
+elseif MWfrequencies(1) == 0
+    MWfrequency = [];
+end
+if min(attenuations)~=max(attenuations)
+    warnings{end+1} = sprintf(...
+        'different attenuations: \n\t%s',...
+        num2str(attenuations));
+    attenuation = attenuations(1);
+    appdata.acc.acc.attenuation = attenuations;
+elseif attenuations(1) == 0
+    attenuation = [];
+end
+if min(temperatures)~=max(temperatures)
+    warnings{end+1} = sprintf(...
+        'different temperatures: \n\t%s',...
+        num2str(temperatures));
+    temperature = temperatures(1);
+    appdata.acc.acc.temperature = temperatures;
+elseif temperatures(1) == 0
+    temperature = [];
+end
+if min(wavelengths)~=max(wavelengths)
+    warnings{end+1} = sprintf(...
+        'different laser wavelengths: \n\t%s',...
+        num2str(wavelengths));
+    wavelength = wavelengths(1);
+    appdata.acc.acc.wavelength = wavelengths;
+elseif wavelengths(1) == 0
+    wavelength = [];
+end
+if min(repetitionRates)~=max(repetitionRates)
+    warnings{end+1} = sprintf(...
+        'different laser repetition rates: \n\t%s',...
+        num2str(repetitionRates));
+    repetitionRate = repetitionRates(1);
+    appdata.acc.acc.repetitionRate = repetitionRates;
+elseif repetitionRates(1) == 0
+    repetitionRate = [];
+end
+
+if length(warnings) == 1 && isempty(warnings{1})
+    if isfield(appdata.handles,'parameterMismatchWarndlg')
+        close(appdata.handles.parameterMismatchWarndlg);
+    end
+else
+    warningText = 'Parameter mismatch occurred:';
+    for k = 2:length(warnings)
+        warningText = sprintf('%s\n- %s',warningText,warnings{k});
+    end
+    parameterMismatchWarndlg = warndlg(...
+        warningText,'Parameter Mismatch','replace');
+    set(parameterMismatchWarndlg,'Position',[231 441 263 89.2]);
+    appdata.handles = setfield(...
+        appdata.handles,...
+        'parameterMismatchWarndlg',...
+        parameterMismatchWarndlg);
+end
+
+% "Normalize" accumulated spectra
+acc = acc / sum(scans);
+
+% Assign accumulated data to structure of ACC GUI
+appdata.acc.header = cell(1);
+appdata.acc.parameters = struct(...
+    'field', struct(...
+    'start', max(field.start),...
+    'stop', min(field.stop),...
+    'step', appdata.data{appdata.control.spectra.accumulated{1}}.parameters.field.step ...
+    ),...
+    'transient', struct(...
+    'points',appdata.data{appdata.control.spectra.accumulated{1}}.parameters.transient.points,...
+    'triggerPosition',appdata.data{appdata.control.spectra.accumulated{1}}.parameters.transient.triggerPosition,...
+    'length',appdata.data{appdata.control.spectra.accumulated{1}}.parameters.transient.length...
+    ),...
+    'bridge', struct(...
+    'MWfrequency',MWfrequency,...
+    'attenuation',attenuation ...
+    ),...
+    'temperature',temperature,...
+    'laser', struct(...
+    'wavelength',wavelength,...
+    'repetitionRate',repetitionRate ...
+    )...
+    );
+appdata.acc.data = acc;
+appdata.acc.axes = struct(...
+    'xaxis',struct(...
+    'values',appdata.data{appdata.control.spectra.accumulated{1}}.axes.xaxis.values,...
+    'measure',appdata.data{appdata.control.spectra.accumulated{1}}.axes.xaxis.measure,...
+    'unit',appdata.data{appdata.control.spectra.accumulated{1}}.axes.xaxis.unit...
+    ),...
+    'yaxis',struct(...
+    'values',yaxis,...
+    'measure',appdata.data{appdata.control.spectra.accumulated{1}}.axes.yaxis.measure,...
+    'unit',appdata.data{appdata.control.spectra.accumulated{1}}.axes.yaxis.unit...
+    )...
+    );
+appdata.acc.filename = get(handles.filenameEdit,'String');
+appdata.acc.Db0 = 0;
+appdata.acc.Dt = 0;
+appdata.acc.Dy = 0;
+appdata.acc.Sx = 1;
+appdata.acc.Sy = 1;
+appdata.acc.t = floor(get(handles.spectraScrollSlider,'Value'));
+appdata.acc.b0 = 1;
+appdata.acc.acc = struct(...
+    'filenames',filenames...
+    );
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
