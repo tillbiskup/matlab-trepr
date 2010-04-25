@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 15-Apr-2010 08:43:21
+% Last Modified by GUIDE v2.5 25-Apr-2010 15:00:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -110,6 +110,26 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
                 handles.headerEdit,...
                 'String',...
                 parentAppdata.data{parentAppdata.control.spectra.active}.header);
+            set(...
+                handles.microwaveFrequencyEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.MWfrequency);
+            set(...
+                handles.microwaveAttenuationEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.attenuation);
+            set(...
+                handles.laserWavelengthEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.wavelength);
+            set(...
+                handles.laserRepetitionRateEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.repetitionRate);
+            set(...
+                handles.temperatureEdit,...
+                'String',...
+                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.temperature);
         else
             set(handles.headerEdit,'String',cell(0));
         end
@@ -204,6 +224,158 @@ function newPushbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
+
+function microwaveAttenuationEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to microwaveAttenuationEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of microwaveAttenuationEdit as text
+%        str2double(get(hObject,'String')) returns contents of microwaveAttenuationEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function microwaveAttenuationEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to microwaveAttenuationEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function microwaveFrequencyEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to microwaveFrequencyEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of microwaveFrequencyEdit as text
+%        str2double(get(hObject,'String')) returns contents of microwaveFrequencyEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function microwaveFrequencyEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to microwaveFrequencyEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function temperatureEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to temperatureEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of temperatureEdit as text
+%        str2double(get(hObject,'String')) returns contents of temperatureEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function temperatureEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to temperatureEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function laserRepetitionRateEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to laserRepetitionRateEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of laserRepetitionRateEdit as text
+%        str2double(get(hObject,'String')) returns contents of laserRepetitionRateEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function laserRepetitionRateEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to laserRepetitionRateEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function laserWavelengthEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to laserWavelengthEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of laserWavelengthEdit as text
+%        str2double(get(hObject,'String')) returns contents of laserWavelengthEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function laserWavelengthEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to laserWavelengthEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in addParamApplyButton.
+function addParamApplyButton_Callback(hObject, eventdata, handles)
+% hObject    handle to addParamApplyButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)
+
+        % Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+
+        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.MWfrequency = ...
+            str2double(get(handles.microwaveFrequencyEdit,'String'));
+        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.attenuation = ...
+            str2double(get(handles.microwaveAttenuationEdit,'String'));
+        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.wavelength = ...
+            str2double(get(handles.laserWavelengthEdit,'String'));
+        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.repetitionRate = ...
+            str2double(get(handles.laserRepetitionRateEdit,'String'));
+        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.temperature = ...
+            str2double(get(handles.temperatureEdit,'String'));
+
+        % Refresh appdata of the parent GUI
+        parentAppdataFieldnames = fieldnames(parentAppdata);
+        for k=1:length(parentAppdataFieldnames)
+        	setappdata(...
+                callerHandles.figure1,...
+                parentAppdataFieldnames{k},...
+                getfield(parentAppdata,...
+                parentAppdataFieldnames{k})...
+                );
+        end
+    end
+    guidata(handles.callerHandle,callerHandles);
+end
 
 % --------------------------------------------------------------------
 function closeGUI(varargin)

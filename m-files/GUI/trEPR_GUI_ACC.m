@@ -1551,7 +1551,7 @@ for k = 1 : length(appdata.control.spectra.accumulated)
     if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.MWfrequency)
         MWfrequencies(k) = 0;
     else
-        MWfrequenies(k) = ...
+        MWfrequencies(k) = ...
            appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.MWfrequency;
     end
     if isempty(appdata.data{appdata.control.spectra.accumulated{k}}.parameters.bridge.attenuation)
@@ -1585,48 +1585,61 @@ warnings = cell(1);
 
 if min(MWfrequencies)~=max(MWfrequencies)
     warnings{end+1} = sprintf(...
-        'different frequencies: \n\t%s',...
-        num2str(MWfrequencies));
-    MWfrequency = MWfrequencies(1);
+        'different frequencies: \n    %s\n    %s',...
+        num2str(MWfrequencies),...
+        'mean value will be used.');
+    % Average frequencies and cut to fourth digit
+    MWfrequency = mean(MWfrequencies);
+    MWfrequency = floor(MWfrequency*1e4)/1e4;
     appdata.acc.acc.MWfrequency = MWfrequencies;
 elseif MWfrequencies(1) == 0
     MWfrequency = [];
+else
+    MWfrequency = MWfrequencies(1);
 end
 if min(attenuations)~=max(attenuations)
     warnings{end+1} = sprintf(...
-        'different attenuations: \n\t%s',...
+        'different attenuations: \n    %s',...
         num2str(attenuations));
     attenuation = attenuations(1);
     appdata.acc.acc.attenuation = attenuations;
 elseif attenuations(1) == 0
     attenuation = [];
+else
+    attenuation = attenuations(1);
 end
 if min(temperatures)~=max(temperatures)
     warnings{end+1} = sprintf(...
-        'different temperatures: \n\t%s',...
+        'different temperatures: \n    %s',...
         num2str(temperatures));
     temperature = temperatures(1);
     appdata.acc.acc.temperature = temperatures;
 elseif temperatures(1) == 0
     temperature = [];
+else
+    temperature = temperatures(1);
 end
 if min(wavelengths)~=max(wavelengths)
     warnings{end+1} = sprintf(...
-        'different laser wavelengths: \n\t%s',...
+        'different laser wavelengths: \n    %s',...
         num2str(wavelengths));
     wavelength = wavelengths(1);
     appdata.acc.acc.wavelength = wavelengths;
 elseif wavelengths(1) == 0
     wavelength = [];
+else
+    wavelength = wavelengths(1);
 end
 if min(repetitionRates)~=max(repetitionRates)
     warnings{end+1} = sprintf(...
-        'different laser repetition rates: \n\t%s',...
+        'different laser repetition rates: \n    %s',...
         num2str(repetitionRates));
     repetitionRate = repetitionRates(1);
     appdata.acc.acc.repetitionRate = repetitionRates;
 elseif repetitionRates(1) == 0
     repetitionRate = [];
+else
+    repetitionRate = repetitionRates(1);
 end
 
 if length(warnings) == 1 && isempty(warnings{1})
