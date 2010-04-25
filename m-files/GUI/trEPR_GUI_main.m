@@ -172,7 +172,7 @@ if ~isempty(appdata.control.spectra.visible)
     appdata.control.spectra.active = appdata.control.spectra.visible{...
         get(handles.spectraVisibleListbox,'Value')...
         };
-    if_spectraVisibleListbox_Refresh;
+    if_spectraVisibleListbox_Refresh(handles.figure1);
 end
 
 % Refresh appdata of the current GUI
@@ -1941,10 +1941,10 @@ end
 
 
 % --- Refresh visible spectra listbox
-function if_spectraVisibleListbox_Refresh
+function if_spectraVisibleListbox_Refresh(hObject)
 
 % Get handles and appdata of the current GUI
-handles = guidata(gcbo);
+handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
 % Extract names of visible Spectra from appdata
@@ -2038,7 +2038,7 @@ if isempty(appdata.control.spectra.active)
     set(handles.scaleXSlider,'Enable','Off');
     set(handles.displaceXSlider,'Enable','Off');
     % Refresh handles and appdata of the current GUI
-    guidata(gcbo,handles);
+    guidata(hObject,handles);
     appdataFieldnames = fieldnames(appdata);
     for k=1:length(appdataFieldnames)
       setappdata(...
@@ -2162,7 +2162,7 @@ elseif get(handles.displaceYSlider,'Value') > max(max(...
 end
 
 % Refresh handles and appdata of the current GUI
-guidata(gcbo,handles);
+guidata(hObject,handles);
 appdataFieldnames = fieldnames(appdata);
 for k=1:length(appdataFieldnames)
   setappdata(...
@@ -2227,7 +2227,7 @@ end
 % Call to internal function refreshing the invisible spectra listbox
 %     => important to do it after refreshing handles and appdata!
 if_spectraInvisibleListbox_Refresh;
-if_spectraVisibleListbox_Refresh;
+if_spectraVisibleListbox_Refresh(handles.figure1);
 
 if_axis_Refresh(handles.figure1);
 
@@ -2286,7 +2286,7 @@ end
 % Call to internal function refreshing the invisible spectra listbox
 %     => important to do it after refreshing handles and appdata!
 if_spectraInvisibleListbox_Refresh;
-if_spectraVisibleListbox_Refresh;
+if_spectraVisibleListbox_Refresh(handles.figure1);
 
 if_axis_Refresh(handles.figure1);
 

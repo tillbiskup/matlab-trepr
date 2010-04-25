@@ -142,10 +142,10 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         setappdata(handles.figure1,'olddata',data);
         setappdata(handles.figure1,'control',control);
 
-        for k = 1 : length(control.spectra.visible)
+        for k = 1 : length(control.spectra.accumulated)
             % Assign filenames (basename) to control.filenames cell array
             [path name ext] = fileparts(...
-                data{control.spectra.visible{k}}.filename);
+                data{control.spectra.accumulated{k}}.filename);
             filenames{k} = name;
             clear path name ext;
         end
@@ -974,15 +974,7 @@ end
 % Get appdata of the current GUI
 appdata = getappdata(handles.figure1);
 
-modified = [];
-for k = 1 : length(appdata.data)
-    if isfield(appdata.data{k},'blc') && ...
-            isfield(appdata.data{k}.blc,'method')
-        modified(end+1) = k;
-    end
-end
-
-if ~isempty(modified)
+if ~isempty(appdata.acc)
     selection = questdlg(...
         sprintf('%s %s\n - %s\n - %s\n - %s',...
         'There exist modified spectra in the GUI.',...
@@ -1000,6 +992,8 @@ if ~isempty(modified)
         case 'Cancel',
             return;
         case 'Apply & Close'
+            % Refresh filename
+            appdata.acc.filename = get(handles.filenameEdit,'String');
             % Get appdata from parent window necessary for ACC
             if isfield(handles,'callerFunction') && ...
                     isfield(handles,'callerHandle')
@@ -1007,16 +1001,9 @@ if ~isempty(modified)
                 if isfield(callerHandles,mfilename)
                     % Get appdata of the parent GUI
                     parentAppdata = getappdata(callerHandles.figure1);
-                    for k = 1:length(modified)
-                        [x y] = size(appdata.data{modified(k)}.data);
-                        for l = appdata.data{modified(k)}.parameters.transient.triggerPosition:y
-                            appdata.data{modified(k)}.data(:,l) = ...
-                                appdata.data{modified(k)}.data(:,l) - ...
-                                appdata.control.fit{modified(k)};
-                        end
-                        parentAppdata.data{modified(k)} = ...
-                            appdata.data{modified(k)};
-                    end
+                    parentAppdata.data{end+1} = appdata.acc;
+                    parentAppdata.control.spectra.visible{end+1} = ...
+                        length(parentAppdata.data);
                     % Refresh appdata of the parent GUI
                     parentAppdataFieldnames = fieldnames(parentAppdata);
                     for k=1:length(parentAppdataFieldnames)
@@ -1029,10 +1016,19 @@ if ~isempty(modified)
                     end
                     % Refresh axes in main GUI
                     trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
+                    trEPR_GUI_main('if_spectraVisibleListbox_Refresh',handles.callerHandle);
                 end
             end
         case 'Discard'
     end
+end
+
+% Close warning dialogs if still open
+if isfield(appdata.handles,'dimensionMismatchWarndlg')
+    close(appdata.handles.dimensionMismatchWarndlg);
+end
+if isfield(appdata.handles,'parameterMismatchWarndlg')
+    close(appdata.handles.parameterMismatchWarndlg);
 end
 
 % removes handle of this GUI from handles structure of the calling gui in
@@ -1112,6 +1108,10 @@ end
 % Set listbox display
 set(handles.spectraAccumulatedListbox,'String',accSpectraNames);
 
+% Set suggestion for filename of accumulated spectra
+set(handles.filenameEdit,'String',...
+	sprintf('%sacc.dat',commonString(accSpectraNames,1)));
+
 % If there are no visible spectra any more, set appdata, turn off elements
 % and return 
 if isempty(appdata.control.spectra.active)
@@ -1138,6 +1138,75 @@ else
     set(handles.positionInTimeValueEdit,'Enable','On');
     set(handles.spectraScrollSlider,'Enable','On');
 end
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_infoPanels_Refresh(hObject);
+
+
+% --- Refresh not accumulated spectra listbox
+function if_spectraNotAccumulatedListbox_Refresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Extract names of not accumulated spectra from appdata
+invSpectraNames = cell(1);
+if isempty(appdata.control.spectra.notaccumulated{1})
+    naccSpectraNames = cell(1);
+    set(handles.spectraAddButton,'Enable','Off');
+    set(handles.spectraNotAccumulatedListbox,'Enable','Inactive');
+else
+    set(handles.spectraAddButton,'Enable','On');
+    set(handles.spectraNotAccumulatedListbox,'Enable','On');
+    for k=1:length(appdata.control.spectra.notaccumulated)
+        [pathstr, name, ext, versn] = fileparts(...
+            appdata.data{...
+            appdata.control.spectra.notaccumulated{k}}.filename...
+            );
+        naccSpectraNames{k} = [name ext];
+    end
+end
+
+% Fix problem with currently selected item
+maxValue = length(naccSpectraNames);
+selectedValue = get(handles.spectraNotAccumulatedListbox,'Value');
+if selectedValue > maxValue
+    set(handles.spectraNotAccumulatedListbox,'Value',maxValue);
+end
+
+% Set listbox display
+set(handles.spectraNotAccumulatedListbox,'String',naccSpectraNames);
+
+% Refresh handles and appdata of the current GUI
+guidata(handles.figure1,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_infoPanels_Refresh(hObject);
+
+% --- Refresh info and resize panels
+function if_infoPanels_Refresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
 % Set Infobox fields
 set(handles.infoFieldStepsizeEdit,'String',...
@@ -1206,53 +1275,6 @@ for k=1:length(appdataFieldnames)
 end
 
 
-% --- Refresh not accumulated spectra listbox
-function if_spectraNotAccumulatedListbox_Refresh(hObject)
-
-% Get handles and appdata of the current GUI
-handles = guidata(hObject);
-appdata = getappdata(handles.figure1);
-
-% Extract names of not accumulated spectra from appdata
-invSpectraNames = cell(1);
-if isempty(appdata.control.spectra.notaccumulated{1})
-    naccSpectraNames = cell(1);
-    set(handles.spectraAddButton,'Enable','Off');
-    set(handles.spectraNotAccumulatedListbox,'Enable','Inactive');
-else
-    set(handles.spectraAddButton,'Enable','On');
-    set(handles.spectraNotAccumulatedListbox,'Enable','On');
-    for k=1:length(appdata.control.spectra.notaccumulated)
-        [pathstr, name, ext, versn] = fileparts(...
-            appdata.data{...
-            appdata.control.spectra.notaccumulated{k}}.filename...
-            );
-        naccSpectraNames{k} = [name ext];
-    end
-end
-
-% Fix problem with currently selected item
-maxValue = length(naccSpectraNames);
-selectedValue = get(handles.spectraNotAccumulatedListbox,'Value');
-if selectedValue > maxValue
-    set(handles.spectraNotAccumulatedListbox,'Value',maxValue);
-end
-
-% Set listbox display
-set(handles.spectraNotAccumulatedListbox,'String',naccSpectraNames);
-
-% Refresh handles and appdata of the current GUI
-guidata(handles.figure1,handles);
-appdataFieldnames = fieldnames(appdata);
-for k=1:length(appdataFieldnames)
-  setappdata(...
-      handles.figure1,...
-      appdataFieldnames{k},...
-      getfield(appdata,appdataFieldnames{k})...
-      );
-end
-
-
 % --- Refresh plot window (axis)
 function if_axis_Refresh(hObject)
 
@@ -1262,13 +1284,31 @@ appdata = getappdata(handles.figure1);
 
 if ~if_checkDimensions(handles.figure1)
     cla(handles.axes1,'reset');
-%     appdata = getappdata(handles.figure1);
-%     close(appdata.handles.dimensionMismatchWarndlg);
     return
 end
 
-if isempty(appdata.control.spectra.visible{1})
+if isempty(appdata.control.spectra.accumulated{1})
     cla(handles.axes1,'reset');
+    return
+end
+
+% If there are less than two spectra to accumulate, reset axes and return
+if length(appdata.control.spectra.accumulated) < 2
+    cla(handles.axes1,'reset');
+
+    appdata.acc = struct();
+    
+    % Refresh handles and appdata of the current GUI
+    guidata(handles.figure1,handles);
+    appdataFieldnames = fieldnames(appdata);
+    for k=1:length(appdataFieldnames)
+      setappdata(...
+          handles.figure1,...
+          appdataFieldnames{k},...
+          getfield(appdata,appdataFieldnames{k})...
+          );
+    end
+    
     return
 end
 
@@ -1414,6 +1454,8 @@ if length(warnings) == 1 && isempty(warnings{1})
     TF = logical(true);
     if isfield(appdata.handles,'dimensionMismatchWarndlg')
         close(appdata.handles.dimensionMismatchWarndlg);
+        appdata.handles = ...
+            rmfield(appdata.handles,'dimensionMismatchWarndlg');
     end
 else
     warningText = 'Dimension mismatch occurred:';
@@ -1637,6 +1679,9 @@ appdata.acc.Dy = 0;
 appdata.acc.Sx = 1;
 appdata.acc.Sy = 1;
 appdata.acc.t = floor(get(handles.spectraScrollSlider,'Value'));
+if appdata.acc.t == 0
+    appdata.acc.t = 1;
+end
 appdata.acc.b0 = 1;
 appdata.acc.acc = struct(...
     'filenames',filenames...
