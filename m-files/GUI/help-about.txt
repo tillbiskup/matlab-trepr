@@ -3,7 +3,7 @@ trEPR toolbox
 ---
 A MATLAB(TM) toolbox for analyzing transient EPR data
 
-GUI: v. 0.0.8
+GUI: v. 0.0.9
 Toolbox: v. 0.1.4
 
 (c) 2005-2010, Till Biskup
