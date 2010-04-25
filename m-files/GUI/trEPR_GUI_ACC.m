@@ -1004,6 +1004,8 @@ if ~isempty(appdata.acc)
                     parentAppdata.data{end+1} = appdata.acc;
                     parentAppdata.control.spectra.visible{end+1} = ...
                         length(parentAppdata.data);
+                    parentAppdata.control.spectra.modified{end+1} = ...
+                        length(parentAppdata.data);
                     % Refresh appdata of the parent GUI
                     parentAppdataFieldnames = fieldnames(parentAppdata);
                     for k=1:length(parentAppdataFieldnames)
@@ -1025,10 +1027,14 @@ end
 
 % Close warning dialogs if still open
 if isfield(appdata.handles,'dimensionMismatchWarndlg')
-    close(appdata.handles.dimensionMismatchWarndlg);
+    if ishandle(appdata.handles.dimensionMismatchWarndlg)
+        close(appdata.handles.dimensionMismatchWarndlg);
+    end
 end
 if isfield(appdata.handles,'parameterMismatchWarndlg')
-    close(appdata.handles.parameterMismatchWarndlg);
+    if ishandle(appdata.handles.parameterMismatchWarndlg)
+        close(appdata.handles.parameterMismatchWarndlg);
+    end
 end
 
 % removes handle of this GUI from handles structure of the calling gui in
@@ -1462,9 +1468,17 @@ else
     for k = 2:length(warnings)
         warningText = sprintf('%s\n- %s',warningText,warnings{k});
     end
+    warningText = sprintf(...
+        '%s\n%s\n%s\n%s',...
+        warningText,...
+        ' ',...
+        'Note: The dialog will close automatically',...
+        'as soon as you solved the problem.'...
+        );
     dimensionMismatchWarndlg = warndlg(...
         warningText,'Dimension Mismatch','replace');
-    set(dimensionMismatchWarndlg,'Position',[231 441 263 89.2]);
+    position = get(dimensionMismatchWarndlg,'Position');
+    set(dimensionMismatchWarndlg,'Position',[231 441 position(3) position(4)]);
     appdata.handles = setfield(...
         appdata.handles,...
         'dimensionMismatchWarndlg',...

@@ -211,9 +211,7 @@ if_spectraShow;
 
 % --- Executes on button press in spectraHideButton.
 function spectraHideButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraHideButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
 if_spectraHide;
 
 
@@ -479,9 +477,8 @@ function spectraSaveButton_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in spectraRemoveButton.
 function spectraRemoveButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraRemoveButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+if_spectraRemove(hObject)
 
 
 % --- Executes on button press in spectraSaveAsButton.
@@ -493,9 +490,6 @@ function spectraSaveAsButton_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in spectraInfoButton.
 function spectraInfoButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraInfoButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 trEPR_GUI_info(...
     'callerFunction',mfilename,...
@@ -2270,6 +2264,110 @@ end
 % Prevent empty cell array
 if isempty(appdata.control.spectra.visible)
     appdata.control.spectra.visible{1} = [];
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% Call to internal function refreshing the invisible spectra listbox
+%     => important to do it after refreshing handles and appdata!
+if_spectraInvisibleListbox_Refresh;
+if_spectraVisibleListbox_Refresh(handles.figure1);
+
+if_axis_Refresh(handles.figure1);
+
+
+% --- Remove currently selected spectrum from GUI
+function if_spectraRemove(hObject, varargin)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+if nargin > 1
+    iSelected = varargin{1};
+else
+    iSelected = appdata.control.spectra.active;
+end
+
+% Return immediately if there are no spectra or selected spectrum is "0"
+if isempty(appdata.data{1}) || iSelected == 0
+    return
+end
+
+% Check whether spectrum to be removed was modified before
+
+modSpectra = length(appdata.control.spectra.modified);
+for k=1:modSpectra
+    if appdata.control.spectra.modified{k} == iSelected
+        selection = questdlg(...
+            sprintf('%s\n%s\n%s\n%s',...
+            'The spectrum you are about to remove from the GUI was modified.',...
+            'Do you really want to remove the modified spectrum without saving?',...
+            ' ',...
+            'NOTE: In this case all modifications are lost!'),...
+            'Modifications exist. Really remove?',...
+            'Cancel',...
+            'Remove',...
+            'Cancel');
+
+        switch selection,
+            case 'Cancel',
+                return;
+            case 'Remove'
+        end
+    end
+end
+
+
+% Remove selected from data
+appdata.data(iSelected) = [];
+
+% Remove selected from visible
+visSpectra = length(appdata.control.spectra.visible);
+for k=1:visSpectra
+    if appdata.control.spectra.visible{k} == iSelected
+        appdata.control.spectra.visible(k) = [];
+        break;  % !!! above statement manipulates cell array length
+    end
+end
+% Prevent empty cell array
+if isempty(appdata.control.spectra.visible)
+    appdata.control.spectra.visible{1} = [];
+end
+
+% Remove selected from visible
+visSpectra = length(appdata.control.spectra.visible);
+for k=1:visSpectra
+    if appdata.control.spectra.visible{k} == iSelected
+        appdata.control.spectra.visible(k) = [];
+        break;  % !!! above statement manipulates cell array length
+    end
+end
+% Prevent empty cell array
+if isempty(appdata.control.spectra.visible)
+    appdata.control.spectra.visible{1} = [];
+end
+
+% Remove selected from modified
+modSpectra = length(appdata.control.spectra.modified);
+for k=1:modSpectra
+    if appdata.control.spectra.modified{k} == iSelected
+        appdata.control.spectra.modified(k) = [];
+        break;  % !!! above statement manipulates cell array length
+    end
+end
+% Prevent empty cell array
+if isempty(appdata.control.spectra.modified)
+    appdata.control.spectra.modified{1} = [];
 end
 
 % Refresh handles and appdata of the current GUI
