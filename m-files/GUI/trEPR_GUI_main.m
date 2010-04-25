@@ -2330,6 +2330,9 @@ end
 
 % Remove selected from data
 appdata.data(iSelected) = [];
+if isempty(appdata.data)
+    appdata.data = cell(1);
+end
 
 % Remove selected from visible
 visSpectra = length(appdata.control.spectra.visible);

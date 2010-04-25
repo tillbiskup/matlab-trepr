@@ -112,6 +112,8 @@ function content = loadFile(filename,varargin)
         content.parameters.field.step = ...
             content.axes.yaxis.values(2) - content.axes.yaxis.values(1);
 
+        content.header = files{1}.textdata;
+        
         content.axes.yaxis.measure = 'magnetic field';
         content.axes.yaxis.unit = 'G';
 
@@ -120,6 +122,9 @@ function content = loadFile(filename,varargin)
         content.parameters.transient.length = ...
             (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
             timeParams{2};
+        % Bug fix for some very weird MATLAB problems with accuracy
+        content.parameters.transient.length = ...
+            floor(content.parameters.transient.length*1e8)/1e8;
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
@@ -128,6 +133,14 @@ function content = loadFile(filename,varargin)
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
+        % Assign default (empty) values to parameters not readable from
+        % file (for completeness of the parameters structure, necessary for
+        % some functions of the trEPR GUI)
+        content.parameters.temperature = '';
+        content.parameters.bridge.attenuation = '';
+        content.parameters.laser.wavelength = '';
+        content.parameters.laser.repetitionRate = '';
+        
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
             linspace(timeParams{3},timeParams{4},timeParams{2});
@@ -152,6 +165,8 @@ function content = loadFile(filename,varargin)
         content.parameters.field.step = ...
             content.axes.yaxis.values(2) - content.axes.yaxis.values(1);
 
+        content.header = files{1}.textdata;
+        
         content.axes.yaxis.measure = 'magnetic field';
         content.axes.yaxis.unit = 'G';
 
@@ -160,6 +175,9 @@ function content = loadFile(filename,varargin)
         content.parameters.transient.length = ...
             (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
             timeParams{2};
+        % Bug fix for some very weird MATLAB problems with accuracy
+        content.parameters.transient.length = ...
+            floor(content.parameters.transient.length*1e8)/1e8;
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
@@ -167,6 +185,14 @@ function content = loadFile(filename,varargin)
             (content.parameters.transient.length / timeParams{2}));
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+
+        % Assign default (empty) values to parameters not readable from
+        % file (for completeness of the parameters structure, necessary for
+        % some functions of the trEPR GUI)
+        content.parameters.temperature = '';
+        content.parameters.bridge.attenuation = '';
+        content.parameters.laser.wavelength = '';
+        content.parameters.laser.repetitionRate = '';
 
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
@@ -191,12 +217,17 @@ function content = loadFile(filename,varargin)
         content.parameters.field.start = str2double(B0{1});
         content.parameters.field.stop = str2double(B0{1});
         content.parameters.field.step = 0;
+
+        content.header = file.textdata;
         
         timeParams = textscan(file.textdata{4},'%f %f %f %f %f %f');
         content.parameters.transient.points = timeParams{2};
         content.parameters.transient.length = ...
             (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
             timeParams{2};
+        % Bug fix for some very weird MATLAB problems with accuracy
+        content.parameters.transient.length = ...
+            floor(content.parameters.transient.length*1e8)/1e8;
         % The floor is important due to the fact that the trigger position
         % might be between two points.
         content.parameters.transient.triggerPosition = ...
@@ -204,6 +235,14 @@ function content = loadFile(filename,varargin)
             (content.parameters.transient.length / timeParams{2}));
         MWfreq = regexp(file.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+
+        % Assign default (empty) values to parameters not readable from
+        % file (for completeness of the parameters structure, necessary for
+        % some functions of the trEPR GUI)
+        content.parameters.temperature = '';
+        content.parameters.bridge.attenuation = '';
+        content.parameters.laser.wavelength = '';
+        content.parameters.laser.repetitionRate = '';
 
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
