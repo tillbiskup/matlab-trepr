@@ -152,7 +152,7 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
 
         % Set suggestion for filename of accumulated spectra
         set(handles.filenameEdit,'String',...
-            sprintf('%sacc.dat',commonString(filenames,1)));
+            sprintf('%sacc',commonString(filenames,1)));
     end
     guidata(handles.callerHandle,callerHandles);
 end
@@ -1116,7 +1116,7 @@ set(handles.spectraAccumulatedListbox,'String',accSpectraNames);
 
 % Set suggestion for filename of accumulated spectra
 set(handles.filenameEdit,'String',...
-	sprintf('%sacc.dat',commonString(accSpectraNames,1)));
+	sprintf('%sacc',commonString(accSpectraNames,1)));
 
 % If there are no visible spectra any more, set appdata, turn off elements
 % and return 

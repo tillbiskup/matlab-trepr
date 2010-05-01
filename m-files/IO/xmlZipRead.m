@@ -33,30 +33,28 @@ catch
     return;
 end
 for k=1:length(filenames)
-    [pathstr, name, ext, versn] = fileparts(filenames{1});
+    [pathstr, name, ext, versn] = fileparts(filenames{k});
     switch ext
         case '.xml'
             xmlFileSerialize(fullfile(pathstr,[name ext versn]));
             DOMnode = xmlread(fullfile(pathstr,[name ext versn]));
-            if nargout
-                varargout{1} = xml2struct(DOMnode);
-            else
-                varname=char(DOMnode.getDocumentElement.getNodeName);
-                varval = xml2struct(DOMnode);
-                assignin('caller',varname,varval);
-            end
+            struct = xml2struct(DOMnode);
             delete(fullfile(pathstr,[name ext versn]));
         case '.dat'
             data = load(fullfile(pathstr,[name ext versn]));
-            if nargout && nargout > 1
-                varargout{2} = data;
-            else
-                assignin('caller',name,data);
-            end
             delete(fullfile(pathstr,[name ext versn]));
         otherwise
             delete(fullfile(pathstr,[name ext versn]));
     end
+end
+if exist('data','var')
+    struct.data = data;
+end
+if nargout
+    varargout{1} = struct;
+else
+    varname=char(DOMnode.getDocumentElement.getNodeName);
+    assignin('caller',varname,struct);
 end
 delete(filename);
 cd(PWD);

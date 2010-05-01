@@ -470,15 +470,11 @@ end
 
 % --- Executes on button press in spectraSaveButton.
 function spectraSaveButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraSaveButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
+if_spectraSave(hObject);
 
 % --- Executes on button press in spectraRemoveButton.
 function spectraRemoveButton_Callback(hObject, eventdata, handles)
-
-if_spectraRemove(hObject)
+if_spectraRemove(hObject);
 
 
 % --- Executes on button press in spectraSaveAsButton.
@@ -1961,6 +1957,7 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.spectraInfoButton,'Enable','Off');
     set(handles.spectraRemoveButton,'Enable','Off');
     set(handles.spectraAccumulateButton,'Enable','Off');
+    set(handles.spectraSaveButton,'Enable','Off');
     set(handles.axisResetButton,'Enable','Off');
     set(handles.axisExportButton,'Enable','Off');
     set(handles.measureClearButton,'Enable','Off');
@@ -1981,7 +1978,7 @@ else
         set(handles.spectraAccumulateButton,'Enable','On');
     else
         set(handles.spectraAccumulateButton,'Enable','Off');
-    end    
+    end
     set(handles.axisResetButton,'Enable','On');
     set(handles.axisExportButton,'Enable','On');
     set(handles.measureClearButton,'Enable','On');
@@ -2059,6 +2056,14 @@ else
     set(handles.displaceYSlider,'Enable','On');
     set(handles.scaleXSlider,'Enable','On');
     set(handles.displaceXSlider,'Enable','On');
+    for k=1:length(appdata.control.spectra.modified)
+        if appdata.control.spectra.modified{k} == appdata.control.spectra.active
+            set(handles.spectraSaveButton,'Enable','On');
+            break;
+        else
+            set(handles.spectraSaveButton,'Enable','Off');
+        end
+    end
 end
 
 % Set slider values and display of these values accordingly for the
@@ -2812,6 +2817,53 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
+
+% --- Background Compensation (BGC)
+function if_spectraSave(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+struct = appdata.data{appdata.control.spectra.active};
+[pathstr, name] = fileparts(...
+    appdata.data{appdata.control.spectra.active}.filename);
+if isempty(name)
+    [pathstr, name] = fileparts(uiputfile('*.zip'));
+elseif exist(fullfile(pathstr, [name '.zip']),'file')
+    button = questdlg(...
+        sprintf('%s\n%s\n%s',...
+        'The file',...
+        fullfile(pathstr, [name '.zip']),...
+        'already exists. Overwrite'),...
+        'File already exists',...
+        'Yes','No','No');
+    switch button
+        case 'Yes'
+        case 'No'
+            [pathstr, name] = fileparts(uiputfile('*.zip'));
+    end
+end
+trEPRsave([pathstr name],struct);
+% Remove saved spectrum from list of modified spectra
+for k=1:length(appdata.control.spectra.modified)
+    if appdata.control.spectra.modified{k} == appdata.control.spectra.active
+        appdata.control.spectra.modified(k) = '';
+        break;
+    end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+if_spectraVisibleListbox_Refresh(hObject);
 
 
 % --- Check Order of Compensation Methods
