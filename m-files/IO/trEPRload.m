@@ -151,7 +151,17 @@ function content = loadFile(filename)
     fileFormats = iniFileRead([mfilename('fullpath') '.ini']);
     
     % read file formats into cell array
-    asciiFileFormats = fieldnames(fileFormats);
+    fileFormatNames = fieldnames(fileFormats);
+    asciiFileFormats = cell(0);
+    binaryFileFormats = cell(0);
+    for k=1:length(fileFormatNames)
+        switch getfield(getfield(fileFormats,fileFormatNames{k}),'type')
+            case 'ascii'
+                asciiFileFormats{end+1} = fileFormatNames{k};
+            case 'binary'
+                binaryFileFormats{end+1} = fileFormatNames{k};
+        end
+    end
     
     % open file
     fid = fopen(filename);
@@ -176,7 +186,7 @@ function content = loadFile(filename)
     fseek(fid,0,'bof');
     firstLine = fgetl(fid);
     
-    if isempty(regexp(firstLine,'[a-zA-Z]'))
+    if isempty(regexp(firstLine,'[a-zA-Z]','once'))
         % If first line does not contain any characters necessary for an
         % identifier string (problem with fsc2 files, see comment above),
         % read another line. 
@@ -187,7 +197,28 @@ function content = loadFile(filename)
     fclose(fid);
     
     if isBinary
-       fprintf('%s is a binary file!',filename); 
+       for k = 1 : length(binaryFileFormats)
+           [pathstr, name, ext] = fileparts(filename);
+           if findstr(...,
+                    getfield(...
+                    getfield(fileFormats,binaryFileFormats{k}),...
+                    'identifierString'),...
+                    ext);
+                functionHandle = str2func(getfield(...
+                    getfield(fileFormats,binaryFileFormats{k}),...
+                    'function'));
+                data = functionHandle(filename);
+                if ~isstruct(data)
+                    content.data = data;
+                else
+                    content = data;
+                end
+                if ~isfield(content,'filename')
+                    content.filename = filename;
+                end
+                break;
+           end
+       end
     else
         % else try to find a matching function from the ini file
         for k = 1 : length(asciiFileFormats)           
@@ -225,7 +256,6 @@ function content = loadFile(filename)
             end
             content.filename = filename;
         end
-        
     end
     if ~exist('content') 
         content = []; 
