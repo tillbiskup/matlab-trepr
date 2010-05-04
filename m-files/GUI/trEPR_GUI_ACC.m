@@ -117,8 +117,9 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         
         data = parentAppdata.data;
         % Assign necessary control parameters to data structure
-        for k = 1:length(data)
+        for l = 1:length(parentAppdata.control.spectra.visible)
             % Adjust displacement in field direction: Apply to field axis
+            k = parentAppdata.control.spectra.visible{1};
             if data{k}.Db0
                 data{k}.axes.yaxis.values = [...
                     data{k}.axes.yaxis.values(1) + (...
@@ -1593,7 +1594,9 @@ if min(MWfrequencies)~=max(MWfrequencies)
     % Average frequencies and cut to fourth digit
     MWfrequency = mean(MWfrequencies);
     MWfrequency = floor(MWfrequency*1e4)/1e4;
-    appdata.acc.acc.MWfrequency = MWfrequencies;
+    for k=1:length(MWfrequencies)
+        appdata.acc.acc(k).MWfrequency = MWfrequencies(k);
+    end
 elseif MWfrequencies(1) == 0
     MWfrequency = [];
 else

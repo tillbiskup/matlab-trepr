@@ -1984,7 +1984,7 @@ else
     set(handles.measureClearButton,'Enable','On');
     set(handles.measurePickButton,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
-        [pathstr, name, ext, versn] = fileparts(...
+        [pathstr, name, ext] = fileparts(...
             appdata.data{...
             appdata.control.spectra.visible{k}}.filename...
             );
@@ -2332,24 +2332,12 @@ for k=1:modSpectra
     end
 end
 
-
 % Remove selected from data
-appdata.data(iSelected) = [];
+% IMPORTANT: Do NOT remove complete index, but set it to an empty matrix
+%            instead.
+appdata.data{iSelected} = [];
 if isempty(appdata.data)
     appdata.data = cell(1);
-end
-
-% Remove selected from visible
-visSpectra = length(appdata.control.spectra.visible);
-for k=1:visSpectra
-    if appdata.control.spectra.visible{k} == iSelected
-        appdata.control.spectra.visible(k) = [];
-        break;  % !!! above statement manipulates cell array length
-    end
-end
-% Prevent empty cell array
-if isempty(appdata.control.spectra.visible)
-    appdata.control.spectra.visible{1} = [];
 end
 
 % Remove selected from visible
