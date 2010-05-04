@@ -110,7 +110,8 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         
         data = parentAppdata.data;
         % Assign necessary control parameters to data structure
-        for k = 1:length(data)
+        for l = 1:length(parentAppdata.control.spectra.visible)
+        	k = parentAppdata.control.spectra.visible{l};
             data{k}.blc.area.left = 10;
             data{k}.blc.area.right = 10;
             data{k}.blc.area.addPoint1 = [];
@@ -1158,7 +1159,8 @@ end
 if isempty(get(handles.spectraVisibleListbox,'String'))
     set(handles.spectraVisibleListbox,...
         'Value',...
-        appdata.control.spectra.active);
+        ind(appdata.control.spectra.visible,...
+        appdata.control.spectra.active));
 else
     appdata.control.spectra.active = appdata.control.spectra.visible{...
         get(handles.spectraVisibleListbox,'Value')...
