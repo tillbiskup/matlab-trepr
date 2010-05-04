@@ -110,7 +110,7 @@ function varargout = trEPRload(filename, varargin)
                 end
             case 7
                 % If name is a directory.
-                content = loadDir(filename);
+                content = loadDir(filename,'combine',p.Results.combine);
                 if ~nargout
                     % of no output argument is given, assign content to a
                     % variable in the workspace with the same name as the
@@ -162,7 +162,7 @@ function content = loadFile(filename)
                 binaryFileFormats{end+1} = fileFormatNames{k};
         end
     end
-    
+
     % open file
     fid = fopen(filename);
 
@@ -185,6 +185,13 @@ function content = loadFile(filename)
     % an identifier string, and in this case, read a second line.
     fseek(fid,0,'bof');
     firstLine = fgetl(fid);
+    
+    % If firstline is "-1", thus we are at the end of the file, meaning we
+    % opened an empty file, return immediately
+    if isnumeric(firstLine) && firstLine == -1
+        content = [];
+        return;
+    end
     
     if isempty(regexp(firstLine,'[a-zA-Z]','once'))
         % If first line does not contain any characters necessary for an
@@ -264,7 +271,7 @@ end
 
 % --- Sequentially read all files in a directory provided their name does
 % not start with a dot and it is a 'real' file and no directory
-function content = loadDir(dirname)
+function content = loadDir(dirname,varargin)
     
     % Get names of files in the directory and remove all files whose name
     % starts with a "." and all directories. The names are stored as a cell
@@ -274,7 +281,7 @@ function content = loadDir(dirname)
     for k=1:length(allFilesInDir)
         if (findstr(allFilesInDir(k).name,'.') ~= 1)
             if ~allFilesInDir(k).isdir
-                filesInDir{l} = allFilesInDir(k).name;
+                filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
                 l=l+1;
             end
         end
@@ -283,12 +290,16 @@ function content = loadDir(dirname)
     % If there are still files in the directory after removing all dot
     % files and directories, try to read every single file
     if ~isempty(filesInDir)
-        l = 1;
-        for k=1:length(filesInDir)
-            fileContent = loadFile(char(filesInDir(k)));
-            if ~isempty(fileContent)
-                content{l} = fileContent;
-                l = l+1;
+        if (nargin >= 3) && (strcmp(varargin{1},'combine') && varargin{2})
+            content = combineFile(filesInDir)
+        else
+            l = 1;
+            for k=1:length(filesInDir)
+                fileContent = loadFile(char(filesInDir(k)));
+                if ~isempty(fileContent)
+                    content{l} = fileContent;
+                    l = l+1;
+                end
             end
         end
     end
