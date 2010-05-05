@@ -2304,7 +2304,7 @@ else
 end
 
 % Return immediately if there are no spectra or selected spectrum is "0"
-if isempty(appdata.data{1}) || iSelected == 0
+if ((length(appdata.data) == 1) && isempty(appdata.data{1})) || iSelected == 0
     return
 end
 
@@ -2645,10 +2645,12 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
         xdata = get(get(handles.axes1,'Children'),'XData');
         ydata = get(get(handles.axes1,'Children'),'YData');
 
-        xdata = xdata{ind(appdata.control.spectra.visible,...
-            appdata.control.spectra.active)};
-        ydata = ydata{ind(appdata.control.spectra.visible,...
-            appdata.control.spectra.active)};
+        if iscell(xdata)
+            xdata = xdata{ind(appdata.control.spectra.visible,...
+                appdata.control.spectra.active)};
+            ydata = ydata{ind(appdata.control.spectra.visible,...
+                appdata.control.spectra.active)};
+        end
         
         indx=interp1(...
             linspace(1,axisPosition(3),length(xdata)),...

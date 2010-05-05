@@ -110,6 +110,10 @@ function trEPRinstall
 		trEPRtoolboxRootDir = strrep(pwd,trEPRtoolboxProgDir,'');
 		path(path,[trEPRtoolboxRootDir trEPRtoolboxBaseDir]);
 		path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir]);
+		path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'GUI']);
+		path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'IO']);
+		path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'preprocessing']);
+		path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'common']);
 		path(path,[trEPRtoolboxRootDir trEPRtoolboxDocDir]);
 		path(path,[trEPRtoolboxRootDir trEPRtoolboxExampleDir]);
 	  
