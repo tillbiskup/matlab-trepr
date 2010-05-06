@@ -267,21 +267,16 @@ function [ metadata ] = readMetaGenFile ( filename, varargin )
 			
 			else
 
-				key = substr( readLine, 0, index(readLine, assignmentChar)-1 );
-				val = substr( readLine, index(readLine, assignmentChar)+length(assignmentChar), (length(readLine)-index(readLine, assignmentChar)) );
+                [names] = regexp(readLine,...
+                    '(?<key>[a-zA-Z0-9._-]+)\s*=\s*(?<val>.*)',...
+                    'names');
 
-				% remove trailing and leading whitespace characters
-				key = removeTrailingWhiteSpace ( key );
-				val = removeTrailingWhiteSpace ( val );
-				key = removeLeadingWhiteSpace ( key );
-				val = removeLeadingWhiteSpace ( val );
-
-				if ( ismember({'metadata'},who)  && isfield(metadata,blockname) )
-					evalString = sprintf('fieldExists = isfield(metadata.%s,''%s'');',blockname,key);
+                if ( ismember({'metadata'},who)  && isfield(metadata,blockname) )
+					evalString = sprintf('fieldExists = isfield(metadata.%s,''%s'');',blockname,names.key);
 					eval(evalString);
 					if ( fieldExists )
 						% get value from that field
-						evalString = sprintf('oldFieldValue = metadata.%s.%s;',blockname,key);
+						evalString = sprintf('oldFieldValue = metadata.%s.%s;',blockname,names.key);
 						eval(evalString);
 					
 						% print warning message telling the user that the field gets overwritten
@@ -290,7 +285,7 @@ function [ metadata ] = readMetaGenFile ( filename, varargin )
 					end
 				end
 				
-				evalString = sprintf('metadata.%s.%s=''%s'';',blockname,key,val);
+				evalString = sprintf('metadata.%s.%s=''%s'';',blockname,names.key,names.val);
 				eval(evalString);
 				
 			end

@@ -104,7 +104,7 @@ function platform = platform
 
 		if ispc
 		   platform = computer();
-		elseif ( index(computer, 'apple') ~= 0)
+		elseif findstr('apple', computer)
 		    [fail, input] = unix('sw_vers');
 		    
 		    if ~fail
