@@ -1,4 +1,14 @@
 function index = ind(array,key,varargin)
+%  IND Return index of a key in an array.
+%     INDEX = IND(ARRAY,KEY) returns the index of the key KEY in the array
+%     ARRAY and an empty vector if KEY is not found in ARRAY. If there is
+%     more than one match of KEY in ARRAY, INDEX is a vector containing all
+%     indices of KEY in ARRAY.
+
+% Copyright (C) 2010 Till Biskup, <till@till-biskup.de>
+% This file ist free software.
+% $Id$
+
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
 p.FunctionName = mfilename; % Function name to be included in error messages
