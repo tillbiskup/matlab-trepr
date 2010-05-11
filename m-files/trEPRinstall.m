@@ -47,7 +47,7 @@ end
 %
 % Therefore, make sure we are called from the path we are installed to.
 % Otherwise, print out a short message and abort further processing.
-	
+
 if ( strfind(pwd,trEPRtoolboxProgDir) ~= 0 ) 
 	
     fprintf('Adding the trEPR toolbox directories to the MATLAB(TM) search path...\n')
@@ -55,22 +55,23 @@ if ( strfind(pwd,trEPRtoolboxProgDir) ~= 0 )
 	trEPRtoolboxRootDir = strrep(pwd,trEPRtoolboxProgDir,'');
 	path(path,[trEPRtoolboxRootDir trEPRtoolboxBaseDir]);
 	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir]);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'GUI']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'IO']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'preprocessing']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir 'common']);
+	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/GUI']);
+	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/IO']);
+	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/preprocessing']);
+	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/common']);
 	path(path,[trEPRtoolboxRootDir trEPRtoolboxDocDir]);
 	path(path,[trEPRtoolboxRootDir trEPRtoolboxExampleDir]);
 	  
-else
-	
-	fprintf('You need to call this program from the directory it resides in...\n\n');
-	return;
-	
 end
 
 % TODO: Try to save the path using "savepath" (return 0 = OK, return 1 =
 % error)
+
+status = savepath;
+
+if status
+    fprintf('There were some problems with saving your Matlab search path.');
+end
 
 fprintf('\nSUCCESS!\n\n  Your trEPR toolbox, version %s, should be properly installed now.\n',trEPRtoolboxRevisionNumber);
 fprintf('  For more information according to the toolbox simply typein "trEPRinfo".\n');

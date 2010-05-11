@@ -19,7 +19,7 @@ TOOLBOXPRGDIR=$(TOOLBOXDIR)/trEPR
 TOOLBOXEXADIR=$(TOOLBOXDIR)/examples
 
 toolbox: tbdirs tbdoc
-	cp $(MFILEDIR)/*.m $(TOOLBOXPRGDIR)/
+	cp -r $(MFILEDIR)/* $(TOOLBOXPRGDIR)/
 	cp $(MFILEDIR)/info.xml $(TOOLBOXPRGDIR)/
 	tar czf $(TOOLBOXDIR).tgz $(TOOLBOXDIR)
 	zip -rq $(TOOLBOXDIR).zip $(TOOLBOXDIR)
