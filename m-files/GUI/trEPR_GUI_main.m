@@ -128,6 +128,40 @@ function menuFile_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Conditionals to check whether or not to activate the respective menu item
+% Save
+for k=1:length(appdata.control.spectra.modified)
+    set(handles.menuFileSave, 'Enable', 'off');
+    if appdata.control.spectra.modified{k} == appdata.control.spectra.active
+        set(handles.menuFileSave, 'Enable', 'on');
+        break;
+    else
+        set(handles.menuFileSave, 'Enable', 'off');
+    end
+end
+%Save as
+if length(appdata.control.spectra.visible) == 1 && ...
+        isempty(appdata.control.spectra.visible{1})
+    set(handles.menuFileSaveAs, 'Enable', 'off');
+else
+    set(handles.menuFileSaveAs, 'Enable', 'on');
+end
+
+% Refresh appdata of the current GUI
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+
+
 % --------------------------------------------------------------------
 function menuHelp_Callback(hObject, eventdata, handles)
 % hObject    handle to menuHelp (see GCBO)
@@ -639,6 +673,7 @@ function menuFileSave_Callback(hObject, eventdata, handles)
 % hObject    handle to menuFileSave (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+if_spectraSave(hObject);
 
 
 % --------------------------------------------------------------------
@@ -1680,6 +1715,10 @@ function closeGUI(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
 selection = questdlg(...
     'Do you really want to quit the trEPR toolbox?',...
     'Really quit?',...
@@ -1689,7 +1728,35 @@ selection = questdlg(...
 
 switch selection,
     case 'Yes',
-        delete(gcf);
+        
+        % Check whether there are modified and still unsaved spectra
+        modSpectra = length(appdata.control.spectra.modified);
+        for k=1:modSpectra
+            if ~isempty(appdata.control.spectra.modified{k})
+                selection = questdlg(...
+                    sprintf('%s\n%s\n%s\n%s\n%s',...
+                    'There are still modified spectra in the GUI.',...
+                    'Do you really want to close the GUI without saving the following spectrum?',...
+                    appdata.data{appdata.control.spectra.modified{k}}.filename,...
+                    ' ',...
+                    'NOTE: In this case all modifications are lost!'),...
+                    'Modifications exist. Really close?',...
+                    'Save',...
+                    'Cancel',...
+                    'Close',...
+                    'Save');
+                switch selection,
+                    case 'Save'
+                        if_spectraSave(...
+                            hObject,...
+                            appdata.control.spectra.modified{k});
+                    case 'Cancel'
+                        return;
+                    case 'Close'
+                end
+            end
+        end
+        delete(handles.figure1);
     case 'No'
         return
 end
@@ -2494,6 +2561,14 @@ switch currentDisplayType
         
         xlabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
         ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
+
+        % Add horizontal line at position 0 in upper axis
+        axes(handles.axes1)
+        line([yaxis(1) yaxis(end)],[0 0],...
+            'Color',[0.75 0.75 0.75],...
+            'LineWidth',1,...
+            'LineStyle','--');
+
     case 'transients'
         set(handles.axes1,'XTick',[],'YTick',[]);     % default if no plot
         set(handles.spectraScrollSlider,'Enable','On');
@@ -2549,6 +2624,13 @@ switch currentDisplayType
 
         xlabel(handles.axes1,sprintf('{\\it time} / s'));
         ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
+
+        % Add horizontal line at position 0 in upper axis
+        axes(handles.axes1)
+        line([xaxis(1) xaxis(end)],[0 0],...
+            'Color',[0.75 0.75 0.75],...
+            'LineWidth',1,...
+            'LineStyle','--');
 end
 
 % Refresh handles and appdata of the current GUI
@@ -2813,16 +2895,22 @@ for k=1:length(appdataFieldnames)
       );
 end
 
-% --- Background Compensation (BGC)
-function if_spectraSave(hObject)
+% --- Save spectrum
+function if_spectraSave(hObject,varargin)
 
 % Get handles and appdata of the current GUI
 handles = guidata(hObject);
 appdata = getappdata(handles.figure1);
 
-struct = appdata.data{appdata.control.spectra.active};
+if nargin > 1
+    iSelected = varargin{1};
+else
+    iSelected = appdata.control.spectra.active;
+end
+
+struct = appdata.data{iSelected};
 [pathstr, name] = fileparts(...
-    appdata.data{appdata.control.spectra.active}.filename);
+    appdata.data{iSelected}.filename);
 if isempty(name)
     [pathstr, name] = fileparts(uiputfile('*.zip'));
 elseif exist(fullfile(pathstr, [name '.zip']),'file')
@@ -2839,10 +2927,21 @@ elseif exist(fullfile(pathstr, [name '.zip']),'file')
             [pathstr, name] = fileparts(uiputfile('*.zip'));
     end
 end
-trEPRsave([pathstr name],struct);
+trEPRsave(fullfile(pathstr,name),struct);
+% Display dialog giving success feedback to the user
+if isempty(pathstr)
+    pathstr = [pwd];
+end
+h = msgbox(...
+    sprintf(...
+    'The currently active spectrum has been saved to the file\n%s/%s.zip',...
+    pathstr,...
+    name...
+    ),...
+    'Saved currently active spectrum');
 % Remove saved spectrum from list of modified spectra
 for k=1:length(appdata.control.spectra.modified)
-    if appdata.control.spectra.modified{k} == appdata.control.spectra.active
+    if appdata.control.spectra.modified{k} == iSelected
         appdata.control.spectra.modified(k) = '';
         break;
     end

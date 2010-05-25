@@ -56,6 +56,5 @@ else
     varname=char(DOMnode.getDocumentElement.getNodeName);
     assignin('caller',varname,struct);
 end
-delete(filename);
 cd(PWD);
 end

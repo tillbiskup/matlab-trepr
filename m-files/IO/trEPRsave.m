@@ -12,22 +12,22 @@ parser.parse(filename,struct);
 if isfield(struct,'data')
     data = struct.data;
     struct = rmfield(struct,'data');
-    save(fullfile(pathstr,[name '.dat']),'data','-ascii');
+    save(fullfile(tempdir,[name '.dat']),'data','-ascii');
     [structpathstr, structname] = fileparts(struct.filename);
     struct.filename = fullfile(structpathstr,[structname '.zip']);
     docNode = struct2xml(struct);
-    xmlwrite(fullfile(pathstr,[name '.xml']),docNode);
+    xmlwrite(fullfile(tempdir,[name '.xml']),docNode);
     zip(fullfile(pathstr,[name '.zip']),...
-        {fullfile(pathstr,[name '.dat']),...
-        fullfile(pathstr,[name '.xml'])});
-    delete(fullfile(pathstr,[name '.xml']));
-    delete(fullfile(pathstr,[name '.dat']));
+        {fullfile(tempdir,[name '.dat']),...
+        fullfile(tempdir,[name '.xml'])});
+    delete(fullfile(tempdir,[name '.xml']));
+    delete(fullfile(tempdir,[name '.dat']));
 else
     [structpathstr, structname] = fileparts(struct.filename);
     struct.filename = fullfile(structpathstr,[structname '.zip']);
     docNode = struct2xml(struct);
-    xmlwrite(fullfile(pathstr,[name '.xml']),docNode);
-    zip(fullfile(pathstr,[name '.zip']),fullfile(pathstr,[name '.xml']));
-    delete(fullfile(pathstr,[name '.xml']));
+    xmlwrite(fullfile(tempdir,[name '.xml']),docNode);
+    zip(fullfile(pathstr,[name '.zip']),fullfile(tempdir,[name '.xml']));
+    delete(fullfile(tempdir,[name '.xml']));
 end
 end
