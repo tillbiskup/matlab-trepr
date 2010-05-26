@@ -75,8 +75,8 @@ function trEPRinfo
 	fprintf('   Platform:         %s \n\n',DisplayPlatform);
 	fprintf('================================================================================\n\n');
 	fprintf(' For latest information, please visit:\n\n');
-	fprintf('   http://physik.fu-berlin.de/~biskup/forschung/datenauswertung/trEPR-toolbox/\n\n');
-	fprintf(' or write an email to <till.biskup@physik.fu-berlin.de>\n\n');
+	fprintf('   http://www2.till-biskup.de/projekte/matlab/trepr/\n\n');
+	fprintf(' or write an email to <till@till-biskup.de>\n\n');
 	fprintf('================================================================================\n\n');
 
 %******
