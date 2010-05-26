@@ -1445,36 +1445,7 @@ trEPR_GUI_export(...
 
 % --- Executes on button press in axisResetButton.
 function axisResetButton_Callback(hObject, eventdata, handles)
-% Get handles and appdata of the current GUI
-handles = guidata(hObject);
-appdata = getappdata(handles.figure1);
-
-set(handles.db0Edit,'String','0');
-set(handles.dtEdit,'String','0');
-set(handles.dyEdit,'String','0');
-%set(handles.sb0Edit,'String','1');
-%set(handles.stEdit,'String','1');
-set(handles.syEdit,'String','1');
-
-appdata.data{appdata.control.spectra.active}.Db0 = 0;
-appdata.data{appdata.control.spectra.active}.Dt = 0;
-appdata.data{appdata.control.spectra.active}.Dy = 0;
-%appdata.data{appdata.control.spectra.active}.Sb0 = 0;
-%appdata.data{appdata.control.spectra.active}.St = 0;
-appdata.data{appdata.control.spectra.active}.Sy = 1;
-
-% Refresh handles and appdata of the current GUI
-guidata(hObject,handles);
-appdataFieldnames = fieldnames(appdata);
-for k=1:length(appdataFieldnames)
-  setappdata(...
-      handles.figure1,...
-      appdataFieldnames{k},...
-      getfield(appdata,appdataFieldnames{k})...
-      );
-end
-
-if_axis_Refresh(handles.figure1);
+if_axisReset(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
 function menuView_Callback(hObject, eventdata, handles)
@@ -1640,6 +1611,23 @@ function zoomInAxisContextMenu_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+if strcmp(get(handles.zoomInAxisContextMenu,'Checked'),'off')
+    set(handles.zoomInAxisContextMenu, 'Checked', 'on');
+    if strcmp(get(handles.zoomOutAxisContextMenu,'Checked'),'on')
+        set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+    end    
+    zh = zoom(handles.figure1);
+    set(zh,'UIContextMenu',handles.axisToolsContextMenu);
+    set(zh,'Enable','on');
+    set(zh,'Motion','both');
+    set(zh,'Direction','in');
+else
+    set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+    zh = zoom(handles.figure1);
+    set(zh,'Enable','off');
+end    
+
+
 
 % --------------------------------------------------------------------
 function zoomOutAxisContextMenu_Callback(hObject, eventdata, handles)
@@ -1647,6 +1635,21 @@ function zoomOutAxisContextMenu_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+if strcmp(get(handles.zoomOutAxisContextMenu,'Checked'),'off')
+    set(handles.zoomOutAxisContextMenu, 'Checked', 'on');
+    if strcmp(get(handles.zoomInAxisContextMenu,'Checked'),'on')
+        set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+    end    
+    zh = zoom(handles.figure1);
+    set(zh,'UIContextMenu',handles.axisToolsContextMenu);
+    set(zh,'Enable','on');
+    set(zh,'Motion','both');
+    set(zh,'Direction','out');
+else
+    set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+    zh = zoom(handles.figure1);
+    set(zh,'Enable','off');
+end 
 
 % --------------------------------------------------------------------
 function exportAxisContextMenu_Callback(hObject, eventdata, handles)
@@ -1661,10 +1664,7 @@ trEPR_GUI_export(...
 
 % --------------------------------------------------------------------
 function resetAxisContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to resetAxisContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
+if_axisReset(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
 function plotPropertiesAxisContextMenu_Callback(hObject, eventdata, handles)
@@ -3288,4 +3288,39 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+function if_axisReset(hObject, eventdata, handles)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
+set(handles.db0Edit,'String','0');
+set(handles.dtEdit,'String','0');
+set(handles.dyEdit,'String','0');
+set(handles.sb0Edit,'String','1');
+set(handles.stEdit,'String','1');
+set(handles.syEdit,'String','1');
+
+set(handles.displaceYSlider,'Value',0);
+set(handles.scaleYSlider,'Value',0);
+set(handles.displaceXSlider,'Value',0);
+set(handles.scaleXSlider,'Value',0);
+
+appdata.data{appdata.control.spectra.active}.Db0 = 0;
+appdata.data{appdata.control.spectra.active}.Dt = 0;
+appdata.data{appdata.control.spectra.active}.Dy = 0;
+appdata.data{appdata.control.spectra.active}.Sb0 = 0;
+appdata.data{appdata.control.spectra.active}.St = 0;
+appdata.data{appdata.control.spectra.active}.Sy = 1;
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
