@@ -25,6 +25,7 @@ function varargout = trEPRload(filename, varargin)
     p.parse(filename,varargin{:});
 
     if iscell(filename)
+        sort(filename);
         if p.Results.combine
             content = combineFile(filename);
         else
