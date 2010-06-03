@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 03-Jun-2010 14:01:36
+% Last Modified by GUIDE v2.5 03-Jun-2010 17:05:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1377,9 +1377,9 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in measurePickButton.
-function measurePickButton_Callback(hObject, eventdata, handles)
-% hObject    handle to measurePickButton (see GCBO)
+% --- Executes on button press in measureSinglePointButton.
+function measureSinglePointButton_Callback(hObject, eventdata, handles)
+% hObject    handle to measureSinglePointButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1387,9 +1387,67 @@ function measurePickButton_Callback(hObject, eventdata, handles)
 guidata(hObject, handles);
 appdata = getappdata(handles.figure1);
 
-appdata.control.measure.point = 1;
-set(handles.figure1,'WindowButtonMotionFcn',@if_trackPointer);
-set(handles.figure1,'WindowButtonDownFcn',@if_switchMeasurementPoint);
+% Switch off zooming (necessary to assign button functions)
+set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+zh = zoom(handles.figure1);
+set(zh,'Enable','off');
+
+if get(handles.measureSinglePointButton,'Value')
+    set(handles.measureX2editIndex,'String','1');
+    set(handles.measureY2editIndex,'String','1');
+    set(handles.measureDeltaXeditIndex,'String','0');
+    set(handles.measureDeltaYeditIndex,'String','0');
+    set(handles.measureX2editValue,'String','1');
+    set(handles.measureY2editValue,'String','1');
+    set(handles.measureDeltaXeditValue,'String','0');
+    set(handles.measureDeltaYeditValue,'String','0');
+
+    set(handles.figure1,'WindowButtonMotionFcn',@if_trackPointer);
+    set(handles.figure1,'WindowButtonDownFcn',@if_singleMeasurementPoint);
+else
+    set(handles.figure1,'WindowButtonMotionFcn','');
+    set(handles.figure1,'WindowButtonDownFcn','');
+    refresh;
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+
+% --- Executes on button press in measureTwoPointButton.
+function measureTwoPointButton_Callback(hObject, eventdata, handles)
+% hObject    handle to measureTwoPointButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+% Switch off zooming (necessary to assign button functions)
+set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+zh = zoom(handles.figure1);
+set(zh,'Enable','off');
+
+if get(handles.measureTwoPointButton,'Value')
+    appdata.control.measure.point = 1;
+    set(handles.figure1,'WindowButtonMotionFcn',@if_trackPointer);
+    set(handles.figure1,'WindowButtonDownFcn',@if_switchMeasurementPoint);
+else
+    set(handles.figure1,'WindowButtonMotionFcn','');
+    set(handles.figure1,'WindowButtonDownFcn','');
+    refresh;
+end
 
 % Refresh handles and appdata of the current GUI
 guidata(hObject,handles);
@@ -1664,6 +1722,18 @@ else
     zh = zoom(handles.figure1);
     set(zh,'Enable','off');
 end 
+
+
+% --------------------------------------------------------------------
+function zoomResetAxisContextMenu_Callback(hObject, eventdata, handles)
+% hObject    handle to zoomResetAxisContextMenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+zh = zoom(handles.figure1);
+set(zh,'Enable','off');
+if_axis_Refresh(handles.figure1);
 
 % --------------------------------------------------------------------
 function exportAxisContextMenu_Callback(hObject, eventdata, handles)
@@ -2042,7 +2112,8 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.axisResetButton,'Enable','Off');
     set(handles.axisExportButton,'Enable','Off');
     set(handles.measureClearButton,'Enable','Off');
-    set(handles.measurePickButton,'Enable','Off');
+    set(handles.measureSinglePointButton,'Enable','Off');
+    set(handles.measureTwoPointButton,'Enable','Off');
 else
     set(handles.spectraHideButton,'Enable','On');
     set(handles.displayTypePopupmenu,'Enable','On');
@@ -2063,7 +2134,8 @@ else
     set(handles.axisResetButton,'Enable','On');
     set(handles.axisExportButton,'Enable','On');
     set(handles.measureClearButton,'Enable','On');
-    set(handles.measurePickButton,'Enable','On');
+    set(handles.measureSinglePointButton,'Enable','On');
+    set(handles.measureTwoPointButton,'Enable','On');
     for k=1:length(appdata.control.spectra.visible)
         [pathstr, name, ext] = fileparts(...
             appdata.data{...
@@ -2661,6 +2733,67 @@ end
 
 
 % --- Get pointer position in current axis
+function if_singleMeasurementPoint(hObject,event)
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+% Get x and y values
+xind = str2num(get(handles.measureX1editIndex,'String'));
+yind = str2num(get(handles.measureY1editIndex,'String'));
+xval = str2num(get(handles.measureX1editValue,'String'));
+yval = str2num(get(handles.measureY1editValue,'String'));
+
+switch appdata.control.axis.displayType;
+    case '2D plot'
+        appdata.data{appdata.control.spectra.active}.t = xind;
+        appdata.data{appdata.control.spectra.active}.b0 = yind;
+        set(handles.b0EditIndex,'String',num2str(yind));
+        set(handles.b0EditValue,'String',num2str(...
+            appdata.data{...
+            appdata.control.spectra.active}.axes.yaxis.values(yind)));
+        set(handles.timeEditIndex,'String',num2str(xind));
+        set(handles.timeEditValue,'String',num2str(...
+            appdata.data{...
+            appdata.control.spectra.active}.axes.xaxis.values(xind)));
+    case 'B0 spectra'
+        appdata.data{appdata.control.spectra.active}.b0 = xind;
+        set(handles.b0EditIndex,'String',num2str(xind));
+        set(handles.b0EditValue,'String',num2str(...
+            appdata.data{...
+            appdata.control.spectra.active}.axes.yaxis.values(xind)));
+    case 'transients'
+        appdata.data{appdata.control.spectra.active}.t = xind;
+        set(handles.timeEditIndex,'String',num2str(xind));
+        set(handles.timeEditValue,'String',num2str(...
+            appdata.data{...
+            appdata.control.spectra.active}.axes.xaxis.values(xind)));
+end
+if_axis_Refresh(handles.figure1);
+
+appdata.control.measure.x1val = xval(1);
+appdata.control.measure.y1val = yval(1);
+appdata.control.measure.x1ind = xind(1);
+appdata.control.measure.y1ind = yind(1);
+set(handles.figure1,'WindowButtonMotionFcn','');
+set(handles.figure1,'WindowButtonDownFcn','');
+set(handles.figure1,'Pointer','arrow');
+set(handles.measureSinglePointButton,'Value',0);
+refresh;
+
+% Refresh appdata of the current GUI
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+
+% --- Get pointer position in current axis
 function if_switchMeasurementPoint(hObject,event)
 
 % Get handles and appdata of the current GUI
@@ -2688,6 +2821,7 @@ switch currentPoint
         set(handles.figure1,'WindowButtonMotionFcn','');
         set(handles.figure1,'WindowButtonDownFcn','');
         set(handles.figure1,'Pointer','arrow');
+        set(handles.measureTwoPointButton,'Value',0);
         refresh;
 end
 
@@ -3423,11 +3557,5 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-
-% --- Executes on button press in measureSingleButton.
-function measureSingleButton_Callback(hObject, eventdata, handles)
-% hObject    handle to measureSingleButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
