@@ -2741,14 +2741,17 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
         %       problems once having more then one plot there!
         xdata = get(get(handles.axes1,'Children'),'XData');
         ydata = get(get(handles.axes1,'Children'),'YData');
-
+        
+        % NOTE: The "+1" of the index is highly necessary due to the
+        % inclusion of the horizontal line at position "0" that is the
+        % first entry of the "xdata" cell array.
         if iscell(xdata)
             xdata = xdata{ind(appdata.control.spectra.visible,...
-                appdata.control.spectra.active)};
+                appdata.control.spectra.active)+1};
             ydata = ydata{ind(appdata.control.spectra.visible,...
-                appdata.control.spectra.active)};
+                appdata.control.spectra.active)+1};
         end
-        
+
         indx=interp1(...
             linspace(1,axisPosition(3),length(xdata)),...
             1:length(xdata),...
@@ -2765,7 +2768,7 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
             linspace(1,axisPosition(4),length(ydata)),...
             ydata,...
             cp(2)-ac(2),'nearest');
-                
+        
         switch currentDisplayType
             case '2D plot'
                 % Set display of value
