@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 03-Jun-2010 10:31:36
+% Last Modified by GUIDE v2.5 03-Jun-2010 10:55:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1146,8 +1146,15 @@ function menuTools_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function menuToolsAccumulate_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsAccumulate (see GCBO)
+function menuToolsFunctions_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsFunctions (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function menuToolsFunctionsAccumulate_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsFunctionsAccumulate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1157,15 +1164,15 @@ trEPR_GUI_ACC(...
 
 
 % --------------------------------------------------------------------
-function menuToolsCorrections_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsCorrections (see GCBO)
+function menuToolsFunctionsSmooth_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsFunctionsSmooth (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
-function menuToolsPreferences_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsPreferences (see GCBO)
+function menuToolsCorrections_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsCorrections (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1224,6 +1231,13 @@ function menuToolsCorrectionsBaseline_Callback(hObject, eventdata, handles)
 trEPR_GUI_BLC(...
     'callerFunction',mfilename,...
     'callerHandle',hObject);
+
+
+% --------------------------------------------------------------------
+function menuToolsPreferences_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToolsPreferences (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 
 function measureX1editIndex_Callback(hObject, eventdata, handles)
@@ -3348,5 +3362,4 @@ function fileTypePopupmenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
