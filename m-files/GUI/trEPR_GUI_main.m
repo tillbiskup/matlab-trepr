@@ -67,6 +67,10 @@ handles = setfield(handles,mfilename,hObject);
 % Update handles structure
 guidata(hObject, handles);
 
+% Display nice picture initially
+[path name] = fileparts(mfilename('fullpath'));
+rgb = imread(fullfile(path,'trEPR-main-start.png'),'png');
+image(rgb);
 % Some initialization of the axes
 set(handles.axes1,'XTick',[]);
 set(handles.axes1,'YTick',[]);
@@ -2553,6 +2557,12 @@ currentDisplayType = appdata.control.axis.displayType;
 
 if isempty(appdata.control.spectra.visible{1})
     cla(handles.axes1,'reset');
+    [path name] = fileparts(mfilename('fullpath'));
+    rgb = imread(fullfile(path,'trEPR-main-start.png'),'png');
+    image(rgb);
+    % Some initialization of the axes
+    set(handles.axes1,'XTick',[]);
+    set(handles.axes1,'YTick',[]);
     return
 end
 
