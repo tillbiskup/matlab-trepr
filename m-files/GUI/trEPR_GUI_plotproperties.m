@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_plotproperties(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_plotproperties
 
-% Last Modified by GUIDE v2.5 17-Mar-2010 22:12:07
+% Last Modified by GUIDE v2.5 04-Jun-2010 18:01:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -103,18 +103,18 @@ function varargout = trEPR_GUI_plotproperties_OutputFcn(hObject, eventdata, hand
 varargout{1} = handles.output;
 
 
-% --- Executes on button press in closePushbutton.
-function closePushbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to closePushbutton (see GCBO)
+% --- Executes on button press in closeButton.
+function closeButton_Callback(hObject, eventdata, handles)
+% hObject    handle to closeButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 closeGUI(hObject, eventdata, handles);
 
 
-% --- Executes on button press in resetPushbutton.
-function resetPushbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to resetPushbutton (see GCBO)
+% --- Executes on button press in resetButton.
+function resetButton_Callback(hObject, eventdata, handles)
+% hObject    handle to resetButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -142,19 +142,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu1.
-function popupmenu1_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+% --- Executes on selection change in lineColorPopupmenu.
+function lineColorPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to lineColorPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = get(hObject,'String') returns popupmenu1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu1
+% Hints: contents = get(hObject,'String') returns lineColorPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from lineColorPopupmenu
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu1 (see GCBO)
+function lineColorPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to lineColorPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -189,18 +189,18 @@ end
 
 
 
-function edit4_Callback(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
+function lineWidthEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to lineWidthEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit4 as text
-%        str2double(get(hObject,'String')) returns contents of edit4 as a double
+% Hints: get(hObject,'String') returns contents of lineWidthEdit as text
+%        str2double(get(hObject,'String')) returns contents of lineWidthEdit as a double
 
 
 % --- Executes during object creation, after setting all properties.
-function edit4_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit4 (see GCBO)
+function lineWidthEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to lineWidthEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -211,19 +211,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in popupmenu2.
-function popupmenu2_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu2 (see GCBO)
+% --- Executes on selection change in lineStylePopupmenu.
+function lineStylePopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to lineStylePopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = get(hObject,'String') returns popupmenu2 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu2
+% Hints: contents = get(hObject,'String') returns lineStylePopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from lineStylePopupmenu
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu2 (see GCBO)
+function lineStylePopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to lineStylePopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -380,19 +380,19 @@ function colorPalettePushbutton_Callback(hObject, eventdata, handles)
 
 trEPR_GUI_colorpalette;
 
-% --- Executes on selection change in popupmenu3.
-function popupmenu3_Callback(hObject, eventdata, handles)
-% hObject    handle to popupmenu3 (see GCBO)
+% --- Executes on selection change in lineMarkersPopupmenu.
+function lineMarkersPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to lineMarkersPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = get(hObject,'String') returns popupmenu3 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from popupmenu3
+% Hints: contents = get(hObject,'String') returns lineMarkersPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from lineMarkersPopupmenu
 
 
 % --- Executes during object creation, after setting all properties.
-function popupmenu3_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to popupmenu3 (see GCBO)
+function lineMarkersPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to lineMarkersPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -567,3 +567,49 @@ else
     handles = rmfield(handles,mfilename);
     guidata(hObject,handles);
 end
+
+
+% --- Executes on selection change in spectraVisibleListbox.
+function spectraVisibleListbox_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraVisibleListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns spectraVisibleListbox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from spectraVisibleListbox
+
+
+% --- Executes during object creation, after setting all properties.
+function spectraVisibleListbox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to spectraVisibleListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in spectraPrevButton.
+function spectraPrevButton_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraPrevButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in spectraNextButton.
+function spectraNextButton_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraNextButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in spectraResetButton.
+function spectraResetButton_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraResetButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+

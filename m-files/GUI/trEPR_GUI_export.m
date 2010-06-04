@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_export(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_export
 
-% Last Modified by GUIDE v2.5 04-Jun-2010 12:08:23
+% Last Modified by GUIDE v2.5 04-Jun-2010 18:27:11
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -563,3 +563,14 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
+
+
+% --- Executes on button press in optionsYAxisLabelsCheckbox.
+function optionsYAxisLabelsCheckbox_Callback(hObject, eventdata, handles)
+% hObject    handle to optionsYAxisLabelsCheckbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of optionsYAxisLabelsCheckbox
+
+
