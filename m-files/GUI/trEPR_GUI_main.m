@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 03-Jun-2010 17:05:19
+% Last Modified by GUIDE v2.5 04-Jun-2010 10:17:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1685,6 +1685,7 @@ function zoomInAxisContextMenu_Callback(hObject, eventdata, handles)
 
 if strcmp(get(handles.zoomInAxisContextMenu,'Checked'),'off')
     set(handles.zoomInAxisContextMenu, 'Checked', 'on');
+    set(handles.axisZoomInButton,'Value',1);
     if strcmp(get(handles.zoomOutAxisContextMenu,'Checked'),'on')
         set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
     end    
@@ -1703,12 +1704,10 @@ end
 
 % --------------------------------------------------------------------
 function zoomOutAxisContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to zoomOutAxisContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 if strcmp(get(handles.zoomOutAxisContextMenu,'Checked'),'off')
     set(handles.zoomOutAxisContextMenu, 'Checked', 'on');
+    set(handles.axisZoomInButton,'Value',0);
     if strcmp(get(handles.zoomInAxisContextMenu,'Checked'),'on')
         set(handles.zoomInAxisContextMenu, 'Checked', 'off');
     end    
@@ -1726,20 +1725,16 @@ end
 
 % --------------------------------------------------------------------
 function zoomResetAxisContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to zoomResetAxisContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
 set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
 set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+set(handles.axisZoomInButton,'Value',0);
 zh = zoom(handles.figure1);
 set(zh,'Enable','off');
 if_axis_Refresh(handles.figure1);
 
 % --------------------------------------------------------------------
 function exportAxisContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to exportAxisContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 trEPR_GUI_export(...
     'callerFunction',mfilename,...
@@ -2108,6 +2103,8 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.spectraInfoButton,'Enable','Off');
     set(handles.spectraRemoveButton,'Enable','Off');
     set(handles.spectraAccumulateButton,'Enable','Off');
+    set(handles.axisZoomInButton,'Enable','Off');
+    set(handles.axisFullScaleButton,'Enable','Off');
     set(handles.spectraSaveButton,'Enable','Off');
     set(handles.axisResetButton,'Enable','Off');
     set(handles.axisExportButton,'Enable','Off');
@@ -2126,10 +2123,16 @@ else
     set(handles.b0EditIndex,'Enable','On');
     set(handles.spectraInfoButton,'Enable','On');
     set(handles.spectraRemoveButton,'Enable','On');
+    set(handles.axisZoomInButton,'Enable','On');
+    set(handles.axisFullScaleButton,'Enable','On');
     if length(appdata.control.spectra.visible) > 1
         set(handles.spectraAccumulateButton,'Enable','On');
+        set(handles.spectraPrevButton,'Enable','On');
+        set(handles.spectraNextButton,'Enable','On');
     else
         set(handles.spectraAccumulateButton,'Enable','Off');
+        set(handles.spectraPrevButton,'Enable','Off');
+        set(handles.spectraNextButton,'Enable','Off');
     end
     set(handles.axisResetButton,'Enable','On');
     set(handles.axisExportButton,'Enable','On');
@@ -2988,8 +2991,14 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
                             sprintf('%s',num2str(valy-y1val)));
                 end
             case 'B0 spectra'
-                valx=xdata(indx);
-                valy=ydata(indx);
+                valx=interp1(...
+                    linspace(1,axisPosition(3),length(xdata)),...
+                    xdata,...
+                    cp(1)-ac(1),'nearest');
+                valy=interp1(...
+                    linspace(1,axisPosition(4),length(ydata)),...
+                    ydata,...
+                    cp(2)-ac(2),'nearest');
                 switch currentPoint
                     case 1
                         set(handles.measureX1editIndex,'String',...
@@ -3019,8 +3028,14 @@ if cp(1)>ac(1) && cp(1)<=ac(3) && cp(2)>ac(2) && cp(2)<=ac(4)
                             sprintf('%s',num2str(valy-y1val)));
                 end
             case 'transients'
-                valx=xdata(indx);
-                valy=ydata(indx);
+                valx=interp1(...
+                    linspace(1,axisPosition(3),length(xdata)),...
+                    xdata,...
+                    cp(1)-ac(1),'nearest');
+                valy=interp1(...
+                    linspace(1,axisPosition(4),length(ydata)),...
+                    ydata,...
+                    cp(2)-ac(2),'nearest');
                 switch currentPoint
                     case 1
                         set(handles.measureX1editIndex,'String',...
@@ -3557,5 +3572,137 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
+
+% --- Executes on button press in spectraPrevButton.
+function spectraPrevButton_Callback(hObject, eventdata, handles)
+
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+if get(handles.spectraVisibleListbox,'Value') == 1
+    appdata.control.spectra.active = appdata.control.spectra.visible{end};
+    set(...
+        handles.spectraVisibleListbox,...
+        'Value',...
+        length(appdata.control.spectra.visible));
+else
+    appdata.control.spectra.active = appdata.control.spectra.visible{...
+        ind(...
+        appdata.control.spectra.visible,appdata.control.spectra.active)-1};
+    set(...
+        handles.spectraVisibleListbox,...
+        'Value',...
+        ind(...
+        appdata.control.spectra.visible,appdata.control.spectra.active));
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
+
+% --- Executes on button press in spectraNextButton.
+function spectraNextButton_Callback(hObject, eventdata, handles)
+
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+if get(handles.spectraVisibleListbox,'Value') == ...
+        length(appdata.control.spectra.visible)
+    appdata.control.spectra.active = appdata.control.spectra.visible{1};
+    set(...
+        handles.spectraVisibleListbox,...
+        'Value',...
+        1);
+else
+    appdata.control.spectra.active = appdata.control.spectra.visible{...
+        ind(...
+        appdata.control.spectra.visible,appdata.control.spectra.active)+1};
+    set(...
+        handles.spectraVisibleListbox,...
+        'Value',...
+        ind(...
+        appdata.control.spectra.visible,appdata.control.spectra.active));
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
+
+% --- Executes on button press in axisZoomInButton.
+function axisZoomInButton_Callback(hObject, eventdata, handles)
+
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+if get(handles.axisZoomInButton,'Value')
+    set(handles.zoomInAxisContextMenu, 'Checked', 'on');
+    if strcmp(get(handles.zoomOutAxisContextMenu,'Checked'),'on')
+        set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+    end    
+    zh = zoom(handles.figure1);
+    set(zh,'UIContextMenu',handles.axisToolsContextMenu);
+    set(zh,'Enable','on');
+    set(zh,'Motion','both');
+    set(zh,'Direction','in');
+else
+    set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+    zh = zoom(handles.figure1);
+    set(zh,'Enable','off');
+    refresh;
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% --- Executes on button press in axisFullScaleButton.
+function axisFullScaleButton_Callback(hObject, eventdata, handles)
+set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
+set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+set(handles.axisZoomInButton,'Value',0);
+zh = zoom(handles.figure1);
+set(zh,'Enable','off');
+if_axis_Refresh(handles.figure1);
+
+% --- Executes on button press in axisPlotPropertiesButton.
+function axisPlotPropertiesButton_Callback(hObject, eventdata, handles)
+% hObject    handle to axisPlotPropertiesButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in axisMathButton.
+function axisMathButton_Callback(hObject, eventdata, handles)
+% hObject    handle to axisMathButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 

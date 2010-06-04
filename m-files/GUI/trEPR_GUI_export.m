@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_export(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_export
 
-% Last Modified by GUIDE v2.5 17-Mar-2010 22:30:08
+% Last Modified by GUIDE v2.5 03-Jun-2010 19:03:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -135,7 +135,7 @@ function fileSelectorPushbutton_Callback(hObject, eventdata, handles)
 [FileName,PathName,FilterIndex] = uiputfile(...
     '',...
     'Select file basename to save figure(s) to');
-if isequal(FileName,0) | isequal(PathName,0)
+if isequal(FileName,0) || isequal(PathName,0)
 else
     set(handles.fileNameEdit,'String',FileName);
 end
@@ -278,3 +278,14 @@ else
     handles = rmfield(handles,mfilename);
     guidata(hObject,handles);
 end
+
+
+% --- Executes on button press in optionsHorizontalLineCheckbox.
+function optionsHorizontalLineCheckbox_Callback(hObject, eventdata, handles)
+% hObject    handle to optionsHorizontalLineCheckbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of optionsHorizontalLineCheckbox
+
+
