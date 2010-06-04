@@ -142,7 +142,7 @@ function save_figure ( varargin )
 
 	% check for the right number of input and output parameters
 
-	if ( nargin > 2 )
+	if ( nargin > 3 )
 
 		error('\n\tThe function is called with the wrong number (%i) of input arguments.\n\tPlease use "help save_figure" to get help.',nargin);
 
@@ -217,6 +217,45 @@ function save_figure ( varargin )
 
 		end
 
+	elseif ( nargin == 3 )
+	
+		filename = varargin{1};
+		params = varargin{2};
+        figureHandle = varargin{3};
+
+		% check for correct format of the input parameters
+	
+		% FILENAME
+	
+		if ~isstr(filename)
+	
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help save_figure" to get help.','filename');
+				% get error if function is called with the wrong format of the
+				% input parameter 'filename'
+	
+		elseif length(filename) == 0
+
+			error('\n\tThe function is called with an empty string as the filename %s.\n\tPlease use "help save_figure" to get help.','filename');
+				% get error if function is called with an empty 'filename'
+
+		end
+		
+		% PARAMS
+
+		if ~isstruct(params)
+	
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help save_figure" to get help.','params');
+				% get error if function is called with the wrong format of the
+				% input parameter 'params'
+	
+		end
+
+		if ( isfield(params,'outputFormat') && ~isstr(params.outputFormat) )
+	
+			error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help save_figure" to get help.','params.outputFormat');
+
+		end
+
 	end 
 
 
@@ -241,6 +280,12 @@ function save_figure ( varargin )
 		% set variable to default value
 	
 	end;
+    
+    % Check for figureHandle
+    
+    if ~exist('figureHandle','var')
+        figureHandle = gcf;
+    end
 	
 	% Find out whether a figure window is open
 	% and abort further operation in case no figure window is open
@@ -341,7 +386,7 @@ function save_figure ( varargin )
 
 		if program == 'Matlab'	% if we're called by GNU Octave (as determined above)
 
-			saveas ( gcf, fig_filename )
+			saveas ( figureHandle, fig_filename )
 
 		else					% otherwise we assume that we're called by MATLAB(R)
 
@@ -358,7 +403,8 @@ function save_figure ( varargin )
 
 		else					% otherwise we assume that we're called by MATLAB(R)
 
-			print ( '-depsc2' , eps_filename );
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle , '-depsc2' , eps_filename );
 
 		end					% end of "if program" clause
 	
@@ -377,25 +423,26 @@ function save_figure ( varargin )
 		else					% otherwise we assume that we're called by MATLAB(R)
 
 			% get original values that will be changed (to reset them at the end)
-			OldPaperUnits = get(gcf,'PaperUnits');
-			OldPaperSize = get(gcf,'PaperSize');
-			OldPaperPosition = get(gcf,'PaperPosition');
-			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+			OldPaperUnits = get(figureHandle,'PaperUnits');
+			OldPaperSize = get(figureHandle,'PaperSize');
+			OldPaperPosition = get(figureHandle,'PaperPosition');
+			OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 4;
 			PaperHeight = 3;
-			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-			set(gcf,'PaperPosition',[0.1,0.1,PaperWidth, PaperHeight]);
-			set(gcf,'PaperPositionMode','manual');
+			set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPosition',[0.1,0.1,PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPositionMode','manual');
 		
-			print ( '-dpdf' , pdf_filename );
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
 			% set changed values back to original values
-			set(gcf,'PaperUnits',OldPaperUnits);
-			set(gcf,'PaperSize',OldPaperSize);
-			set(gcf,'PaperPosition',OldPaperPosition);
-			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+			set(figureHandle,'PaperUnits',OldPaperUnits);
+			set(figureHandle,'PaperSize',OldPaperSize);
+			set(figureHandle,'PaperPosition',OldPaperPosition);
+			set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
 		
@@ -412,25 +459,26 @@ function save_figure ( varargin )
 		else					% otherwise we assume that we're called by MATLAB(R)
 
 			% get original values that will be changed (to reset them at the end)
-			OldPaperUnits = get(gcf,'PaperUnits');
-			OldPaperSize = get(gcf,'PaperSize');
-			OldPaperPosition = get(gcf,'PaperPosition');
-			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+			OldPaperUnits = get(figureHandle,'PaperUnits');
+			OldPaperSize = get(figureHandle,'PaperSize');
+			OldPaperPosition = get(figureHandle,'PaperPosition');
+			OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 4;
 			PaperHeight = 2.5;
-			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-			set(gcf,'PaperPosition',[0.1,0.1,PaperWidth, PaperHeight]);
-			set(gcf,'PaperPositionMode','manual');
+			set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPosition',[0.1,0.1,PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPositionMode','manual');
 		
-			print ( '-dpdf' , pdf_filename );
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
 			% set changed values back to original values
-			set(gcf,'PaperUnits',OldPaperUnits);
-			set(gcf,'PaperSize',OldPaperSize);
-			set(gcf,'PaperPosition',OldPaperPosition);
-			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+			set(figureHandle,'PaperUnits',OldPaperUnits);
+			set(figureHandle,'PaperSize',OldPaperSize);
+			set(figureHandle,'PaperPosition',OldPaperPosition);
+			set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
 	
@@ -447,25 +495,26 @@ function save_figure ( varargin )
 		else					% otherwise we assume that we're called by MATLAB(R)
 
 			% get original values that will be changed (to reset them at the end)
-			OldPaperUnits = get(gcf,'PaperUnits');
-			OldPaperSize = get(gcf,'PaperSize');
-			OldPaperPosition = get(gcf,'PaperPosition');
-			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+			OldPaperUnits = get(figureHandle,'PaperUnits');
+			OldPaperSize = get(figureHandle,'PaperSize');
+			OldPaperPosition = get(figureHandle,'PaperPosition');
+			OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 8;
 			PaperHeight = 6;
-			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-			set(gcf,'PaperPosition',[0.05,0.05,PaperWidth-0.05, PaperHeight-0.05]);
-			set(gcf,'PaperPositionMode','manual');
-		
-			print ( '-dpdf' , pdf_filename );
+			set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPosition',[0.05,0.05,PaperWidth-0.05, PaperHeight-0.05]);
+			set(figureHandle,'PaperPositionMode','manual');
+            
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
 			% set changed values back to original values
-			set(gcf,'PaperUnits',OldPaperUnits);
-			set(gcf,'PaperSize',OldPaperSize);
-			set(gcf,'PaperPosition',OldPaperPosition);
-			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+			set(figureHandle,'PaperUnits',OldPaperUnits);
+			set(figureHandle,'PaperSize',OldPaperSize);
+			set(figureHandle,'PaperPosition',OldPaperPosition);
+			set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
 	
@@ -482,25 +531,26 @@ function save_figure ( varargin )
 		else					% otherwise we assume that we're called by MATLAB(R)
 
 			% get original values that will be changed (to reset them at the end)
-			OldPaperUnits = get(gcf,'PaperUnits');
-			OldPaperSize = get(gcf,'PaperSize');
-			OldPaperPosition = get(gcf,'PaperPosition');
-			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+			OldPaperUnits = get(figureHandle,'PaperUnits');
+			OldPaperSize = get(figureHandle,'PaperSize');
+			OldPaperPosition = get(figureHandle,'PaperPosition');
+			OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 6.25;
 			PaperHeight = 2.8;
-			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-			set(gcf,'PaperPosition',[0,0.05,PaperWidth, PaperHeight]);
-			set(gcf,'PaperPositionMode','manual');
+			set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPosition',[0,0.05,PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPositionMode','manual');
 		
-			print ( '-dpdf' , pdf_filename );
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
 			% set changed values back to original values
-			set(gcf,'PaperUnits',OldPaperUnits);
-			set(gcf,'PaperSize',OldPaperSize);
-			set(gcf,'PaperPosition',OldPaperPosition);
-			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+			set(figureHandle,'PaperUnits',OldPaperUnits);
+			set(figureHandle,'PaperSize',OldPaperSize);
+			set(figureHandle,'PaperPosition',OldPaperPosition);
+			set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
     
@@ -517,25 +567,26 @@ function save_figure ( varargin )
         else                    % otherwise we assume that we're called by MATLAB(R)
 
             % get original values that will be changed (to reset them at the end)
-            OldPaperUnits = get(gcf,'PaperUnits');
-            OldPaperSize = get(gcf,'PaperSize');
-            OldPaperPosition = get(gcf,'PaperPosition');
-            OldPaperPositionMode = get(gcf,'PaperPositionMode');
+            OldPaperUnits = get(figureHandle,'PaperUnits');
+            OldPaperSize = get(figureHandle,'PaperSize');
+            OldPaperPosition = get(figureHandle,'PaperPosition');
+            OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-            set(gcf,'PaperUnits','inches');
+            set(figureHandle,'PaperUnits','inches');
             PaperWidth = 8.5;
             PaperHeight = 5;
-            set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-            set(gcf,'PaperPosition',[-0.4,0.05,PaperWidth+0.7, PaperHeight-0.05]);
-            set(gcf,'PaperPositionMode','manual');
+            set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+            set(figureHandle,'PaperPosition',[-0.4,0.05,PaperWidth+0.7, PaperHeight-0.05]);
+            set(figureHandle,'PaperPositionMode','manual');
         
-            print ( '-dpdf' , pdf_filename );
+            printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
             % set changed values back to original values
-            set(gcf,'PaperUnits',OldPaperUnits);
-            set(gcf,'PaperSize',OldPaperSize);
-            set(gcf,'PaperPosition',OldPaperPosition);
-            set(gcf,'PaperPositionMode',OldPaperPositionMode);
+            set(figureHandle,'PaperUnits',OldPaperUnits);
+            set(figureHandle,'PaperSize',OldPaperSize);
+            set(figureHandle,'PaperPosition',OldPaperPosition);
+            set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
         end                 % end of "if program" clause
 		
@@ -552,25 +603,26 @@ function save_figure ( varargin )
 		else					% otherwise we assume that we're called by MATLAB(R)
 
 			% get original values that will be changed (to reset them at the end)
-			OldPaperUnits = get(gcf,'PaperUnits');
-			OldPaperSize = get(gcf,'PaperSize');
-			OldPaperPosition = get(gcf,'PaperPosition');
-			OldPaperPositionMode = get(gcf,'PaperPositionMode');
+			OldPaperUnits = get(figureHandle,'PaperUnits');
+			OldPaperSize = get(figureHandle,'PaperSize');
+			OldPaperPosition = get(figureHandle,'PaperPosition');
+			OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 8;
 			PaperHeight = 11;
-			set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-			set(gcf,'PaperPosition',[-0.5,-0.5,1.1*PaperWidth, 1.1*PaperHeight]);
-			set(gcf,'PaperPositionMode','manual');
+			set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+			set(figureHandle,'PaperPosition',[-0.5,-0.5,1.1*PaperWidth, 1.1*PaperHeight]);
+			set(figureHandle,'PaperPositionMode','manual');
 		
-			print ( '-dpdf' , pdf_filename );
+			printFigureHandle = sprintf('-f%i',figureHandle);
+            print ( printFigureHandle ,'-dpdf' , pdf_filename );
 
 			% set changed values back to original values
-			set(gcf,'PaperUnits',OldPaperUnits);
-			set(gcf,'PaperSize',OldPaperSize);
-			set(gcf,'PaperPosition',OldPaperPosition);
-			set(gcf,'PaperPositionMode',OldPaperPositionMode);
+			set(figureHandle,'PaperUnits',OldPaperUnits);
+			set(figureHandle,'PaperSize',OldPaperSize);
+			set(figureHandle,'PaperPosition',OldPaperPosition);
+			set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 
 		end					% end of "if program" clause
 		
@@ -584,7 +636,7 @@ function save_figure ( varargin )
 			
 		else
 		
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperWidth = 8.5;
 		
 		end
@@ -595,7 +647,7 @@ function save_figure ( varargin )
 			
 		else
 		
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 			PaperHeight = 11;
 		
 		end
@@ -603,11 +655,11 @@ function save_figure ( varargin )
 		if ( isfield(params,'PaperUnits') )
 		
 			PaperUnits = params.PaperUnits;
-			set(gcf,'PaperUnits',PaperUnits);
+			set(figureHandle,'PaperUnits',PaperUnits);
 			
 		else
 		
-			set(gcf,'PaperUnits','inches');
+			set(figureHandle,'PaperUnits','inches');
 		
 		end
 	
@@ -628,26 +680,28 @@ function save_figure ( varargin )
 		end
 		
 		% get original values that will be changed (to reset them at the end)
-		OldPaperUnits = get(gcf,'PaperUnits');
-		OldPaperSize = get(gcf,'PaperSize');
-		OldPaperPosition = get(gcf,'PaperPosition');
-		OldPaperPositionMode = get(gcf,'PaperPositionMode');
+		OldPaperUnits = get(figureHandle,'PaperUnits');
+		OldPaperSize = get(figureHandle,'PaperSize');
+		OldPaperPosition = get(figureHandle,'PaperPosition');
+		OldPaperPositionMode = get(figureHandle,'PaperPositionMode');
 
-		%set(gcf,'PaperUnits','inches');
+		%set(figureHandle,'PaperUnits','inches');
 		%PaperWidth = 8;
 		%PaperHeight = 11;
 		
-		set(gcf,'PaperSize',[PaperWidth, PaperHeight]);
-		set(gcf,'PaperPosition',[0,0,PaperWidth, PaperHeight]);
-		set(gcf,'PaperPositionMode','manual');
+		set(figureHandle,'PaperSize',[PaperWidth, PaperHeight]);
+		set(figureHandle,'PaperPosition',[0,0,PaperWidth, PaperHeight]);
+		set(figureHandle,'PaperPositionMode','manual');
 		
-		print ( PrinterDriver , print_filename );
+        printFigureHandle = sprintf('-f%i',figureHandle);
+        
+		print ( printFigureHandle, PrinterDriver , print_filename );
 
 		% set changed values back to original values
-		set(gcf,'PaperUnits',OldPaperUnits);
-		set(gcf,'PaperSize',OldPaperSize);
-		set(gcf,'PaperPosition',OldPaperPosition);
-		set(gcf,'PaperPositionMode',OldPaperPositionMode);
+		set(figureHandle,'PaperUnits',OldPaperUnits);
+		set(figureHandle,'PaperSize',OldPaperSize);
+		set(figureHandle,'PaperPosition',OldPaperPosition);
+		set(figureHandle,'PaperPositionMode',OldPaperPositionMode);
 		
 	
 	end

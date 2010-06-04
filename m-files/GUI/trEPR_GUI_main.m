@@ -3609,6 +3609,7 @@ for k=1:length(appdataFieldnames)
 end
 
 if_axis_Refresh(handles.figure1);
+if_spectraVisibleListbox_Refresh(handles.figure1);
 
 % --- Executes on button press in spectraNextButton.
 function spectraNextButton_Callback(hObject, eventdata, handles)
@@ -3647,6 +3648,7 @@ for k=1:length(appdataFieldnames)
 end
 
 if_axis_Refresh(handles.figure1);
+if_spectraVisibleListbox_Refresh(handles.figure1);
 
 % --- Executes on button press in axisZoomInButton.
 function axisZoomInButton_Callback(hObject, eventdata, handles)

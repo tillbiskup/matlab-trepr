@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_export(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_export
 
-% Last Modified by GUIDE v2.5 03-Jun-2010 19:03:49
+% Last Modified by GUIDE v2.5 04-Jun-2010 12:08:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,8 +85,77 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     guidata(handles.callerHandle,callerHandles);
 end
 
+% Set application data (at this stage only empty structures)
+data = cell(1); % store the data (spectra) together with their information
+olddata = cell(1); % store a copy of the data (spectra)
+acc = struct(); % store the accumulated spectra together with their information
+configuration = struct(); % store the configuration information for the GUI
+% --- store important control values, such as the currently active spectrum etc.
+control = struct(...
+    'spectra', struct(...
+    'active',0,...
+    'visible',cell(1),...
+    'accumulated',cell(1),...
+    'notaccumulated',cell(1),...
+    'filenames',cell(1)...
+    )...
+);
+appdataHandles = struct();
+
+setappdata(handles.figure1,'data',data);
+setappdata(handles.figure1,'olddata',data);
+setappdata(handles.figure1,'acc',acc);
+setappdata(handles.figure1,'configuration',configuration);
+setappdata(handles.figure1,'control',control);
+setappdata(handles.figure1,'handles',appdataHandles);
+
+% add handle of this GUI to handles structure of the calling gui in case
+% this function has been called from another GUI
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    callerHandles = setfield(...
+        callerHandles,...
+        mfilename,...
+        hObject);
+    guidata(handles.callerHandle,callerHandles);
+end
+
+% Get appdata from parent window necessary for ACC
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')    
+    callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)        
+
+        % Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+        
+        data = parentAppdata.data;
+        control = parentAppdata.control;
+        setappdata(handles.figure1,'data',data);
+        setappdata(handles.figure1,'control',control);
+
+        for k = 1 : length(control.spectra.visible)
+            % Assign filenames (basename) to control.filenames cell array
+            [path name ext] = fileparts(...
+                data{control.spectra.visible{k}}.filename);
+            filenames{k} = name;
+            clear path name ext;
+        end
+
+        % Set suggestion for filename of accumulated spectra
+        set(handles.fileNameEdit,'String',...
+            sprintf('%s',commonString(filenames,1)));
+    end
+    guidata(handles.callerHandle,callerHandles);
+end
+
+% Create invisible figure (with handle)
+handles.invFH = figure('Visible','Off');
+handles.invAH = gca;
+
 % Update handles structure
 guidata(hObject, handles);
+
+if_plot(hObject);
 
 % UIWAIT makes trEPR_GUI_export wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -178,9 +247,42 @@ function fileFormatJPGCheckbox_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in exportPushbutton.
 function exportPushbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to exportPushbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+if get(handles.fileFormatPDFCheckbox,'Value')
+    sizes = get(handles.sizePopupmenu,'String');
+    switch sizes{get(handles.sizePopupmenu,'Value')}
+        case 'LaTeX full width'
+            saveParam.outputFormat = 'LaTeXfullWidth';
+        case 'LaTeX full width small height'
+            saveParam.outputFormat = 'LaTeXfullWidthSmallHeight';
+        case 'LaTeX half width'
+            saveParam.outputFormat = 'LaTeXhalfWidth';
+        case 'LaTeX half width small height'
+            saveParam.outputFormat = 'LaTeXhalfWidthSmallHeight';
+        case 'LaTeX full page'
+            saveParam.outputFormat = 'LaTeXfullPage';
+        case 'LaTeX Beamer Slide'
+            saveParam.outputFormat = 'LaTeXbeamerSlide';
+    end
+    save_figure(...
+        get(handles.fileNameEdit,'String'),...
+        saveParam,...
+        handles.invFH);
+end
+
+
+h = msgbox(...
+    sprintf(...
+    'The currently displayed spectra have been exported to the file\n%s',...
+    get(handles.fileNameEdit,'String')...
+    ),...
+    'Exported currently displayed spectra');
+
+closeGUI;
 
 
 % --- Executes on button press in abortPushbutton.
@@ -259,6 +361,8 @@ else
     handles = guidata(gcbo);
 end
 
+close(handles.invFH);
+
 % removes handle of this GUI from handles structure of the calling gui in
 % case this function has been called from another GUI
 if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
@@ -289,3 +393,173 @@ function optionsHorizontalLineCheckbox_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of optionsHorizontalLineCheckbox
 
 
+% --- Executes on button press in optionsBoxCheckbox.
+function optionsBoxCheckbox_Callback(hObject, eventdata, handles)
+% hObject    handle to optionsBoxCheckbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of optionsBoxCheckbox
+
+
+
+% --- Plot spectra
+function if_plot(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Get current display type
+currentDisplayType = appdata.control.axis.displayType;
+
+% Plot visible spectra
+data = appdata.data{appdata.control.spectra.active}.data;
+[ yDim, xDim ] = size(data);
+xaxis = appdata.data{appdata.control.spectra.active}.axes.xaxis.values;
+yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
+% Convert G -> mT
+if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
+    yaxis = yaxis / 10;
+end
+
+switch currentDisplayType
+    case '2D plot'
+        % Get currently active spectrum
+        
+        % Plot with imagesc (in this case, 2D plot, only active one...)
+        set(handles.invAH,'XTick',[],'YTick',[]);     % default if no plot
+
+        imagesc(...
+            appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
+            appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
+            appdata.data{appdata.control.spectra.active}.data,...
+            'hittest','off'...
+            );
+        set(handles.invAH,'YDir','normal');
+
+        xlabel(handles.invAH,sprintf('{\\it time} / s'));
+        ylabel(handles.invAH,sprintf('{\\it magnetic field} / mT'));
+    case 'B0 spectra'        
+        % Reset current axis
+        cla(handles.invAH,'reset');
+        hold on;
+        for k = 1 : length(appdata.control.spectra.visible)
+            % Set plot style of currently active spectrum
+            if appdata.control.spectra.visible{k} == appdata.control.spectra.active
+                plotStyle = 'b-';
+            else
+                plotStyle = 'k-';
+            end
+            % Convert G -> mT
+            if strcmp(appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.unit,'G')
+                yaxis = appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values / 10;
+                Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0 / 10;
+            else
+                yaxis = appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values;
+                Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
+            end
+            plot(...
+                handles.invAH,...
+                yaxis + Db0,...
+                appdata.data{appdata.control.spectra.visible{k}}.data(...
+                :,floor(appdata.data{appdata.control.spectra.visible{k}}.t)...
+                )*...
+                appdata.data{appdata.control.spectra.visible{k}}.Sy+...
+                appdata.data{appdata.control.spectra.visible{k}}.Dy,...
+                plotStyle...
+                );
+            xLimits(k,:) = [...
+                yaxis(1) ...
+                yaxis(end) ...                
+                ];
+            yLimits(k,:) = [...
+                min(min(appdata.data{appdata.control.spectra.visible{k}}.data)) ...
+                max(max(appdata.data{appdata.control.spectra.visible{k}}.data)) ...                
+                ];
+        end
+        hold off;
+        set(...
+            handles.invAH,...
+            'XLim',...
+            [min(min(xLimits)) max(max(xLimits))]...
+            );
+        set(...
+            handles.invAH,...
+            'YLim',...
+            [min(min(yLimits))*1.05 max(max(yLimits))*1.05]...
+            );
+        
+        xlabel(handles.invAH,sprintf('{\\it magnetic field} / mT'));
+        ylabel(handles.invAH,sprintf('{\\it intensity} / a.u.'));
+
+        % Add horizontal line at position 0 in upper axis
+        line([yaxis(1) yaxis(end)],[0 0],...
+            'Color',[0.75 0.75 0.75],...
+            'LineWidth',1,...
+            'LineStyle','--');
+
+    case 'transients'
+        set(handles.invAH,'XTick',[],'YTick',[]);     % default if no plot        
+        % Reset current axis
+        cla(handles.invAH,'reset');
+        hold on;
+        for k = 1 : length(appdata.control.spectra.visible)
+            % Set plot style of currently active spectrum
+            if appdata.control.spectra.visible{k} == appdata.control.spectra.active
+                plotStyle = 'b-';
+            else
+                plotStyle = 'k-';
+            end
+            plot(...
+                handles.invAH,...
+                appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values,...
+                appdata.data{appdata.control.spectra.visible{k}}.data(...
+                floor(appdata.data{appdata.control.spectra.visible{k}}.b0),:...
+                )*...
+                appdata.data{appdata.control.spectra.visible{k}}.Sy+...
+                appdata.data{appdata.control.spectra.visible{k}}.Dy,...
+                plotStyle...
+                );
+            xLimits(k,:) = [...
+                appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values(1) ...
+                appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values(end) ...                
+                ];
+            yLimits(k,:) = [...
+                min(min(appdata.data{appdata.control.spectra.visible{k}}.data)) ...
+                max(max(appdata.data{appdata.control.spectra.visible{k}}.data)) ...                
+                ];
+        end
+        hold off;
+        set(...
+            handles.invAH,...
+            'XLim',...
+            [min(min(xLimits)) max(max(xLimits))]...
+            );
+        set(...
+            handles.invAH,...
+            'YLim',...
+            [min(min(yLimits))*1.05 max(max(yLimits))*1.05]...
+            );
+
+        xlabel(handles.invAH,sprintf('{\\it time} / s'));
+        ylabel(handles.invAH,sprintf('{\\it intensity} / a.u.'));
+
+        % Add horizontal line at position 0 in upper axis
+        line([xaxis(1) xaxis(end)],[0 0],...
+            'Color',[0.75 0.75 0.75],...
+            'LineWidth',1,...
+            'LineStyle','--');
+end
+
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
