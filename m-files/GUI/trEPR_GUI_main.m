@@ -206,11 +206,14 @@ function spectraVisibleListbox_Callback(hObject, eventdata, handles)
 appdata = getappdata(handles.figure1);
 
 % Set currently active spectrum
-if ~isempty(appdata.control.spectra.visible)
+if ~isempty(appdata.control.spectra.visible) && ...
+        ~isempty(appdata.control.spectra.visible{1})
     appdata.control.spectra.active = appdata.control.spectra.visible{...
         get(handles.spectraVisibleListbox,'Value')...
         };
     if_spectraVisibleListbox_Refresh(handles.figure1);
+else
+    return;
 end
 
 % Refresh appdata of the current GUI
@@ -1636,18 +1639,29 @@ function displayContextMenu_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function showDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to showDisplayContextMenu (see GCBO)
+function displayHiddenContextMenu_Callback(hObject, eventdata, handles)
+% hObject    handle to displayHiddenContextMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function showDisplayContextMenu_Callback(hObject, eventdata, handles)
 if_spectraShow;
 
 % --------------------------------------------------------------------
+function showAllDisplayContextMenu_Callback(hObject, eventdata, handles)
+if_spectraShowAll;
+
+
+% --------------------------------------------------------------------
 function hideDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to hideDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 if_spectraHide;
+
+% --------------------------------------------------------------------
+function hideAllDisplayContextMenu_Callback(hObject, eventdata, handles)
+if_spectraHideAll;
+
 
 % --------------------------------------------------------------------
 function removeDisplayContextMenu_Callback(hObject, eventdata, handles)
@@ -1762,20 +1776,6 @@ else
         'callerFunction',mfilename,...
         'callerHandle',hObject);
 end
-
-
-% --------------------------------------------------------------------
-function showAllDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to showAllDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function hideAllDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to hideAllDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
@@ -2032,9 +2032,13 @@ if isempty(appdata.control.spectra.invisible{1})
     invSpectraNames = cell(1);
     set(handles.spectraShowButton,'Enable','Off');
     set(handles.spectraInvisibleListbox,'Enable','Inactive');
+    set(handles.showDisplayContextMenu,'Enable','Off');
+    set(handles.showAllDisplayContextMenu,'Enable','Off');        
 else
     set(handles.spectraShowButton,'Enable','On');
     set(handles.spectraInvisibleListbox,'Enable','On');
+    set(handles.showDisplayContextMenu,'Enable','On');
+    set(handles.showAllDisplayContextMenu,'Enable','On');        
     for k=1:length(appdata.control.spectra.invisible)
         [pathstr, name, ext, versn] = fileparts(...
             appdata.data{...
@@ -2081,6 +2085,11 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.spectraHideButton,'Enable','Off');
     set(handles.displayTypePopupmenu,'Enable','Inactive');
     set(handles.spectraVisibleListbox,'Enable','Inactive');
+    set(handles.hideDisplayContextMenu,'Enable','Off');
+    set(handles.hideAllDisplayContextMenu,'Enable','Off');
+    set(handles.removeDisplayContextMenu,'Enable','Off');
+    set(handles.infoDisplayContextMenu,'Enable','Off');
+    set(handles.spectraVisibleListbox,'Enable','Inactive');
     cla(handles.axes1,'reset');
     set(handles.db0Edit,'Enable','Inactive');
     set(handles.dtEdit,'Enable','Inactive');
@@ -2105,6 +2114,10 @@ else
     set(handles.spectraHideButton,'Enable','On');
     set(handles.displayTypePopupmenu,'Enable','On');
     set(handles.spectraVisibleListbox,'Enable','On');
+    set(handles.hideDisplayContextMenu,'Enable','On');
+    set(handles.hideAllDisplayContextMenu,'Enable','On');
+    set(handles.removeDisplayContextMenu,'Enable','On');
+    set(handles.infoDisplayContextMenu,'Enable','On');
     set(handles.db0Edit,'Enable','On');
     set(handles.dyEdit,'Enable','On');
     set(handles.sb0Edit,'Enable','On');
@@ -2377,6 +2390,61 @@ if_spectraVisibleListbox_Refresh(handles.figure1);
 if_axis_Refresh(handles.figure1);
 
 
+% --- Move all spectra to visible spectra
+function if_spectraShowAll
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+% Return immediately if there is no invisible spectrum
+if isempty(appdata.control.spectra.invisible)
+    return
+elseif isempty(appdata.control.spectra.invisible{1})
+    return
+end
+
+% Add all to visible
+if length(appdata.control.spectra.visible) == 1 && ...
+        isempty(appdata.control.spectra.visible{1})
+    appdata.control.spectra.visible{1} = ...
+        appdata.control.spectra.invisible{1};
+    if length(appdata.control.spectra.invisible) > 1
+        for k = 2:length(appdata.control.spectra.invisible)
+            appdata.control.spectra.visible{end+1} = ...
+                appdata.control.spectra.invisible{k};
+        end
+    end
+else
+    for k = 1:length(appdata.control.spectra.invisible)
+        appdata.control.spectra.visible{end+1} = ...
+            appdata.control.spectra.invisible{k};
+    end
+end
+
+
+% Remove all from invisible
+appdata.control.spectra.invisible = cell(1);
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% Call to internal function refreshing the invisible spectra listbox
+%     => important to do it after refreshing handles and appdata!
+if_spectraInvisibleListbox_Refresh;
+if_spectraVisibleListbox_Refresh(handles.figure1);
+
+if_axis_Refresh(handles.figure1);
+
+
 % --- Move currently selected spectrum to invisible spectra
 function if_spectraHide
 
@@ -2416,6 +2484,61 @@ end
 if isempty(appdata.control.spectra.visible)
     appdata.control.spectra.visible{1} = [];
 end
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+% Call to internal function refreshing the invisible spectra listbox
+%     => important to do it after refreshing handles and appdata!
+if_spectraInvisibleListbox_Refresh;
+if_spectraVisibleListbox_Refresh(handles.figure1);
+
+if_axis_Refresh(handles.figure1);
+
+
+% --- Move all spectra to invisible spectra
+function if_spectraHideAll
+
+% Get handles and appdata of the current GUI
+handles = guidata(gcbo);
+appdata = getappdata(handles.figure1);
+
+% Return immediately if there is no visible spectrum
+if isempty(appdata.control.spectra.visible)
+    return
+elseif isempty(appdata.control.spectra.visible{1})
+    return
+end
+
+% Add all to invisible
+if length(appdata.control.spectra.invisible) == 1 && ...
+        isempty(appdata.control.spectra.invisible{1})
+    appdata.control.spectra.invisible{1} = ...
+        appdata.control.spectra.visible{1};
+    if length(appdata.control.spectra.visible) > 1
+        for k = 2:length(appdata.control.spectra.visible)
+            appdata.control.spectra.invisible{end+1} = ...
+                appdata.control.spectra.visible{k};
+        end
+    end
+else
+    for k = 1:length(appdata.control.spectra.visible)
+        appdata.control.spectra.invisible{end+1} = ...
+            appdata.control.spectra.visible{k};
+    end
+end
+
+
+% Remove all from visible
+appdata.control.spectra.visible = cell(1);
 
 % Refresh handles and appdata of the current GUI
 guidata(gcbo,handles);
@@ -3700,13 +3823,6 @@ function axisPlotPropertiesButton_Callback(hObject, eventdata, handles)
 % --- Executes on button press in axisMathButton.
 function axisMathButton_Callback(hObject, eventdata, handles)
 % hObject    handle to axisMathButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function displayHiddenContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to displayHiddenContextMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
