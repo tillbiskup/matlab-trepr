@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_plotproperties(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_plotproperties
 
-% Last Modified by GUIDE v2.5 04-Jun-2010 18:01:51
+% Last Modified by GUIDE v2.5 05-Jun-2010 09:04:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -611,5 +611,50 @@ function spectraResetButton_Callback(hObject, eventdata, handles)
 % hObject    handle to spectraResetButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in gridXButton.
+function gridXButton_Callback(hObject, eventdata, handles)
+% hObject    handle to gridXButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of gridXButton
+
+
+% --- Executes on button press in gridYButton.
+function gridYButton_Callback(hObject, eventdata, handles)
+% hObject    handle to gridYButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of gridYButton
+
+
+% --- Executes on button press in gridXYButton.
+function gridXYButton_Callback(hObject, eventdata, handles)
+% hObject    handle to gridXYButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of gridXYButton
+
+
+% --- Executes on button press in gridMinorButton.
+function gridMinorButton_Callback(hObject, eventdata, handles)
+% hObject    handle to gridMinorButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of gridMinorButton
+
+
+% --- Executes on button press in gridZeroLine.
+function gridZeroLine_Callback(hObject, eventdata, handles)
+% hObject    handle to gridZeroLine (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
 
 

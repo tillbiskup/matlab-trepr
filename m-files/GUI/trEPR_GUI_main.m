@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 04-Jun-2010 10:17:01
+% Last Modified by GUIDE v2.5 05-Jun-2010 09:39:47
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1636,17 +1636,6 @@ function displayContextMenu_Callback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
-function plotPropertiesDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to plotPropertiesDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-trEPR_GUI_plotproperties(...
-    'callerFunction',mfilename,...
-    'callerHandle',hObject);
-
-
-% --------------------------------------------------------------------
 function showDisplayContextMenu_Callback(hObject, eventdata, handles)
 % hObject    handle to showDisplayContextMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1662,16 +1651,13 @@ if_spectraHide;
 
 % --------------------------------------------------------------------
 function removeDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to removeDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
+if_spectraRemove(hObject);
 
 % --------------------------------------------------------------------
 function infoDisplayContextMenu_Callback(hObject, eventdata, handles)
-% hObject    handle to infoDisplayContextMenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+trEPR_GUI_info(...
+    'callerFunction',mfilename,...
+    'callerHandle',hObject);
 
 
 % --------------------------------------------------------------------
@@ -3714,6 +3700,13 @@ function axisPlotPropertiesButton_Callback(hObject, eventdata, handles)
 % --- Executes on button press in axisMathButton.
 function axisMathButton_Callback(hObject, eventdata, handles)
 % hObject    handle to axisMathButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function displayHiddenContextMenu_Callback(hObject, eventdata, handles)
+% hObject    handle to displayHiddenContextMenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
