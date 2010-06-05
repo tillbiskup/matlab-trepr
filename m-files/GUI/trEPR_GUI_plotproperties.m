@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_plotproperties(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_plotproperties
 
-% Last Modified by GUIDE v2.5 05-Jun-2010 16:57:46
+% Last Modified by GUIDE v2.5 05-Jun-2010 19:31:13
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -85,6 +85,88 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     guidata(handles.callerHandle,callerHandles);
 end
 
+% Set application data (at this stage only empty structures)
+data = cell(1); % store the data (spectra) together with their information
+olddata = cell(1); % store a copy of the data (spectra)
+acc = struct(); % store the accumulated spectra together with their information
+configuration = struct(); % store the configuration information for the GUI
+% --- store important control values, such as the currently active spectrum etc.
+control = struct(...
+    'spectra', struct(...
+    'active',0,...
+    'visible',cell(1),...
+    'accumulated',cell(1),...
+    'notaccumulated',cell(1),...
+    'filenames',cell(1)...
+    )...
+);
+appdataHandles = struct();
+
+setappdata(handles.figure1,'data',data);
+setappdata(handles.figure1,'configuration',configuration);
+setappdata(handles.figure1,'control',control);
+setappdata(handles.figure1,'handles',appdataHandles);
+
+% add handle of this GUI to handles structure of the calling gui in case
+% this function has been called from another GUI
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+    callerHandles = guidata(handles.callerHandle);
+    callerHandles = setfield(...
+        callerHandles,...
+        mfilename,...
+        hObject);
+    guidata(handles.callerHandle,callerHandles);
+end
+
+% Get appdata from parent window
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')    
+    callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)        
+
+        % Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+        
+        data = parentAppdata.data;
+        control = parentAppdata.control;
+        setappdata(handles.figure1,'data',data);
+        setappdata(handles.figure1,'control',control);
+    end
+    guidata(handles.callerHandle,callerHandles);
+end
+
+% Fill elements with correct values
+switch control.axis.displayType
+    case '2D plot'
+        set(handles.xLabelMeasureEdit,'String',...
+            data{control.spectra.active}.axes.xaxis.measure);
+        set(handles.xLabelUnitEdit,'String',...
+            data{control.spectra.active}.axes.xaxis.unit);
+        set(handles.yLabelMeasureEdit,'String',...
+            data{control.spectra.active}.axes.yaxis.measure);
+        set(handles.yLabelUnitEdit,'String',...
+            data{control.spectra.active}.axes.yaxis.unit);
+    case 'B0 spectra'
+        set(handles.xLabelMeasureEdit,'String',...
+            data{control.spectra.active}.axes.yaxis.measure);
+        set(handles.xLabelUnitEdit,'String',...
+            data{control.spectra.active}.axes.yaxis.unit);
+        set(handles.yLabelMeasureEdit,'String','intensity');
+        set(handles.yLabelUnitEdit,'String','a.u.');
+    case 'transients'
+        set(handles.xLabelMeasureEdit,'String',...
+            data{control.spectra.active}.axes.xaxis.measure);
+        set(handles.xLabelUnitEdit,'String',...
+            data{control.spectra.active}.axes.xaxis.unit);
+        set(handles.yLabelMeasureEdit,'String','intensity');
+        set(handles.yLabelUnitEdit,'String','a.u.');
+end
+xlimits = get(callerHandles.axes1,'XLim');
+ylimits = get(callerHandles.axes1,'YLim');
+set(handles.xMinEdit,'String',num2str(xlimits(1)));
+set(handles.yMinEdit,'String',num2str(ylimits(1)));
+set(handles.xMaxEdit,'String',num2str(xlimits(2)));
+set(handles.yMaxEdit,'String',num2str(ylimits(2)));
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -112,12 +194,10 @@ function closeButton_Callback(hObject, eventdata, handles)
 closeGUI(hObject, eventdata, handles);
 
 
-% --- Executes on button press in resetButton.
-function resetButton_Callback(hObject, eventdata, handles)
-% hObject    handle to resetButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
+% --- Executes on button press in applyButton.
+function applyButton_Callback(hObject, eventdata, handles)
+%handles = guidata(gcbo);
+trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
 
 
 function edit2_Callback(hObject, eventdata, handles)
@@ -658,19 +738,19 @@ function gridZeroLine_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of gridZeroLine
 
 
-% --- Executes on selection change in currentPlotHighlightPopupmenu.
-function currentPlotHighlightPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to currentPlotHighlightPopupmenu (see GCBO)
+% --- Executes on selection change in plotHighlightMethodPopupmenu.
+function plotHighlightMethodPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to plotHighlightMethodPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = get(hObject,'String') returns currentPlotHighlightPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from currentPlotHighlightPopupmenu
+% Hints: contents = get(hObject,'String') returns plotHighlightMethodPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from plotHighlightMethodPopupmenu
 
 
 % --- Executes during object creation, after setting all properties.
-function currentPlotHighlightPopupmenu_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to currentPlotHighlightPopupmenu (see GCBO)
+function plotHighlightMethodPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to plotHighlightMethodPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -679,5 +759,35 @@ function currentPlotHighlightPopupmenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on selection change in plotHighlightValuePopupmenu.
+function plotHighlightValuePopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to plotHighlightValuePopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns plotHighlightValuePopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from plotHighlightValuePopupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function plotHighlightValuePopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to plotHighlightValuePopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in plotHighlightColorPaletteButton.
+function plotHighlightColorPaletteButton_Callback(hObject, eventdata, handles)
+% hObject    handle to plotHighlightColorPaletteButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
 

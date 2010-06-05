@@ -1250,27 +1250,14 @@ function menuToolsCorrections_Callback(hObject, eventdata, handles)
 % Get appdata of the current GUI
 appdata = getappdata(handles.figure1);
 
-%Pretrigger offset compensation (POC)
 if isempty(appdata.control.spectra.visible) || ...
         isempty(appdata.control.spectra.visible{1})
     set(handles.menuToolsCorrectionsPretriggerOffset, 'Enable', 'off');
-else
-    set(handles.menuToolsCorrectionsPretriggerOffset, 'Enable', 'on');
-end
-
-%Background subtraction (BGC)
-if isempty(appdata.control.spectra.visible) || ...
-        isempty(appdata.control.spectra.visible{1})
     set(handles.menuToolsCorrectionsBackground, 'Enable', 'off');
-else
-    set(handles.menuToolsCorrectionsBackground, 'Enable', 'on');
-end
-
-%Baseline correction (BLC)
-if isempty(appdata.control.spectra.visible) || ...
-        isempty(appdata.control.spectra.visible{1})
     set(handles.menuToolsCorrectionsBaseline, 'Enable', 'off');
 else
+    set(handles.menuToolsCorrectionsPretriggerOffset, 'Enable', 'on');
+    set(handles.menuToolsCorrectionsBackground, 'Enable', 'on');
     set(handles.menuToolsCorrectionsBaseline, 'Enable', 'on');
 end
 
@@ -1619,9 +1606,28 @@ if_axisReset(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
 function menuView_Callback(hObject, eventdata, handles)
-% hObject    handle to menuView (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+% Toggle "enable" status
+if length(appdata.control.spectra.visible) > 1
+    set(handles.menuViewAccumulate, 'Enable', 'on');
+else
+    set(handles.menuViewAccumulate, 'Enable', 'off');
+end
+if isempty(appdata.control.spectra.visible) || ...
+        isempty(appdata.control.spectra.visible{1})
+    set(handles.menuViewBaselineCorrection, 'Enable', 'off');
+    set(handles.menuViewInformation, 'Enable', 'off');
+    set(handles.menuViewExportPlot, 'Enable', 'off');
+    set(handles.menuViewPlotProperties, 'Enable', 'off');
+else
+    set(handles.menuViewBaselineCorrection, 'Enable', 'on');
+    set(handles.menuViewInformation, 'Enable', 'on');
+    set(handles.menuViewExportPlot, 'Enable', 'on');
+    set(handles.menuViewPlotProperties, 'Enable', 'on');
+end
+
 
 % Conditionals to check whether the respective windows are open or not
 % to toggle the 'Checked' property of the respective menu item
@@ -1664,9 +1670,13 @@ function menuViewAccumulate_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 if strcmp(get(gcbo, 'Checked'),'on')
     set(gcbo, 'Checked', 'off');
+        
+    trEPR_GUI_ACC('closeGUI',hObject, eventdata, handles);
 else 
     set(gcbo, 'Checked', 'on');
-    handles
+    trEPR_GUI_ACC(...
+        'callerFunction',mfilename,...
+        'callerHandle',hObject);
 end
 
 % --------------------------------------------------------------------
@@ -1791,6 +1801,7 @@ if strcmp(get(handles.zoomInAxisContextMenu,'Checked'),'off')
     set(zh,'Direction','in');
 else
     set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+    set(handles.axisZoomInButton,'Value',0);
     zh = zoom(handles.figure1);
     set(zh,'Enable','off');
 end    
@@ -2825,7 +2836,8 @@ switch currentDisplayType
             appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
             appdata.data{appdata.control.spectra.active}.axes.yaxis.values,...
             appdata.data{appdata.control.spectra.active}.data,...
-            'hittest','off'...
+            'hittest','off',...
+            'Parent',handles.axes1...
             );
         set(handles.axes1,'YDir','normal');
 
@@ -2850,6 +2862,8 @@ switch currentDisplayType
                 'Value',...
                 appdata.data{appdata.control.spectra.active}.Sb0-1);
         end
+        set(handles.sb0Edit,'String',...
+            appdata.data{appdata.control.spectra.active}.Sb0);
         set(handles.displaceXSlider,'Enable','On');
         set(handles.db0Edit,'Enable','On');
         set(handles.dtEdit,'Enable','Inactive');
@@ -2860,7 +2874,7 @@ switch currentDisplayType
 
         % Reset current axis
         cla(handles.axes1,'reset');
-        hold on;
+        hold(handles.axes1,'on');
         for k = 1 : length(appdata.control.spectra.visible)
             % Set plot style of currently active spectrum
             if appdata.control.spectra.visible{k} == appdata.control.spectra.active
@@ -2893,7 +2907,7 @@ switch currentDisplayType
                 max(max(appdata.data{appdata.control.spectra.visible{k}}.data)) ...                
                 ];
         end
-        hold off;
+        hold(handles.axes1,'off');
         set(...
             handles.axes1,...
             'XLim',...
@@ -2911,11 +2925,19 @@ switch currentDisplayType
 
         % Add horizontal line at position 0 in upper axis
         if appdata.control.axis.grid.zero
-            axes(handles.axes1);
-            line([yaxis(1) yaxis(end)],[0 0],...
+            hold(handles.axes1,'on');
+            plot(handles.axes1,...
+                [yaxis(1) yaxis(end)],[0 0],...
                 'Color',[0.75 0.75 0.75],...
                 'LineWidth',1,...
-                'LineStyle','--');
+                'LineStyle','--')
+            hold(handles.axes1,'off');
+            set(handles.figure1,'CurrentAxes',handles.axes1);
+            %axes(handles.axes1);
+%            line([yaxis(1) yaxis(end)],[0 0],...
+%                'Color',[0.75 0.75 0.75],...
+%                'LineWidth',1,...
+%                'LineStyle','--');
         end
 
     case 'transients'
@@ -2937,6 +2959,8 @@ switch currentDisplayType
                 'Value',...
                 appdata.data{appdata.control.spectra.active}.St-1);
         end
+        set(handles.stEdit,'String',...
+            appdata.data{appdata.control.spectra.active}.St);
         set(handles.displaceXSlider,'Enable','On');
         set(handles.db0Edit,'Enable','inactive');
         set(handles.dtEdit,'Enable','On');
@@ -2947,7 +2971,7 @@ switch currentDisplayType
         
         % Reset current axis
         cla(handles.axes1,'reset');
-        hold on;
+        hold(handles.axes1,'on');
         for k = 1 : length(appdata.control.spectra.visible)
             % Set plot style of currently active spectrum
             if appdata.control.spectra.visible{k} == appdata.control.spectra.active
@@ -2980,7 +3004,7 @@ switch currentDisplayType
                 max(max(appdata.data{appdata.control.spectra.visible{k}}.data)) ...                
                 ];
         end
-        hold off;
+        hold(handles.axes1,'off');
         set(...
             handles.axes1,...
             'XLim',...
@@ -2998,11 +3022,14 @@ switch currentDisplayType
 
         % Add horizontal line at position 0 in upper axis
         if appdata.control.axis.grid.zero
-            axes(handles.axes1);
-            line([xaxis(1) xaxis(end)],[0 0],...
+            hold(handles.axes1,'on');
+            plot(handles.axes1,...
+                [yaxis(1) yaxis(end)],[0 0],...
                 'Color',[0.75 0.75 0.75],...
                 'LineWidth',1,...
-                'LineStyle','--');
+                'LineStyle','--')
+            hold(handles.axes1,'off');
+            set(handles.figure1,'CurrentAxes',handles.axes1);
         end
 end
 

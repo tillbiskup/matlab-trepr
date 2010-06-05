@@ -103,8 +103,6 @@ control = struct(...
 appdataHandles = struct();
 
 setappdata(handles.figure1,'data',data);
-setappdata(handles.figure1,'olddata',data);
-setappdata(handles.figure1,'acc',acc);
 setappdata(handles.figure1,'configuration',configuration);
 setappdata(handles.figure1,'control',control);
 setappdata(handles.figure1,'handles',appdataHandles);
@@ -120,7 +118,7 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     guidata(handles.callerHandle,callerHandles);
 end
 
-% Get appdata from parent window necessary for ACC
+% Get appdata from parent window
 if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')    
     callerHandles = guidata(handles.callerHandle);
     if isfield(callerHandles,mfilename)        
