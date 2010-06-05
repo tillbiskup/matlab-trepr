@@ -123,6 +123,21 @@ function varargout = trEPR_GUI_main_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 
+% Display a disclaimer at startup
+message = {...
+    sprintf('{\\bfWelcome - Important Note}'),...
+    'You''re working with a development version of the trEPR toolbox.',...
+    'Please report all errors you encounter to the developer. Thus you',...
+    'help improving the toolbox further.',...
+    'Thank you for your patience and support. Enjoy!'};
+% Set default position for dialog box
+msg = msgbox(...
+    message,...
+    'Important Note',...
+    'help',...
+    struct('WindowStyle','modal','Interpreter','tex'));
+posVec = get(msg,'Position');
+set(msg,'Position',[200,320,posVec(3),posVec(4)]);
 
 % --------------------------------------------------------------------
 function menuFileExit_Callback(hObject, eventdata, handles)
@@ -2028,6 +2043,10 @@ if isempty(appdata.data{1})    % No data loaded to the GUI yet
             appdata.data{k}.Sy = 1;
             appdata.data{k}.t = 1;
             appdata.data{k}.b0 = 1;
+            appdata.data{k}.line.color = 'k';
+            appdata.data{k}.line.style = '-';
+            appdata.data{k}.line.marker = 'none';
+            appdata.data{k}.line.width = 1;
         end
         iLoadedSpectra = [ 1:1:length(spectra) ];
     else                       % Single spectrum loaded
@@ -2040,6 +2059,10 @@ if isempty(appdata.data{1})    % No data loaded to the GUI yet
         appdata.data{1}.Sy = 1;
         appdata.data{1}.t = 1;
         appdata.data{1}.b0 = 1;
+        appdata.data{1}.line.color = 'k';
+        appdata.data{1}.line.style = '-';
+        appdata.data{1}.line.marker = 'none';
+        appdata.data{1}.line.width = 1;
         iLoadedSpectra = [ 1 ];
     end
 else                           % GUI contains already data
@@ -2055,6 +2078,10 @@ else                           % GUI contains already data
             appdata.data{k}.Sy = 1;
             appdata.data{k}.t = 1;
             appdata.data{k}.b0 = 1;
+            appdata.data{k}.line.color = 'k';
+            appdata.data{k}.line.style = '-';
+            appdata.data{k}.line.marker = 'none';
+            appdata.data{k}.line.width = 1;
         end
         iLoadedSpectra = [nSpectra+1:1:nSpectra+length(spectra)];
     else                       % Single spectrum loaded
@@ -2067,6 +2094,10 @@ else                           % GUI contains already data
         appdata.data{nSpectra+1}.Sy = 1;
         appdata.data{nSpectra+1}.t = 1;
         appdata.data{nSpectra+1}.b0 = 1;
+        appdata.data{nSpectra+1}.line.color = 'k';
+        appdata.data{nSpectra+1}.line.style = '-';
+        appdata.data{nSpectra+1}.line.marker = 'none';
+        appdata.data{nSpectra+1}.line.width = 1;
         iLoadedSpectra = [ nSpectra+1 ];
     end
 end
@@ -2771,10 +2802,6 @@ data = appdata.data{appdata.control.spectra.active}.data;
 [ yDim, xDim ] = size(data);
 xaxis = appdata.data{appdata.control.spectra.active}.axes.xaxis.values;
 yaxis = appdata.data{appdata.control.spectra.active}.axes.yaxis.values;
-% Convert G -> mT
-if strcmp(appdata.data{appdata.control.spectra.active}.axes.yaxis.unit,'G')
-    yaxis = yaxis / 10;
-end
 
 switch currentDisplayType
     case '2D plot'
@@ -2802,8 +2829,10 @@ switch currentDisplayType
             );
         set(handles.axes1,'YDir','normal');
 
-        xlabel(handles.axes1,sprintf('{\\it time} / s'));
-        ylabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
+        xlabel(handles.axes1,sprintf('{\\it time} / %s',...
+            appdata.data{appdata.control.spectra.active}.axes.xaxis.unit));
+        ylabel(handles.axes1,sprintf('{\\it magnetic field} / %s',...
+            appdata.data{appdata.control.spectra.active}.axes.yaxis.unit));
     case 'B0 spectra'        
         set(handles.spectraScrollSlider,'Enable','On');
         set(handles.spectraScrollSlider,'Min',1);
@@ -2835,18 +2864,11 @@ switch currentDisplayType
         for k = 1 : length(appdata.control.spectra.visible)
             % Set plot style of currently active spectrum
             if appdata.control.spectra.visible{k} == appdata.control.spectra.active
-                plotStyle = 'b-';
+                color = 'b';
             else
-                plotStyle = 'k-';
+                color = appdata.data{appdata.control.spectra.active}.line.color;
             end
-            % Convert G -> mT
-            if strcmp(appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.unit,'G')
-                yaxis = appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values / 10;
-                Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0 / 10;
-            else
-                yaxis = appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values;
-                Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
-            end
+            Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
             Sb0 = appdata.data{appdata.control.spectra.visible{k}}.Sb0;
             plot(...
                 handles.axes1,...
@@ -2857,7 +2879,10 @@ switch currentDisplayType
                 )*...
                 appdata.data{appdata.control.spectra.visible{k}}.Sy+...
                 appdata.data{appdata.control.spectra.visible{k}}.Dy,...
-                plotStyle...
+                'Color',color,...
+                'LineStyle',appdata.data{appdata.control.spectra.active}.line.style,...
+                'Marker',appdata.data{appdata.control.spectra.active}.line.marker,...
+                'LineWidth',appdata.data{appdata.control.spectra.active}.line.width...
                 );
             xLimits(k,:) = [...
                 yaxis(1) ...
@@ -2880,7 +2905,8 @@ switch currentDisplayType
             [min(min(yLimits))*1.05 max(max(yLimits))*1.05]...
             );
         
-        xlabel(handles.axes1,sprintf('{\\it magnetic field} / mT'));
+        xlabel(handles.axes1,sprintf('{\\it magnetic field} / %s',...
+            appdata.data{appdata.control.spectra.active}.axes.yaxis.unit));
         ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
 
         % Add horizontal line at position 0 in upper axis
@@ -2925,12 +2951,10 @@ switch currentDisplayType
         for k = 1 : length(appdata.control.spectra.visible)
             % Set plot style of currently active spectrum
             if appdata.control.spectra.visible{k} == appdata.control.spectra.active
-                plotStyle = 'b-';
+                color = 'b';
             else
-                plotStyle = 'k-';
+                color = appdata.data{appdata.control.spectra.active}.line.color;
             end
-            xaxis = appdata.data{...
-                appdata.control.spectra.visible{k}}.axes.xaxis.values;
             Dt = appdata.data{appdata.control.spectra.visible{k}}.Dt;
             St = appdata.data{appdata.control.spectra.visible{k}}.St;
             plot(...
@@ -2942,7 +2966,10 @@ switch currentDisplayType
                 )*...
                 appdata.data{appdata.control.spectra.visible{k}}.Sy+...
                 appdata.data{appdata.control.spectra.visible{k}}.Dy,...
-                plotStyle...
+                'Color',color,...
+                'LineStyle',appdata.data{appdata.control.spectra.active}.line.style,...
+                'Marker',appdata.data{appdata.control.spectra.active}.line.marker,...
+                'LineWidth',appdata.data{appdata.control.spectra.active}.line.width...
                 );
             xLimits(k,:) = [...
                 appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values(1) ...
@@ -2965,7 +2992,8 @@ switch currentDisplayType
             [min(min(yLimits))*1.05 max(max(yLimits))*1.05]...
             );
 
-        xlabel(handles.axes1,sprintf('{\\it time} / s'));
+        xlabel(handles.axes1,sprintf('{\\it time} / %s',...
+            appdata.data{appdata.control.spectra.active}.axes.xaxis.unit));
         ylabel(handles.axes1,sprintf('{\\it intensity} / a.u.'));
 
         % Add horizontal line at position 0 in upper axis
