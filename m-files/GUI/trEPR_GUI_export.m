@@ -496,10 +496,12 @@ switch currentDisplayType
         ylabel(handles.invAH,sprintf('{\\it intensity} / a.u.'));
 
         % Add horizontal line at position 0 in upper axis
-        line([yaxis(1) yaxis(end)],[0 0],...
-            'Color',[0.75 0.75 0.75],...
-            'LineWidth',1,...
-            'LineStyle','--');
+        if appdata.control.axis.grid.zero
+            line([yaxis(1) yaxis(end)],[0 0],...
+                'Color',[0.75 0.75 0.75],...
+                'LineWidth',1,...
+                'LineStyle','--');
+        end
 
     case 'transients'
         set(handles.invAH,'XTick',[],'YTick',[]);     % default if no plot        
@@ -553,10 +555,34 @@ switch currentDisplayType
         ylabel(handles.invAH,sprintf('{\\it intensity} / a.u.'));
 
         % Add horizontal line at position 0 in upper axis
-        line([xaxis(1) xaxis(end)],[0 0],...
-            'Color',[0.75 0.75 0.75],...
-            'LineWidth',1,...
-            'LineStyle','--');
+        if appdata.control.axis.grid.zero
+            line([xaxis(1) xaxis(end)],[0 0],...
+                'Color',[0.75 0.75 0.75],...
+                'LineWidth',1,...
+                'LineStyle','--');
+        end
+end
+
+% Display grid
+switch appdata.control.axis.grid.x
+    case 'major'
+        set(handles.invAH,'XGrid','on');
+    case 'minor'
+        set(handles.invAH,'XGrid','on');
+        set(handles.invAH,'XMinorGrid','on');
+    otherwise
+        set(handles.invAH,'XGrid','off');
+        set(handles.invAH,'XMinorGrid','off');
+end
+switch appdata.control.axis.grid.y
+    case 'major'
+        set(handles.invAH,'YGrid','on');
+    case 'minor'
+        set(handles.invAH,'YGrid','on');
+        set(handles.invAH,'YMinorGrid','on');
+    otherwise
+        set(handles.invAH,'YGrid','off');
+        set(handles.invAH,'YMinorGrid','off');
 end
 
 
