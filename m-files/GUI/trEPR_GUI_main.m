@@ -147,7 +147,7 @@ for k=1:length(appdata.control.spectra.modified)
     end
 end
 %Save as
-if length(appdata.control.spectra.visible) == 1 && ...
+if isempty(appdata.control.spectra.visible) || ...
         isempty(appdata.control.spectra.visible{1})
     set(handles.menuFileSaveAs, 'Enable', 'off');
 else
@@ -685,9 +685,6 @@ if_spectraSave(hObject);
 
 % --------------------------------------------------------------------
 function menuFileSaveAs_Callback(hObject, eventdata, handles)
-% hObject    handle to menuFileSaveAs (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 function db0Edit_Callback(hObject, eventdata, handles)
 
@@ -698,31 +695,17 @@ value = str2double(get(hObject,'String'));
 min = get(handles.displaceXSlider,'Min');
 max = get(handles.displaceXSlider,'Max');
 
-switch appdata.control.axis.displayType
-    case 'B0 spectra'
-        if value>=min && value<=max
-            set(handles.displaceXSlider,'Value',value);
-            appdata.data{appdata.control.spectra.active}.Db0 = ...
-                get(gcbo,'Value');
-        elseif value<min
-            set(handles.displaceXSlider,'Value',min);
-            appdata.data{appdata.control.spectra.active}.Db0 = min;
-        else
-            set(handles.displaceXSlider,'Value',max);
-            appdata.data{appdata.control.spectra.active}.Db0 = max;
-        end    
-    case 'transients'
-        if value>=min && value<=max
-            set(handles.displaceXSlider,'Value',value);
-            appdata.data{appdata.control.spectra.active}.Dt = ...
-                get(gcbo,'Value');
-        elseif value<min
-            set(handles.displaceXSlider,'Value',min);
-            appdata.data{appdata.control.spectra.active}.Dt = min;
-        else
-            set(handles.displaceXSlider,'Value',max);
-            appdata.data{appdata.control.spectra.active}.Dt = max;
-        end    
+if value>=min && value<=max
+    set(handles.displaceXSlider,'Value',value);
+    appdata.data{appdata.control.spectra.active}.Db0 = value;
+elseif value<min
+    set(handles.displaceXSlider,'Value',min);
+    set(handles.db0Edit,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.Db0 = min;
+else
+    set(handles.displaceXSlider,'Value',max);
+    set(handles.db0Edit,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.Db0 = max;
 end
 
 % Refresh handles and appdata of the current GUI
@@ -741,9 +724,6 @@ if_axis_Refresh(handles.figure1);
 
 % --- Executes during object creation, after setting all properties.
 function db0Edit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to db0Edit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
@@ -753,12 +733,38 @@ end
 
 
 function dtEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to dtEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of dtEdit as text
-%        str2double(get(hObject,'String')) returns contents of dtEdit as a double
+value = str2double(get(hObject,'String'));
+min = get(handles.displaceXSlider,'Min');
+max = get(handles.displaceXSlider,'Max');
+
+if value>=min && value<=max
+    set(handles.displaceXSlider,'Value',value);
+    appdata.data{appdata.control.spectra.active}.Dt = value;
+elseif value<min
+    set(handles.displaceXSlider,'Value',min);
+    set(handles.dtEdit,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.Dt = min;
+else
+    set(handles.displaceXSlider,'Value',max);
+    set(handles.dtEdit,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.Dt = max;
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -840,14 +846,16 @@ if value>=min && value<=max
         sliderValue = value-1;
     end
     set(handles.scaleXSlider,'Value',sliderValue);
-    appdata.data{appdata.control.spectra.active}.Sx = ...
+    appdata.data{appdata.control.spectra.active}.Sb0 = ...
         value;
 elseif value<min
     set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Min'));
-    appdata.data{appdata.control.spectra.active}.Sx = min;
+    set(handles.sb0Edit,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.Sb0 = min;
 else
     set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Max'));
-    appdata.data{appdata.control.spectra.active}.Sx = max;
+    set(handles.sb0Edit,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.Sb0 = max;
 end    
 
 % Refresh handles and appdata of the current GUI
@@ -878,12 +886,46 @@ end
 
 
 function stEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to stEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of stEdit as text
-%        str2double(get(hObject,'String')) returns contents of stEdit as a double
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+min = 1/abs(get(handles.scaleXSlider,'Min')-1);
+max = get(handles.scaleXSlider,'Max')+1;
+
+value = str2double(get(hObject,'String'));
+
+if value>=min && value<=max
+    if value < 1
+        sliderValue = -(1/value)+1;
+    else
+        sliderValue = value-1;
+    end
+    set(handles.scaleXSlider,'Value',sliderValue);
+    appdata.data{appdata.control.spectra.active}.St = ...
+        value;
+elseif value<min
+    set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Min'));
+    set(handles.stEdit,'String',num2str(min));
+    appdata.data{appdata.control.spectra.active}.St = min;
+else
+    set(handles.scaleXSlider,'Value',get(handles.scaleXSlider,'Max'));
+    set(handles.stEdit,'String',num2str(max));
+    appdata.data{appdata.control.spectra.active}.St = max;
+end    
+
+% Refresh handles and appdata of the current GUI
+guidata(gcbo,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_axis_Refresh(handles.figure1);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1147,16 +1189,19 @@ end
 
 % --------------------------------------------------------------------
 function menuTools_Callback(hObject, eventdata, handles)
-% hObject    handle to menuTools (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
 function menuToolsFunctions_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsFunctions (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+%Accumulate (ACC)
+if length(appdata.control.spectra.visible) > 1
+    set(handles.menuToolsFunctionsAccumulate, 'Enable', 'on');
+else
+    set(handles.menuToolsFunctionsAccumulate, 'Enable', 'off');
+end
 
 
 % --------------------------------------------------------------------
@@ -1179,9 +1224,32 @@ function menuToolsFunctionsSmooth_Callback(hObject, eventdata, handles)
 
 % --------------------------------------------------------------------
 function menuToolsCorrections_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToolsCorrections (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get appdata of the current GUI
+appdata = getappdata(handles.figure1);
+
+%Pretrigger offset compensation (POC)
+if isempty(appdata.control.spectra.visible) || ...
+        isempty(appdata.control.spectra.visible{1})
+    set(handles.menuToolsCorrectionsPretriggerOffset, 'Enable', 'off');
+else
+    set(handles.menuToolsCorrectionsPretriggerOffset, 'Enable', 'on');
+end
+
+%Background subtraction (BGC)
+if isempty(appdata.control.spectra.visible) || ...
+        isempty(appdata.control.spectra.visible{1})
+    set(handles.menuToolsCorrectionsBackground, 'Enable', 'off');
+else
+    set(handles.menuToolsCorrectionsBackground, 'Enable', 'on');
+end
+
+%Baseline correction (BLC)
+if isempty(appdata.control.spectra.visible) || ...
+        isempty(appdata.control.spectra.visible{1})
+    set(handles.menuToolsCorrectionsBaseline, 'Enable', 'off');
+else
+    set(handles.menuToolsCorrectionsBaseline, 'Enable', 'on');
+end
 
 
 % --------------------------------------------------------------------
@@ -1947,7 +2015,8 @@ if isempty(appdata.data{1})    % No data loaded to the GUI yet
             appdata.data{k}.Db0 = 0;
             appdata.data{k}.Dt = 0;
             appdata.data{k}.Dy = 0;
-            appdata.data{k}.Sx = 1;
+            appdata.data{k}.Sb0 = 1;
+            appdata.data{k}.St = 1;
             appdata.data{k}.Sy = 1;
             appdata.data{k}.t = 1;
             appdata.data{k}.b0 = 1;
@@ -1958,7 +2027,8 @@ if isempty(appdata.data{1})    % No data loaded to the GUI yet
         appdata.data{1}.Db0 = 0;
         appdata.data{1}.Dt = 0;
         appdata.data{1}.Dy = 0;
-        appdata.data{1}.Sx = 1;
+        appdata.data{1}.Sb0 = 1;
+        appdata.data{1}.St = 1;
         appdata.data{1}.Sy = 1;
         appdata.data{1}.t = 1;
         appdata.data{1}.b0 = 1;
@@ -1972,7 +2042,8 @@ else                           % GUI contains already data
             appdata.data{k}.Db0 = 0;
             appdata.data{k}.Dt = 0;
             appdata.data{k}.Dy = 0;
-            appdata.data{k}.Sx = 1;
+            appdata.data{k}.Sb0 = 1;
+            appdata.data{k}.St = 1;
             appdata.data{k}.Sy = 1;
             appdata.data{k}.t = 1;
             appdata.data{k}.b0 = 1;
@@ -1983,7 +2054,8 @@ else                           % GUI contains already data
         appdata.data{nSpectra+1}.Db0 = 0;
         appdata.data{nSpectra+1}.Dt = 0;
         appdata.data{nSpectra+1}.Dy = 0;
-        appdata.data{nSpectra+1}.Sx = 1;
+        appdata.data{nSpectra+1}.Sb0 = 1;
+        appdata.data{nSpectra+1}.St = 1;
         appdata.data{nSpectra+1}.Sy = 1;
         appdata.data{nSpectra+1}.t = 1;
         appdata.data{nSpectra+1}.b0 = 1;
@@ -2245,6 +2317,15 @@ switch appdata.control.axis.displayType;
             appdata.data{appdata.control.spectra.active}.Db0);
         set(handles.db0Edit,'String',...
             appdata.data{appdata.control.spectra.active}.Db0);
+        if appdata.data{appdata.control.spectra.active}.Sb0 < 1
+            set(handles.scaleXSlider,'Value',...
+                -(1/appdata.data{appdata.control.spectra.active}.Sb0)+1);
+        else
+            set(handles.scaleXSlider,'Value',...
+                appdata.data{appdata.control.spectra.active}.Sb0-1);
+        end
+        set(handles.sb0Edit,'String',...
+            appdata.data{appdata.control.spectra.active}.Sb0);
     case 'transients'
         set(handles.spectraScrollSlider,'Value',...
             appdata.data{appdata.control.spectra.active}.b0);
@@ -2252,6 +2333,15 @@ switch appdata.control.axis.displayType;
             appdata.data{appdata.control.spectra.active}.Dt);
         set(handles.dtEdit,'String',...
             appdata.data{appdata.control.spectra.active}.Dt);
+        if appdata.data{appdata.control.spectra.active}.St < 1
+            set(handles.scaleXSlider,'Value',...
+                -(1/appdata.data{appdata.control.spectra.active}.St)+1);
+        else
+            set(handles.scaleXSlider,'Value',...
+                appdata.data{appdata.control.spectra.active}.St-1);
+        end
+        set(handles.stEdit,'String',...
+            appdata.data{appdata.control.spectra.active}.St);
 end
 
 set(handles.displaceYSlider,'Value',...
@@ -2259,13 +2349,6 @@ set(handles.displaceYSlider,'Value',...
 set(handles.dyEdit,'String',...
     appdata.data{appdata.control.spectra.active}.Dy);
 
-if appdata.data{appdata.control.spectra.active}.Sx < 1
-    set(handles.scaleXSlider,'Value',...
-        -(1/appdata.data{appdata.control.spectra.active}.Sx)+1);
-else
-    set(handles.scaleXSlider,'Value',...
-        appdata.data{appdata.control.spectra.active}.Sx-1);
-end
 if appdata.data{appdata.control.spectra.active}.Sy < 1
     set(handles.scaleYSlider,'Value',...
         -(1/appdata.data{appdata.control.spectra.active}.Sy)+1);
@@ -2273,8 +2356,6 @@ else
     set(handles.scaleYSlider,'Value',...
         appdata.data{appdata.control.spectra.active}.Sy-1);
 end
-set(handles.sb0Edit,'String',...
-    appdata.data{appdata.control.spectra.active}.Sx);
 set(handles.syEdit,'String',...
     appdata.data{appdata.control.spectra.active}.Sy);
 
@@ -2698,6 +2779,12 @@ switch currentDisplayType
         set(handles.displaceYSlider,'Enable','Off');
         set(handles.scaleXSlider,'Enable','Off');
         set(handles.displaceXSlider,'Enable','Off');
+        set(handles.db0Edit,'Enable','Inactive');
+        set(handles.dtEdit,'Enable','Inactive');
+        set(handles.dyEdit,'Enable','Inactive');
+        set(handles.sb0Edit,'Enable','Inactive');
+        set(handles.stEdit,'Enable','Inactive');
+        set(handles.syEdit,'Enable','Inactive');
 
         imagesc(...
             appdata.data{appdata.control.spectra.active}.axes.xaxis.values,...
@@ -2717,7 +2804,22 @@ switch currentDisplayType
         set(handles.scaleYSlider,'Enable','On');
         set(handles.displaceYSlider,'Enable','On');
         set(handles.scaleXSlider,'Enable','On');
+        if appdata.data{appdata.control.spectra.active}.Sb0 < 1
+            set(handles.scaleXSlider,...
+                'Value',...
+                -(1/appdata.data{appdata.control.spectra.active}.Sb0)+1);
+        else
+            set(handles.scaleXSlider,...
+                'Value',...
+                appdata.data{appdata.control.spectra.active}.Sb0-1);
+        end
         set(handles.displaceXSlider,'Enable','On');
+        set(handles.db0Edit,'Enable','On');
+        set(handles.dtEdit,'Enable','Inactive');
+        set(handles.dyEdit,'Enable','On');
+        set(handles.sb0Edit,'Enable','On');
+        set(handles.stEdit,'Enable','Inactive');
+        set(handles.syEdit,'Enable','On');
 
         % Reset current axis
         cla(handles.axes1,'reset');
@@ -2737,9 +2839,11 @@ switch currentDisplayType
                 yaxis = appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values;
                 Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
             end
+            Sb0 = appdata.data{appdata.control.spectra.visible{k}}.Sb0;
             plot(...
                 handles.axes1,...
-                yaxis + Db0,...
+                ((yaxis-(max(yaxis)-((max(yaxis)-min(yaxis))/2)))*Sb0)+...
+                (max(yaxis)-((max(yaxis)-min(yaxis))/2)) + Db0,...
                 appdata.data{appdata.control.spectra.visible{k}}.data(...
                 :,floor(appdata.data{appdata.control.spectra.visible{k}}.t)...
                 )*...
@@ -2788,7 +2892,22 @@ switch currentDisplayType
         set(handles.scaleYSlider,'Enable','On');
         set(handles.displaceYSlider,'Enable','On');
         set(handles.scaleXSlider,'Enable','On');
+        if appdata.data{appdata.control.spectra.active}.St < 1
+            set(handles.scaleXSlider,...
+                'Value',...
+                -(1/appdata.data{appdata.control.spectra.active}.St)+1);
+        else
+            set(handles.scaleXSlider,...
+                'Value',...
+                appdata.data{appdata.control.spectra.active}.St-1);
+        end
         set(handles.displaceXSlider,'Enable','On');
+        set(handles.db0Edit,'Enable','inactive');
+        set(handles.dtEdit,'Enable','On');
+        set(handles.dyEdit,'Enable','On');
+        set(handles.sb0Edit,'Enable','Inactive');
+        set(handles.stEdit,'Enable','On');
+        set(handles.syEdit,'Enable','On');
         
         % Reset current axis
         cla(handles.axes1,'reset');
@@ -2800,9 +2919,14 @@ switch currentDisplayType
             else
                 plotStyle = 'k-';
             end
+            xaxis = appdata.data{...
+                appdata.control.spectra.visible{k}}.axes.xaxis.values;
+            Dt = appdata.data{appdata.control.spectra.visible{k}}.Dt;
+            St = appdata.data{appdata.control.spectra.visible{k}}.St;
             plot(...
                 handles.axes1,...
-                appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values,...
+                ((xaxis-(max(xaxis)-((max(xaxis)-min(xaxis))/2)))*St)+...
+                (max(xaxis)-((max(xaxis)-min(xaxis))/2)) + Dt,...
                 appdata.data{appdata.control.spectra.visible{k}}.data(...
                 floor(appdata.data{appdata.control.spectra.visible{k}}.b0),:...
                 )*...
@@ -3651,8 +3775,8 @@ set(handles.scaleXSlider,'Value',0);
 appdata.data{appdata.control.spectra.active}.Db0 = 0;
 appdata.data{appdata.control.spectra.active}.Dt = 0;
 appdata.data{appdata.control.spectra.active}.Dy = 0;
-appdata.data{appdata.control.spectra.active}.Sb0 = 0;
-appdata.data{appdata.control.spectra.active}.St = 0;
+appdata.data{appdata.control.spectra.active}.Sb0 = 1;
+appdata.data{appdata.control.spectra.active}.St = 1;
 appdata.data{appdata.control.spectra.active}.Sy = 1;
 
 % Refresh handles and appdata of the current GUI
