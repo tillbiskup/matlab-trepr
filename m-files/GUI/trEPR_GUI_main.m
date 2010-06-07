@@ -2880,7 +2880,7 @@ switch currentDisplayType
             if appdata.control.spectra.visible{k} == appdata.control.spectra.active
                 color = 'b';
             else
-                color = appdata.data{appdata.control.spectra.active}.line.color;
+                color = appdata.data{appdata.control.spectra.visible{k}}.line.color;
             end
             Db0 = appdata.data{appdata.control.spectra.visible{k}}.Db0;
             Sb0 = appdata.data{appdata.control.spectra.visible{k}}.Sb0;

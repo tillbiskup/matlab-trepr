@@ -1709,7 +1709,8 @@ appdata.acc.filename = get(handles.filenameEdit,'String');
 appdata.acc.Db0 = 0;
 appdata.acc.Dt = 0;
 appdata.acc.Dy = 0;
-appdata.acc.Sx = 1;
+appdata.acc.Sb0 = 1;
+appdata.acc.St = 1;
 appdata.acc.Sy = 1;
 appdata.acc.t = floor(get(handles.spectraScrollSlider,'Value'));
 if appdata.acc.t == 0
@@ -1719,6 +1720,10 @@ appdata.acc.b0 = 1;
 appdata.acc.acc = struct(...
     'filenames',filenames...
     );
+appdata.acc.line.color = 'r';
+appdata.acc.line.style = '-';
+appdata.acc.line.marker = 'none';
+appdata.acc.line.width = 1;
 
 % Refresh handles and appdata of the current GUI
 guidata(handles.figure1,handles);
