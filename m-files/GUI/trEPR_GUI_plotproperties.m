@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_plotproperties(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_plotproperties
 
-% Last Modified by GUIDE v2.5 05-Jun-2010 21:03:32
+% Last Modified by GUIDE v2.5 15-Jun-2010 18:24:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -546,9 +546,9 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         callerHandles = rmfield(...
             callerHandles,...
             mfilename);
+        guidata(handles.callerHandle,callerHandles);
+        delete(ownHandle);
     end
-    guidata(handles.callerHandle,callerHandles);
-    delete(ownHandle);
 elseif isfield(handles,'mfilename') && strcmpi(handles.mfilename,mfilename)
     delete(gcf);
 else
@@ -604,57 +604,166 @@ function spectraResetButton_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in gridXButton.
 function gridXButton_Callback(hObject, eventdata, handles)
-% hObject    handle to gridXButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hint: get(hObject,'Value') returns toggle state of gridXButton
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    if get(handles.gridMinorButton,'Value')
+        appdata.control.axis.grid.x = 'minor';
+    else
+        appdata.control.axis.grid.x = 'major';
+    end
+else
+    appdata.control.axis.grid.x = 'off';
+end
 
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 % --- Executes on button press in gridYButton.
 function gridYButton_Callback(hObject, eventdata, handles)
-% hObject    handle to gridYButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hint: get(hObject,'Value') returns toggle state of gridYButton
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    if get(handles.gridMinorButton,'Value')
+        appdata.control.axis.grid.y = 'minor';
+    else
+        appdata.control.axis.grid.y = 'major';
+    end
+else
+    appdata.control.axis.grid.y = 'off';
+end
 
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
-% --- Executes on button press in gridXYButton.
-function gridXYButton_Callback(hObject, eventdata, handles)
-% hObject    handle to gridXYButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of gridXYButton
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in gridMinorButton.
 function gridMinorButton_Callback(hObject, eventdata, handles)
-% hObject    handle to gridMinorButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hint: get(hObject,'Value') returns toggle state of gridMinorButton
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    if get(handles.gridXButton,'Value')
+        appdata.control.axis.grid.x = 'minor';
+    end
+    if get(handles.gridYButton,'Value')
+        appdata.control.axis.grid.y = 'minor';
+    end
+else
+    if get(handles.gridXButton,'Value')
+        appdata.control.axis.grid.x = 'major';
+    end
+    if get(handles.gridYButton,'Value')
+        appdata.control.axis.grid.y = 'major';
+    end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in gridZeroLine.
 function gridZeroLine_Callback(hObject, eventdata, handles)
-% hObject    handle to gridZeroLine (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
 % Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+appdata.control.axis.grid.zero = get(hObject,'Value');
 
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 % --- Executes on selection change in plotHighlightMethodPopupmenu.
 function plotHighlightMethodPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to plotHighlightMethodPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
 % Hints: contents = get(hObject,'String') returns plotHighlightMethodPopupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from plotHighlightMethodPopupmenu
+contents = get(hObject,'String');
+switch contents{get(hObject,'Value')}
+    case 'Color'
+        set(handles.plotHighlightValuePopupmenu,'String',...
+            {'blue','green','red',...
+            'cyan','magenta','yellow','black',...
+            '<other>'});
+    case 'Width'
+        set(handles.plotHighlightValuePopupmenu,'String',...
+            {'1 px','2 px','3 px','4 px','5 px'});
+    case 'Marker'
+        set(handles.plotHighlightValuePopupmenu,'String',...
+            {'solid','dashed','dotted','dash-dotted'});
+    case 'Style'
+        set(handles.plotHighlightValuePopupmenu,'String',...
+            {'plus','circle','asterisk','point','cross','square',...
+            'diamond','Upwd-png triangle','Dnwd-png triangle',...
+            'Right-png triangle','Left-png triangle',...
+            'pentragram','hexagram'});
+end
+set(handles.plotHighlightValuePopupmenu,'Value',1);
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -672,12 +781,52 @@ end
 
 % --- Executes on selection change in plotHighlightValuePopupmenu.
 function plotHighlightValuePopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to plotHighlightValuePopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns plotHighlightValuePopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from plotHighlightValuePopupmenu
+contents = get(hObject,'String');
+methodContents = get(handles.plotHighlightMethodPopupmenu,'String');
+switch methodContents{get(handles.plotHighlightMethodPopupmenu,'Value')}
+    case 'Color'
+        appdata.control.axis.highlight.method = 'Color';
+        switch contents{get(hObject,'Value')}
+            case 'blue'
+                appdata.control.axis.highlight.value = 'b';
+            case 'green'
+                appdata.control.axis.highlight.value = 'g';
+            case 'red'
+                appdata.control.axis.highlight.value = 'r';
+            case 'cyan'
+                appdata.control.axis.highlight.value = 'c';
+            case 'magenta'
+                appdata.control.axis.highlight.value = 'm';
+            case 'yellow'
+                appdata.control.axis.highlight.value = 'y';
+            case 'black'
+                appdata.control.axis.highlight.value = 'k';
+        end
+    case 'Width'
+        appdata.control.axis.highlight.method = 'LineWidth';
+        appdata.control.axis.highlight.value = ...
+            str2double(...
+            contents{get(handles.plotHighlightValuePopupmenu,'Value')}(1));
+    case 'Marker'
+    case 'Style'
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -723,48 +872,193 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in legendShowButton.
-function legendShowButton_Callback(hObject, eventdata, handles)
-% hObject    handle to legendShowButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Executes on button press in legendBestButton.
+function legendBestButton_Callback(hObject, eventdata, handles)
 
-% Hint: get(hObject,'Value') returns toggle state of legendShowButton
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    set(handles.legendNWbutton,'Value',0);
+    set(handles.legendNEbutton,'Value',0);
+    set(handles.legendSWbutton,'Value',0);
+    set(handles.legendSEbutton,'Value',0);
+    appdata.control.axis.legend.location = 'Best';
+else
+    appdata.control.axis.legend.location = 'off';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in legendNWbutton.
 function legendNWbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to legendNWbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of legendNWbutton
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    set(handles.legendBestButton,'Value',0);
+    set(handles.legendNEbutton,'Value',0);
+    set(handles.legendSWbutton,'Value',0);
+    set(handles.legendSEbutton,'Value',0);
+    appdata.control.axis.legend.location = 'NorthWest';
+else
+    appdata.control.axis.legend.location = 'off';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in legendNEbutton.
 function legendNEbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to legendNEbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of legendNEbutton
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    set(handles.legendBestButton,'Value',0);
+    set(handles.legendNWbutton,'Value',0);
+    set(handles.legendSWbutton,'Value',0);
+    set(handles.legendSEbutton,'Value',0);
+    appdata.control.axis.legend.location = 'NorthEast';
+else
+    appdata.control.axis.legend.location = 'off';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in legendSWbutton.
 function legendSWbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to legendSWbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of legendSWbutton
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    set(handles.legendBestButton,'Value',0);
+    set(handles.legendNWbutton,'Value',0);
+    set(handles.legendNEbutton,'Value',0);
+    set(handles.legendSEbutton,'Value',0);
+    appdata.control.axis.legend.location = 'SouthWest';
+else
+    appdata.control.axis.legend.location = 'off';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in legendSEbutton.
 function legendSEbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to legendSEbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of legendSEbutton
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Hint: get(hObject,'Value') returns toggle state of gridZeroLine
+if get(hObject,'Value')
+    set(handles.legendBestButton,'Value',0);
+    set(handles.legendNWbutton,'Value',0);
+    set(handles.legendNEbutton,'Value',0);
+    set(handles.legendSWbutton,'Value',0);
+    appdata.control.axis.legend.location = 'SouthEast';
+else
+    appdata.control.axis.legend.location = 'off';
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
+function if_parentAppdataRefresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Get appdata from parent window
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+	callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)
+    	% Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+        % Set changed parameters of parentAppdata
+        parentAppdata.control.axis.grid = appdata.control.axis.grid;
+        parentAppdata.control.axis.legend = appdata.control.axis.legend;
+        parentAppdata.control.axis.highlight = appdata.control.axis.highlight;
+        % Refresh appdata of the parent GUI
+        parentAppdataFieldnames = fieldnames(parentAppdata);
+        for k=1:length(parentAppdataFieldnames)
+            setappdata(...
+                callerHandles.figure1,...
+                parentAppdataFieldnames{k},...
+                getfield(parentAppdata,...
+                parentAppdataFieldnames{k})...
+                );
+        end
+        % Refresh axes in main GUI
+        trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
+    end
+end
