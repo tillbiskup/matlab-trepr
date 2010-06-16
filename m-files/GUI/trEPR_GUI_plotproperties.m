@@ -95,8 +95,6 @@ control = struct(...
     'spectra', struct(...
     'active',0,...
     'visible',cell(1),...
-    'accumulated',cell(1),...
-    'notaccumulated',cell(1),...
     'filenames',cell(1)...
     )...
 );
@@ -166,7 +164,7 @@ control.highlight = struct(...
     'triangle0down','v',...
     'triangle0right','>',...
     'triangle0left','<',...
-    'pentragram','p',...
+    'pentagram','p',...
     'hexagram','h'...
     )...
     );
@@ -209,6 +207,8 @@ set(handles.plotHighlightMethodPopupmenu,'Value',1);
 set(handles.plotHighlightValuePopupmenu,'String',...
     fieldnames(control.highlight.Color));
 
+if_spectraVisibleListboxRefresh(hObject);
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -244,12 +244,44 @@ trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
 
 % --- Executes on selection change in lineColorPopupmenu.
 function lineColorPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to lineColorPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns lineColorPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from lineColorPopupmenu
+lineColors = struct(...
+    'blue','b',...
+    'green','g',...
+    'red','r',...
+    'cyan','c',...
+    'magenta','m',...
+    'yellow','y',...
+    'black','k',...
+    'other',''...
+    );
+
+contents = get(hObject,'String');
+if strcmp(contents{get(hObject,'Value')},'other')
+    % TODO: Handle color palette output
+    % For now, set to gray
+    appdata.data{appdata.control.spectra.active}.line.color = ...
+        [0.6 0.6 0.6];
+else
+    appdata.data{appdata.control.spectra.active}.line.color = ...
+        getfield(lineColors,contents{get(hObject,'Value')});
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -267,12 +299,34 @@ end
 
 
 function lineWidthEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to lineWidthEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
 % Hints: get(hObject,'String') returns contents of lineWidthEdit as text
 %        str2double(get(hObject,'String')) returns contents of lineWidthEdit as a double
+if isnan(str2double(get(handles.lineWidthEdit,'String')))
+    set(handles.lineWidthEdit,'String',...
+        num2str(appdata.data{appdata.control.spectra.active}.line.width));
+else
+    appdata.data{appdata.control.spectra.active}.line.width = ...
+        round(str2double(get(handles.lineWidthEdit,'String')));
+    set(handles.lineWidthEdit,'String',...
+        num2str(round(str2double(get(handles.lineWidthEdit,'String')))));
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -290,12 +344,36 @@ end
 
 % --- Executes on selection change in lineStylePopupmenu.
 function lineStylePopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to lineStylePopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns lineStylePopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from lineStylePopupmenu
+lineStyles = struct(...
+    'solid','-',...
+    'dashed','--',...
+    'dotted',':',...
+    'dash_dotted','-.'...
+    );
+contents = get(hObject,'String');
+for k=1:length(contents)
+    contents{k} = strrep(contents{k},' ','0');
+    contents{k} = strrep(contents{k},'-','_');
+end
+appdata.data{appdata.control.spectra.active}.line.style = ...
+    getfield(lineStyles,contents{get(hObject,'Value')});
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -311,14 +389,90 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+% --- Executes on selection change in lineMarkersPopupmenu.
+function lineMarkersPopupmenu_Callback(hObject, eventdata, handles)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+lineMarkers = struct(...
+    'none','none',...
+    'plus','+',...
+    'circle','o',...
+    'asterisk','*',...
+    'point','.',...
+    'cross','x',...
+    'square','s',...
+    'diamond','d',...
+    'triangle0up','^',...
+    'triangle0down','v',...
+    'triangle0right','>',...
+    'triangle0left','<',...
+    'pentagram','p',...
+    'hexagram','h'...
+    );
+
+contents = get(hObject,'String');
+for k=1:length(contents)
+    contents{k} = strrep(contents{k},' ','0');
+    contents{k} = strrep(contents{k},'-','_');
+end
+appdata.data{appdata.control.spectra.active}.line.marker = ...
+    getfield(lineMarkers,contents{get(hObject,'Value')});
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
+
+
+% --- Executes during object creation, after setting all properties.
+function lineMarkersPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to lineMarkersPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
 function xLabelMeasureEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to xLabelMeasureEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of xLabelMeasureEdit as text
-%        str2double(get(hObject,'String')) returns contents of xLabelMeasureEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        appdata.control.axis.labels.x.measure = get(hObject,'String');
+    case 'B0 spectra'
+        appdata.control.axis.labels.y.measure = get(hObject,'String');
+    case 'transients'
+        appdata.control.axis.labels.x.measure = get(hObject,'String');
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -336,12 +490,31 @@ end
 
 
 function yLabelMeasureEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to yLabelMeasureEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of yLabelMeasureEdit as text
-%        str2double(get(hObject,'String')) returns contents of yLabelMeasureEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        appdata.control.axis.labels.y.measure = get(hObject,'String');
+    case 'B0 spectra'
+        appdata.control.axis.labels.z.measure = get(hObject,'String');
+    case 'transients'
+        appdata.control.axis.labels.z.measure = get(hObject,'String');
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -359,12 +532,31 @@ end
 
 
 function xLabelUnitEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to xLabelUnitEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of xLabelUnitEdit as text
-%        str2double(get(hObject,'String')) returns contents of xLabelUnitEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        appdata.control.axis.labels.x.unit = get(hObject,'String');
+    case 'B0 spectra'
+        appdata.control.axis.labels.y.unit = get(hObject,'String');
+    case 'transients'
+        appdata.control.axis.labels.x.unit = get(hObject,'String');
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -382,12 +574,31 @@ end
 
 
 function yLabelUnitEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to yLabelUnitEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of yLabelUnitEdit as text
-%        str2double(get(hObject,'String')) returns contents of yLabelUnitEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        appdata.control.axis.labels.y.unit = get(hObject,'String');
+    case 'B0 spectra'
+        appdata.control.axis.labels.z.unit = get(hObject,'String');
+    case 'transients'
+        appdata.control.axis.labels.z.unit = get(hObject,'String');
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -410,28 +621,6 @@ function colorPalettePushbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 trEPR_GUI_colorpalette;
-
-% --- Executes on selection change in lineMarkersPopupmenu.
-function lineMarkersPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to lineMarkersPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = get(hObject,'String') returns lineMarkersPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from lineMarkersPopupmenu
-
-
-% --- Executes during object creation, after setting all properties.
-function lineMarkersPopupmenu_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to lineMarkersPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 
 
 % --- Executes on button press in normalizePkPkCheckbox.
@@ -463,12 +652,49 @@ function convertG2mTCheckbox_Callback(hObject, eventdata, handles)
 
 
 function xMinEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to xMinEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of xMinEdit as text
-%        str2double(get(hObject,'String')) returns contents of xMinEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        if isnan(str2double(get(handles.xMinEdit,'String')))
+            set(handles.xMinEdit,'String',...
+                num2str(control.axis.limits.x.min));
+        else
+            appdata.control.axis.limits.x.min = ...
+                str2double(get(handles.xMinEdit,'String'));
+        end
+    case 'B0 spectra'
+        if isnan(str2double(get(handles.xMinEdit,'String')))
+            set(handles.xMinEdit,'String',...
+                num2str(control.axis.limits.y.min));
+        else
+            appdata.control.axis.limits.y.min = ...
+                str2double(get(handles.xMinEdit,'String'));
+        end
+    case 'transients'
+        if isnan(str2double(get(handles.xMinEdit,'String')))
+            set(handles.xMinEdit,'String',...
+                num2str(control.axis.limits.x.min));
+        else
+            appdata.control.axis.limits.x.min = ...
+                str2double(get(handles.xMinEdit,'String'));
+        end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -486,12 +712,49 @@ end
 
 
 function yMinEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to yMinEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of yMinEdit as text
-%        str2double(get(hObject,'String')) returns contents of yMinEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        if isnan(str2double(get(handles.yMinEdit,'String')))
+            set(handles.xMinEdit,'String',...
+                num2str(control.axis.limits.y.min));
+        else
+            appdata.control.axis.limits.y.min = ...
+                str2double(get(handles.yMinEdit,'String'));
+        end
+    case 'B0 spectra'
+        if isnan(str2double(get(handles.yMinEdit,'String')))
+            set(handles.yMinEdit,'String',...
+                num2str(control.axis.limits.z.min));
+        else
+            appdata.control.axis.limits.z.min = ...
+                str2double(get(handles.yMinEdit,'String'));
+        end
+    case 'transients'
+        if isnan(str2double(get(handles.yMinEdit,'String')))
+            set(handles.yMinEdit,'String',...
+                num2str(control.axis.limits.z.min));
+        else
+            appdata.control.axis.limits.z.min = ...
+                str2double(get(handles.yMinEdit,'String'));
+        end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -509,12 +772,49 @@ end
 
 
 function xMaxEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to xMaxEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of xMaxEdit as text
-%        str2double(get(hObject,'String')) returns contents of xMaxEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        if isnan(str2double(get(handles.xMaxEdit,'String')))
+            set(handles.xMaxEdit,'String',...
+                num2str(control.axis.limits.x.max));
+        else
+            appdata.control.axis.limits.x.max = ...
+                str2double(get(handles.xMaxEdit,'String'));
+        end
+    case 'B0 spectra'
+        if isnan(str2double(get(handles.xMaxEdit,'String')))
+            set(handles.xMaxEdit,'String',...
+                num2str(control.axis.limits.y.max));
+        else
+            appdata.control.axis.limits.y.max = ...
+                str2double(get(handles.xMaxEdit,'String'));
+        end
+    case 'transients'
+        if isnan(str2double(get(handles.xMaxEdit,'String')))
+            set(handles.xMaxEdit,'String',...
+                num2str(control.axis.limits.x.max));
+        else
+            appdata.control.axis.limits.x.max = ...
+                str2double(get(handles.xMaxEdit,'String'));
+        end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -532,12 +832,49 @@ end
 
 
 function yMaxEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to yMaxEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of yMaxEdit as text
-%        str2double(get(hObject,'String')) returns contents of yMaxEdit as a double
+switch appdata.control.axis.displayType
+    case '2D plot'
+        if isnan(str2double(get(handles.yMaxEdit,'String')))
+            set(handles.yMaxEdit,'String',...
+                num2str(control.axis.limits.y.max));
+        else
+            appdata.control.axis.limits.y.max = ...
+                str2double(get(handles.yMaxEdit,'String'));
+        end
+    case 'B0 spectra'
+        if isnan(str2double(get(handles.yMaxEdit,'String')))
+            set(handles.yMaxEdit,'String',...
+                num2str(control.axis.limits.z.max));
+        else
+            appdata.control.axis.limits.z.max = ...
+                str2double(get(handles.yMaxEdit,'String'));
+        end
+    case 'transients'
+        if isnan(str2double(get(handles.yMaxEdit,'String')))
+            set(handles.yMaxEdit,'String',...
+                num2str(control.axis.limits.z.max));
+        else
+            appdata.control.axis.limits.z.max = ...
+                str2double(get(handles.yMaxEdit,'String'));
+        end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -551,15 +888,6 @@ function yMaxEdit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-% --- Executes on button press in Checkbox.
-function Checkbox_Callback(hObject, eventdata, handles)
-% hObject    handle to Checkbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of Checkbox
 
 
 % --------------------------------------------------------------------
@@ -602,12 +930,28 @@ end
 
 % --- Executes on selection change in spectraVisibleListbox.
 function spectraVisibleListbox_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraVisibleListbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
 % Hints: contents = get(hObject,'String') returns spectraVisibleListbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from spectraVisibleListbox
+% Refresh handles and appdata of the current GUI
+
+appdata.control.spectra.active = ...
+    appdata.control.spectra.visible{get(hObject,'Value')};
+
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_spectraVisibleListboxRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -625,23 +969,85 @@ end
 
 % --- Executes on button press in spectraPrevButton.
 function spectraPrevButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraPrevButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+if appdata.control.spectra.active == appdata.control.spectra.visible{1}
+    appdata.control.spectra.active = appdata.control.spectra.visible{end};
+else
+    appdata.control.spectra.active = appdata.control.spectra.visible{...
+        appdata.control.spectra.active-1};
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_spectraVisibleListboxRefresh(hObject);
 
 
 % --- Executes on button press in spectraNextButton.
 function spectraNextButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraNextButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+if appdata.control.spectra.active == appdata.control.spectra.visible{end}
+    appdata.control.spectra.active = appdata.control.spectra.visible{1};
+else
+    appdata.control.spectra.active = appdata.control.spectra.visible{...
+        appdata.control.spectra.active+1};
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_spectraVisibleListboxRefresh(hObject);
 
 
 % --- Executes on button press in spectraResetButton.
 function spectraResetButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraResetButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+appdata.data{appdata.control.spectra.active}.line.color = 'k';
+set(handles.lineColorPopupmenu,'Value',7);
+appdata.data{appdata.control.spectra.active}.line.style = '-';
+set(handles.lineStylePopupmenu,'Value',1);
+appdata.data{appdata.control.spectra.active}.line.marker = 'none';
+set(handles.lineMarkersPopupmenu,'Value',1);
+appdata.data{appdata.control.spectra.active}.line.width = 1;
+set(handles.lineWidthEdit,'String','1');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in gridXButton.
@@ -794,6 +1200,9 @@ switch contents{get(hObject,'Value')}
             values{k} = strrep(values{k},'0',' ');
         end
         set(handles.plotHighlightValuePopupmenu,'String',values);
+    case 'none'
+        set(handles.plotHighlightValuePopupmenu,'String',{''});
+        set(handles.plotHighlightValuePopupmenu,'Enable','inactive');        
 end
 set(handles.plotHighlightValuePopupmenu,'Value',1);
 
@@ -856,6 +1265,9 @@ switch methodContents{get(handles.plotHighlightMethodPopupmenu,'Value')}
         appdata.control.axis.highlight.value = ...
             getfield(appdata.control.highlight.Marker,...
             valueContents{get(handles.plotHighlightValuePopupmenu,'Value')});
+    case 'none'
+        appdata.control.axis.highlight.method = 'none';
+        appdata.control.axis.highlight.value = '';
 end
 
 % Refresh handles and appdata of the current GUI
@@ -894,12 +1306,25 @@ function plotHighlightColorPaletteButton_Callback(hObject, eventdata, handles)
 
 
 function legendLabelEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to legendLabelEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of legendLabelEdit as text
-%        str2double(get(hObject,'String')) returns contents of legendLabelEdit as a double
+appdata.data{appdata.control.spectra.active}.label = get(hObject,'String');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
+if_spectraVisibleListboxRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1090,7 +1515,15 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         % Set changed parameters of parentAppdata
         parentAppdata.control.axis.grid = appdata.control.axis.grid;
         parentAppdata.control.axis.legend = appdata.control.axis.legend;
+        parentAppdata.control.axis.labels = appdata.control.axis.labels;
+        parentAppdata.control.axis.limits = appdata.control.axis.limits;
         parentAppdata.control.axis.highlight = appdata.control.axis.highlight;
+        for k=1:length(appdata.control.spectra.visible)
+            parentAppdata.data{appdata.control.spectra.visible{k}}.line = ...
+                appdata.data{appdata.control.spectra.visible{k}}.line;
+            parentAppdata.data{appdata.control.spectra.visible{k}}.label = ...
+                appdata.data{appdata.control.spectra.visible{k}}.label;
+        end
         % Refresh appdata of the parent GUI
         parentAppdataFieldnames = fieldnames(parentAppdata);
         for k=1:length(parentAppdataFieldnames)
@@ -1104,4 +1537,59 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         % Refresh axes in main GUI
         trEPR_GUI_main('if_axis_Refresh',handles.callerHandle);
     end
+end
+
+function if_spectraVisibleListboxRefresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+visibleSpectraNames = cell(1,length(appdata.control.spectra.visible));
+for k=1:length(appdata.control.spectra.visible)
+    visibleSpectraNames{k} = ...
+        appdata.data{appdata.control.spectra.visible{k}}.label;
+end
+set(handles.spectraVisibleListbox,'String',visibleSpectraNames);
+set(handles.spectraVisibleListbox,'Value',appdata.control.spectra.active);
+
+% Set values of Line Style panel
+% Color, Style, Markers
+colorValues = {'b','g','r','c','m','y','k'};
+styleValues = {'-','--',':','-.'};
+markerValues = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+if isnumeric(appdata.data{appdata.control.spectra.active}.line.color)
+    set(...
+        handles.lineColorPopupmenu,...
+        'Value',...
+        length(colorValues)+1);
+else
+    set(...
+        handles.lineColorPopupmenu,...
+        'Value',...
+        ind(colorValues,appdata.data{appdata.control.spectra.active}.line.color));
+end
+set(...
+    handles.lineStylePopupmenu,...
+    'Value',...
+    ind(styleValues,appdata.data{appdata.control.spectra.active}.line.style));
+set(...
+    handles.lineMarkersPopupmenu,...
+    'Value',...
+    ind(markerValues,appdata.data{appdata.control.spectra.active}.line.marker));
+% Label, LineWidth
+set(handles.lineWidthEdit,'String',num2str(...
+    appdata.data{appdata.control.spectra.active}.line.width));
+set(handles.legendLabelEdit,'String',...
+    appdata.data{appdata.control.spectra.active}.label);
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
 end

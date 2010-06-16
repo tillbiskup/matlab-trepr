@@ -23,7 +23,7 @@ p.parse(array,key,varargin{:});
 index = [];
 if iscell(array)
     for k=1:length(array)
-        if isscalar(key)
+        if isnumeric(key)
             if array{k}==key, index(end+1)=k; end
         elseif ischar(key)
             if strcmp(array{k},key), index(end+1)=k; end
