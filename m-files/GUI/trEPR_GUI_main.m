@@ -1514,6 +1514,7 @@ zh = zoom(handles.figure1);
 set(zh,'Enable','off');
 
 if get(handles.measureSinglePointButton,'Value')
+    set(handles.measureTwoPointButton,'Value',0);
     set(handles.measureX2editIndex,'String','1');
     set(handles.measureY2editIndex,'String','1');
     set(handles.measureDeltaXeditIndex,'String','0');
@@ -1560,6 +1561,7 @@ zh = zoom(handles.figure1);
 set(zh,'Enable','off');
 
 if get(handles.measureTwoPointButton,'Value')
+    set(handles.measureSinglePointButton,'Value',0);
     appdata.control.measure.point = 1;
     set(handles.figure1,'WindowButtonMotionFcn',@if_trackPointer);
     set(handles.figure1,'WindowButtonDownFcn',@if_switchMeasurementPoint);
