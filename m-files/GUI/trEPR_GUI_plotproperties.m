@@ -1570,9 +1570,74 @@ function axesConvert2G_Callback(hObject, eventdata, handles)
 
 % --- Executes on button press in axesLimOptButton.
 function axesLimOptButton_Callback(hObject, eventdata, handles)
-% hObject    handle to axesLimOptButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+for k=1:length(appdata.control.spectra.visible)
+    xLimits(k,:) = [...
+       min(appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values) ...
+       max(appdata.data{appdata.control.spectra.visible{k}}.axes.xaxis.values) ...                
+       ];    
+    yLimits(k,:) = [...
+       min(appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values) ...
+       max(appdata.data{appdata.control.spectra.visible{k}}.axes.yaxis.values) ...                
+       ];    
+    zLimits(k,:) = [...
+       min(min(appdata.data{appdata.control.spectra.visible{k}}.data)) ...
+       max(max(appdata.data{appdata.control.spectra.visible{k}}.data)) ...                
+       ];    
+end
+appdata.control.axis.limits.x.min = min(min(xLimits));
+appdata.control.axis.limits.x.max = max(max(xLimits));
+appdata.control.axis.limits.y.min = min(min(yLimits));
+appdata.control.axis.limits.y.max = max(max(yLimits));
+appdata.control.axis.limits.z.min = min(min(zLimits))*1.05;
+appdata.control.axis.limits.z.max = max(max(zLimits))*1.05;
+
+% Set values in limits edit fields to new values
+switch appdata.control.axis.displayType
+    case '2D plot'
+        set(handles.xMinEdit,'String',...
+            num2str(appdata.control.axis.limits.x.min));
+        set(handles.xMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.x.max));
+        set(handles.yMinEdit,'String',...
+            num2str(appdata.control.axis.limits.y.min));
+        set(handles.yMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.y.max));
+    case 'B0 spectra'
+        set(handles.xMinEdit,'String',...
+            num2str(appdata.control.axis.limits.y.min));
+        set(handles.xMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.y.max));
+        set(handles.yMinEdit,'String',...
+            num2str(appdata.control.axis.limits.z.min));
+        set(handles.yMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.z.max));
+    case 'transients'
+        set(handles.xMinEdit,'String',...
+            num2str(appdata.control.axis.limits.x.min));
+        set(handles.xMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.x.max));
+        set(handles.yMinEdit,'String',...
+            num2str(appdata.control.axis.limits.z.min));
+        set(handles.yMaxEdit,'String',...
+            num2str(appdata.control.axis.limits.z.max));
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes on button press in functionsGAxisShowButton.
@@ -1704,100 +1769,3 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
-
-
-% --- Executes on button press in togglebutton27.
-function togglebutton27_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton27 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton27
-
-
-% --- Executes on button press in togglebutton28.
-function togglebutton28_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton28 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton28
-
-
-% --- Executes on button press in togglebutton29.
-function togglebutton29_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton29 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton29
-
-
-% --- Executes on button press in togglebutton30.
-function togglebutton30_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton30 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton30
-
-
-% --- Executes on button press in togglebutton31.
-function togglebutton31_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton31 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton31
-
-
-% --- Executes on button press in togglebutton32.
-function togglebutton32_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton32 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton32
-
-
-% --- Executes on button press in togglebutton33.
-function togglebutton33_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton33 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton33
-
-
-% --- Executes on button press in togglebutton34.
-function togglebutton34_Callback(hObject, eventdata, handles)
-% hObject    handle to togglebutton34 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of togglebutton34
-
-
-
-function edit21_Callback(hObject, eventdata, handles)
-% hObject    handle to legendLabelEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of legendLabelEdit as text
-%        str2double(get(hObject,'String')) returns contents of legendLabelEdit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit21_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to legendLabelEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
