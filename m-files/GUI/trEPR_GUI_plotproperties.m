@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_plotproperties(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_plotproperties
 
-% Last Modified by GUIDE v2.5 15-Jun-2010 18:24:03
+% Last Modified by GUIDE v2.5 17-Jun-2010 11:48:23
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -219,6 +219,33 @@ switch control.axis.highlight.method
             handles.plotHighlightValuePopupmenu,...
             'Value',...
             control.axis.highlight.value);
+    case 'Color'
+        highlightValueNames = fieldnames(...
+            getfield(...
+            control.highlight,...
+            strrep(control.axis.highlight.method,'Line','')));
+        set(handles.plotHighlightValuePopupmenu,'String',...
+            highlightValueNames...
+            );
+        highlightValues = cell(1,length(highlightValueNames));
+        for k = 1:length(highlightValueNames)
+            highlightValues{k} = getfield(...
+                getfield(...
+                control.highlight,...
+                strrep(control.axis.highlight.method,'Line','')),...
+                highlightValueNames{k});
+        end
+        if isnumeric(control.axis.highlight.value)
+            set(...
+                handles.plotHighlightValuePopupmenu,...
+                'Value',...
+                8);
+        else
+            set(...
+                handles.plotHighlightValuePopupmenu,...
+                'Value',...
+                ind(highlightValues,control.axis.highlight.value));
+        end
     case 'none'
         set(...
             handles.plotHighlightValuePopupmenu,...
@@ -668,34 +695,6 @@ function colorPalettePushbutton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 trEPR_GUI_colorpalette;
-
-
-% --- Executes on button press in normalizePkPkCheckbox.
-function normalizePkPkCheckbox_Callback(hObject, eventdata, handles)
-% hObject    handle to normalizePkPkCheckbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of normalizePkPkCheckbox
-
-
-% --- Executes on button press in normalizeCheckbox.
-function normalizeCheckbox_Callback(hObject, eventdata, handles)
-% hObject    handle to normalizeCheckbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of normalizeCheckbox
-
-
-% --- Executes on button press in convertG2mTCheckbox.
-function convertG2mTCheckbox_Callback(hObject, eventdata, handles)
-% hObject    handle to convertG2mTCheckbox (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of convertG2mTCheckbox
-
 
 
 function xMinEdit_Callback(hObject, eventdata, handles)
@@ -1551,6 +1550,67 @@ end
 if_parentAppdataRefresh(hObject);
 
 
+% --- Executes on button press in axesConvert2mT.
+function axesConvert2mT_Callback(hObject, eventdata, handles)
+% hObject    handle to axesConvert2mT (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of axesConvert2mT
+
+
+% --- Executes on button press in axesConvert2G.
+function axesConvert2G_Callback(hObject, eventdata, handles)
+% hObject    handle to axesConvert2G (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of axesConvert2G
+
+
+% --- Executes on button press in axesLimOptButton.
+function axesLimOptButton_Callback(hObject, eventdata, handles)
+% hObject    handle to axesLimOptButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in functionsGAxisShowButton.
+function functionsGAxisShowButton_Callback(hObject, eventdata, handles)
+% hObject    handle to functionsGAxisShowButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of functionsGAxisShowButton
+
+
+% --- Executes on button press in functionsGAxisConvertButton.
+function functionsGAxisConvertButton_Callback(hObject, eventdata, handles)
+% hObject    handle to functionsGAxisConvertButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of functionsGAxisConvertButton
+
+
+% --- Executes on button press in functionsNormalize01Button.
+function functionsNormalize01Button_Callback(hObject, eventdata, handles)
+% hObject    handle to functionsNormalize01Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of functionsNormalize01Button
+
+
+% --- Executes on button press in functionsNormalizePkPkButton.
+function functionsNormalizePkPkButton_Callback(hObject, eventdata, handles)
+% hObject    handle to functionsNormalizePkPkButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of functionsNormalizePkPkButton
+
+
 function if_parentAppdataRefresh(hObject)
 
 % Get handles and appdata of the current GUI
@@ -1644,3 +1704,100 @@ for k=1:length(appdataFieldnames)
       getfield(appdata,appdataFieldnames{k})...
       );
 end
+
+
+% --- Executes on button press in togglebutton27.
+function togglebutton27_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton27 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton27
+
+
+% --- Executes on button press in togglebutton28.
+function togglebutton28_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton28 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton28
+
+
+% --- Executes on button press in togglebutton29.
+function togglebutton29_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton29 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton29
+
+
+% --- Executes on button press in togglebutton30.
+function togglebutton30_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton30 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton30
+
+
+% --- Executes on button press in togglebutton31.
+function togglebutton31_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton31 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton31
+
+
+% --- Executes on button press in togglebutton32.
+function togglebutton32_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton32 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton32
+
+
+% --- Executes on button press in togglebutton33.
+function togglebutton33_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton33 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton33
+
+
+% --- Executes on button press in togglebutton34.
+function togglebutton34_Callback(hObject, eventdata, handles)
+% hObject    handle to togglebutton34 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of togglebutton34
+
+
+
+function edit21_Callback(hObject, eventdata, handles)
+% hObject    handle to legendLabelEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of legendLabelEdit as text
+%        str2double(get(hObject,'String')) returns contents of legendLabelEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit21_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to legendLabelEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
