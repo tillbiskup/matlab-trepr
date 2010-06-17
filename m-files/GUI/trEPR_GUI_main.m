@@ -2275,6 +2275,7 @@ if isempty(appdata.control.spectra.visible{1})
     set(handles.spectraAccumulateButton,'Enable','Off');
     set(handles.axisZoomInButton,'Enable','Off');
     set(handles.axisFullScaleButton,'Enable','Off');
+    set(handles.axisPlotPropertiesButton,'Enable','Off');
     set(handles.spectraSaveButton,'Enable','Off');
     set(handles.axisResetButton,'Enable','Off');
     set(handles.axisExportButton,'Enable','Off');
@@ -2299,6 +2300,7 @@ else
     set(handles.spectraRemoveButton,'Enable','On');
     set(handles.axisZoomInButton,'Enable','On');
     set(handles.axisFullScaleButton,'Enable','On');
+    set(handles.axisPlotPropertiesButton,'Enable','On');
     if length(appdata.control.spectra.visible) > 1
         set(handles.spectraAccumulateButton,'Enable','On');
         set(handles.spectraPrevButton,'Enable','On');
@@ -4113,9 +4115,10 @@ if_axis_Refresh(handles.figure1);
 
 % --- Executes on button press in axisPlotPropertiesButton.
 function axisPlotPropertiesButton_Callback(hObject, eventdata, handles)
-% hObject    handle to axisPlotPropertiesButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+trEPR_GUI_plotproperties(...
+    'callerFunction',mfilename,...
+    'callerHandle',hObject);
 
 
 % --- Executes on button press in axisMathButton.
