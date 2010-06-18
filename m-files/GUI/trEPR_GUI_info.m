@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 17-Jun-2010 23:05:38
+% Last Modified by GUIDE v2.5 18-Jun-2010 12:26:36
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,6 +74,24 @@ if iscell(varargin)
     end
 end
 
+% Set application data (at this stage only empty structures)
+data = cell(1); % store the data (spectra) together with their information
+configuration = struct(); % store the configuration information for the GUI
+% --- store important control values, such as the currently active spectrum etc.
+control = struct(...
+    'spectra', struct(...
+    'active',0,...
+    'visible',cell(1),...
+    'filenames',cell(1)...
+    )...
+);
+appdataHandles = struct();
+
+setappdata(handles.figure1,'data',data);
+setappdata(handles.figure1,'configuration',configuration);
+setappdata(handles.figure1,'control',control);
+setappdata(handles.figure1,'handles',appdataHandles);
+
 % add handle of this GUI to handles structure of the calling gui in case
 % this function has been called from another GUI
 if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
@@ -85,218 +103,342 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
     guidata(handles.callerHandle,callerHandles);
 end
 
-% Display Information of currently active spectrum on opening
-if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+% Get appdata from parent window
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')    
     callerHandles = guidata(handles.callerHandle);
-    if isfield(callerHandles,mfilename)
+    if isfield(callerHandles,mfilename)        
 
         % Get appdata of the parent GUI
         parentAppdata = getappdata(callerHandles.figure1);
         
-        [path name ext] = fileparts(...
-            parentAppdata.data{parentAppdata.control.spectra.active}.filename...
-            );
-        
-        set(handles.headlineText,'String',...
-            strrep(...
-            get(handles.headlineText,'String'),...
-            'FILENAME',...
-            sprintf('"%s"',name)...
-            ));
+        data = parentAppdata.data;
+        control = parentAppdata.control;
+        setappdata(handles.figure1,'data',data);
+        setappdata(handles.figure1,'control',control);
+        setappdata(handles.figure1,'configuration',configuration);
+        setappdata(handles.figure1,'handles',handles);
+    end
+    guidata(handles.callerHandle,callerHandles);
+end
 
-        % Display parameters that should always be there
+% Display Information of currently active spectrum on opening
+if exist('data','var') && ~isempty(data{1})
+    % Set number of spectrum to display information for
+    if ~isfield(handles,'Spectrum')
+        handles.Spectrum = parentAppdata.control.spectra.active;
+    end
+        
+    [path name ext] = fileparts(...
+        data{handles.Spectrum}.filename...
+        );
+        
+    set(handles.headlineText,'String',...
+        strrep(...
+        get(handles.headlineText,'String'),...
+        'FILENAME',...
+        sprintf('"%s"',name)...
+        ));
+
+    % Display parameters that should always be there
+    set(...
+        handles.fieldStartEdit,...
+        'String',...
+        num2str(min(data{handles.Spectrum}.axes.yaxis.values)));
+    set(...
+        handles.fieldEndEdit,...
+        'String',...
+        num2str(max(data{handles.Spectrum}.axes.yaxis.values)));
+    set(...
+        handles.fieldStepEdit,...
+        'String',...
+        num2str(data{handles.Spectrum}.axes.yaxis.values(2)-...
+        data{handles.Spectrum}.axes.yaxis.values(1)));
+    set(handles.fieldUnitPopupmenu,'Value',...
+        ind(get(handles.fieldUnitPopupmenu,'String'),...
+        data{handles.Spectrum}.axes.yaxis.unit));
+    set(...
+        handles.timeStartEdit,...
+        'String',...
+        num2str(min(data{handles.Spectrum}.axes.xaxis.values)));
+    set(...
+        handles.timeEndEdit,...
+        'String',...
+        num2str(max(data{handles.Spectrum}.axes.xaxis.values)));
+    set(...
+        handles.timeStepEdit,...
+        'String',...
+        num2str(data{handles.Spectrum}.axes.xaxis.values(2)-...
+        data{handles.Spectrum}.axes.xaxis.values(1)));
+    set(handles.timeUnitPopupmenu,'Value',...
+        ind(get(handles.timeUnitPopupmenu,'String'),...
+        data{handles.Spectrum}.axes.xaxis.unit));
+    set(...
+        handles.labelEdit,...
+        'String',...
+        data{handles.Spectrum}.label);
+    set(...
+        handles.fileNameEdit,...
+        'String',...
+        data{handles.Spectrum}.filename);
+
+    % Mark fields with red background that are necessary but not filled
+    if isempty(get(handles.fieldStartEdit,'String'))
         set(...
             handles.fieldStartEdit,...
-            'String',...
-            num2str(min(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.yaxis.values)));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.fieldEndEdit,'String'))
         set(...
             handles.fieldEndEdit,...
-            'String',...
-            num2str(max(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.yaxis.values)));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.fieldStepEdit,'String'))
         set(...
             handles.fieldStepEdit,...
-            'String',...
-            num2str(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.yaxis.values(2)-...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.yaxis.values(1)));
-        set(handles.fieldUnitPopupmenu,'Value',...
-            ind(get(handles.fieldUnitPopupmenu,'String'),...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.yaxis.unit));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.timeStartEdit,'String'))
         set(...
             handles.timeStartEdit,...
-            'String',...
-            num2str(min(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.xaxis.values)));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.timeEndEdit,'String'))
         set(...
             handles.timeEndEdit,...
-            'String',...
-            num2str(max(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.xaxis.values)));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.timeStepEdit,'String'))
         set(...
             handles.timeStepEdit,...
-            'String',...
-            num2str(parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.xaxis.values(2)-...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.xaxis.values(1)));
-        set(handles.timeUnitPopupmenu,'Value',...
-            ind(get(handles.timeUnitPopupmenu,'String'),...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.axes.xaxis.unit));
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.labelEdit,'String'))
         set(...
             handles.labelEdit,...
-            'String',...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.label);
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
+    if isempty(get(handles.fileNameEdit,'String'))
         set(...
             handles.fileNameEdit,...
-            'String',...
-            parentAppdata.data{...
-            parentAppdata.control.spectra.active}.filename);
+            'BackgroundColor',...
+            [1 0.8 0.8]);
+    end
 
-        % Display only something if there is something to display
-        if parentAppdata.control.spectra.active > 0
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active},'header')
-                set(...
-                    handles.headerEdit,...
-                    'String',...
-                    parentAppdata.data{parentAppdata.control.spectra.active}.header);
-            else
-                set(...
-                    handles.headerEdit,...
-                    'String',...
-                    '');
+    % Display only something if there is something to display
+    if handles.Spectrum > 0
+        if isfield(data{handles.Spectrum},'header')
+            for k=1:length(data{handles.Spectrum}.header)
+                header{k} = sprintf('%i: %s',k,...
+                    data{handles.Spectrum}.header{k});
             end
+            set(...
+                handles.headerEdit,...
+                'String',...
+                header);
+        else
+            set(...
+                handles.headerEdit,...
+                'String',...
+                '');
+        end
+        if isfield(data{handles.Spectrum}.parameters.bridge,'MWfrequency')
             set(...
                 handles.microwaveFrequencyEdit,...
                 'String',...
-                parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.MWfrequency);
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge,'attenuation')
+                data{handles.Spectrum}.parameters.bridge.MWfrequency);
+        else
+            set(...
+                handles.microwaveFrequencyEdit,...
+                'String',...
+                '');
+        end
+        if isempty(get(handles.microwaveFrequencyEdit,'String'))
+            set(...
+                handles.microwaveFrequencyEdit,...
+                'BackgroundColor',...
+                [1 0.8 0.8]);
+        end
+        if isfield(data{handles.Spectrum}.parameters.bridge,'attenuation')
+            set(...
+                handles.microwaveAttenuationEdit,...
+                'String',...
+                data{handles.Spectrum}.parameters.bridge.attenuation);
+        else
+            set(...
+                handles.microwaveAttenuationEdit,...
+                'String',...
+                '');
+        end
+        if isempty(get(handles.microwaveAttenuationEdit,'String'))
+            set(...
+                handles.microwaveAttenuationEdit,...
+                'BackgroundColor',...
+                [1 0.8 0.8]);
+        end
+        if isfield(data{handles.Spectrum}.parameters.bridge,'MWpower')
+            set(...
+                handles.microwavePowerEdit,...
+                'String',...
+                data{handles.Spectrum}.parameters.bridge.MWpower.value);
+        else
+            set(...
+                handles.microwavePowerEdit,...
+                'String',...
+                '');
+        end
+        if isfield(data{handles.Spectrum}.parameters.bridge,'videogain')
+            set(...
+                handles.videoGainEdit,...
+                'String',...
+                data{handles.Spectrum}.parameters.bridge.videogain.value);
+        else
+            set(...
+                handles.videoGainEdit,...
+                'String',...
+                '');
+        end
+        if isfield(data{handles.Spectrum}.parameters.bridge,'bandwidth')
+            set(...
+                handles.bandwidthEdit,...
+                'String',...
+                data{handles.Spectrum}.parameters.bridge.bandwidth.value);
+        else
+            set(...
+                handles.bandwidthEdit,...
+                'String',...
+                '');
+        end
+        if isfield(data{handles.Spectrum}.parameters,'laser')
+            if isfield(data{handles.Spectrum}.parameters.laser,'wavelength')
                 set(...
-                    handles.microwaveAttenuationEdit,...
+                    handles.laserWavelengthEdit,...
                     'String',...
-                    parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.attenuation);
-            else
-                set(...
-                    handles.microwaveAttenuationEdit,...
-                    'String',...
-                    '');
-            end
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge,'power')
-                set(...
-                    handles.microwavePowerEdit,...
-                    'String',...
-                    parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.power);
-            else
-                set(...
-                    handles.microwavePowerEdit,...
-                    'String',...
-                    '');
-            end
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters,'laser')
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser,'wavelength')
-                    set(...
-                        handles.laserWavelengthEdit,...
-                        'String',...
-                        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.wavelength);
-                else
-                    set(...
-                        handles.laserWavelengthEdit,...
-                        'String',...
-                        '');
-                end
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser,'repetitionRate')
-                    set(...
-                        handles.laserRepetitionRateEdit,...
-                        'String',...
-                        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.repetitionRate);
-                else
-                    set(...
-                        handles.laserRepetitionRateEdit,...
-                        'String',...
-                        '');
-                end
+                    data{handles.Spectrum}.parameters.laser.wavelength);
             else
                 set(...
                     handles.laserWavelengthEdit,...
                     'String',...
                     '');
+            end
+            if isfield(data{handles.Spectrum}.parameters.laser,'repetitionRate')
                 set(...
                     handles.laserRepetitionRateEdit,...
                     'String',...
-                    '');
-            end
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters,'temperature')
-                set(...
-                    handles.temperatureEdit,...
-                    'String',...
-                    parentAppdata.data{parentAppdata.control.spectra.active}.parameters.temperature);
+                    data{handles.Spectrum}.parameters.laser.repetitionRate);
             else
                 set(...
-                    handles.temperatureEdit,...
+                     handles.laserRepetitionRateEdit,...
                     'String',...
                     '');
             end
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters,'transient')
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.transient,'points')
-                    set(...
-                        handles.timeLengthPointsEdit,...
-                        'String',...
-                        num2str(max(parentAppdata.data{...
-                        parentAppdata.control.spectra.active}.parameters.transient.points)));
-                else
-                    set(...
-                        handles.timeLengthPointsEdit,...
-                        'String',...
-                        '');
-                end                    
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.transient,'length')
-                    set(...
-                        handles.timeLengthTimeEdit,...
-                        'String',...
-                        num2str(max(parentAppdata.data{...
-                        parentAppdata.control.spectra.active}.parameters.transient.length)));
-                else
-                    set(...
-                        handles.timeLengthTimeEdit,...
-                        'String',...
-                        '');
-                end                    
-            end
-            if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters,'recorder')
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.recorder,'sensitivity')
-                    set(...
-                        handles.sensitivityEdit,...
-                        'String',...
-                        num2str(max(parentAppdata.data{...
-                        parentAppdata.control.spectra.active}.parameters.recorder.sensitivity)));
-                else
-                    set(...
-                        handles.sensitivityEdit,...
-                        'String',...
-                        '');
-                end                    
-                if isfield(parentAppdata.data{parentAppdata.control.spectra.active}.parameters.recorder,'averages')
-                    set(...
-                        handles.averagesEdit,...
-                        'String',...
-                        num2str(max(parentAppdata.data{...
-                        parentAppdata.control.spectra.active}.parameters.recorder.averages)));
-                else
-                    set(...
-                        handles.averagesEdit,...
-                        'String',...
-                        '');
-                end                    
-            end
         else
-            set(handles.headerEdit,'String',cell(0));
+            set(...
+                handles.laserWavelengthEdit,...
+                'String',...
+                '');
+            set(...
+                handles.laserRepetitionRateEdit,...
+                'String',...
+                '');
         end
-
+        if isempty(get(handles.laserWavelengthEdit,'String'))
+            set(...
+                handles.laserWavelengthEdit,...
+                'BackgroundColor',...
+                [1 0.8 0.8]);
+        end
+        if isempty(get(handles.laserRepetitionRateEdit,'String'))
+            set(...
+                handles.laserRepetitionRateEdit,...
+                'BackgroundColor',...
+                [1 0.8 0.8]);
+        end
+        if isfield(data{handles.Spectrum}.parameters,'temperature')
+            set(...
+                handles.temperatureEdit,...
+                'String',...
+                data{handles.Spectrum}.parameters.temperature);
+        else
+            set(...
+                handles.temperatureEdit,...
+                'String',...
+                '');
+        end
+        if isempty(get(handles.temperatureEdit,'String'))
+            set(...
+                handles.temperatureEdit,...
+                'BackgroundColor',...
+                [1 0.8 0.8]);
+        end
+        if isfield(data{handles.Spectrum}.parameters,'transient')
+            if isfield(data{handles.Spectrum}.parameters.transient,'points')
+                set(...
+                    handles.timeLengthPointsEdit,...
+                    'String',...
+                    num2str(data{...
+                    handles.Spectrum}.parameters.transient.points));
+            else
+                set(...
+                    handles.timeLengthPointsEdit,...
+                    'String',...
+                    '');
+            end                    
+            if isfield(data{handles.Spectrum}.parameters.transient,'length')
+                set(...
+                    handles.timeLengthTimeEdit,...
+                    'String',...
+                    num2str(data{...
+                    handles.Spectrum}.parameters.transient.length));
+            else
+                set(...
+                    handles.timeLengthTimeEdit,...
+                    'String',...
+                    '');
+            end                    
+        end
+        if isfield(data{handles.Spectrum}.parameters,'recorder')
+            if isfield(data{handles.Spectrum}.parameters.recorder,'sensitivity')
+                set(...
+                    handles.sensitivityEdit,...
+                    'String',...
+                    num2str(data{...
+                    handles.Spectrum}.parameters.recorder.sensitivity.value));
+            else
+                set(...
+                    handles.sensitivityEdit,...
+                    'String',...
+                    '');
+            end
+            if isfield(data{handles.Spectrum}.parameters.recorder.sensitivity,'unit') && ...
+                    ~isempty(data{handles.Spectrum}.parameters.recorder.sensitivity.unit)
+                set(handles.sensitivityUnitPopupmenu,'Value',...
+                    ind(get(handles.sensitivityUnitPopupmenu,'String'),...
+                    data{handles.Spectrum}.parameters.recorder.sensitivity.unit));
+            else
+                set(handles.sensitivityUnitPopupmenu,'Value',1);
+            end
+            if isfield(data{handles.Spectrum}.parameters.recorder,'averages')
+                set(...
+                    handles.averagesEdit,...
+                    'String',...
+                    num2str(data{...
+                    handles.Spectrum}.parameters.recorder.averages));
+            else
+                set(...
+                    handles.averagesEdit,...
+                    'String',...
+                    '');
+            end                    
+        end
+    else
+        set(handles.headerEdit,'String',cell(0));
     end
     guidata(handles.callerHandle,callerHandles);
 end
@@ -348,7 +490,8 @@ function closePushbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-close;
+%close;
+closeGUI(hObject, eventdata, handles);
 
 
 function dscFilenameEdit_Callback(hObject, eventdata, handles)
@@ -373,28 +516,38 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in savePushbutton.
-function savePushbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to savePushbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in newPushbutton.
-function newPushbutton_Callback(hObject, eventdata, handles)
-% hObject    handle to newPushbutton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-
 function microwaveAttenuationEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to microwaveAttenuationEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of microwaveAttenuationEdit as text
-%        str2double(get(hObject,'String')) returns contents of microwaveAttenuationEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.attenuation = ...
+    str2double(get(handles.microwaveAttenuationEdit,'String'));
+
+if isempty(get(handles.microwaveAttenuationEdit,'String'))
+    set(...
+    	handles.microwaveAttenuationEdit,...
+        'BackgroundColor',...
+        [1 0.8 0.8]);
+else
+    set(...
+    	handles.microwaveAttenuationEdit,...
+        'BackgroundColor',...
+        [1 1 1]);
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -412,12 +565,37 @@ end
 
 
 function microwaveFrequencyEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to microwaveFrequencyEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of microwaveFrequencyEdit as text
-%        str2double(get(hObject,'String')) returns contents of microwaveFrequencyEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.MWfrequency = ...
+    str2double(get(handles.microwaveFrequencyEdit,'String'));
+
+if isempty(get(handles.microwaveFrequencyEdit,'String'))
+    set(...
+    	handles.microwaveFrequencyEdit,...
+        'BackgroundColor',...
+        [1 0.8 0.8]);
+else
+    set(...
+    	handles.microwaveFrequencyEdit,...
+        'BackgroundColor',...
+        [1 1 1]);
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -435,12 +613,36 @@ end
 
 
 function temperatureEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to temperatureEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of temperatureEdit as text
-%        str2double(get(hObject,'String')) returns contents of temperatureEdit as a double
+appdata.data{handles.Spectrum}.parameters.temperature = ...
+    str2double(get(handles.temperatureEdit,'String'));
+
+if isempty(get(handles.temperatureEdit,'String'))
+    set(...
+    	handles.temperatureEdit,...
+        'BackgroundColor',...
+        [1 0.8 0.8]);
+else
+    set(...
+    	handles.temperatureEdit,...
+        'BackgroundColor',...
+        [1 1 1]);
+end
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -458,12 +660,37 @@ end
 
 
 function laserRepetitionRateEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to laserRepetitionRateEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of laserRepetitionRateEdit as text
-%        str2double(get(hObject,'String')) returns contents of laserRepetitionRateEdit as a double
+appdata.data{handles.Spectrum}.parameters.laser.repetitionRate = ...
+    str2double(get(handles.laserRepetitionRateEdit,'String'));
+
+if isempty(get(handles.laserRepetitionRateEdit,'String'))
+    set(...
+    	handles.laserRepetitionRateEdit,...
+        'BackgroundColor',...
+        [1 0.8 0.8]);
+else
+    set(...
+    	handles.laserRepetitionRateEdit,...
+        'BackgroundColor',...
+        [1 1 1]);
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -481,12 +708,37 @@ end
 
 
 function laserWavelengthEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to laserWavelengthEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of laserWavelengthEdit as text
-%        str2double(get(hObject,'String')) returns contents of laserWavelengthEdit as a double
+appdata.data{handles.Spectrum}.parameters.laser.wavelength = ...
+    str2double(get(handles.laserWavelengthEdit,'String'));
+
+if isempty(get(handles.laserWavelengthEdit,'String'))
+    set(...
+    	handles.laserWavelengthEdit,...
+        'BackgroundColor',...
+        [1 0.8 0.8]);
+else
+    set(...
+    	handles.laserWavelengthEdit,...
+        'BackgroundColor',...
+        [1 1 1]);
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -504,41 +756,9 @@ end
 
 % --- Executes on button press in addParamApplyButton.
 function addParamApplyButton_Callback(hObject, eventdata, handles)
-% hObject    handle to addParamApplyButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
-    callerHandles = guidata(handles.callerHandle);
-    if isfield(callerHandles,mfilename)
+if_parentAppdataRefresh(hObject);
 
-        % Get appdata of the parent GUI
-        parentAppdata = getappdata(callerHandles.figure1);
-
-        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.MWfrequency = ...
-            str2double(get(handles.microwaveFrequencyEdit,'String'));
-        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.bridge.attenuation = ...
-            str2double(get(handles.microwaveAttenuationEdit,'String'));
-        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.wavelength = ...
-            str2double(get(handles.laserWavelengthEdit,'String'));
-        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.laser.repetitionRate = ...
-            str2double(get(handles.laserRepetitionRateEdit,'String'));
-        parentAppdata.data{parentAppdata.control.spectra.active}.parameters.temperature = ...
-            str2double(get(handles.temperatureEdit,'String'));
-
-        % Refresh appdata of the parent GUI
-        parentAppdataFieldnames = fieldnames(parentAppdata);
-        for k=1:length(parentAppdataFieldnames)
-        	setappdata(...
-                callerHandles.figure1,...
-                parentAppdataFieldnames{k},...
-                getfield(parentAppdata,...
-                parentAppdataFieldnames{k})...
-                );
-        end
-    end
-    guidata(handles.callerHandle,callerHandles);
-end
 
 % --------------------------------------------------------------------
 function closeGUI(varargin)
@@ -554,6 +774,49 @@ if nargin == 3
     handles = varargin{3};
 else
     handles = guidata(gcbo);
+end
+
+necessaryFields = {...
+    'fieldStartEdit',...
+    'fieldEndEdit',...
+    'fieldStepEdit',...
+    'timeStartEdit',...
+    'timeEndEdit',...
+    'timeStepEdit',...
+    'timeLengthTimeEdit',...
+    'timeLengthPointsEdit',...
+    'laserWavelengthEdit',...
+    'laserRepetitionRateEdit',...
+    'microwaveFrequencyEdit',...
+    'microwaveAttenuationEdit',...
+    'averagesEdit',...
+    'temperatureEdit',...
+    'labelEdit'...
+    };
+missingFields = {};
+for k = 1:length(necessaryFields)
+    if isempty(get(getfield(handles,necessaryFields{k}),'String'))
+        missingFields{end+1}=necessaryFields{k};
+    end
+end
+if ~isempty(missingFields)
+    selection = questdlg(...
+        sprintf('%s %s\n - %s\n - %s\n\n%s',...
+        'There are empty, but necessary fields left in the GUI.',...
+        'Do you want to',...
+        'cancel the closing of the GUI and further edit, or ',...
+        'close anyway (what can cause errors later)?',...
+        'In any case you can later on edit these parameters again.'),...
+        'Empty, but necessary fields exist. Really quit?',...
+        'Cancel',...
+        'Close',...
+        'Cancel');
+
+    switch selection,
+        case 'Cancel',
+            return;
+        otherwise
+    end
 end
 
 % removes handle of this GUI from handles structure of the calling gui in
@@ -648,12 +911,25 @@ end
 
 
 function timeLengthTimeEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to timeLengthTimeEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of timeLengthTimeEdit as text
-%        str2double(get(hObject,'String')) returns contents of timeLengthTimeEdit as a double
+appdata.data{handles.Spectrum}.parameters.transient.length = ...
+    str2double(get(handles.timeLengthTimeEdit,'String'));
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -671,12 +947,25 @@ end
 
 
 function timeLengthPointsEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to timeLengthPointsEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of timeLengthPointsEdit as text
-%        str2double(get(hObject,'String')) returns contents of timeLengthPointsEdit as a double
+appdata.data{handles.Spectrum}.parameters.transient.points = ...
+    str2double(get(handles.timeLengthPointsEdit,'String'));
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -690,30 +979,6 @@ function timeLengthPointsEdit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-
-
-function edit13_Callback(hObject, eventdata, handles)
-% hObject    handle to edit13 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit13 as text
-%        str2double(get(hObject,'String')) returns contents of edit13 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit13_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit13 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
 
 
 function timeEndEdit_Callback(hObject, eventdata, handles)
@@ -738,7 +1003,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function timeStepEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to timeStepEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -761,83 +1025,29 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
-function edit16_Callback(hObject, eventdata, handles)
-% hObject    handle to edit16 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit16 as text
-%        str2double(get(hObject,'String')) returns contents of edit16 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit16_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit16 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function noScansEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to noScansEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of noScansEdit as text
-%        str2double(get(hObject,'String')) returns contents of noScansEdit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function noScansEdit_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to noScansEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit18_Callback(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit18 as text
-%        str2double(get(hObject,'String')) returns contents of edit18 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit18_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit18 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
 function microwavePowerEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to microwavePowerEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of microwavePowerEdit as text
-%        str2double(get(hObject,'String')) returns contents of microwavePowerEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.MWpower.value = ...
+    str2double(get(handles.microwavePowerEdit,'String'));
+MWpowerUnits = get(handles.microwavePowerUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.parameters.bridge.MWpower.unit = ...
+    MWpowerUnits{get(handles.microwavePowerUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -855,12 +1065,26 @@ end
 
 % --- Executes on selection change in fieldUnitPopupmenu.
 function fieldUnitPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to fieldUnitPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns fieldUnitPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from fieldUnitPopupmenu
+sensitivityUnits = get(handles.fieldUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.axes.yaxis.unit = ...
+    sensitivityUnits{get(handles.fieldUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -878,12 +1102,26 @@ end
 
 % --- Executes on selection change in timeUnitPopupmenu.
 function timeUnitPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to timeUnitPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns timeUnitPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from timeUnitPopupmenu
+sensitivityUnits = get(handles.timeUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.axes.xaxis.unit = ...
+    sensitivityUnits{get(handles.timeUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -901,12 +1139,32 @@ end
 
 
 function sensitivityEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to sensitivityEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of sensitivityEdit as text
-%        str2double(get(hObject,'String')) returns contents of sensitivityEdit as a double
+appdata.data{handles.Spectrum}.parameters.recorder.sensitivity.value = ...
+    str2double(get(handles.sensitivityEdit,'String'));
+sensitivityUnits = get(handles.sensitivityUnitPopupmenu,'String');
+if strcmp(sensitivityUnits{get(handles.sensitivityUnitPopupmenu,'Value')},'unit')
+    appdata.data{handles.Spectrum}.parameters.bridge.videogain.unit = '';
+else
+    appdata.data{handles.Spectrum}.parameters.bridge.videogain.unit = ...
+        sensitivityUnits{get(handles.sensitivityUnitPopupmenu,'Value')};
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -924,12 +1182,33 @@ end
 
 
 function videoGainEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to videoGainEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of videoGainEdit as text
-%        str2double(get(hObject,'String')) returns contents of videoGainEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.videogain.value = ...
+    str2double(get(handles.videoGainEdit,'String'));
+videoGainUnits = get(handles.videoGainUnitPopupmenu,'String');
+if iscell(videoGainUnits)
+    appdata.data{handles.Spectrum}.parameters.bridge.videogain.unit = ...
+        videoGainUnits{get(handles.videoGainUnitPopupmenu,'Value')};
+else
+    appdata.data{handles.Spectrum}.parameters.bridge.videogain.unit = ...
+        videoGainUnits;
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -947,12 +1226,33 @@ end
 
 
 function bandwidthEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to bandwidthEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of bandwidthEdit as text
-%        str2double(get(hObject,'String')) returns contents of bandwidthEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.bandwidth.value = ...
+    str2double(get(handles.bandwidthEdit,'String'));
+bandwidthUnits = get(handles.bandwidthUnitPopupmenu,'String');
+if iscell(bandwidthUnits)
+    appdata.data{handles.Spectrum}.parameters.bridge.bandwidth.unit = ...
+        bandwidthUnits{get(handles.bandwidthUnitPopupmenu,'Value')};
+else
+    appdata.data{handles.Spectrum}.parameters.bridge.bandwidth.unit = ...
+        bandwidthUnits;
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -970,12 +1270,25 @@ end
 
 
 function bridgeTypeEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to bridgeTypeEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of bridgeTypeEdit as text
-%        str2double(get(hObject,'String')) returns contents of bridgeTypeEdit as a double
+appdata.data{handles.Spectrum}.parameters.bridge.type = ...
+    get(handles.bridgeTypeEdit,'String');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -993,40 +1306,30 @@ end
 
 
 function resonatorTypeEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to resonatorTypeEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of resonatorTypeEdit as text
-%        str2double(get(hObject,'String')) returns contents of resonatorTypeEdit as a double
+appdata.data{handles.Spectrum}.parameters.resonator.type = ...
+    get(handles.resonatorTypeEdit,'String');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
 function resonatorTypeEdit_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to resonatorTypeEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-
-function edit25_Callback(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit25 as text
-%        str2double(get(hObject,'String')) returns contents of edit25 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit25_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1081,19 +1384,33 @@ function dscFileLoadButton_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on selection change in attenuationUnitPopupmenu.
-function attenuationUnitPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to attenuationUnitPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% --- Executes on selection change in microwavePowerUnitPopupmenu.
+function microwavePowerUnitPopupmenu_Callback(hObject, eventdata, handles)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns attenuationUnitPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from attenuationUnitPopupmenu
+MWpowerUnits = get(handles.microwavePowerUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.parameters.bridge.MWpower.unit = ...
+    MWpowerUnits{get(handles.microwavePowerUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
-function attenuationUnitPopupmenu_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to attenuationUnitPopupmenu (see GCBO)
+function microwavePowerUnitPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to microwavePowerUnitPopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -1104,37 +1421,26 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+function averagesEdit_Callback(hObject, eventdata, handles)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-function edit29_Callback(hObject, eventdata, handles)
-% hObject    handle to temperatureEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+appdata.data{handles.Spectrum}.parameters.recorder.averages = ...
+    str2double(get(handles.averagesEdit,'String'));
 
-% Hints: get(hObject,'String') returns contents of temperatureEdit as text
-%        str2double(get(hObject,'String')) returns contents of temperatureEdit as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit29_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to temperatureEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
 end
 
-
-
-function averagesEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to averagesEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of averagesEdit as text
-%        str2double(get(hObject,'String')) returns contents of averagesEdit as a double
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1152,12 +1458,25 @@ end
 
 
 function labelEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to labelEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of labelEdit as text
-%        str2double(get(hObject,'String')) returns contents of labelEdit as a double
+appdata.data{handles.Spectrum}.label = ...
+   get(handles.labelEdit,'String');
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1198,12 +1517,26 @@ end
 
 % --- Executes on selection change in sensitivityUnitPopupmenu.
 function sensitivityUnitPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to sensitivityUnitPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns sensitivityUnitPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from sensitivityUnitPopupmenu
+sensitivityUnits = get(handles.sensitivityUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.parameters.recorder.sensitivity.unit = ...
+    sensitivityUnits{get(handles.sensitivityUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1221,12 +1554,26 @@ end
 
 % --- Executes on selection change in videoGainUnitPopupmenu.
 function videoGainUnitPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to videoGainUnitPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns videoGainUnitPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from videoGainUnitPopupmenu
+videoGainUnits = get(handles.videoGainUnitPopupmenu,'String');
+appdata.data{handles.Spectrum}.parameters.bridge.videogain.unit = ...
+    videoGainUnits{get(handles.videoGainUnitPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
+
+if_parentAppdataRefresh(hObject);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1265,7 +1612,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-
 function fileNameEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to fileNameEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1288,3 +1634,30 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
+function if_parentAppdataRefresh(hObject)
+
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+% Get appdata from parent window
+if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+	callerHandles = guidata(handles.callerHandle);
+    if isfield(callerHandles,mfilename)
+    	% Get appdata of the parent GUI
+        parentAppdata = getappdata(callerHandles.figure1);
+        % Set changed parameters of parentAppdata
+        parentAppdata.data{handles.Spectrum} = ...
+            appdata.data{handles.Spectrum};
+        % Refresh appdata of the parent GUI
+        parentAppdataFieldnames = fieldnames(parentAppdata);
+        for k=1:length(parentAppdataFieldnames)
+            setappdata(...
+                callerHandles.figure1,...
+                parentAppdataFieldnames{k},...
+                getfield(parentAppdata,...
+                parentAppdataFieldnames{k})...
+                );
+        end
+    end
+end

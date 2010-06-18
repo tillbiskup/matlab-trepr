@@ -158,6 +158,12 @@ function content = loadFile(filename)
         end
     end
     
+    % Workaround for sensitivity
+    sensitivity = content.parameters.recorder.sensitivity;
+    content.parameters.recorder.sensitivity = struct(...
+        'value',sensitivity,...
+        'unit','');
+    
     % Terminate if the dimensions of the final data matrix could not be
     % determined from the information in the header.
     if isempty(content.parameters.field.start) ...

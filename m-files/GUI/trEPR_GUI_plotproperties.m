@@ -87,8 +87,6 @@ end
 
 % Set application data (at this stage only empty structures)
 data = cell(1); % store the data (spectra) together with their information
-olddata = cell(1); % store a copy of the data (spectra)
-acc = struct(); % store the accumulated spectra together with their information
 configuration = struct(); % store the configuration information for the GUI
 % --- store important control values, such as the currently active spectrum etc.
 control = struct(...
