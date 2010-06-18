@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 18-Jun-2010 12:26:36
+% Last Modified by GUIDE v2.5 18-Jun-2010 18:41:45
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -132,12 +132,9 @@ if exist('data','var') && ~isempty(data{1})
         data{handles.Spectrum}.filename...
         );
         
-    set(handles.headlineText,'String',...
-        strrep(...
-        get(handles.headlineText,'String'),...
-        'FILENAME',...
-        sprintf('"%s"',name)...
-        ));
+    set(handles.multipleFilesPopupmenu,'String',...
+        sprintf('%s%s',name,ext)...
+        );
 
     % Display parameters that should always be there
     set(...
@@ -1661,3 +1658,51 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         end
     end
 end
+
+
+
+function edit42_Callback(hObject, eventdata, handles)
+% hObject    handle to edit42 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of edit42 as text
+%        str2double(get(hObject,'String')) returns contents of edit42 as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function edit42_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to edit42 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in multipleFilesPopupmenu.
+function multipleFilesPopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to multipleFilesPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns multipleFilesPopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from multipleFilesPopupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function multipleFilesPopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to multipleFilesPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
