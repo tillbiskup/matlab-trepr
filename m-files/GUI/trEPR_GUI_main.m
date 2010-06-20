@@ -2337,9 +2337,17 @@ necessaryFields = {...
     };
 parameters = appdata.data{id}.parameters;
 for k = 1:length(necessaryFields)
-    if ~isfield(parameters,necessaryFields{k}) || ...
-            isempty(getfield(parameters,necessaryFields{k}))
-        TF = logical(true);
+    fieldName = explode(necessaryFields{k},'.');
+    if length(fieldName) == 2
+        if ~isfield(getfield(parameters,fieldName{1}),fieldName{2}) || ...
+                isempty(getfield(getfield(parameters,fieldName{1}),fieldName{2}))
+            TF = logical(true);
+        end
+    else
+        if ~isfield(parameters,necessaryFields{k}) || ...
+                isempty(getfield(parameters,necessaryFields{k}))
+            TF = logical(true);
+        end
     end
 end
 
