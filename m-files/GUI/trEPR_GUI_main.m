@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 05-Jun-2010 09:39:47
+% Last Modified by GUIDE v2.5 20-Jun-2010 10:23:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,7 +88,7 @@ control = struct(...
     'visible',cell(1),...
     'invisible',cell(1),...
     'modified',cell(1),...
-    'missing',[]...
+    'missing',cell(1)...
     ),...
     'measure', struct(...
     'point',1,...
@@ -2188,12 +2188,12 @@ end
 
 % Call to internal function refreshing the invisible spectra listbox
 %     => important to do it after refreshing handles and appdata!
-if_spectraInvisibleListbox_Refresh
+if_spectraInvisibleListbox_Refresh;
 
 % Check for datasets with missing parameters
 for k=1:length(iLoadedSpectra)
     if(if_checkForMissingParameters(handles.figure1, iLoadedSpectra(k)))
-        appdata.control.spectra.missing(end+1) = k;
+        appdata.control.spectra.missing{end+1} = iLoadedSpectra(k);
     end
 end
 
@@ -2205,6 +2205,38 @@ for k=1:length(appdataFieldnames)
       appdataFieldnames{k},...
       getfield(appdata,appdataFieldnames{k})...
       );
+end
+
+if ~isempty(appdata.control.spectra.missing)
+    message = {...
+        'You have loaded spectra with incomplete parameters.',...
+        'Do you want to complete the parameters?',...
+        ' ',...
+        'Note:',...
+        'Incomplete parameters may lead to severe problems later.',...
+        'If you choose not to complete, dont''t complain...'...
+        };
+    selection = questdlg(...
+        message,...
+        'Complete parameters?',...
+        'Yes',...
+        'No',...
+        'Yes');
+    switch selection
+        case 'Yes'
+            if length(appdata.control.spectra.missing) == 1
+                trEPR_GUI_info(...
+                  'callerFunction',mfilename,...
+                  'callerHandle',handles.figure1,...
+                  'Spectrum',appdata.control.spectra.missing{1});
+            else
+                trEPR_GUI_info(...
+                  'callerFunction',mfilename,...
+                  'callerHandle',handles.figure1,...
+                  'Spectra',appdata.control.spectra.missing);
+            end
+        case 'No'
+    end
 end
 
 
@@ -2854,30 +2886,26 @@ if isempty(appdata.data)
 end
 
 % Remove selected from visible
-visSpectra = length(appdata.control.spectra.visible);
-for k=1:visSpectra
-    if appdata.control.spectra.visible{k} == iSelected
-        appdata.control.spectra.visible(k) = [];
-        break;  % !!! above statement manipulates cell array length
-    end
-end
+appdata.control.spectra.visible(...
+    ind(appdata.control.spectra.visible,iSelected)) = [];
 % Prevent empty cell array
 if isempty(appdata.control.spectra.visible)
     appdata.control.spectra.visible{1} = [];
 end
 
 % Remove selected from modified
-modSpectra = length(appdata.control.spectra.modified);
-for k=1:modSpectra
-    if appdata.control.spectra.modified{k} == iSelected
-        appdata.control.spectra.modified(k) = [];
-        break;  % !!! above statement manipulates cell array length
-    end
+if ~isempty(appdata.control.spectra.modified)
+    appdata.control.spectra.modified(...
+        ind(appdata.control.spectra.modified,iSelected)) = [];
 end
 % Prevent empty cell array
 if isempty(appdata.control.spectra.modified)
     appdata.control.spectra.modified{1} = [];
 end
+
+% Remove selected from missing
+appdata.control.spectra.missing(...
+    ind(appdata.control.spectra.missing,iSelected)) = [];
 
 % Refresh handles and appdata of the current GUI
 guidata(gcbo,handles);
@@ -3647,7 +3675,7 @@ h = msgbox(...
 % Remove saved spectrum from list of modified spectra
 for k=1:length(appdata.control.spectra.modified)
     if appdata.control.spectra.modified{k} == iSelected
-        appdata.control.spectra.modified(k) = '';
+        appdata.control.spectra.modified(k) = [];
         break;
     end
 end
@@ -4186,6 +4214,13 @@ trEPR_GUI_plotproperties(...
 % --- Executes on button press in axisMathButton.
 function axisMathButton_Callback(hObject, eventdata, handles)
 % hObject    handle to axisMathButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in spectraCompleteParametersButton.
+function spectraCompleteParametersButton_Callback(hObject, eventdata, handles)
+% hObject    handle to spectraCompleteParametersButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 

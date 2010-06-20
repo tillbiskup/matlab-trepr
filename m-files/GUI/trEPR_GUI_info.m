@@ -22,7 +22,7 @@ function varargout = trEPR_GUI_info(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_info
 
-% Last Modified by GUIDE v2.5 18-Jun-2010 18:41:45
+% Last Modified by GUIDE v2.5 19-Jun-2010 12:30:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,10 +79,9 @@ data = cell(1); % store the data (spectra) together with their information
 configuration = struct(); % store the configuration information for the GUI
 % --- store important control values, such as the currently active spectrum etc.
 control = struct(...
-    'spectra', struct(...
-    'active',0,...
-    'visible',cell(1),...
-    'filenames',cell(1)...
+    'dsc', struct(...
+    'fileName','',...
+    'fileType',''...
     )...
 );
 appdataHandles = struct();
@@ -112,9 +111,7 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
         parentAppdata = getappdata(callerHandles.figure1);
         
         data = parentAppdata.data;
-        control = parentAppdata.control;
         setappdata(handles.figure1,'data',data);
-        setappdata(handles.figure1,'control',control);
         setappdata(handles.figure1,'configuration',configuration);
         setappdata(handles.figure1,'handles',handles);
     end
@@ -123,19 +120,32 @@ end
 
 % Display Information of currently active spectrum on opening
 if exist('data','var') && ~isempty(data{1})
-    % Set number of spectrum to display information for
-    if ~isfield(handles,'Spectrum')
-        handles.Spectrum = parentAppdata.control.spectra.active;
+    if isfield(handles,'Spectra')
+        % Get names of spectra for selection popupmenu
+        for k=1:length(handles.Spectra)
+            [path name ext] = fileparts(...
+                data{handles.Spectra{k}}.filename...
+                );
+            namesOfSpectra{k} = sprintf('%s%s',name,ext);
+        end
+        set(handles.multipleFilesPopupmenu,'String',namesOfSpectra);
+        % Set current active spectrum to the first in the list
+        handles.Spectrum = handles.Spectra{1};
+    else
+        % Set number of spectrum to display information for in case it is
+        % not called with the optional parameter
+        if ~isfield(handles,'Spectrum')
+            handles.Spectrum = parentAppdata.control.spectra.active;
+        end
+        % Set selection popupmenu
+        [path name ext] = fileparts(...
+            data{handles.Spectrum}.filename...
+            );
+        set(handles.multipleFilesPopupmenu,'String',...
+            sprintf('%s%s',name,ext)...
+            );
     end
         
-    [path name ext] = fileparts(...
-        data{handles.Spectrum}.filename...
-        );
-        
-    set(handles.multipleFilesPopupmenu,'String',...
-        sprintf('%s%s',name,ext)...
-        );
-
     % Display parameters that should always be there
     set(...
         handles.fieldStartEdit,...
@@ -443,6 +453,11 @@ end
 % Update handles structure
 guidata(hObject, handles);
 
+handles.hash = if_makeHash(hObject);
+
+% Update handles structure
+guidata(hObject, handles);
+
 % UIWAIT makes trEPR_GUI_info wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -492,12 +507,29 @@ closeGUI(hObject, eventdata, handles);
 
 
 function dscFilenameEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to dscFilenameEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: get(hObject,'String') returns contents of dscFilenameEdit as text
-%        str2double(get(hObject,'String')) returns contents of dscFilenameEdit as a double
+if isempty(get(handles.dscFilenameEdit,'String')) || ...
+    ~exist(get(handles.dscFilenameEdit,'String'),'file')
+    set(handles.dscFileShowButton,'Enable','Off');
+    set(handles.dscFileLoadButton,'Enable','Off');
+else
+    appdata.control.dsc.fileName = get(handles.dscFilenameEdit,'String');
+    set(handles.dscFileShowButton,'Enable','On');
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -813,6 +845,52 @@ if ~isempty(missingFields)
         case 'Cancel',
             return;
         otherwise
+    end
+else
+    % Remove spectrum from parentAppdata.control.spectra.missing in case it
+    % was listed there
+    % Get appdata from parent window
+    if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+        callerHandles = guidata(handles.callerHandle);
+        if isfield(callerHandles,mfilename)
+        	% Get appdata of the parent GUI
+            parentAppdata = getappdata(callerHandles.figure1);
+            if ind(parentAppdata.control.spectra.missing,handles.Spectrum)
+                parentAppdata.control.spectra.missing(...
+                    ind(parentAppdata.control.spectra.missing,handles.Spectrum)) = [];
+                setappdata(...
+                    callerHandles.figure1,...
+                    'control',...
+                    parentAppdata.control);
+            end
+        end
+    end
+end
+
+if ~strcmp(handles.hash,if_makeHash(handles.figure1))
+    % Add id of spectrum to parentAppdata.control.spectra.modified
+    % Get appdata from parent window
+    if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
+        callerHandles = guidata(handles.callerHandle);
+        if isfield(callerHandles,mfilename)
+        	% Get appdata of the parent GUI
+            parentAppdata = getappdata(callerHandles.figure1);
+            if isempty(parentAppdata.control.spectra.modified) || ...
+                    isempty(ind(parentAppdata.control.spectra.modified,handles.Spectrum))
+                if isempty(parentAppdata.control.spectra.modified) || ...
+                        isempty(parentAppdata.control.spectra.modified{1})
+                    parentAppdata.control.spectra.modified{1} = ...
+                        handles.Spectrum;
+                else
+                    parentAppdata.control.spectra.modified{end+1} = ...
+                        handles.Spectrum;
+                end
+                setappdata(...
+                    callerHandles.figure1,...
+                    'control',...
+                    parentAppdata.control);
+            end
+        end
     end
 end
 
@@ -1339,19 +1417,94 @@ end
 
 % --- Executes on button press in dscFileBrowseButton.
 function dscFileBrowseButton_Callback(hObject, eventdata, handles)
-% hObject    handle to dscFileBrowseButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
+
+dscFormats = get(handles.dscFormatPopupmenu,'String');
+switch dscFormats{get(handles.dscFormatPopupmenu,'Value')}
+    case 'unrecognized (show only)'
+        [FileName,PathName,FilterIndex] = uigetfile(...
+            '*.*',...
+            'Select file to load',...
+            'MultiSelect','off');
+        if ischar(FileName)
+            appdata.control.dsc.fileName = [PathName FileName];
+            appdata.control.dsc.fileType = 'unrecognized (show only)';
+            set(handles.dscFilenameEdit,'String',[PathName FileName]);
+            set(handles.dscFileShowButton,'Enable','On');
+        end
+    case 'metaGen dsc'
+        [FileName,PathName,FilterIndex] = uigetfile(...
+            '*.dsc',...
+            'Select file to load',...
+            'MultiSelect','off');
+        if ischar(FileName)
+            appdata.control.dsc.fileName = [PathName FileName];
+            appdata.control.dsc.fileType = 'unrecognized (show only)';
+            set(handles.dscFilenameEdit,'String',[PathName FileName]);
+            set(handles.dscFileShowButton,'Enable','On');
+        end
+    case 'Bruker DSC'
+        [FileName,PathName,FilterIndex] = uigetfile(...
+            '*.DSC',...
+            'Select file to load',...
+            'MultiSelect','off');
+        if ischar(FileName)
+            appdata.control.dsc.fileName = [PathName FileName];
+            appdata.control.dsc.fileType = 'unrecognized (show only)';
+            set(handles.dscFilenameEdit,'String',[PathName FileName]);
+            set(handles.dscFileShowButton,'Enable','On');
+        end
+    case 'XML'
+        [FileName,PathName,FilterIndex] = uigetfile(...
+            '*.xml',...
+            'Select file to load',...
+            'MultiSelect','off');
+        if ischar(FileName)
+            appdata.control.dsc.fileName = [PathName FileName];
+            appdata.control.dsc.fileType = 'unrecognized (show only)';
+            set(handles.dscFilenameEdit,'String',[PathName FileName]);
+            set(handles.dscFileShowButton,'Enable','On');
+        end
+end
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 
 % --- Executes on selection change in dscFormatPopupmenu.
 function dscFormatPopupmenu_Callback(hObject, eventdata, handles)
-% hObject    handle to dscFormatPopupmenu (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
-% Hints: contents = get(hObject,'String') returns dscFormatPopupmenu contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from dscFormatPopupmenu
+dscFormats = get(handles.dscFormatPopupmenu,'String');
+if ~strcmp(appdata.control.dsc.fileType,dscFormats{get(handles.dscFormatPopupmenu,'Value')})
+    set(handles.dscFilenameEdit,'String','');
+    appdata.control.dsc.fileName = '';
+end
+appdata.control.dsc.fileType = ...
+    dscFormats{get(handles.dscFormatPopupmenu,'Value')};
+
+% Refresh handles and appdata of the current GUI
+guidata(hObject,handles);
+appdataFieldnames = fieldnames(appdata);
+for k=1:length(appdataFieldnames)
+  setappdata(...
+      handles.figure1,...
+      appdataFieldnames{k},...
+      getfield(appdata,appdataFieldnames{k})...
+      );
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -1369,10 +1522,15 @@ end
 
 % --- Executes on button press in dscFileShowButton.
 function dscFileShowButton_Callback(hObject, eventdata, handles)
-% hObject    handle to dscFileShowButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% Get handles and appdata of the current GUI
+handles = guidata(hObject);
+appdata = getappdata(handles.figure1);
 
+trEPR_GUI_filedisplay(...
+    'File',...
+    appdata.control.dsc.fileName,...
+    'LineNumbers',...
+    true);
 
 % --- Executes on button press in dscFileLoadButton.
 function dscFileLoadButton_Callback(hObject, eventdata, handles)
@@ -1660,27 +1818,62 @@ if isfield(handles,'callerFunction') && isfield(handles,'callerHandle')
 end
 
 
+% --- Create "hash" of all fields
+function hash = if_makeHash(hObject)
+% Get handles of the current GUI
+handles = guidata(hObject);
 
-function edit42_Callback(hObject, eventdata, handles)
-% hObject    handle to edit42 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit42 as text
-%        str2double(get(hObject,'String')) returns contents of edit42 as a double
-
-
-% --- Executes during object creation, after setting all properties.
-function edit42_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit42 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
+hashRelevantEditFields = {...
+    'fieldStartEdit',...
+    'fieldEndEdit',...
+    'fieldStepEdit',...
+    'timeStartEdit',...
+    'timeEndEdit',...
+    'timeStepEdit',...
+    'timeLengthTimeEdit',...
+    'timeLengthPointsEdit',...
+    'laserWavelengthEdit',...
+    'laserRepetitionRateEdit',...
+    'microwaveFrequencyEdit',...
+    'microwaveAttenuationEdit',...
+    'microwavePowerEdit',...
+    'averagesEdit',...
+    'temperatureEdit',...
+    'labelEdit',...
+    'sensitivityEdit',...
+    'videoGainEdit',...
+    'bandwidthEdit',...
+    'digitizerEdit',...
+    'bridgeTypeEdit',...
+    'resonatorTypeEdit'...
+    };
+hashRelevantPopupFields = {...
+    'fieldUnitPopupmenu',...
+    'timeUnitPopupmenu',...
+    'microwavePowerUnitPopupmenu',...
+    'sensitivityUnitPopupmenu',...
+    'videoGainUnitPopupmenu',...
+    'bandwidthUnitPopupmenu',...
+    'fieldProbePopupmenu'...
+    };
+hash = '';
+for k=1:length(hashRelevantEditFields)
+    hash = sprintf('%s%s',...
+        hash,...
+        get(getfield(handles,hashRelevantEditFields{k}),'String')...
+        );
 end
+for k=1:length(hashRelevantPopupFields)
+    hash = sprintf('%s%s',...
+        hash,...
+        num2str(...
+        get(getfield(handles,hashRelevantPopupFields{k}),'Value')...
+        )...
+        );
+end
+
+% Refresh handles of the current GUI
+guidata(hObject,handles);
 
 
 % --- Executes on selection change in multipleFilesPopupmenu.
@@ -1696,6 +1889,52 @@ function multipleFilesPopupmenu_Callback(hObject, eventdata, handles)
 % --- Executes during object creation, after setting all properties.
 function multipleFilesPopupmenu_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to multipleFilesPopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function digitizerEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to digitizerEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of digitizerEdit as text
+%        str2double(get(hObject,'String')) returns contents of digitizerEdit as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function digitizerEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to digitizerEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in fieldProbePopupmenu.
+function fieldProbePopupmenu_Callback(hObject, eventdata, handles)
+% hObject    handle to fieldProbePopupmenu (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns fieldProbePopupmenu contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from fieldProbePopupmenu
+
+
+% --- Executes during object creation, after setting all properties.
+function fieldProbePopupmenu_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fieldProbePopupmenu (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
