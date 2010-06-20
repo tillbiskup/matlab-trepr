@@ -223,6 +223,39 @@ set(handles.xMinEdit,'String',num2str(xlimits(1)));
 set(handles.yMinEdit,'String',num2str(ylimits(1)));
 set(handles.xMaxEdit,'String',num2str(xlimits(2)));
 set(handles.yMaxEdit,'String',num2str(ylimits(2)));
+% Set grid options
+switch control.axis.grid.x
+    case 'off'
+        set(handles.gridXButton,'Value',0);
+    case 'major'
+        set(handles.gridXButton,'Value',1);
+    case 'minor'
+        set(handles.gridXButton,'Value',1);
+        set(handles.gridMinorButton,'Value',1);
+end
+switch control.axis.grid.y
+    case 'off'
+        set(handles.gridYButton,'Value',0);
+    case 'major'
+        set(handles.gridYButton,'Value',1);
+    case 'minor'
+        set(handles.gridYButton,'Value',1);
+        set(handles.gridMinorButton,'Value',1);
+end
+set(handles.gridZeroLine,'Value',control.axis.grid.zero);
+% Set legend options
+switch control.axis.legend.location
+    case 'Best'
+        set(handles.legendBestButton,'Value',1);
+    case 'NorthWest'
+        set(handles.legendNWbutton,'Value',1);
+    case 'NorthEast'
+        set(handles.legendNEbutton,'Value',1);
+    case 'SouthWest'
+        set(handles.legendSWbutton,'Value',1);
+    case 'SouthEast'
+        set(handles.legendSEbutton,'Value',1);
+end        
 
 % Set highlighting method of active plot
 highlightMethods = {'Color','LineWidth','LineStyle','Marker','none'};
