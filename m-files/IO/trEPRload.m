@@ -292,7 +292,7 @@ function content = loadDir(dirname,varargin)
     % files and directories, try to read every single file
     if ~isempty(filesInDir)
         if (nargin >= 3) && (strcmp(varargin{1},'combine') && varargin{2})
-            content = combineFile(filesInDir)
+            content = combineFile(filesInDir);
         else
             l = 1;
             for k=1:length(filesInDir)
