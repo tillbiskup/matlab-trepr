@@ -85,7 +85,7 @@ function [ varargout ] = trEPRtoolboxRevision
 	% contact the maintainer via the email address given there.
 	
 	trEPRtoolboxRevisionNumber = '0.2.3';
-	trEPRtoolboxRevisionDate = '2010-06-04';
+	trEPRtoolboxRevisionDate = '2010-06-20';
 	
 	if (nargout == 1)
 		% in case the function is called with one output parameter
