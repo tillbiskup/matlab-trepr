@@ -172,27 +172,50 @@ setappdata(handles.figure1,'control',control);
 switch control.axis.displayType
     case '2D plot'
         set(handles.xLabelMeasureEdit,'String',...
-            data{control.spectra.active}.axes.xaxis.measure);
+            control.axis.labels.x.measure);
         set(handles.xLabelUnitEdit,'String',...
-            data{control.spectra.active}.axes.xaxis.unit);
+            control.axis.labels.x.unit);
         set(handles.yLabelMeasureEdit,'String',...
-            data{control.spectra.active}.axes.yaxis.measure);
+            control.axis.labels.y.measure);
         set(handles.yLabelUnitEdit,'String',...
-            data{control.spectra.active}.axes.yaxis.unit);
+            control.axis.labels.y.unit);
+        % Switch off legend buttons, because legend does not work with
+        % image "plot"
+        set(handles.legendBestButton,'Enable','Off');
+        set(handles.legendNWbutton,'Enable','Off');
+        set(handles.legendNEbutton,'Enable','Off');
+        set(handles.legendSWbutton,'Enable','Off');
+        set(handles.legendSEbutton,'Enable','Off');
     case 'B0 spectra'
         set(handles.xLabelMeasureEdit,'String',...
-            data{control.spectra.active}.axes.yaxis.measure);
+            control.axis.labels.y.measure);
         set(handles.xLabelUnitEdit,'String',...
-            data{control.spectra.active}.axes.yaxis.unit);
-        set(handles.yLabelMeasureEdit,'String','intensity');
-        set(handles.yLabelUnitEdit,'String','a.u.');
+            control.axis.labels.y.unit);
+        set(handles.yLabelMeasureEdit,'String',...
+            control.axis.labels.z.measure);
+        set(handles.yLabelUnitEdit,'String',...
+            control.axis.labels.z.unit);
+        % Switch on legend buttons
+        set(handles.legendBestButton,'Enable','On');
+        set(handles.legendNWbutton,'Enable','On');
+        set(handles.legendNEbutton,'Enable','On');
+        set(handles.legendSWbutton,'Enable','On');
+        set(handles.legendSEbutton,'Enable','On');
     case 'transients'
         set(handles.xLabelMeasureEdit,'String',...
-            data{control.spectra.active}.axes.xaxis.measure);
+            control.axis.labels.x.measure);
         set(handles.xLabelUnitEdit,'String',...
-            data{control.spectra.active}.axes.xaxis.unit);
-        set(handles.yLabelMeasureEdit,'String','intensity');
-        set(handles.yLabelUnitEdit,'String','a.u.');
+            control.axis.labels.x.unit);
+        set(handles.yLabelMeasureEdit,'String',...
+            control.axis.labels.z.measure);
+        set(handles.yLabelUnitEdit,'String',...
+            control.axis.labels.z.unit);
+        % Switch on legend buttons
+        set(handles.legendBestButton,'Enable','On');
+        set(handles.legendNWbutton,'Enable','On');
+        set(handles.legendNEbutton,'Enable','On');
+        set(handles.legendSWbutton,'Enable','On');
+        set(handles.legendSEbutton,'Enable','On');
 end
 xlimits = get(callerHandles.axes1,'XLim');
 ylimits = get(callerHandles.axes1,'YLim');
