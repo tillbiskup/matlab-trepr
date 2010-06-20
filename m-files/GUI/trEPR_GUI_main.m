@@ -592,6 +592,18 @@ trEPR_GUI_info(...
     'callerHandle',hObject);
 
 
+% --- Executes on button press in spectraCompleteParametersButton.
+function spectraCompleteParametersButton_Callback(hObject, eventdata, handles)
+% Get handles and appdata of the current GUI
+guidata(hObject, handles);
+appdata = getappdata(handles.figure1);
+
+trEPR_GUI_info(...
+    'callerFunction',mfilename,...
+	'callerHandle',handles.figure1,...
+    'Spectra',appdata.control.spectra.missing);
+
+
 % --- Executes on selection change in displayTypePopupmenu.
 function displayTypePopupmenu_Callback(hObject, eventdata, handles)
 % hObject    handle to displayTypePopupmenu (see GCBO)
@@ -2208,6 +2220,7 @@ for k=1:length(appdataFieldnames)
 end
 
 if ~isempty(appdata.control.spectra.missing)
+    set(handles.spectraCompleteParametersButton,'Enable','On');
     message = {...
         'You have loaded spectra with incomplete parameters.',...
         'Do you want to complete the parameters?',...
@@ -2278,6 +2291,13 @@ end
 
 % Set listbox display
 set(handles.spectraInvisibleListbox,'String',invSpectraNames);
+
+% Enable/disable spectraCompleteParameters button
+if ~isempty(appdata.control.spectra.missing)
+    set(handles.spectraCompleteParametersButton,'Enable','On');
+else
+    set(handles.spectraCompleteParametersButton,'Enable','Off');
+end
 
 % Refresh handles and appdata of the current GUI
 guidata(gcbo,handles);
@@ -2432,6 +2452,13 @@ appdata.control.spectra.active = appdata.control.spectra.visible{...
 
 % Set listbox display
 set(handles.spectraVisibleListbox,'String',visSpectraNames);
+
+% Enable/disable spectraCompleteParameters button
+if ~isempty(appdata.control.spectra.missing)
+    set(handles.spectraCompleteParametersButton,'Enable','On');
+else
+    set(handles.spectraCompleteParametersButton,'Enable','Off');
+end
 
 % If there are no visible spectra any more, set appdata, turn off elements
 % and return 
@@ -4216,12 +4243,4 @@ function axisMathButton_Callback(hObject, eventdata, handles)
 % hObject    handle to axisMathButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on button press in spectraCompleteParametersButton.
-function spectraCompleteParametersButton_Callback(hObject, eventdata, handles)
-% hObject    handle to spectraCompleteParametersButton (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 
