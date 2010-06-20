@@ -1523,6 +1523,7 @@ appdata = getappdata(handles.figure1);
 % Switch off zooming (necessary to assign button functions)
 set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
 set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+set(handles.axisZoomInButton, 'Value',0);
 zh = zoom(handles.figure1);
 set(zh,'Enable','off');
 
@@ -1570,6 +1571,7 @@ appdata = getappdata(handles.figure1);
 % Switch off zooming (necessary to assign button functions)
 set(handles.zoomOutAxisContextMenu, 'Checked', 'off');
 set(handles.zoomInAxisContextMenu, 'Checked', 'off');
+set(handles.axisZoomInButton, 'Value',0);
 zh = zoom(handles.figure1);
 set(zh,'Enable','off');
 
@@ -2337,7 +2339,7 @@ necessaryFields = {...
     };
 parameters = appdata.data{id}.parameters;
 for k = 1:length(necessaryFields)
-    fieldName = explode(necessaryFields{k},'.');
+    fieldName = explode('.',necessaryFields{k});
     if length(fieldName) == 2
         if ~isfield(getfield(parameters,fieldName{1}),fieldName{2}) || ...
                 isempty(getfield(getfield(parameters,fieldName{1}),fieldName{2}))
