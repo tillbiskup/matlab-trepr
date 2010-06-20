@@ -144,6 +144,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
     
     elseif nargin > 1 && strcmp(varargin{1},'combine')
         % This is used in case filename is a cell array of file names
@@ -195,6 +198,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
 
     else
         % If only a single filename is provided as input argument
@@ -248,6 +254,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
     end    
 end
 

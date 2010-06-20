@@ -140,6 +140,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
         
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
@@ -193,6 +196,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
 
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
@@ -243,6 +249,9 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.attenuation = '';
         content.parameters.laser.wavelength = '';
         content.parameters.laser.repetitionRate = '';
+        content.parameters.recorder.averages = [];
+        content.parameters.recorder.sensitivity.value = [];
+        content.parameters.recorder.sensitivity.unit = '';
 
         % Create axis informations from parameters
         content.axes.xaxis.values = ...
