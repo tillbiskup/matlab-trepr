@@ -24,7 +24,7 @@ function varargout = trEPR_GUI_main(varargin)
 
 % Edit the above text to modify the response to help trEPR_GUI_main
 
-% Last Modified by GUIDE v2.5 20-Jun-2010 10:23:35
+% Last Modified by GUIDE v2.5 24-Jun-2010 10:19:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
