@@ -21,6 +21,11 @@
 %           matrix of X, the degrees of freedom, and the norm of the
 %           residuals, respectively.
 function varargout = polyFit(data, degree, left, right, varargin)
+    % Show help if called with no parameters
+    if nargin == 0
+        help polyFit
+        return;
+    end
     % Parse input arguments using the inputParser functionality
     p = inputParser;   % Create an instance of the inputParser class.
     p.FunctionName = mfilename; % Function name to be included in error messages
