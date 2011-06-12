@@ -73,7 +73,7 @@ hsl_v1 = uicontrol('Tag','vert1_slider',...
 hsl_v2 = uicontrol('Tag','vert2_slider',...
     'Style', 'slider',...
 	'Parent', hPanelAxis, ...
-    'Min',1,'Max',100,'Value',50,...
+    'Min',-1,'Max',1,'Value',0,...
     'Position', [615 95 15 500],...
     'BackgroundColor',sl2_bgcolor,...
     'TooltipString','',...
@@ -84,7 +84,7 @@ hsl_v2 = uicontrol('Tag','vert2_slider',...
 hsl_v3 = uicontrol('Tag','vert3_slider',...
     'Style', 'slider',...
 	'Parent', hPanelAxis, ...
-    'Min',1,'Max',100,'Value',50,...
+    'Min',-1,'Max',1,'Value',0,...
     'Position', [635 95 15 500],...
     'BackgroundColor',sl3_bgcolor,...
     'TooltipString','',...
@@ -95,7 +95,7 @@ hsl_v3 = uicontrol('Tag','vert3_slider',...
 hsl_h1 = uicontrol('Tag','horz1_slider',...
     'Style', 'slider',...
 	'Parent', hPanelAxis, ...
-    'Min',1,'Max',100,'Value',50,...
+    'Min',-1,'Max',1,'Value',0,...
     'Position', [70 20 500 15],...
     'BackgroundColor',sl2_bgcolor,...
     'TooltipString','',...
@@ -106,7 +106,7 @@ hsl_h1 = uicontrol('Tag','horz1_slider',...
 hsl_h2 = uicontrol('Tag','horz2_slider',...
     'Style', 'slider',...
 	'Parent', hPanelAxis, ...
-    'Min',1,'Max',100,'Value',50,...
+    'Min',-1,'Max',1,'Value',0,...
     'Position', [70 0 500 15],...
     'BackgroundColor',sl3_bgcolor,...
     'TooltipString','',...
@@ -495,6 +495,7 @@ ad.control.axis.limits.y.max = 1;
 ad.control.axis.limits.z = struct();
 ad.control.axis.limits.z.min = 0;
 ad.control.axis.limits.z.max = 1;
+ad.control.axis.normalisation = 'none';
 
 
 setappdata(hMainFigure,'data',ad.data);
@@ -546,7 +547,7 @@ add2status('trEPR GUI main window initialised successfully.');
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function slider_v1_Callback(source,eventdata)
+function slider_v1_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -577,51 +578,191 @@ function slider_v1_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function slider_v2_Callback(source,eventdata)
-end
+function slider_v2_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
 
-function slider_v3_Callback(source,eventdata)
-end
-
-function slider_h1_Callback(source,eventdata)
-end
-
-function slider_h2_Callback(source,eventdata)
-end
-
-
-    function tbg_Callback(source,eventdata)
-        panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7];
-        val = get(get(source,'SelectedObject'),'String');
-        switch val
-            case 'Load'
-                set(panels,'Visible','off');
-                set(hp1,'Visible','on');         
-            case 'Datasets'
-                set(panels,'Visible','off');
-                set(hp2,'Visible','on');
-                % Update both list boxes
-                update_invisibleSpectra();
-                update_visibleSpectra();
-            case 'Slider'
-                set(panels,'Visible','off');
-                set(hp3,'Visible','on');         
-            case 'Measure'
-                set(panels,'Visible','off');
-                set(hp4,'Visible','on');         
-            case 'Display'
-                set(panels,'Visible','off');
-                set(hp5,'Visible','on');         
-                % Update display panel
-                update_displayPanel();
-            case 'Processing'
-                set(panels,'Visible','off');
-                set(hp6,'Visible','on');         
-            case 'Analysis'
-                set(panels,'Visible','off');
-                set(hp7,'Visible','on');         
-        end
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Convert slider value to scaling factor
+    if (get(source,'Value') > 0)
+        scalingFactor = get(source,'Value')+1;
+    else
+        scalingFactor = 1/(abs(get(source,'Value'))+1);
     end
+    
+    % Depending on display type settings
+    switch ad.control.axis.displayType
+        case '2D plot'
+            ad.data{ad.control.spectra.active}.display.scaling.y = ...
+                scalingFactor;
+        case '1D along x'
+            ad.data{ad.control.spectra.active}.display.scaling.z = ...
+                scalingFactor;
+        case '1D along y'
+            ad.data{ad.control.spectra.active}.display.scaling.z = ...
+                scalingFactor;
+        otherwise
+            msg = sprintf('Display type %s currently unsupported',displayType);
+            add2status(msg);            
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();
+end
+
+function slider_v3_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Depending on display type settings
+    switch ad.control.axis.displayType
+        case '2D plot'
+            ad.data{ad.control.spectra.active}.display.displacement.y = ...
+                get(source,'Value');
+        case '1D along x'
+            ad.data{ad.control.spectra.active}.display.displacement.z = ...
+                get(source,'Value');
+        case '1D along y'
+            ad.data{ad.control.spectra.active}.display.displacement.z = ...
+                get(source,'Value');
+        otherwise
+            msg = sprintf('Display type %s currently unsupported',displayType);
+            add2status(msg);            
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();
+end
+
+function slider_h1_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Convert slider value to scaling factor
+    if (get(source,'Value') > 0)
+        scalingFactor = get(source,'Value')+1;
+    else
+        scalingFactor = 1/(abs(get(source,'Value'))+1);
+    end
+    
+    % Depending on display type settings
+    switch ad.control.axis.displayType
+        case '2D plot'
+            ad.data{ad.control.spectra.active}.display.scaling.x = ...
+                scalingFactor;
+        case '1D along x'
+            ad.data{ad.control.spectra.active}.display.scaling.x = ...
+                scalingFactor;
+        case '1D along y'
+            ad.data{ad.control.spectra.active}.display.scaling.y = ...
+                scalingFactor;
+        otherwise
+            msg = sprintf('Display type %s currently unsupported',displayType);
+            add2status(msg);            
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();
+end
+
+function slider_h2_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Depending on display type settings
+    switch ad.control.axis.displayType
+        case '2D plot'
+            ad.data{ad.control.spectra.active}.display.displacement.x = ...
+                get(source,'Value');
+        case '1D along x'
+            ad.data{ad.control.spectra.active}.display.displacement.x = ...
+                get(source,'Value');
+        case '1D along y'
+            ad.data{ad.control.spectra.active}.display.displacement.y = ...
+                get(source,'Value');
+        otherwise
+            msg = sprintf('Display type %s currently unsupported',displayType);
+            add2status(msg);            
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();
+end
+
+
+function tbg_Callback(source,~)
+    panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7];
+    val = get(get(source,'SelectedObject'),'String');
+    switch val
+        case 'Load'
+            set(panels,'Visible','off');
+            set(hp1,'Visible','on');         
+        case 'Datasets'
+            set(panels,'Visible','off');
+            set(hp2,'Visible','on');
+            % Update both list boxes
+            update_invisibleSpectra();
+            update_visibleSpectra();
+        case 'Slider'
+            set(panels,'Visible','off');
+            set(hp3,'Visible','on');         
+        case 'Measure'
+            set(panels,'Visible','off');
+            set(hp4,'Visible','on');         
+            % Update measure panel
+            update_measurePanel();
+        case 'Display'
+            set(panels,'Visible','off');
+            set(hp5,'Visible','on');         
+            % Update display panel
+            update_displayPanel();
+        case 'Processing'
+            set(panels,'Visible','off');
+            set(hp6,'Visible','on');         
+        case 'Analysis'
+            set(panels,'Visible','off');
+            set(hp7,'Visible','on');         
+    end
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

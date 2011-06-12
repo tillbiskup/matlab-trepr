@@ -153,7 +153,7 @@ uicontrol('Tag','display_panel_axislabels_x_measure_edit',...
     'Units','Pixels',...
     'Position',[60 110 (handle_size(3)-90)/2 25],...
     'String','index',...
-    'Callback',{@axislabels_x_measure_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'xmeasure'}...
     );
 uicontrol('Tag','display_panel_axislabels_x_unit_edit',...
     'Style','edit',...
@@ -162,7 +162,7 @@ uicontrol('Tag','display_panel_axislabels_x_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 110 (handle_size(3)-90)/2 25],...
     'String','points',...
-    'Callback',{@axislabels_x_unit_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'xunit'}...
     );
 uicontrol('Tag','display_panel_axislabels_y_text',...
     'Style','text',...
@@ -179,7 +179,7 @@ uicontrol('Tag','display_panel_axislabels_y_measure_edit',...
     'Units','Pixels',...
     'Position',[60 80 (handle_size(3)-90)/2 25],...
     'String','index',...
-    'Callback',{@axislabels_y_measure_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'ymeasure'}...
     );
 uicontrol('Tag','display_panel_axislabels_y_unit_edit',...
     'Style','edit',...
@@ -188,7 +188,7 @@ uicontrol('Tag','display_panel_axislabels_y_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 80 (handle_size(3)-90)/2 25],...
     'String','points',...
-    'Callback',{@axislabels_y_unit_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'yunit'}...
     );
 uicontrol('Tag','display_panel_axislabels_z_text',...
     'Style','text',...
@@ -205,7 +205,7 @@ uicontrol('Tag','display_panel_axislabels_z_measure_edit',...
     'Units','Pixels',...
     'Position',[60 50 (handle_size(3)-90)/2 25],...
     'String','index',...
-    'Callback',{@axislabels_z_measure_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'zmeasure'}...
     );
 uicontrol('Tag','display_panel_axislabels_z_unit_edit',...
     'Style','edit',...
@@ -214,7 +214,7 @@ uicontrol('Tag','display_panel_axislabels_z_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 50 (handle_size(3)-90)/2 25],...
     'String','points',...
-    'Callback',{@axislabels_z_unit_edit_Callback}...
+    'Callback',{@axislabels_edit_Callback,'zunit'}...
     );
 uicontrol('Tag','display_panel_axislabels_getfromactivedataset_pushbutton',...
     'Style','pushbutton',...
@@ -265,7 +265,7 @@ uicontrol('Tag','display_panel_axislimits_x_min_edit',...
     'Units','Pixels',...
     'Position',[60 100 (handle_size(3)-90)/2 25],...
     'String','0',...
-    'Callback',{@axislimits_x_min_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'xmin'}...
     );
 uicontrol('Tag','display_panel_axislimits_x_max_edit',...
     'Style','edit',...
@@ -274,7 +274,7 @@ uicontrol('Tag','display_panel_axislimits_x_max_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 100 (handle_size(3)-90)/2 25],...
     'String','1',...
-    'Callback',{@axislimits_x_max_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'xmax'}...
     );
 uicontrol('Tag','display_panel_axislimits_y_text',...
     'Style','text',...
@@ -291,7 +291,7 @@ uicontrol('Tag','display_panel_axislimits_y_min_edit',...
     'Units','Pixels',...
     'Position',[60 70 (handle_size(3)-90)/2 25],...
     'String','0',...
-    'Callback',{@axislimits_y_min_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'ymin'}...
     );
 uicontrol('Tag','display_panel_axislimits_y_max_edit',...
     'Style','edit',...
@@ -300,7 +300,7 @@ uicontrol('Tag','display_panel_axislimits_y_max_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 70 (handle_size(3)-90)/2 25],...
     'String','1',...
-    'Callback',{@axislimits_y_max_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'ymax'}...
     );
 uicontrol('Tag','display_panel_axislimits_z_text',...
     'Style','text',...
@@ -317,7 +317,7 @@ uicontrol('Tag','display_panel_axislimits_z_min_edit',...
     'Units','Pixels',...
     'Position',[60 40 (handle_size(3)-90)/2 25],...
     'String','-1',...
-    'Callback',{@axislimits_z_min_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'zmin'}...
     );
 uicontrol('Tag','display_panel_axislimits_z_max_edit',...
     'Style','edit',...
@@ -326,7 +326,7 @@ uicontrol('Tag','display_panel_axislimits_z_max_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 40 (handle_size(3)-90)/2 25],...
     'String','1',...
-    'Callback',{@axislimits_z_max_edit_Callback}...
+    'Callback',{@axislimits_edit_Callback,'zmax'}...
     );
 uicontrol('Tag','display_panel_axislimits_auto_checkbox',...
     'Style','checkbox',...
@@ -470,7 +470,9 @@ uicontrol('Tag','display_panel_normalise_pkpk_togglebutton',...
     'pos',[handle_size(3)-30-(((handle_size(3)-40)/2)*2) 10 (handle_size(3)-40)/2 30],...
     'parent',handle_p5,...
     'HandleVisibility','off',...
-    'Value',0);
+    'Value',0,...
+    'Callback',{@normalise_togglebutton_Callback}...
+    );
 uicontrol('Tag','display_panel_normalise_amplitude_togglebutton',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
@@ -479,7 +481,9 @@ uicontrol('Tag','display_panel_normalise_amplitude_togglebutton',...
     'pos',[handle_size(3)-30-(((handle_size(3)-40)/2)) 10 (handle_size(3)-40)/2 30],...
     'parent',handle_p5,...
     'HandleVisibility','off',...
-    'Value',0);
+    'Value',0,...
+    'Callback',{@normalise_togglebutton_Callback}...
+    );
 
 handle_p6 = uipanel('Tag','display_panel_highlight_panel',...
     'Parent',handle_pp2,...
@@ -583,7 +587,7 @@ uicontrol('Tag','display_panel_currentaxis_3dplot_pushbutton',...
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function pages_buttongroup_Callback(source,eventdata)
+function pages_buttongroup_Callback(source,~)
     page_panels = [handle_pp1 handle_pp2 handle_pp3 handle_pp4];
     val = get(get(source,'SelectedObject'),'String');
     switch val
@@ -602,12 +606,34 @@ function pages_buttongroup_Callback(source,eventdata)
     end
 end
 
-function axislabels_x_measure_edit_Callback(source,eventdata)
+function axislabels_edit_Callback(source,~,label)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.x.measure = get(source,'String');
+    
+    switch label
+        case 'xmeasure'
+            ad.control.axis.labels.x.measure = get(source,'String');
+        case 'xunit'
+            ad.control.axis.labels.x.unit = get(source,'String');
+        case 'ymeasure'
+            ad.control.axis.labels.y.measure = get(source,'String');
+        case 'yunit'
+            ad.control.axis.labels.y.unit = get(source,'String');
+        case 'zmeasure'
+            ad.control.axis.labels.z.measure = get(source,'String');
+        case 'zunit'
+            ad.control.axis.labels.z.unit = get(source,'String');
+        otherwise
+            msgstr = { 'Unknown axis label in callback function call.' ...
+                sprintf('Function "%s" in file "%s"',...
+                'axislabels_edit_Callback',...
+                mfilename ...
+                )...
+                };
+            status = add2status(msgstr);
+            return;
+    end
     
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);  
@@ -616,77 +642,7 @@ function axislabels_x_measure_edit_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function axislabels_x_unit_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.x.unit = get(source,'String');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
-end
-
-function axislabels_y_measure_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.y.measure = get(source,'String');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
-end
-
-function axislabels_y_unit_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.y.unit = get(source,'String');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
-end
-
-function axislabels_z_measure_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.z.measure = get(source,'String');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
-end
-
-function axislabels_z_unit_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.labels.z.unit = get(source,'String');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
-end
-
-function axislabels_getfromactivedataset_pushbutton_Callback(source,eventdata)
+function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -738,12 +694,58 @@ function axislabels_getfromactivedataset_pushbutton_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function axislimits_x_min_edit_Callback(source,eventdata)
+function axislimits_edit_Callback(source,~,limit)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.x.min = str2num(get(source,'String'));
+    
+    switch limit
+        case 'xmin'
+            ad.control.axis.limits.x.min = str2num(get(source,'String'));
+        case 'xmax'
+            % Test whether value is larger than min for same axis
+            if (str2num(get(source,'String')) > ad.control.axis.limits.x.min)
+                ad.control.axis.limits.x.max = str2num(get(source,'String'));
+            else
+                set(source,'String',num2str(ad.control.axis.limits.x.max));
+                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                status = add2status(msgstr);
+                return;
+            end
+        case 'ymin'
+            ad.control.axis.limits.y.min = str2num(get(source,'String'));
+        case 'ymax'
+            % Test whether value is larger than min for same axis
+            if (str2num(get(source,'String')) > ad.control.axis.limits.y.min)
+                ad.control.axis.limits.y.max = str2num(get(source,'String'));
+            else
+                set(source,'String',num2str(ad.control.axis.limits.y.max));
+                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                status = add2status(msgstr);
+                return;
+            end
+        case 'zmin'
+            ad.control.axis.limits.z.min = str2num(get(source,'String'));
+        case 'zmax'
+            % Test whether value is larger than min for same axis
+            if (str2num(get(source,'String')) > ad.control.axis.limits.z.min)
+                ad.control.axis.limits.z.max = str2num(get(source,'String'));
+            else
+                set(source,'String',num2str(ad.control.axis.limits.z.max));
+                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                status = add2status(msgstr);
+                return;
+            end
+        otherwise
+            msgstr = { 'Unknown axis limit in callback function call.' ...
+                sprintf('Function "%s" in file "%s"',...
+                'axislimits_edit_Callback',...
+                mfilename ...
+                )...
+                };
+            status = add2status(msgstr);
+            return;
+    end
     
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);  
@@ -752,77 +754,7 @@ function axislimits_x_min_edit_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function axislimits_x_max_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.x.max = str2num(get(source,'String'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
-end
-
-function axislimits_y_min_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.y.min = str2num(get(source,'String'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
-end
-
-function axislimits_y_max_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.y.max = str2num(get(source,'String'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
-end
-
-function axislimits_z_min_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.z.min = str2num(get(source,'String'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
-end
-
-function axislimits_z_max_edit_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.z.max = str2num(get(source,'String'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
-end
-
-function axislimits_auto_checkbox_Callback(source,eventdata)
+function axislimits_auto_checkbox_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -839,7 +771,7 @@ function axislimits_auto_checkbox_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function highlight_checkbox_Callback(source,eventdata)
+function highlight_checkbox_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -1003,7 +935,7 @@ function grid_y_togglebutton_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function grid_minor_togglebutton_Callback(source,eventdata)
+function grid_minor_togglebutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -1021,7 +953,7 @@ function grid_minor_togglebutton_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function grid_zero_togglebutton_Callback(source,eventdata)
+function grid_zero_togglebutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -1035,7 +967,7 @@ function grid_zero_togglebutton_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function grid_legend_togglebutton_Callback(source,eventdata)
+function grid_legend_togglebutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -1100,9 +1032,6 @@ function grid_legend_togglebutton_Callback(source,eventdata)
                 set(legendButtons,'Value',0);
             end
     end
-    
-    %NorthWest NorthEast SouthWest SouthEast Best
-    %ad.control.axis.legend.location = ;
 
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);  
@@ -1111,6 +1040,48 @@ function grid_legend_togglebutton_Callback(source,eventdata)
     update_mainAxis();    
 end
 
+function normalise_togglebutton_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+ 
+    % For some currently unknown reason, findobj seems not to work. The
+    % parent handle behaves weird...
+    normaliseButtons = [...
+        gh.display_panel_normalise_pkpk_togglebutton ...
+        gh.display_panel_normalise_amplitude_togglebutton ...
+        ];
+    
+    switch source
+        case gh.display_panel_normalise_pkpk_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.normalisation = 'pkpk';
+                set(normaliseButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.normalisation = 'none';
+                set(normaliseButtons,'Value',0);
+            end
+        case gh.display_panel_normalise_amplitude_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.normalisation = 'amplitude';
+                set(normaliseButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.normalisation = 'none';
+                set(normaliseButtons,'Value',0);
+            end
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);  
+    
+    %Update main axis
+    update_mainAxis();    
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions

@@ -24,6 +24,9 @@ if (ad.control.axis.limits.auto)
     setMinMax();
 end
 
+% Get appdata from main GUI
+ad = getappdata(mainWindow);
+
 % Change enable status of pushbuttons and other elements
 mainAxisChildren = findobj(...
     'Parent',gh.mainAxes_panel,...
@@ -111,26 +114,46 @@ switch ad.control.axis.displayType
         for k = 1 : length(ad.control.spectra.visible)
             [y,x] = size(ad.data{k}.data);
             x = linspace(1,x,x);
-            y = linspace(1,y,y);
             if (isfield(ad.data{k},'axes') ...
                     && isfield(ad.data{k}.axes,'x') ...
                     && isfield(ad.data{k}.axes.x,'values') ...
                     && not (isempty(ad.data{k}.axes.x.values)))
                 x = ad.data{k}.axes.x.values;
             end
-            if (isfield(ad.data{k},'axes') ...
-                    && isfield(ad.data{k}.axes,'y') ...
-                    && isfield(ad.data{k}.axes.y,'values') ...
-                    && not (isempty(ad.data{k}.axes.y.values)))
-                y = ad.data{k}.axes.y.values;
-            end
-            % Apply filter if necessary
             y = ad.data{k}.data(...
                 ad.data{k}.display.position.y,...
                 :);
+            % Normalise if necessary
+            switch ad.control.axis.normalisation
+                case 'pkpk'
+                    y = y/(max(max(ad.data{k}.data))-min(min(ad.data{k}.data)));
+                case 'amplitude'
+                    y = y/max(max(ad.data{k}.data));
+            end
+            % Apply filter if necessary
             if (ad.data{k}.display.smoothing.x.value > 1)
                 filterfun = str2func(ad.data{k}.display.smoothing.x.filterfun);
                 y = filterfun(y,ad.data{k}.display.smoothing.x.value);
+            end
+            % Apply scaling if necessary
+            if (ad.data{k}.display.scaling.x ~= 0)
+                x = linspace(...
+                    (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.x/2),...
+                    (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.x/2),...
+                    length(x));
+            end
+            if (ad.data{k}.display.scaling.z ~= 0)
+                y = y * ad.data{k}.display.scaling.z;
+            end
+            % Apply displacement if necessary
+            if (ad.data{k}.display.displacement.x ~= 0)
+                x = x + (max(x)-min(x)) * ...
+                    ad.data{k}.display.displacement.x;
+            end
+            if (ad.data{k}.display.displacement.z ~= 0)
+                y = y + ...
+                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data))) * ...
+                    ad.data{k}.display.displacement.z;
             end
             currLine = plot(...
                 x,...
@@ -202,28 +225,48 @@ switch ad.control.axis.displayType
         hold on;
         for k = 1 : length(ad.control.spectra.visible)
             [y,x] = size(ad.data{k}.data);
-            x = linspace(1,x,x);
             y = linspace(1,y,y);
-            if (isfield(ad.data{k},'axes') ...
-                    && isfield(ad.data{k}.axes,'x') ...
-                    && isfield(ad.data{k}.axes.x,'values') ...
-                    && not (isempty(ad.data{k}.axes.x.values)))
-                x = ad.data{k}.axes.x.values;
-            end
             if (isfield(ad.data{k},'axes') ...
                     && isfield(ad.data{k}.axes,'y') ...
                     && isfield(ad.data{k}.axes.y,'values') ...
                     && not (isempty(ad.data{k}.axes.y.values)))
                 y = ad.data{k}.axes.y.values;
             end
-            % Apply filter if necessary
             x = ad.data{k}.data(...
                 :,...
                 ad.data{k}.display.position.x...
                 );
+            % Normalise if necessary
+            switch ad.control.axis.normalisation
+                case 'pkpk'
+                    x = x/(max(max(ad.data{k}.data))-min(min(ad.data{k}.data)));
+                case 'amplitude'
+                    x = x/max(max(ad.data{k}.data));
+            end
+            % Apply filter if necessary
             if (ad.data{k}.display.smoothing.y.value > 1)
                 filterfun = str2func(ad.data{k}.display.smoothing.y.filterfun);
                 x = filterfun(x,ad.data{k}.display.smoothing.y.value);
+            end
+            % Apply scaling if necessary
+            if (ad.data{k}.display.scaling.y ~= 0)
+                y = linspace(...
+                    (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.y/2),...
+                    (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.y/2),...
+                    length(y));
+            end
+            if (ad.data{k}.display.scaling.z ~= 0)
+                x = x * ad.data{k}.display.scaling.z;
+            end
+            % Apply displacement if necessary
+            if (ad.data{k}.display.displacement.y ~= 0)
+                y = y + (max(y)-min(y)) * ...
+                    ad.data{k}.display.displacement.y;
+            end
+            if (ad.data{k}.display.displacement.z ~= 0)
+                x = x + ...
+                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data))) * ...
+                    ad.data{k}.display.displacement.z;
             end
             currLine = plot(...
                 y,...
@@ -356,8 +399,21 @@ if not (isempty(ad.control.spectra.visible))
         xmax(k) = x(end);
         ymin(k) = y(1);
         ymax(k) = y(end);
-        zmin(k) = min(min(ad.data{k}.data));
-        zmax(k) = max(max(ad.data{k}.data));
+        switch ad.control.axis.normalisation
+            case 'pkpk'
+                zmin(k) = min(min(...
+                    ad.data{k}.data/...
+                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data)))));
+                zmax(k) = max(max(...
+                    ad.data{k}.data/...
+                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data)))));
+            case 'amplitude'
+                zmin(k) = min(min(ad.data{k}.data/max(max(ad.data{k}.data))));
+                zmax(k) = max(max(ad.data{k}.data/max(max(ad.data{k}.data))));
+            otherwise
+                zmin(k) = min(min(ad.data{k}.data));
+                zmax(k) = max(max(ad.data{k}.data));
+        end
     end
     ad.control.axis.limits.x.min = min(xmin);
     ad.control.axis.limits.x.max = max(xmax);
