@@ -167,7 +167,8 @@ uicontrol('Tag','reset_button',...
     'String','Reset',...
     'TooltipString','Reset all slider settings to their default values',...
     'pos',[590 25 60 25],...
-    'Enable','off'...
+    'Enable','off',...
+    'Callback',{@reset_pushbutton_Callback}...
     );
 uicontrol('Tag','plus_button',...
     'Style','pushbutton',...
@@ -728,6 +729,36 @@ function slider_h2_Callback(source,~)
     update_mainAxis();
 end
 
+function reset_pushbutton_Callback(source,~)
+    if (get(source,'Value') == 0) || (isempty(ad.control.spectra.active))
+        return;
+    end
+    
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Reset displacement and scaling for current spectrum
+    ad.data{ad.control.spectra.active}.display.displacement.x = 0;
+    ad.data{ad.control.spectra.active}.display.displacement.y = 0;
+    ad.data{ad.control.spectra.active}.display.displacement.z = 0;
+
+    ad.data{ad.control.spectra.active}.display.scaling.x = 1;
+    ad.data{ad.control.spectra.active}.display.scaling.y = 1;
+    ad.data{ad.control.spectra.active}.display.scaling.z = 1;
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();
+end
 
 function tbg_Callback(source,~)
     panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7];
