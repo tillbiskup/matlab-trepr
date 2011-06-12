@@ -756,6 +756,8 @@ function tbg_Callback(source,~)
         case 'Slider'
             set(panels,'Visible','off');
             set(hp3,'Visible','on');         
+            % Update slider panel
+            update_sliderPanel();
         case 'Measure'
             set(panels,'Visible','off');
             set(hp4,'Visible','on');         
