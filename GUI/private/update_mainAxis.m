@@ -147,6 +147,13 @@ switch ad.control.axis.displayType
             y = ad.data{k}.data(...
                 ad.data{k}.display.position.y,...
                 :);
+            % Apply displacement if necessary
+            if (ad.data{k}.display.displacement.x ~= 0)
+                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.x;
+            end
+            if (ad.data{k}.display.displacement.z ~= 0)
+                y = y + ad.data{k}.display.displacement.z;
+            end
             % Normalise if necessary
             switch ad.control.axis.normalisation
                 case 'pkpk'
@@ -168,13 +175,6 @@ switch ad.control.axis.displayType
             end
             if (ad.data{k}.display.scaling.z ~= 0)
                 y = y * ad.data{k}.display.scaling.z;
-            end
-            % Apply displacement if necessary
-            if (ad.data{k}.display.displacement.x ~= 0)
-                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.x;
-            end
-            if (ad.data{k}.display.displacement.z ~= 0)
-                y = y + ad.data{k}.display.displacement.z;
             end
             currLine = plot(...
                 x,...
@@ -277,6 +277,13 @@ switch ad.control.axis.displayType
                 :,...
                 ad.data{k}.display.position.x...
                 );
+            % Apply displacement if necessary
+            if (ad.data{k}.display.displacement.y ~= 0)
+                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.y;
+            end
+            if (ad.data{k}.display.displacement.z ~= 0)
+                x = x + ad.data{k}.display.displacement.z;
+            end
             % Normalise if necessary
             switch ad.control.axis.normalisation
                 case 'pkpk'
@@ -298,13 +305,6 @@ switch ad.control.axis.displayType
             end
             if (ad.data{k}.display.scaling.z ~= 0)
                 x = x * ad.data{k}.display.scaling.z;
-            end
-            % Apply displacement if necessary
-            if (ad.data{k}.display.displacement.y ~= 0)
-                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.y;
-            end
-            if (ad.data{k}.display.displacement.z ~= 0)
-                x = x + ad.data{k}.display.displacement.z;
             end
             currLine = plot(...
                 y,...

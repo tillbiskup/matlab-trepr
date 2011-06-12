@@ -1081,6 +1081,9 @@ function normalise_togglebutton_Callback(source,~)
     
     %Update main axis
     update_mainAxis();    
+    
+    %Update slider panel
+    update_sliderPanel();    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

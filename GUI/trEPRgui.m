@@ -537,8 +537,6 @@ if (nargout == 1)
     varargout{1} = hMainFigure;
 end
 
-gh = guihandles;
-
 % Set status message
 add2status('trEPR GUI main window initialised successfully.');
 %update_statuswindow(ad.control.status);
@@ -552,9 +550,6 @@ function slider_v1_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Depending on display type settings
     switch ad.control.axis.displayType
@@ -583,9 +578,6 @@ function slider_v2_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Convert slider value to scaling factor
     if (get(source,'Value') > 0)
@@ -624,9 +616,6 @@ function slider_v3_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Depending on display type settings
     switch ad.control.axis.displayType
@@ -658,9 +647,6 @@ function slider_h1_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Convert slider value to scaling factor
     if (get(source,'Value') > 0)
@@ -699,9 +685,6 @@ function slider_h2_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Depending on display type settings
     switch ad.control.axis.displayType
@@ -737,9 +720,6 @@ function reset_pushbutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % Reset displacement and scaling for current spectrum
     ad.data{ad.control.spectra.active}.display.displacement.x = 0;
