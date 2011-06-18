@@ -57,12 +57,14 @@ if isempty(ad.control.spectra.visible)
     set(visPanelChildren,'Enable','off');
     set(dTypePanelChildren,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
+    set(gh.data_panel_visible_listbox,'Enable','off');
 else
     set(gh.data_panel_hide_pushbutton,'Enable','on');
     set(currActiveButtons,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
     set(dTypePanelChildren,'Enable','on');
     set(gh.processing_panel_datasets_listbox,'Enable','on');
+    set(gh.data_panel_visible_listbox,'Enable','on');
 
     % Show additional controls in visible_listbox only if there are more
     % than two datasets currently visible

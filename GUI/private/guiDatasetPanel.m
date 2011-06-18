@@ -229,6 +229,11 @@ function show_pushbutton_Callback(source,eventdata)
     % Get selected item of listbox
     selected = get(gh.data_panel_invisible_listbox,'Value');
 
+    % Be on the save side if user is faster than Matlab
+    if selected == 0
+        return;
+    end
+    
     % Move to visible
     ad.control.spectra.visible = [...
         ad.control.spectra.visible ...
@@ -263,6 +268,11 @@ function hide_pushbutton_Callback(source,eventdata)
     
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
+
+    % Be on the save side if user is faster than Matlab
+    if selected == 0
+        return;
+    end
 
     % Move to invisible
     ad.control.spectra.invisible = [...

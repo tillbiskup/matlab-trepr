@@ -19,14 +19,6 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
-% Set min and max for plots - internal function
-if (ad.control.axis.limits.auto)
-    setMinMax();
-end
-
-% Get appdata from main GUI
-ad = getappdata(mainWindow);
-
 % Change enable status of pushbuttons and other elements
 mainAxisChildren = findobj(...
     'Parent',gh.mainAxes_panel,...
@@ -41,6 +33,12 @@ if isempty(ad.control.spectra.visible)
 else
     set(mainAxisChildren,'Enable','on');
 end
+
+% Set min and max for plots - internal function
+setMinMax();
+
+% Get appdata from main GUI
+ad = getappdata(mainWindow);
 
 % Plot depending on display type settings
 % Be as robust as possible: if there is no axes, default is indices
@@ -147,6 +145,13 @@ switch ad.control.axis.displayType
             y = ad.data{k}.data(...
                 ad.data{k}.display.position.y,...
                 :);
+            % In case that we loaded 1D data...
+            if isscalar(x)
+                x = [x x+1];
+            end
+            if isscalar(y)
+                y = [y y+1];
+            end
             % Apply displacement if necessary
             if (ad.data{k}.display.displacement.x ~= 0)
                 x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.x;
@@ -277,6 +282,13 @@ switch ad.control.axis.displayType
                 :,...
                 ad.data{k}.display.position.x...
                 );
+            % In case that we loaded 1D data...
+            if isscalar(x)
+                x = [x x+1];
+            end
+            if isscalar(y)
+                y = [y y+1];
+            end
             % Apply displacement if necessary
             if (ad.data{k}.display.displacement.y ~= 0)
                 y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.y;
@@ -408,8 +420,12 @@ function setMinMax()
 mainWindow = findobj('Tag','trepr_gui_mainwindow');
 ad = getappdata(mainWindow);
 
-% Set min and max for spectra
-if not (isempty(ad.control.spectra.visible))
+if (isempty(ad.control.spectra.visible))
+    return;
+end
+
+% set min and max for spectra
+if (ad.control.axis.limits.auto)
     xmin = zeros(length(ad.control.spectra.visible),1);
     xmax = zeros(length(ad.control.spectra.visible),1);
     ymin = zeros(length(ad.control.spectra.visible),1);
@@ -417,21 +433,21 @@ if not (isempty(ad.control.spectra.visible))
     zmin = zeros(length(ad.control.spectra.visible),1);
     zmax = zeros(length(ad.control.spectra.visible),1);
     for k=1:length(ad.control.spectra.visible)
-        % Be as robust as possible: if there is no axes, default is indices
-        [y,x] = size(ad.data{k}.data);
+        % be as robust as possible: if there is no axes, default is indices
+        [y,x] = size(ad.data{ad.control.spectra.visible(k)}.data);
         x = linspace(1,x,x);
         y = linspace(1,y,y);
-        if (isfield(ad.data{k},'axes') ...
-                && isfield(ad.data{k}.axes,'x') ...
-                && isfield(ad.data{k}.axes.x,'values') ...
-                && not (isempty(ad.data{k}.axes.x.values)))
-            x = ad.data{k}.axes.x.values;
+        if (isfield(ad.data{ad.control.spectra.visible(k)},'axes') ...
+                && isfield(ad.data{ad.control.spectra.visible(k)}.axes,'x') ...
+                && isfield(ad.data{ad.control.spectra.visible(k)}.axes.x,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.visible(k)}.axes.x.values)))
+            x = ad.data{ad.control.spectra.visible(k)}.axes.x.values;
         end
-        if (isfield(ad.data{k},'axes') ...
-                && isfield(ad.data{k}.axes,'y') ...
-                && isfield(ad.data{k}.axes.y,'values') ...
-                && not (isempty(ad.data{k}.axes.y.values)))
-            y = ad.data{k}.axes.y.values;
+        if (isfield(ad.data{ad.control.spectra.visible(k)},'axes') ...
+                && isfield(ad.data{ad.control.spectra.visible(k)}.axes,'y') ...
+                && isfield(ad.data{ad.control.spectra.visible(k)}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.visible(k)}.axes.y.values)))
+            y = ad.data{ad.control.spectra.visible(k)}.axes.y.values;
         end
         xmin(k) = x(1);
         xmax(k) = x(end);
@@ -440,17 +456,23 @@ if not (isempty(ad.control.spectra.visible))
         switch ad.control.axis.normalisation
             case 'pkpk'
                 zmin(k) = min(min(...
-                    ad.data{k}.data/...
-                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data)))));
+                    ad.data{ad.control.spectra.visible(k)}.data/...
+                    (max(max(ad.data{ad.control.spectra.visible(k)}.data))-...
+                    min(min(ad.data{ad.control.spectra.visible(k)}.data)))));
                 zmax(k) = max(max(...
-                    ad.data{k}.data/...
-                    (max(max(ad.data{k}.data))-min(min(ad.data{k}.data)))));
+                    ad.data{ad.control.spectra.visible(k)}.data/...
+                    (max(max(ad.data{ad.control.spectra.visible(k)}.data))-...
+                    min(min(ad.data{ad.control.spectra.visible(k)}.data)))));
             case 'amplitude'
-                zmin(k) = min(min(ad.data{k}.data/max(max(ad.data{k}.data))));
-                zmax(k) = max(max(ad.data{k}.data/max(max(ad.data{k}.data))));
+                zmin(k) = min(min(ad.data{ad.control.spectra.visible(k)}.data/...
+                    max(max(ad.data{ad.control.spectra.visible(k)}.data))));
+                zmax(k) = max(max(ad.data{ad.control.spectra.visible(k)}.data/...
+                    max(max(ad.data{k}.data))));
             otherwise
-                zmin(k) = min(min(ad.data{k}.data));
-                zmax(k) = max(max(ad.data{k}.data));
+                zmin(k) = ...
+                    min(min(ad.data{ad.control.spectra.visible(k)}.data));
+                zmax(k) = ...
+                    max(max(ad.data{ad.control.spectra.visible(k)}.data));
         end
     end
     ad.control.axis.limits.x.min = min(xmin);
@@ -459,9 +481,43 @@ if not (isempty(ad.control.spectra.visible))
     ad.control.axis.limits.y.max = max(ymax);
     ad.control.axis.limits.z.min = min(zmin);
     ad.control.axis.limits.z.max = max(zmax);
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);    
+else
+    ad.control.axis.limits.x.min = ...
+        ad.data{ad.control.spectra.active}.axes.x.values(1);
+    ad.control.axis.limits.x.max = ...
+        ad.data{ad.control.spectra.active}.axes.x.values(end);
+    ad.control.axis.limits.y.min = ...
+        ad.data{ad.control.spectra.active}.axes.y.values(1);
+    ad.control.axis.limits.y.max = ...
+        ad.data{ad.control.spectra.active}.axes.y.values(end);
+    switch ad.control.axis.normalisation
+        case 'pkpk'
+            ad.control.axis.limits.z.min = ...
+                min(min(...
+                ad.data{ad.control.spectra.active}.data/...
+                (max(max(ad.data{ad.control.spectra.active}.data))-...
+                min(min(ad.data{ad.control.spectra.active}.data)))));
+            ad.control.axis.limits.z.max = ...
+                max(max(...
+                ad.data{ad.control.spectra.active}.data/...
+                (max(max(ad.data{ad.control.spectra.active}.data))-...
+                min(min(ad.data{ad.control.spectra.active}.data)))));
+        case 'amplitude'
+            ad.control.axis.limits.z.min = ...
+                min(min(ad.data{ad.control.spectra.active}.data/...
+                max(max(ad.data{ad.control.spectra.active}.data))));
+            ad.control.axis.limits.z.max = ...
+                max(max(ad.data{ad.control.spectra.active}.data/...
+                max(max(ad.data{ad.control.spectra.active}.data))));
+        otherwise
+            ad.control.axis.limits.z.min = ...
+                min(min(ad.data{ad.control.spectra.active}.data));
+            ad.control.axis.limits.z.max = ...
+                max(max(ad.data{ad.control.spectra.active}.data));
+    end
 end
+
+% update appdata of main window
+setappdata(mainWindow,'control',ad.control);    
 
 end

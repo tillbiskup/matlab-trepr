@@ -35,6 +35,13 @@ if (isfield(ad.data{ad.control.spectra.active},'axes') ...
         && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
     y = ad.data{ad.control.spectra.active}.axes.y.values;
 end
+% In case that we loaded 1D data...
+if isscalar(x)
+    x = [x x+1];
+end
+if isscalar(y)
+    y = [y y+1];
+end
 
 % Update scaling panel
 set(...
