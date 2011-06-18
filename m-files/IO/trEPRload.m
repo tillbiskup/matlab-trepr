@@ -19,7 +19,7 @@ function varargout = trEPRload(filename, varargin)
     p.KeepUnmatched = true; % Enable errors on unmatched arguments
     p.StructExpand = true; % Enable passing arguments in a structure
 
-    p.addRequired('filename', @(x)ischar(x) || iscell(x));
+    p.addRequired('filename', @(x)ischar(x) || iscell(x) || isstruct(x));
 %    p.addOptional('parameters','',@isstruct);
     p.addParamValue('combine',logical(false),@islogical);
     p.parse(filename,varargin{:});
@@ -47,11 +47,64 @@ function varargout = trEPRload(filename, varargin)
             end
         end
         if ~nargout && exist('content','var')
-            % of no output argument is given, assign content to a
+            % If no output argument is given, assign content to a
             % variable in the workspace with the same name as the
             % file
             if p.Results.combine
                 [pathstr, name, ext] = fileparts(filename{1});
+                name = cleanFileName([name ext]);
+                assignin('base',name,content);
+            else
+                for k=1:length(content)
+                    [pathstr, name, ext, versn] = fileparts(...
+                        content{k}.filename);
+                    name = cleanFileName([name ext]);
+                    assignin('base',name,content{k});
+                end
+            end
+        elseif exist('content','var')
+            varargout{1} = content;
+        else
+            varargout{1} = 0;
+        end
+    elseif isstruct(filename) && isfield(filename,'name')
+        % That might be the case if the user uses "dir" as input for the
+        % filenames, as this returns a structure with fields as "name"
+        % Convert struct to cell
+        filenames = cell(length(filename),1);
+        l = 1;
+        for k = 1:length(filename)
+            if ~strcmp(filename(k).name,'.') && ~strcmp(filename(k).name,'..')
+                filenames{l} = filename(k).name;
+                l=l+1;
+            end
+        end
+        if p.Results.combine
+            content = combineFile(filenames);
+        else
+            for k=1:length(filenames)
+                switch exist(filenames{k})
+                    case 0
+                        % If name does not exist.
+                        fprintf('%s does not exist...\n',filenames{k});
+                    case 2
+                        % If name is an M-file on your MATLAB search path.
+                        % It also returns 2 when name is the full pathname
+                        % to a file or the name of an ordinary file on your
+                        % MATLAB search path. 
+                        content{k} = loadFile(filenames{k});
+                    otherwise
+                        % If none of the above possibilities match
+                        fprintf('%s could not be loaded...\n',filenames{k});
+                end
+            end
+        end
+        if ~nargout && exist('content','var')
+            % If no output argument is given, assign content to a
+            % variable in the workspace with the same name as the
+            % file
+            if p.Results.combine
+                [pathstr, name, ext] = fileparts(filenames{1});
                 name = cleanFileName([name ext]);
                 assignin('base',name,content);
             else
@@ -317,13 +370,13 @@ function content = combineFile(filename)
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
     fileFormats = iniFileRead([mfilename('fullpath') '.ini']);
-    
+      
     % read file formats into cell array
     asciiFileFormats = fieldnames(fileFormats);
     
     % open file
     fid = fopen(filename{1});
-
+    
     % Initialize switch resembling binary or ascii data
     isBinary = logical(false);
     
@@ -351,7 +404,7 @@ function content = combineFile(filename)
        fprintf('%s is a binary file!',filename); 
     else
         % else try to find a matching function from the ini file
-        for k = 1 : length(asciiFileFormats)           
+        for k = 1 : length(asciiFileFormats) 
             if ~isempty(findstr(...,
                     getfield(...
                     getfield(fileFormats,asciiFileFormats{k}),...

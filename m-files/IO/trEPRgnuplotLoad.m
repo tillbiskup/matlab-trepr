@@ -102,20 +102,27 @@ function content = loadFile(filename,varargin)
                 files{k} = importdata(fileNames(k).name,' ',3);
                 content.data(k,:) = files{k}.data(:,2);
                 B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                content.axes.yaxis.values(k) = str2double(B0{1});
+                content.axes.y.values(k) = str2double(B0{1});
             end
         end
+        
+        % In case we have not loaded anything
+        if isempty(fieldnames(content))
+            content = [];
+            return;
+        end
+        
         content.parameters.field.start = ...
-            content.axes.yaxis.values(1);
+            content.axes.y.values(1);
         content.parameters.field.stop = ...
-            content.axes.yaxis.values(end);
+            content.axes.y.values(end);
         content.parameters.field.step = ...
-            content.axes.yaxis.values(2) - content.axes.yaxis.values(1);
+            content.axes.y.values(2) - content.axes.y.values(1);
 
         content.header = files{1}.textdata;
 
-        content.axes.yaxis.measure = 'magnetic field';
-        content.axes.yaxis.unit = 'G';
+        content.axes.y.measure = 'magnetic field';
+        content.axes.y.unit = 'G';
 
         content.parameters.transient.points = length(files{1}.data(:,1));
         content.parameters.transient.length = ...
@@ -133,9 +140,13 @@ function content = loadFile(filename,varargin)
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
-        content.axes.xaxis.values = files{1}.data(:,1);
-        content.axes.xaxis.measure = 'time';
-        content.axes.xaxis.unit = 's';
+        content.axes.x.values = files{1}.data(:,1);
+        content.axes.x.measure = 'time';
+        content.axes.x.unit = 's';
+        
+        % For backwards compatibility
+        content.axes.xaxis = content.axes.x;
+        content.axes.yaxis = content.axes.y;
 
         % Assign default (empty) values to parameters not readable from
         % file (for completeness of the parameters structure, necessary for
@@ -156,20 +167,27 @@ function content = loadFile(filename,varargin)
                 files{k} = importdata(filename{k},' ',3);
                 content.data(k,:) = files{k}.data(:,2);
                 B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                content.axes.yaxis.values(k) = str2double(B0{1});
+                content.axes.y.values(k) = str2double(B0{1});
             end
         end
+        
+        % In case we have not loaded anything
+        if isempty(fieldnames(content))
+            content = [];
+            return;
+        end
+        
         content.parameters.field.start = ...
-            content.axes.yaxis.values(1);
+            content.axes.y.values(1);
         content.parameters.field.stop = ...
-            content.axes.yaxis.values(end);
+            content.axes.y.values(end);
         content.parameters.field.step = ...
-            content.axes.yaxis.values(2) - content.axes.yaxis.values(1);
+            content.axes.y.values(2) - content.axes.y.values(1);
 
         content.header = files{1}.textdata;
 
-        content.axes.yaxis.measure = 'magnetic field';
-        content.axes.yaxis.unit = 'G';
+        content.axes.y.measure = 'magnetic field';
+        content.axes.y.unit = 'G';
 
         content.parameters.transient.points = length(files{1}.data(:,1));
         content.parameters.transient.length = ...
@@ -187,9 +205,13 @@ function content = loadFile(filename,varargin)
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
-        content.axes.xaxis.values = files{1}.data(:,1);
-        content.axes.xaxis.measure = 'time';
-        content.axes.xaxis.unit = 's';
+        content.axes.x.values = files{1}.data(:,1);
+        content.axes.x.measure = 'time';
+        content.axes.x.unit = 's';
+        
+        % For backwards compatibility
+        content.axes.xaxis = content.axes.x;
+        content.axes.yaxis = content.axes.y;
 
         % Assign default (empty) values to parameters not readable from
         % file (for completeness of the parameters structure, necessary for
@@ -239,13 +261,17 @@ function content = loadFile(filename,varargin)
         content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
 
         % Create axis informations from parameters
-        content.axes.xaxis.values = file.data(:,1);
-        content.axes.xaxis.measure = 'time';
-        content.axes.xaxis.unit = 's';
+        content.axes.x.values = file.data(:,1);
+        content.axes.x.measure = 'time';
+        content.axes.x.unit = 's';
 
-        content.axes.yaxis.values = [];
-        content.axes.yaxis.measure = '';
-        content.axes.yaxis.unit = '';
+        content.axes.y.values = [];
+        content.axes.y.measure = '';
+        content.axes.y.unit = '';
+        
+        % For backwards compatibility
+        content.axes.xaxis = content.axes.x;
+        content.axes.yaxis = content.axes.y;
 
         % Assign default (empty) values to parameters not readable from
         % file (for completeness of the parameters structure, necessary for
