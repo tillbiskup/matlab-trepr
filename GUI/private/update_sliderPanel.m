@@ -19,6 +19,10 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
+if (isempty(ad.control.spectra.visible))
+    return;
+end
+
 % Get dimensions and axes of currend dataset
 [y,x] = size(ad.data{ad.control.spectra.active}.data);
 x = linspace(1,x,x);

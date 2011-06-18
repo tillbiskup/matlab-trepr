@@ -134,6 +134,7 @@ switch ad.control.axis.displayType
         cla reset;
         hold on;
         for k = 1 : length(ad.control.spectra.visible)
+            k = ad.control.spectra.visible(k);
             [y,x] = size(ad.data{k}.data);
             x = linspace(1,x,x);
             if (isfield(ad.data{k},'axes') ...
@@ -270,6 +271,7 @@ switch ad.control.axis.displayType
         cla reset;
         hold on;
         for k = 1 : length(ad.control.spectra.visible)
+            k = ad.control.spectra.visible(k);
             [y,x] = size(ad.data{k}.data);
             y = linspace(1,y,y);
             if (isfield(ad.data{k},'axes') ...
