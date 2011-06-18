@@ -799,12 +799,24 @@ function highlight_checkbox_Callback(source,~)
             'Enable','On');
         set(gh.display_panel_highlight_value_popupmenu,...
             'Enable','On');
+        highlightTypes = ...
+            cellstr(get(gh.display_panel_highlight_method_popupmenu,'String'));
+        highlightType = ...
+            highlightTypes{get(gh.display_panel_highlight_method_popupmenu,'Value')};
+        ad.control.axis.highlight.method = highlightType;
     else
         set(gh.display_panel_highlight_method_popupmenu,...
             'Enable','Off');
         set(gh.display_panel_highlight_value_popupmenu,...
             'Enable','Off');
+        ad.control.axis.highlight.method = '';
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);  
+    
+    %Update main axis
+    update_mainAxis();    
 end
 
 function highlight_method_popupmenu_Callback(source,eventdata)
