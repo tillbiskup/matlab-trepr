@@ -224,10 +224,11 @@ function load_pushbutton_Callback(source,eventdata)
     add2status(msg);
     clear msgStr msg;
     
-    data = trEPRload(FileName);
-
-    if isequal(data,0)
+    data = trEPRload(FileName,'combine',state.comb);
+    
+    if isequal(data,0) || isempty(data)
         msg = 'Data could not be loaded.';
+        add2status(msg);
         return;
     end
     
