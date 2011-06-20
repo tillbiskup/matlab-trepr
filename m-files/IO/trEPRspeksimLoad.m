@@ -102,10 +102,10 @@ function content = loadFile(filename,varargin)
             if exist(fileNames(k).name,'file') && ...
                     checkFileFormat(fileNames(k).name)
                 files{k} = importdata(fileNames(k).name,' ',5);
-                content.data(1,:) = reshape(files{k}.data',1,[]);
+                content.data(l,:) = reshape(files{k}.data',1,[]);
                 B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
                 content.axes.y.values(l) = str2double(B0{1});
-                l=l+1;
+                l=l+1
             end
         end
         

@@ -315,7 +315,24 @@ function content = loadFile(filename)
             else
                 content.data = data;
             end
+            % In case we have not loaded anything
+            if isempty(content.data)
+                content = [];
+                return;
+            end
             content.filename = filename;
+            % Create axis informations from dimensions
+            [y,x] = size(content.data);
+            content.axes.x.values = linspace(1,x,x);
+            content.axes.x.measure = '';
+            content.axes.x.unit = '';
+            content.axes.y.values = linspace(1,y,y);
+            content.axes.y.measure = '';
+            content.axes.y.unit = '';
+
+            % For backwards compatibility
+            content.axes.xaxis = content.axes.x;
+            content.axes.yaxis = content.axes.y;
         end
     end
     if ~exist('content') 
@@ -425,11 +442,15 @@ function content = combineFile(filename)
                     content = data;
                 end
                 if ~isfield(content,'filename')
-                    content.filename = sprintf(...
-                        '%s-%s',...
-                        filename{1},...
-                        filename{end}...
-                        );
+                    [path,firstFileName,firstExt] = fileparts(filename{1});
+                    [~,lastFileName,lastExt] = fileparts(filename{end});
+                    if strcmp(firstFileName,lastFileName)
+                        % If file basenames are identical
+                        fn = sprintf('%s.%s-%s',firstFileName,firstExt(2:end),lastExt(2:end));
+                    else
+                        fn = sprintf('%s-%s.%s',firstFileName,lastFileName,lastExt(2:end));
+                    end
+                    content.filename = fullfile(path,fn);
                 end
                 break;
             end
