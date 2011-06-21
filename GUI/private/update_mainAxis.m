@@ -26,7 +26,9 @@ mainAxisChildren = findobj(...
     '-not','Type','axes');
 if isempty(ad.control.spectra.visible)
     set(mainAxisChildren,'Enable','off');
-    splash = imread('TAtoolboxSplash.png','png');
+    [path,~,~] = fileparts(mfilename('fullpath'));
+    splash = imread(fullfile(path,'TREPRtoolboxSplash.png'),'png');
+    %splash = imread(fullfile(path,'TAtoolboxSplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers
     return;

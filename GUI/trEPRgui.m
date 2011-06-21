@@ -530,8 +530,8 @@ set(hPlotAxes,'XLim',[-.0001,0.0002]);
 % Display splash
 set(hMainFigure,'CurrentAxes',hPlotAxes);
 [path,~,~] = fileparts(mfilename('fullpath'));
-%splash = imread(fullfile('trEPR-main-start.png'),'png');
-splash = imread(fullfile(path,'TAtoolboxSplash.png'),'png');
+splash = imread(fullfile(path,'private','TREPRtoolboxSplash.png'),'png');
+%splash = imread(fullfile(path,'private','TAtoolboxSplash.png'),'png');
 image(splash);
 axis off          % Remove axis ticks and numbers
 
