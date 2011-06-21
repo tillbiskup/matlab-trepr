@@ -209,11 +209,14 @@ function poc_Callback(source,eventdata)
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
     
-    if not (ad.control.spectra.active)
+    if isempty(ad.control.spectra.active)
         return;
     end
     
     guiProcessingPOC(ad.control.spectra.active);
+    
+    % Update visible spectra listbox
+    update_visibleSpectra();
 end
 
 function bgc_Callback(source,eventdata)
@@ -221,11 +224,14 @@ function bgc_Callback(source,eventdata)
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
     
-    if not (ad.control.spectra.active)
+    if isempty(ad.control.spectra.active)
         return;
     end
     
     guiProcessingBGC(ad.control.spectra.active);
+    
+    % Update visible spectra listbox
+    update_visibleSpectra();
 end
 
 function datasets_listbox_Callback(source,eventdata)
@@ -242,6 +248,11 @@ function datasets_listbox_Callback(source,eventdata)
     
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);
+    
+    % If user double clicked on list entry
+    if strcmp(get(gcf,'SelectionType'),'open')
+        datasetChangeLabel(ad.control.spectra.active);
+    end
     
     % Update processing panel
     update_processingPanel();
@@ -483,5 +494,15 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function datasetChangeLabel(index)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+end
 
 end

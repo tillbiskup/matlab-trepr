@@ -27,7 +27,11 @@ inv = ad.control.spectra.invisible;
 % Get names for display in listbox
 labels = cell(0);
 for k=1:length(inv)
-    labels{k} = ad.data{inv(k)}.label;
+    if (find(inv(k)==ad.control.spectra.modified))
+        labels{k} = ['*' ad.data{inv(k)}.label];
+    else
+        labels{k} = ad.data{inv(k)}.label;
+    end
 end
 
 % Update status display

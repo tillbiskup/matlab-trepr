@@ -19,6 +19,18 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
+
+% Get appdata of main window
+mainWindow = findobj('Tag','trepr_gui_mainwindow');
+ad = getappdata(mainWindow);
+
+if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
+    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),'Enable','Inactive');
+    return;
+else
+    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),'Enable','On');
+end
+
 % Update x points display
 set(gh.processing_panel_average_x_points_edit,...
     'String',...

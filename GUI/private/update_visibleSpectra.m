@@ -24,13 +24,17 @@ visLbox = gh.data_panel_visible_listbox;
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
-% Get indices of invisible spectra
+% Get indices of visible spectra
 vis = ad.control.spectra.visible;
 
 % Get names for display in listbox
 labels = cell(0);
 for k=1:length(vis)
-    labels{k} = ad.data{vis(k)}.label;
+    if (find(vis(k)==ad.control.spectra.modified))
+        labels{k} = ['*' ad.data{vis(k)}.label];
+    else
+        labels{k} = ad.data{vis(k)}.label;
+    end
 end
 
 % Update status display

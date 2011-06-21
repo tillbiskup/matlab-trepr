@@ -49,7 +49,8 @@ uicontrol('Tag','data_panel_invisible_listbox',...
     'BackgroundColor',defaultBackground,...
     'Units','Pixels',...
     'Position',[10 10 panel_size(3)-40 70],...
-    'String',''...
+    'String','',...
+    'Callback',{@invisible_listbox_Callback}...
     );
 
 handle_p2 = uipanel('Tag','data_panel_visible_panel',...
@@ -183,13 +184,14 @@ uicontrol('Tag','data_panel_getinfo_pushbutton',...
     'Position',[floor((panel_size(3)-40)/3)+10 10 floor((panel_size(3)-40)/3) 30],...
     'String','Get info'...
     );
-uicontrol('Tag','data_panel_complete_pushbutton',...
+uicontrol('Tag','data_panel_duplicate_pushbutton',...
     'Style','pushbutton',...
     'Parent',handle_p3,...
     'BackgroundColor',defaultBackground,...
     'Units','Pixels',...
     'Position',[(floor((panel_size(3)-40)/3)*2)+10 10 floor((panel_size(3)-40)/3) 30],...
-    'String','Complete'...
+    'TooltipString','Duplicate currently active dataset',...
+    'String','Duplicate'...
     );
 
 handle_p4 = uipanel('Tag','data_panel_displaytype_panel',...
@@ -218,7 +220,7 @@ uicontrol('Tag','data_panel_displaytype_popupmenu',...
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function show_pushbutton_Callback(source,eventdata)
+function show_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -258,7 +260,7 @@ function show_pushbutton_Callback(source,eventdata)
 end
 
 
-function hide_pushbutton_Callback(source,eventdata)
+function hide_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -306,7 +308,7 @@ function hide_pushbutton_Callback(source,eventdata)
 end
 
 
-function remove_pushbutton_Callback(source,eventdata)
+function remove_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -316,6 +318,9 @@ function remove_pushbutton_Callback(source,eventdata)
     
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
+    
+    removedDatasetLabel = ...
+        ad.data{ad.control.spectra.visible(selected)}.label;
 
     % Remove from data and origdata
     ad.data(ad.control.spectra.visible(selected)) = [];
@@ -351,6 +356,13 @@ function remove_pushbutton_Callback(source,eventdata)
     setappdata(mainWindow,'control',ad.control);
     setappdata(mainWindow,'data',ad.data);
     setappdata(mainWindow,'origdata',ad.origdata);
+
+    % Adding status line
+    msgStr = cell(0);
+    msgStr{length(msgStr)+1} = ...
+        sprintf('Data set "%s" removed from GUI',removedDatasetLabel);
+    status = add2status(msgStr);
+    clear msgStr;    
     
     % Update both list boxes
     update_invisibleSpectra();
@@ -360,7 +372,7 @@ function remove_pushbutton_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function displaytype_popupmenu_Callback(source,eventdata)
+function displaytype_popupmenu_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -375,7 +387,7 @@ function displaytype_popupmenu_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function visible_listbox_Callback(source,eventdata)
+function visible_listbox_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -390,6 +402,11 @@ function visible_listbox_Callback(source,eventdata)
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);
     
+    % If user double clicked on list entry
+    if strcmp(get(gcf,'SelectionType'),'open')
+        datasetChangeLabel(ad.control.spectra.active);
+    end
+    
     % Update processing panel
     update_processingPanel();
     
@@ -403,14 +420,26 @@ function visible_listbox_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function previous_pushbutton_Callback(source,eventdata)
+function invisible_listbox_Callback(source,~);
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+    
+    % If user double clicked on list entry
+    if strcmp(get(gcf,'SelectionType'),'open')
+        datasetChangeLabel(...
+            ad.control.spectra.invisible(...
+            get(source,'Value')...
+            ));
+    end
+    update_invisibleSpectra();
+end
+
+function previous_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
 
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
     % This shall never happen, as the element should not be active in this
     % case
     if (length(ad.control.spectra.visible) < 2)
@@ -440,13 +469,10 @@ function previous_pushbutton_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function next_pushbutton_Callback(source,eventdata)
+function next_pushbutton_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     % This shall never happen, as the element should not be active in this
     % case
@@ -480,5 +506,16 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function datasetChangeLabel(index)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+
+end
 
 end

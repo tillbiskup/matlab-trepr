@@ -811,6 +811,8 @@ function tbg_Callback(source,~)
         case 'Processing'
             set(panels,'Visible','off');
             set(hp6,'Visible','on');         
+            % Update processing panel
+            update_processingPanel();
         case 'Analysis'
             set(panels,'Visible','off');
             set(hp7,'Visible','on');         
