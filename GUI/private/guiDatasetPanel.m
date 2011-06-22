@@ -320,56 +320,8 @@ function save_pushbutton_Callback(~,~)
     
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
-    
-    % Check whether selected dataset has a (valid) filename
-    if ~isfield(ad.data{selected},'filename') || ...
-            (strcmp(ad.data{selected}.filename,''))
-        disp('Need to come up with dialog box asking user for file...');
-        return;
-    else
-        [fpath,fname,fext] = fileparts(ad.data{selected}.filename);
-        if ~strcmp(fext,'.zip')
-            ad.data{selected}.filename = fullfile(fpath,[fname '.zip']);
-        end
-    end
-    
-    % Do the actual saving
-    [ status, exception ] = ...
-        trEPRsave(ad.data{selected}.filename,ad.data{selected});
-    
-    % In case something went wrong
-    if status
-        % Adding status line
-        msgStr = cell(0);
-        msgStr{length(msgStr)+1} = ...
-            sprintf('Problems when trying to save "%s" to file',...
-            ad.data{selected}.label);
-        msgStr{length(msgStr)+1} = ad.data{selected}.filename;
-        status = add2status(msgStr);
-        clear msgStr;
-        return;
-    else
-        % Get second output parameter from trEPRsave, i.e. filename
-        % (See help of trEPRsave for details)
-        filename = exception;
-    end
-    
-    % Remove from modified
-    ad.control.spectra.modified(...
-        find(ad.control.spectra.modified == selected)) = [];
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-    
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('Data set "%s" saved to file',ad.data{selected}.label);
-    msgStr{length(msgStr)+1} = filename;
-    status = add2status(msgStr);
-    clear msgStr;
+
+    datasetSave(selected);
     
     % Update both list boxes
     update_invisibleSpectra();
@@ -390,11 +342,17 @@ function remove_pushbutton_Callback(~,~)
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
     
+    % Get id of selected spectrum
+    selectedId = ad.control.spectra.visible(selected);
+    
     % Check whether currently selected spectrum is modified, and if so, ask
     % the user whether to remove it anyway
-    if find(ad.control.spectra.modified==selected)
+    if find(ad.control.spectra.modified==selectedId)
         answer = questdlg(...
             {'Dataset was modified. Remove anyway?'...
+            ' '...
+            'Note that "Remove" means that you loose the changes you made,'...
+            'but the (original) file will not be deleted from the file system.'...
             ' '...
             'Other options include "Save & Remove" or "Cancel".'},...
             'Warning: Dataset Modified...',...
@@ -413,18 +371,18 @@ function remove_pushbutton_Callback(~,~)
     end
     
     removedDatasetLabel = ...
-        ad.data{ad.control.spectra.visible(selected)}.label;
+        ad.data{selectedId}.label;
 
     % Remove from data and origdata
-    ad.data(ad.control.spectra.visible(selected)) = [];
-    ad.origdata(ad.control.spectra.visible(selected)) = [];
+    ad.data(selectedId) = [];
+    ad.origdata(selectedId) = [];
     
     % Remove from modified if it's there
     ad.control.spectra.modified(...
-        find(ad.control.spectra.modified == selected)) = [];
+        find(ad.control.spectra.modified == selectedId)) = [];
     % Remove from missing if it's there
     ad.control.spectra.missing(...
-        find(ad.control.spectra.missing == selected)) = [];
+        find(ad.control.spectra.missing == selectedId)) = [];
         
     
     % Delete in visible
@@ -440,6 +398,13 @@ function remove_pushbutton_Callback(~,~)
         indices = find(ad.control.spectra.invisible>selected);
         ad.control.spectra.invisible(indices) = ...
             ad.control.spectra.invisible(indices)-1;
+    end
+    
+    % Shift numbering in spectra.modified
+    if (~isempty(ad.control.spectra.modified))
+        indices = find(ad.control.spectra.modified>selected);
+        ad.control.spectra.modified(indices) = ...
+            ad.control.spectra.modified(indices)-1;
     end
     
     % Toggle active entry
@@ -694,6 +659,110 @@ function datasetChangeLabel(index)
     % Update appdata of main window
     setappdata(mainWindow,'data',ad.data);
 
+end
+
+function datasetSave(id)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+    
+    % Check whether selected dataset has a (valid) filename
+    if ~isfield(ad.data{id},'filename') || ...
+            (strcmp(ad.data{id}.filename,''))
+        disp('Need to come up with dialog box asking user for file...');
+        return;
+    else
+        [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+        if ~strcmp(fext,'.zip')
+            ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
+            % Need to test for existing file and in case, ask user...
+            if (exist(ad.data{id}.filename,'file'))
+                answer = questdlg(...
+                    {'WARNING: You''re about to save the current dataset to the file'...
+                    ad.data{id}.filename ...
+                    ' '...
+                    'This file exists already! Are you sure you want to overwrite it?'...
+                    ' '...
+                    'Please hold on and think twice before you hit "Overwrite".'...
+                    'Alternatively you can press "Save as" and choose a different name.'},...
+                    'Warning: File exists already...',...
+                    'Overwrite','Save as','Cancel',...
+                    'Cancel');
+                switch answer
+                    case 'Overwrite'
+                    case 'Save as'
+                        disp('Not implemented yet! Therefore cancelled...');
+                        return;
+                    case 'Cancel'
+                        return;
+                    otherwise
+                        return;
+                end
+            end
+        end
+    end
+    
+    for k = 1:length(ad.data)
+        if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
+            answer = questdlg(...
+                {'WARNING: You''re about to save the current dataset to the file'...
+                ad.data{id}.filename ...
+                ' '...
+                'A dataset loaded from a file with that name has been loaded to the GUI!'...
+                ' '...
+                'Please use "Save as" and choose a different name or press "Cancel".'},...
+                'Warning: Dataset with same filename loaded to GUI...',...
+                'Save as','Cancel',...
+                'Cancel');
+            switch answer
+                case 'Save as'
+                    disp('Not implemented yet! Therefore cancelled...');
+                    return;
+                case 'Cancel'
+                    return;
+                otherwise
+                    return;
+            end
+        end
+    end
+    
+    % Do the actual saving
+    [ status, exception ] = ...
+        trEPRsave(ad.data{id}.filename,ad.data{id});
+    
+    % In case something went wrong
+    if status
+        % Adding status line
+        msgStr = cell(0);
+        msgStr{length(msgStr)+1} = ...
+            sprintf('Problems when trying to save "%s" to file',...
+            ad.data{selected}.label);
+        msgStr{length(msgStr)+1} = ad.data{id}.filename;
+        status = add2status(msgStr);
+        clear msgStr;
+        return;
+    else
+        % Get second output parameter from trEPRsave, i.e. filename
+        % (See help of trEPRsave for details)
+        filename = exception;
+    end
+    
+    % Remove from modified
+    ad.control.spectra.modified(...
+        find(ad.control.spectra.modified == id)) = [];
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'origdata',ad.origdata);
+    
+    % Adding status line
+    msgStr = cell(0);
+    msgStr{length(msgStr)+1} = ...
+        sprintf('Data set "%s" saved to file',ad.data{id}.label);
+    msgStr{length(msgStr)+1} = filename;
+    status = add2status(msgStr);
+    clear msgStr;
 end
 
 end
