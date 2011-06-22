@@ -360,8 +360,7 @@ function remove_pushbutton_Callback(~,~)
             'Save & Remove');
         switch answer
             case 'Save & Remove'
-                disp('Not implemented yet! Therefore cancelled...');
-                return;
+                datasetSave(selectedId);
             case 'Remove'
             case 'Cancel'
                 return;
