@@ -321,7 +321,34 @@ function save_pushbutton_Callback(~,~)
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
 
-    datasetSave(selected);
+    % Get id of selected spectrum
+    selectedId = ad.control.spectra.visible(selected);
+
+    datasetSave(selectedId);
+    
+    % Update both list boxes
+    update_invisibleSpectra();
+    update_visibleSpectra();
+    
+    %Update main axis
+    update_mainAxis();
+end
+
+function saveas_pushbutton_Callback(~,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Get selected item of listbox
+    selected = get(gh.data_panel_visible_listbox,'Value');
+
+    % Get id of selected spectrum
+    selectedId = ad.control.spectra.visible(selected);
+
+    datasetSaveAs(selectedId);
     
     % Update both list boxes
     update_invisibleSpectra();
@@ -668,8 +695,7 @@ function datasetSave(id)
     % Check whether selected dataset has a (valid) filename
     if ~isfield(ad.data{id},'filename') || ...
             (strcmp(ad.data{id}.filename,''))
-        disp('Need to come up with dialog box asking user for file...');
-        return;
+        datasetSaveAs(id);
     else
         [fpath,fname,fext] = fileparts(ad.data{id}.filename);
         if ~strcmp(fext,'.zip')
@@ -690,7 +716,7 @@ function datasetSave(id)
                 switch answer
                     case 'Overwrite'
                     case 'Save as'
-                        disp('Not implemented yet! Therefore cancelled...');
+                        datasetSaveAs(id);
                         return;
                     case 'Cancel'
                         return;
@@ -715,7 +741,7 @@ function datasetSave(id)
                 'Cancel');
             switch answer
                 case 'Save as'
-                    disp('Not implemented yet! Therefore cancelled...');
+                    datasetSaveAs(id);
                     return;
                 case 'Cancel'
                     return;
@@ -763,5 +789,125 @@ function datasetSave(id)
     status = add2status(msgStr);
     clear msgStr;
 end
+
+function datasetSaveAs(id)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+    
+    % Create default filename
+    [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+    if ~strcmp(fext,'.zip')
+        ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
+    end
+    % Need to test for existing file and in case, change default name
+    if (exist(ad.data{id}.filename,'file'))
+        % 1. Check whether name ends with -NNN (where NNN are numbers)
+        % 2. existingFiles = dir(sprintf('%s*',filename));
+        % 2a. If name ends with -NNN, remove "-NNN" from filename before
+        % 3. regexp existingFiles for "-NNN" pattern
+        % 4. Get highest "-NNN" pattern and increment "NNN"
+        % 5. Use filename with incremented "NNN" as new default filename
+        if (regexp(fname,'_\d+$'))
+            filesInDir = ...
+                dir(sprintf('%s*',fullfile(fpath,regexprep(fname,'_\d+$',''))));
+        else
+            filesInDir = dir(sprintf('%s*',fullfile(fpath,fname)));
+        end
+        l=0;
+        numbers = [];
+        for k=1:length(filesInDir)
+            token = regexp(filesInDir(k).name,'_(\d+)\..*$','tokens');
+            if ~isempty(token)
+                l=l+1;
+                numbers(l) = str2double(token{1});
+            end
+        end
+        if (~isempty(numbers));
+            number = max(numbers)+1;
+        else
+            number = 1;
+        end
+        ad.data{id}.filename = fullfile(...
+            fpath,...
+            sprintf('%s_%i.zip',fname,number));
+    end
+    
+    % Show dialog for file selection
+    [FileName,PathName,FilterIndex] = uiputfile(...
+        '*.zip',...
+        'Save dataset in a new file',...
+        ad.data{id}.filename);
+    
+    if (FileName == 0)
+        return;
+    end
+    
+    % Set filename to save in
+    ad.data{id}.filename = fullfile(PathName, FileName);
+    
+    for k = 1:length(ad.data)
+        if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
+            answer = questdlg(...
+                {'WARNING: You''re about to save the current dataset to the file'...
+                ad.data{id}.filename ...
+                ' '...
+                'A dataset loaded from a file with that name has been loaded to the GUI!'...
+                ' '...
+                'Please use "Save as" and choose a different name or press "Cancel".'},...
+                'Warning: Dataset with same filename loaded to GUI...',...
+                'Save as','Cancel',...
+                'Cancel');
+            switch answer
+                case 'Save as'
+                    datasetSaveAs(id);
+                    return;
+                case 'Cancel'
+                    return;
+                otherwise
+                    return;
+            end
+        end
+    end
+    
+    % Do the actual saving
+    [ status, exception ] = ...
+        trEPRsave(ad.data{id}.filename,ad.data{id});
+    
+    % In case something went wrong
+    if status
+        % Adding status line
+        msgStr = cell(0);
+        msgStr{length(msgStr)+1} = ...
+            sprintf('Problems when trying to save "%s" to file',...
+            ad.data{selected}.label);
+        msgStr{length(msgStr)+1} = ad.data{id}.filename;
+        status = add2status(msgStr);
+        clear msgStr;
+        return;
+    else
+        % Get second output parameter from trEPRsave, i.e. filename
+        % (See help of trEPRsave for details)
+        filename = exception;
+    end
+    
+    % Remove from modified
+    ad.control.spectra.modified(...
+        find(ad.control.spectra.modified == id)) = [];
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'origdata',ad.origdata);
+    
+    % Adding status line
+    msgStr = cell(0);
+    msgStr{length(msgStr)+1} = ...
+        sprintf('Data set "%s" saved to file',ad.data{id}.label);
+    msgStr{length(msgStr)+1} = filename;
+    status = add2status(msgStr);
+    clear msgStr;
+end
+    
 
 end
