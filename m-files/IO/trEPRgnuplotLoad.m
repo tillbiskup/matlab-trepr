@@ -138,7 +138,11 @@ function content = loadFile(filename,varargin)
             (content.parameters.transient.length / ...
             length(files{1}.data(:,1))));
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        if ~isempty(MWfreq)
+            content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        else
+            content.parameters.bridge.MWfrequency = [];
+        end
 
         content.axes.x.values = files{1}.data(:,1);
         content.axes.x.measure = 'time';
@@ -203,7 +207,11 @@ function content = loadFile(filename,varargin)
             (content.parameters.transient.length / ...
             length(files{1}.data(:,1))));
         MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        if ~isempty(MWfreq)
+            content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        else
+            content.parameters.bridge.MWfrequency = [];
+        end
 
         content.axes.x.values = files{1}.data(:,1);
         content.axes.x.measure = 'time';
@@ -258,7 +266,11 @@ function content = loadFile(filename,varargin)
             (content.parameters.transient.length / ...
             length(file.data(:,1))));
         MWfreq = regexp(file.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        if ~isempty(MWfreq)
+            content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
+        else
+            content.parameters.bridge.MWfrequency = [];
+        end
 
         % Create axis informations from parameters
         content.axes.x.values = file.data(:,1);
