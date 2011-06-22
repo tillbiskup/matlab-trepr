@@ -33,18 +33,18 @@ catch
     return;
 end
 for k=1:length(filenames)
-    [pathstr, name, ext, versn] = fileparts(filenames{k});
+    [pathstr, name, ext] = fileparts(filenames{k});
     switch ext
         case '.xml'
-            xmlFileSerialize(fullfile(pathstr,[name ext versn]));
-            DOMnode = xmlread(fullfile(pathstr,[name ext versn]));
+            xmlFileSerialize(fullfile(pathstr,[name ext]));
+            DOMnode = xmlread(fullfile(pathstr,[name ext]));
             struct = xml2struct(DOMnode);
-            delete(fullfile(pathstr,[name ext versn]));
+            delete(fullfile(pathstr,[name ext]));
         case '.dat'
-            data = load(fullfile(pathstr,[name ext versn]));
-            delete(fullfile(pathstr,[name ext versn]));
+            data = load(fullfile(pathstr,[name ext]));
+            delete(fullfile(pathstr,[name ext]));
         otherwise
-            delete(fullfile(pathstr,[name ext versn]));
+            delete(fullfile(pathstr,[name ext]));
     end
 end
 if exist('data','var')
