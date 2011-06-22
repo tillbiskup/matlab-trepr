@@ -147,7 +147,8 @@ uicontrol('Tag','data_panel_save_pushbutton',...
     'Units','Pixels',...
     'Position',[10 40 floor((panel_size(3)-40)/3) 30],...
     'String','Save',...
-    'TooltipString','Save currently active spectrum'...
+    'TooltipString','Save currently active spectrum',...
+    'Callback', {@save_pushbutton_Callback}...
     );
 uicontrol('Tag','data_panel_saveas_pushbutton',...
     'Style','pushbutton',...
@@ -156,7 +157,8 @@ uicontrol('Tag','data_panel_saveas_pushbutton',...
     'Units','Pixels',...
     'Position',[floor((panel_size(3)-40)/3)+10 40 floor((panel_size(3)-40)/3) 30],...
     'String','Save as',...
-    'TooltipString','Save currently active spectrum under different filename'...
+    'TooltipString','Save currently active spectrum under different filename',...
+    'Callback', {@saveas_pushbutton_Callback}...
     );
 uicontrol('Tag','data_panel_remove_pushbutton',...
     'Style','pushbutton',...
@@ -308,6 +310,74 @@ function hide_pushbutton_Callback(~,~)
     update_mainAxis();
 end
 
+function save_pushbutton_Callback(~,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Get selected item of listbox
+    selected = get(gh.data_panel_visible_listbox,'Value');
+    
+    % Check whether selected dataset has a (valid) filename
+    if ~isfield(ad.data{selected},'filename') || ...
+            (strcmp(ad.data{selected}.filename,''))
+        disp('Need to come up with dialog box asking user for file...');
+        return;
+    else
+        [fpath,fname,fext] = fileparts(ad.data{selected}.filename);
+        if ~strcmp(fext,'.zip')
+            ad.data{selected}.filename = fullfile(fpath,[fname '.zip']);
+        end
+    end
+    
+    % Do the actual saving
+    [ status, exception ] = ...
+        trEPRsave(ad.data{selected}.filename,ad.data{selected});
+    
+    % In case something went wrong
+    if status
+        % Adding status line
+        msgStr = cell(0);
+        msgStr{length(msgStr)+1} = ...
+            sprintf('Problems when trying to save "%s" to file',...
+            ad.data{selected}.label);
+        msgStr{length(msgStr)+1} = ad.data{selected}.filename;
+        status = add2status(msgStr);
+        clear msgStr;
+        return;
+    else
+        % Get second output parameter from trEPRsave, i.e. filename
+        % (See help of trEPRsave for details)
+        filename = exception;
+    end
+    
+    % Remove from modified
+    ad.control.spectra.modified(...
+        find(ad.control.spectra.modified == selected)) = [];
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'origdata',ad.origdata);
+    
+    % Adding status line
+    msgStr = cell(0);
+    msgStr{length(msgStr)+1} = ...
+        sprintf('Data set "%s" saved to file',ad.data{selected}.label);
+    msgStr{length(msgStr)+1} = filename;
+    status = add2status(msgStr);
+    clear msgStr;
+    
+    % Update both list boxes
+    update_invisibleSpectra();
+    update_visibleSpectra();
+    
+    %Update main axis
+    update_mainAxis();
+end
 
 function remove_pushbutton_Callback(~,~)
     % Get appdata of main window
@@ -320,12 +390,42 @@ function remove_pushbutton_Callback(~,~)
     % Get selected item of listbox
     selected = get(gh.data_panel_visible_listbox,'Value');
     
+    % Check whether currently selected spectrum is modified, and if so, ask
+    % the user whether to remove it anyway
+    if find(ad.control.spectra.modified==selected)
+        answer = questdlg(...
+            {'Dataset was modified. Remove anyway?'...
+            ' '...
+            'Other options include "Save & Remove" or "Cancel".'},...
+            'Warning: Dataset Modified...',...
+            'Save & Remove','Remove','Cancel',...
+            'Save & Remove');
+        switch answer
+            case 'Save & Remove'
+                disp('Not implemented yet! Therefore cancelled...');
+                return;
+            case 'Remove'
+            case 'Cancel'
+                return;
+            otherwise
+                return;
+        end
+    end
+    
     removedDatasetLabel = ...
         ad.data{ad.control.spectra.visible(selected)}.label;
 
     % Remove from data and origdata
     ad.data(ad.control.spectra.visible(selected)) = [];
     ad.origdata(ad.control.spectra.visible(selected)) = [];
+    
+    % Remove from modified if it's there
+    ad.control.spectra.modified(...
+        find(ad.control.spectra.modified == selected)) = [];
+    % Remove from missing if it's there
+    ad.control.spectra.missing(...
+        find(ad.control.spectra.missing == selected)) = [];
+        
     
     % Delete in visible
     ad.control.spectra.visible(selected) = [];
