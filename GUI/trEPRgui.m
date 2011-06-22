@@ -793,6 +793,7 @@ function tbg_Callback(source,~)
             % Update both list boxes
             update_invisibleSpectra();
             update_visibleSpectra();
+            update_datasetPanel();
         case 'Slider'
             set(panels,'Visible','off');
             set(hp3,'Visible','on');         
