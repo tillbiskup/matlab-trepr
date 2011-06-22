@@ -166,7 +166,7 @@ uicontrol('Tag','data_panel_remove_pushbutton',...
     'Position',[(floor((panel_size(3)-40)/3)*2)+10 40 floor((panel_size(3)-40)/3) 30],...
     'String','Remove',...
     'TooltipString','Remove currently active spectrum from GUI (does not delete the file)',...
-    'Callback', {@remove_pushbutton_Callback}......
+    'Callback', {@remove_pushbutton_Callback}...
     );
 uicontrol('Tag','data_panel_linestyle_pushbutton',...
     'Style','pushbutton',...
@@ -191,7 +191,8 @@ uicontrol('Tag','data_panel_duplicate_pushbutton',...
     'Units','Pixels',...
     'Position',[(floor((panel_size(3)-40)/3)*2)+10 10 floor((panel_size(3)-40)/3) 30],...
     'TooltipString','Duplicate currently active dataset',...
-    'String','Duplicate'...
+    'String','Duplicate',...
+    'Callback', {@duplicate_pushbutton_Callback}...
     );
 
 handle_p4 = uipanel('Tag','data_panel_displaytype_panel',...
@@ -371,6 +372,83 @@ function remove_pushbutton_Callback(~,~)
     %Update main axis
     update_mainAxis();
 end
+
+function duplicate_pushbutton_Callback(~,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = guihandles(mainWindow);
+    
+    % Get selected item of listbox
+    selected = get(gh.data_panel_visible_listbox,'Value');
+    
+    % Create label for duplicate
+    % That is, add number in brackets at the end: (n)
+    % But check whether there is already such a number in brackets in any
+    % of the visible spectra with the same label.
+    expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
+    l = 0;
+    token = [];
+    for k=1:length(ad.control.spectra.visible)
+        tokens = regexp(ad.data{ad.control.spectra.visible(k)}.label,expression,'tokens');
+        if ~isempty(tokens)
+            l=l+1;
+            token(l) = str2double(char(tokens{1}));
+        end
+    end
+    if ~isempty(token)
+        ad.data{selected}.label
+        if (regexp(ad.data{selected}.label,' \((\d+)\)$'))
+            duplicateLabel = regexprep(...
+                ad.data{selected}.label,...
+                ' \((\d+)\)$',sprintf(' (%i)',max(token)+1));
+        else
+            duplicateLabel = sprintf('%s (%i)',ad.data{selected}.label,max(token)+1);
+        end
+    else
+        duplicateLabel = sprintf('%s (1)',ad.data{selected}.label);
+    end
+    
+    % Actually duplicate the dataset
+    duplicate = ad.data{selected};
+    % Set label of duplicate
+    duplicate.label = duplicateLabel;
+    % IMPORTANT: Set the filename of the duplicate to empty string
+    duplicate.filename = '';
+    
+    nSpectra = length(ad.data);
+    
+    ad.data{end+1} = duplicate;
+    ad.origdata{end+1} = duplicate;
+    
+    ad.control.spectra.visible(end+1) = nSpectra+1;
+    ad.control.spectra.modified(end+1) = nSpectra+1;
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'origdata',ad.origdata);
+
+    % Adding status line
+    msgstr = cell(0);
+    msgstr{length(msgstr)+1} = ...
+        sprintf(...
+        'Data set "%s" duplicated as %s',...
+        ad.data{selected}.label,...
+        duplicateLabel);
+    status = add2status(msgstr);
+    clear msgstr;
+    
+    % Update both list boxes
+    update_invisibleSpectra();
+    update_visibleSpectra();
+    
+    %Update main axis
+    update_mainAxis();
+end
+
 
 function displaytype_popupmenu_Callback(source,~)
     % Get appdata of main window
