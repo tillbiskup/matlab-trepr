@@ -111,17 +111,17 @@ uicontrol('Tag','measure_panel_point1_y_unit_edit',...
     'Position',[60+(handle_size(3)-90)/2 40 (handle_size(3)-90)/2 25],...
     'String','0'...
     );
-uicontrol('Tag','measure_panel_getposition_checkbox',...
+uicontrol('Tag','measure_panel_setslider_checkbox',...
     'Style','checkbox',...
     'Parent',handle_p1,...
     'BackgroundColor',defaultBackground,...
     'Units','Pixels',...
     'Position',[60 10 handle_size(3)-90 20],...
-    'String',' Take position for slider',...
-    'ToolTip','Use picked point to set the position sliders for x and y',...
-    'Value',1 ...
+    'String',' Set sliders (1 Pt)',...
+    'ToolTip','Use picked point to set the position sliders in x and y dimension',...
+    'Value',1,...
+    'Callback',{@measure_setslider_checkbox_Callback}...
     );
-%    'Callback',{@axislimits_auto_checkbox_Callback}...
 
 handle_p2 = uipanel('Tag','measure_panel_point2_panel',...
     'Parent',handle,...
@@ -312,7 +312,24 @@ uicontrol('Tag','measure_panel_clear_pushbutton',...
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function measure_1point_togglebutton_Callback(source,eventdata)
+function measure_setslider_checkbox_Callback(source,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    ad.control.measure.setslider = get(source,'Value');
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);  
+    
+    % Update slider panel
+    update_sliderPanel();
+
+    %Update main axis
+    update_mainAxis();    
+end
+
+function measure_1point_togglebutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -322,10 +339,17 @@ function measure_1point_togglebutton_Callback(source,eventdata)
 
     if (get(source,'Value'))
         set(gh.measure_panel_2points_togglebutton,'Value',0);
+        set(mainWindow,'WindowButtonMotionFcn',@trackPointer);
+%         set(mainWindow,'WindowButtonDownFcn',@if_singleMeasurementPoint);
+    else
+        set(mainWindow,'WindowButtonMotionFcn','');
+        set(mainWindow,'WindowButtonDownFcn','');
+        refresh;
     end
+    
 end
 
-function measure_2points_togglebutton_Callback(source,eventdata)
+function measure_2points_togglebutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -338,7 +362,7 @@ function measure_2points_togglebutton_Callback(source,eventdata)
     end
 end
 
-function clear_pushbutton_Callback(source,eventdata)
+function clear_pushbutton_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -348,6 +372,10 @@ function clear_pushbutton_Callback(source,eventdata)
 
     set(gh.measure_panel_1point_togglebutton,'Value',0);
     set(gh.measure_panel_2points_togglebutton,'Value',0);
+
+    % Switch off pointer functions
+    set(mainWindow,'WindowButtonMotionFcn','');
+    set(mainWindow,'WindowButtonDownFcn','');
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -387,7 +387,11 @@ function remove_pushbutton_Callback(~,~)
             'Save & Remove');
         switch answer
             case 'Save & Remove'
-                datasetSave(selectedId);
+                status = datasetSave(selectedId);
+                if status
+                    % That means that something went wrong with the saveAs
+                    return;
+                end
             case 'Remove'
             case 'Cancel'
                 return;
@@ -687,7 +691,12 @@ function datasetChangeLabel(index)
 
 end
 
-function datasetSave(id)
+function status = datasetSave(id)
+    % Internal function that saves a given dataset
+    %
+    % STATUS: 0 - in case save was successful
+    %        -1 - in case something went wrong
+
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -695,7 +704,7 @@ function datasetSave(id)
     % Check whether selected dataset has a (valid) filename
     if ~isfield(ad.data{id},'filename') || ...
             (strcmp(ad.data{id}.filename,''))
-        datasetSaveAs(id);
+        status = datasetSaveAs(id);
         return;
     else
         [fpath,fname,fext] = fileparts(ad.data{id}.filename);
@@ -717,7 +726,7 @@ function datasetSave(id)
                 switch answer
                     case 'Overwrite'
                     case 'Save as'
-                        datasetSaveAs(id);
+                        status = datasetSaveAs(id);
                         return;
                     case 'Cancel'
                         return;
@@ -742,7 +751,7 @@ function datasetSave(id)
                 'Cancel');
             switch answer
                 case 'Save as'
-                    datasetSaveAs(id);
+                    status = datasetSaveAs(id);
                     return;
                 case 'Cancel'
                     return;
@@ -753,11 +762,11 @@ function datasetSave(id)
     end
     
     % Do the actual saving
-    [ status, exception ] = ...
+    [ saveStatus, exception ] = ...
         trEPRsave(ad.data{id}.filename,ad.data{id});
     
     % In case something went wrong
-    if status
+    if saveStatus
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...
@@ -789,9 +798,17 @@ function datasetSave(id)
     msgStr{length(msgStr)+1} = filename;
     status = add2status(msgStr);
     clear msgStr;
+    
+    status = 0;
 end
 
-function datasetSaveAs(id)
+function status = datasetSaveAs(id)
+    % Internal function that asks the user for a filename to save a given
+    % dataset to
+    %
+    % STATUS: 0 - in case saveAs was successful
+    %        -1 - in case something went wrong
+    
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -841,6 +858,7 @@ function datasetSaveAs(id)
         ad.data{id}.filename);
     
     if (FileName == 0)
+        status = -1;
         return;
     end
     
@@ -861,7 +879,7 @@ function datasetSaveAs(id)
                 'Cancel');
             switch answer
                 case 'Save as'
-                    datasetSaveAs(id);
+                    status = datasetSaveAs(id);
                     return;
                 case 'Cancel'
                     return;
@@ -872,11 +890,11 @@ function datasetSaveAs(id)
     end
     
     % Do the actual saving
-    [ status, exception ] = ...
+    [ saveStatus, exception ] = ...
         trEPRsave(ad.data{id}.filename,ad.data{id});
     
     % In case something went wrong
-    if status
+    if saveStatus
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...
@@ -908,6 +926,8 @@ function datasetSaveAs(id)
     msgStr{length(msgStr)+1} = filename;
     status = add2status(msgStr);
     clear msgStr;
+    
+    status = 0;
 end
     
 
