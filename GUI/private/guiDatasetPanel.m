@@ -775,6 +775,7 @@ function status = datasetSave(id)
         msgStr{length(msgStr)+1} = ad.data{id}.filename;
         status = add2status(msgStr);
         clear msgStr;
+        status = -1;
         return;
     else
         % Get second output parameter from trEPRsave, i.e. filename

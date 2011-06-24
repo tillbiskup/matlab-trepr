@@ -118,7 +118,7 @@ uicontrol('Tag','measure_panel_setslider_checkbox',...
     'Units','Pixels',...
     'Position',[60 10 handle_size(3)-90 20],...
     'String',' Set sliders (1 Pt)',...
-    'ToolTip','Use picked point to set the position sliders in x and y dimension',...
+    'ToolTip','Use picked point to set the position sliders in x and/or y dimension',...
     'Value',1,...
     'Callback',{@measure_setslider_checkbox_Callback}...
     );
@@ -336,14 +336,37 @@ function measure_1point_togglebutton_Callback(source,~)
     
     % Get guihandles of main window
     gh = guihandles(mainWindow);
-
+    
     if (get(source,'Value'))
+        % Switch off other togglebutton
         set(gh.measure_panel_2points_togglebutton,'Value',0);
+        
+        % Reset display of values
+        clearFields();
+
+        % Set nPoints to measure in appdata
+        ad.control.measure.nPoints = 1;
+        % Set number of current point in appdata
+        ad.control.measure.point = 1;
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Set pointer callback functions
         set(mainWindow,'WindowButtonMotionFcn',@trackPointer);
-%         set(mainWindow,'WindowButtonDownFcn',@if_singleMeasurementPoint);
+        set(mainWindow,'WindowButtonDownFcn',@switchMeasurePointer);
     else
+        % Reset nPoints to measure in appdata
+        ad.control.measure.nPoints = 0;
+        % Reset number of point in appdata
+        ad.control.measure.point = 0;
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+
+        % Reset pointer callback functions
         set(mainWindow,'WindowButtonMotionFcn','');
         set(mainWindow,'WindowButtonDownFcn','');
+        
+        % Update display - REALLY NECESSARY?
         refresh;
     end
     
@@ -358,11 +381,77 @@ function measure_2points_togglebutton_Callback(source,~)
     gh = guihandles(mainWindow);
 
     if (get(source,'Value'))
+        % Switch off other togglebutton
         set(gh.measure_panel_1point_togglebutton,'Value',0);
+
+        % Set nPoints to measure in appdata
+        ad.control.measure.nPoints = 2;
+        % Set number of current point in appdata
+        ad.control.measure.point = 1;
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Set pointer callback functions
+        set(mainWindow,'WindowButtonMotionFcn',@trackPointer);
+        set(mainWindow,'WindowButtonDownFcn',@switchMeasurePointer);
+    else
+        % Reset nPoints to measure in appdata
+        ad.control.measure.nPoints = 0;
+        % Reset number of point in appdata
+        ad.control.measure.point = 0;
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+
+        % Reset pointer callback functions
+        set(mainWindow,'WindowButtonMotionFcn','');
+        set(mainWindow,'WindowButtonDownFcn','');
+        
+        % Update display - REALLY NECESSARY?
+        refresh;
     end
 end
 
-function clear_pushbutton_Callback(source,~)
+function clear_pushbutton_Callback(~,~)
+    measureEnd();    
+    clearFields();
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Utility functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function switchMeasurePointer(~,~)
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    ad = getappdata(mainWindow);
+
+    % Depending on nPoints
+    switch ad.control.measure.nPoints
+        case 1
+            measureEnd();
+        case 2
+            % Set number of point in appdata
+            switch ad.control.measure.point
+                case 1
+                    ad.control.measure.point = 2;
+                case 2
+                    measureEnd()
+                otherwise
+                    % That shall never happen!
+                    disp('guiMeasurePanel() -> switchMeasurePointer(): Unrecognised point');
+                    return;
+            end
+        otherwise
+            % That shall never happen!
+            disp('guiMeasurePanel() -> switchMeasurePointer(): Unrecognised nPoints');
+            return;            
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+end
+
+function measureEnd()
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -370,16 +459,49 @@ function clear_pushbutton_Callback(source,~)
     % Get guihandles of main window
     gh = guihandles(mainWindow);
 
-    set(gh.measure_panel_1point_togglebutton,'Value',0);
-    set(gh.measure_panel_2points_togglebutton,'Value',0);
-
-    % Switch off pointer functions
+    % Reset nPoints to measure in appdata
+    ad.control.measure.nPoints = 0;
+    % Reset number of point in appdata
+    ad.control.measure.point = 0;
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Reset pointer callback functions
     set(mainWindow,'WindowButtonMotionFcn','');
     set(mainWindow,'WindowButtonDownFcn','');
+    
+    % Reset pointer
+    set(mainWindow,'Pointer','arrow');
+
+    % Switch off togglebuttons
+    set(gh.measure_panel_1point_togglebutton,'Value',0);
+    set(gh.measure_panel_2points_togglebutton,'Value',0);
+    
+    % Update display - REALLY NECESSARY?
+    refresh;
 end
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function clearFields()
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+
+    % Reset edit fields
+    set(gh.measure_panel_point1_x_index_edit,'String','0');
+    set(gh.measure_panel_point1_x_unit_edit,'String','0');
+    set(gh.measure_panel_point1_y_index_edit,'String','0');
+    set(gh.measure_panel_point1_y_unit_edit,'String','0');
+    set(gh.measure_panel_point2_x_index_edit,'String','0');
+    set(gh.measure_panel_point2_x_unit_edit,'String','0');
+    set(gh.measure_panel_point2_y_index_edit,'String','0');
+    set(gh.measure_panel_point2_y_unit_edit,'String','0');
+    set(gh.measure_panel_distance_x_index_edit,'String','0');
+    set(gh.measure_panel_distance_x_unit_edit,'String','0');
+    set(gh.measure_panel_distance_y_index_edit,'String','0');
+    set(gh.measure_panel_distance_y_unit_edit,'String','0');
+end
+        
 
 end

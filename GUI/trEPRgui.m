@@ -450,6 +450,10 @@ ad.configuration.display.labels.z.unit = 'points';
 ad.control = struct();
 % control.status - empty struct
 ad.control.status = cell(0);
+% control.measure - struct
+ad.control.measure = struct();
+ad.control.measure.point = 0;
+ad.control.measure.nPoints = 0;
 % control.spectra - struct
 ad.control.spectra = struct();
 ad.control.spectra.active = 0;
