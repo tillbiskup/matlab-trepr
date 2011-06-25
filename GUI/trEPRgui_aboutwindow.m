@@ -127,6 +127,8 @@ set(hMsg3,'String',contributorsMessageText);
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
 
+% Set focus to "Close" button
+uicontrol(closeBtn);
 
 % Define timer for all the fun stuff
 t1 = timer( ...
