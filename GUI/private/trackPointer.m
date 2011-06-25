@@ -94,9 +94,14 @@ if pointerPosition(1) > axisCoordinates(1) && ...
     active = ad.control.spectra.active;
     
     % Get xdata and ydata of currently active dataset
-    xdata = get(get(mainAxis,'Children'),'XData');
-    ydata = get(get(mainAxis,'Children'),'YData');
-        
+    if (strcmp(ad.control.axis.displayType,'2D plot'))
+        xdata = get(findobj('Parent',mainAxis,'-and','Type','image'),'xdata');
+        ydata = get(findobj('Parent',mainAxis,'-and','Type','image'),'ydata');
+    else
+        xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
+        ydata = get(findobj('Parent',mainAxis,'-and','Type','line'),'ydata');
+    end
+    
     % If we are in 1D display mode and there are more than one spectrum
     % and/or a zero line displayed
     if (strcmp(ad.control.axis.displayType,'1D along x') || ...

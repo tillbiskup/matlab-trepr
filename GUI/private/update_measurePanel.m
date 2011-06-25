@@ -35,7 +35,8 @@ if (ad.control.spectra.active)
         );
     % Set values accordingly - if they exist
     active = ad.control.spectra.active;
-    if ~isempty(ad.data{active}.display.measure.point(1).index)
+    if isfield(ad.data{active}.display,'measure') && ...
+            ~isempty(ad.data{active}.display.measure.point(1).index)
         set(gh.measure_panel_point1_x_index_edit,'String',...
             num2str(ad.data{active}.display.measure.point(1).index(1)));
         set(gh.measure_panel_point1_y_index_edit,'String',...
@@ -50,7 +51,8 @@ if (ad.control.spectra.active)
         set(gh.measure_panel_point1_x_unit_edit,'String','0');
         set(gh.measure_panel_point1_y_unit_edit,'String','0');
     end
-    if ~isempty(ad.data{active}.display.measure.point(2).index)
+    if isfield(ad.data{active}.display,'measure') && ...
+            ~isempty(ad.data{active}.display.measure.point(2).index)
         set(gh.measure_panel_point2_x_index_edit,'String',...
             num2str(ad.data{active}.display.measure.point(2).index(1)));
         set(gh.measure_panel_point2_y_index_edit,'String',...

@@ -224,11 +224,20 @@ function load_pushbutton_Callback(source,eventdata)
     add2status(msg);
     clear msgStr msg;
     
+    message = msgbox(...
+        'Loading spectra...       ',...
+        'Loading spectra',...
+        'Help','modal');
+    
     data = trEPRload(FileName,'combine',state.comb);
     
     if isequal(data,0) || isempty(data)
         msg = 'Data could not be loaded.';
         add2status(msg);
+        message = msgbox(...
+            'Loading spectra... FAILED!',...
+            'Loading spectra',...
+            'Help','modal');
         return;
     end
     
@@ -262,6 +271,10 @@ function load_pushbutton_Callback(source,eventdata)
     end
     
     if isempty(data)
+        message = msgbox(...
+            'Loading spectra... FAILED!',...
+            'Loading spectra',...
+            'Help','modal');
         return;
     end
     
@@ -344,6 +357,11 @@ function load_pushbutton_Callback(source,eventdata)
     status = add2status(msg);
     clear msgStr msg;
     
+    message = msgbox(...
+        'Loading spectra... DONE  ',...
+        'Loading spectra',...
+        'Help','modal');
+
     % Get appdata again after making changes to it before
     ad = getappdata(mainWindow);
     
