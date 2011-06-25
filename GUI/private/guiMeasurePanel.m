@@ -308,6 +308,19 @@ uicontrol('Tag','measure_panel_clear_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Set setslider checkbox
+% Get appdata of main window
+mainWindow = findobj('Tag','trepr_gui_mainwindow');
+ad = getappdata(mainWindow);
+
+% Get guihandles of main window
+gh = guihandles(mainWindow);
+
+set(gh.measure_panel_setslider_checkbox,...
+    'Value',ad.configuration.measure.setslider);
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -429,13 +442,15 @@ function switchMeasurePointer(~,~)
     switch ad.control.measure.nPoints
         case 1
             measureEnd();
+            assignPointsToDataStructure();
         case 2
             % Set number of point in appdata
             switch ad.control.measure.point
                 case 1
                     ad.control.measure.point = 2;
                 case 2
-                    measureEnd()
+                    measureEnd();
+                    assignPointsToDataStructure();
                 otherwise
                     % That shall never happen!
                     disp('guiMeasurePanel() -> switchMeasurePointer(): Unrecognised point');
@@ -481,6 +496,61 @@ function measureEnd()
     refresh;
 end
 
+function assignPointsToDataStructure()
+    % Get appdata of main window
+    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+
+    % To shorten lines, assign id of currently active dataset to var
+    active = ad.control.spectra.active;
+
+    % Assign index and value to data structure of currently active dataset
+    ad.data{active}.display.measure.point(1).index = [...
+        str2double(get(gh.measure_panel_point1_x_index_edit,'String'))...
+        str2double(get(gh.measure_panel_point1_y_index_edit,'String'))...
+        ];
+    ad.data{active}.display.measure.point(1).unit = [...
+        str2double(get(gh.measure_panel_point1_x_unit_edit,'String'))...
+        str2double(get(gh.measure_panel_point1_y_unit_edit,'String'))...
+        ];
+    if (ad.control.measure.nPoints == 2)
+        ad.data{active}.display.measure.point(2).index = [...
+            str2double(get(gh.measure_panel_point2_x_index_edit,'String'))...
+            str2double(get(gh.measure_panel_point2_y_index_edit,'String'))...
+            ];
+        ad.data{active}.display.measure.point(2).unit = [...
+            str2double(get(gh.measure_panel_point2_x_unit_edit,'String'))...
+            str2double(get(gh.measure_panel_point2_y_unit_edit,'String'))...
+            ];
+    end
+    
+    % Set slider values accordingly, if configured to do so
+    if (ad.control.measure.setslider)
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{active}.display.position.x = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+                ad.data{active}.display.position.y = ...
+                    ad.data{active}.display.measure.point(1).index(2);
+            case '1D along x'
+                ad.data{active}.display.position.x = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+            case '1D along y'
+                ad.data{active}.display.position.y = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+            otherwise
+                % That shall never happen
+                disp('guiMeasurePanel(): Unrecognised displayType');
+                return;
+        end
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+end
+
 function clearFields()
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
@@ -501,6 +571,15 @@ function clearFields()
     set(gh.measure_panel_distance_x_unit_edit,'String','0');
     set(gh.measure_panel_distance_y_index_edit,'String','0');
     set(gh.measure_panel_distance_y_unit_edit,'String','0');
+    
+    % Clear fields in data structure of currently active dataset
+    ad.data{ad.control.spectra.active}.display.measure.point(1).index = [];
+    ad.data{ad.control.spectra.active}.display.measure.point(1).unit = [];
+    ad.data{ad.control.spectra.active}.display.measure.point(2).index = [];
+    ad.data{ad.control.spectra.active}.display.measure.point(2).unit = [];
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
 end
         
 

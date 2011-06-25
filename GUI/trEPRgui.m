@@ -27,6 +27,94 @@ hMainFigure = figure('Tag','trepr_gui_mainwindow',...
     'Menu','none','Toolbar','none',...
     'KeyPressFcn',@(obj,evt)disp(evt));
 
+
+% Create appdata structure
+ad = struct();
+% data - empty cell array
+ad.data = cell(0);
+% origdata - empty cell array
+ad.origdata = cell(0);
+% configuration - struct
+ad.configuration = struct();
+ad.configuration.display = struct();
+ad.configuration.display.highlight = struct();
+ad.configuration.display.highlight.method = 'color';
+ad.configuration.display.highlight.value = 'b';
+ad.configuration.display.labels = struct();
+ad.configuration.display.labels.x.measure = 'index';
+ad.configuration.display.labels.x.unit = 'points';
+ad.configuration.display.labels.y.measure = 'index';
+ad.configuration.display.labels.y.unit = 'points';
+ad.configuration.display.labels.z.measure = 'index';
+ad.configuration.display.labels.z.unit = 'points';
+ad.configuration.measure.setslider = 1;
+% control - struct
+ad.control = struct();
+% control.status - empty struct
+ad.control.status = cell(0);
+% control.measure - struct
+ad.control.measure = struct();
+ad.control.measure.point = 0;
+ad.control.measure.nPoints = 0;
+ad.control.measure.setslider = 1;
+% control.spectra - struct
+ad.control.spectra = struct();
+ad.control.spectra.active = 0;
+ad.control.spectra.invisible = [];
+ad.control.spectra.visible = [];
+ad.control.spectra.modified = [];
+ad.control.spectra.missing = [];
+% control.axis - struct
+ad.control.axis = struct();
+ad.control.axis.displayType = '';
+ad.control.axis.grid = struct();
+ad.control.axis.grid.x = 'off';
+ad.control.axis.grid.y = 'off';
+ad.control.axis.grid.minor = 'off';
+ad.control.axis.grid.zero = true;
+ad.control.axis.highlight = struct();
+ad.control.axis.highlight.method = ...
+    ad.configuration.display.highlight.method;
+ad.control.axis.highlight.value = ...
+    ad.configuration.display.highlight.value;
+ad.control.axis.legend = struct();
+ad.control.axis.legend.location = 'none';
+ad.control.axis.labels = struct();
+ad.control.axis.labels.x = struct();
+ad.control.axis.labels.x.measure = ...
+    ad.configuration.display.labels.x.measure;
+ad.control.axis.labels.x.unit = ...
+    ad.configuration.display.labels.x.unit;
+ad.control.axis.labels.y = struct();
+ad.control.axis.labels.y.measure = ...
+    ad.configuration.display.labels.y.measure;
+ad.control.axis.labels.y.unit = ...
+    ad.configuration.display.labels.y.unit;
+ad.control.axis.labels.z = struct();
+ad.control.axis.labels.z.measure = ...
+    ad.configuration.display.labels.z.measure;
+ad.control.axis.labels.z.unit = ...
+    ad.configuration.display.labels.z.unit;
+ad.control.axis.limits = struct();
+ad.control.axis.limits.auto = true;
+ad.control.axis.limits.x = struct();
+ad.control.axis.limits.x.min = 0;
+ad.control.axis.limits.x.max = 1;
+ad.control.axis.limits.y = struct();
+ad.control.axis.limits.y.min = 0;
+ad.control.axis.limits.y.max = 1;
+ad.control.axis.limits.z = struct();
+ad.control.axis.limits.z.min = 0;
+ad.control.axis.limits.z.max = 1;
+ad.control.axis.normalisation = 'none';
+
+
+setappdata(hMainFigure,'data',ad.data);
+setappdata(hMainFigure,'origdata',ad.origdata);
+setappdata(hMainFigure,'configuration',ad.configuration);
+setappdata(hMainFigure,'control',ad.control);
+
+
 defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
@@ -426,90 +514,6 @@ uicontrol('Tag','panel_analysis_description',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Create appdata structure
-ad = struct();
-% data - empty cell array
-ad.data = cell(0);
-% origdata - empty cell array
-ad.origdata = cell(0);
-% configuration - struct
-ad.configuration = struct();
-ad.configuration.display = struct();
-ad.configuration.display.highlight = struct();
-ad.configuration.display.highlight.method = 'color';
-ad.configuration.display.highlight.value = 'b';
-ad.configuration.display.labels = struct();
-ad.configuration.display.labels.x.measure = 'index';
-ad.configuration.display.labels.x.unit = 'points';
-ad.configuration.display.labels.y.measure = 'index';
-ad.configuration.display.labels.y.unit = 'points';
-ad.configuration.display.labels.z.measure = 'index';
-ad.configuration.display.labels.z.unit = 'points';
-% control - struct
-ad.control = struct();
-% control.status - empty struct
-ad.control.status = cell(0);
-% control.measure - struct
-ad.control.measure = struct();
-ad.control.measure.point = 0;
-ad.control.measure.nPoints = 0;
-% control.spectra - struct
-ad.control.spectra = struct();
-ad.control.spectra.active = 0;
-ad.control.spectra.invisible = [];
-ad.control.spectra.visible = [];
-ad.control.spectra.modified = [];
-ad.control.spectra.missing = [];
-% control.axis - struct
-ad.control.axis = struct();
-ad.control.axis.displayType = '';
-ad.control.axis.grid = struct();
-ad.control.axis.grid.x = 'off';
-ad.control.axis.grid.y = 'off';
-ad.control.axis.grid.minor = 'off';
-ad.control.axis.grid.zero = true;
-ad.control.axis.highlight = struct();
-ad.control.axis.highlight.method = ...
-    ad.configuration.display.highlight.method;
-ad.control.axis.highlight.value = ...
-    ad.configuration.display.highlight.value;
-ad.control.axis.legend = struct();
-ad.control.axis.legend.location = 'none';
-ad.control.axis.labels = struct();
-ad.control.axis.labels.x = struct();
-ad.control.axis.labels.x.measure = ...
-    ad.configuration.display.labels.x.measure;
-ad.control.axis.labels.x.unit = ...
-    ad.configuration.display.labels.x.unit;
-ad.control.axis.labels.y = struct();
-ad.control.axis.labels.y.measure = ...
-    ad.configuration.display.labels.y.measure;
-ad.control.axis.labels.y.unit = ...
-    ad.configuration.display.labels.y.unit;
-ad.control.axis.labels.z = struct();
-ad.control.axis.labels.z.measure = ...
-    ad.configuration.display.labels.z.measure;
-ad.control.axis.labels.z.unit = ...
-    ad.configuration.display.labels.z.unit;
-ad.control.axis.limits = struct();
-ad.control.axis.limits.auto = true;
-ad.control.axis.limits.x = struct();
-ad.control.axis.limits.x.min = 0;
-ad.control.axis.limits.x.max = 1;
-ad.control.axis.limits.y = struct();
-ad.control.axis.limits.y.min = 0;
-ad.control.axis.limits.y.max = 1;
-ad.control.axis.limits.z = struct();
-ad.control.axis.limits.z.min = 0;
-ad.control.axis.limits.z.max = 1;
-ad.control.axis.normalisation = 'none';
-
-
-setappdata(hMainFigure,'data',ad.data);
-setappdata(hMainFigure,'origdata',ad.origdata);
-setappdata(hMainFigure,'configuration',ad.configuration);
-setappdata(hMainFigure,'control',ad.control);
 
 
 % Make the GUI visible.
