@@ -25,7 +25,7 @@ hMainFigure = figure('Tag','trepr_gui_mainwindow',...
     'Resize','off',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
-    'KeyPressFcn',@(obj,evt)disp(evt));
+    'KeyPressFcn',@keyBindings);
 
 
 % Create appdata structure
@@ -828,6 +828,13 @@ function tbg_Callback(source,~)
     end
 end
 
+function keyBindings(obj,evt)
+    disp(evt)
+    switch evt.Key
+        case 'f1'
+            trEPRgui_aboutwindow();
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions

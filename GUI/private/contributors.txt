@@ -1,0 +1,279 @@
+This toolbox and especially the GUI
+would not have been possible without many people
+contributing by some means or other.
+
+
+A very special thanks for their outstanding support
+and encouragement goes to:
+
+Stefan Weber
+&
+Erik Schleicher
+
+
+
+Several people - besides the two mentioned above -
+contributed ideas, helped with tips&tricks, ...
+
+
+
+- The former "Berlin crew" -
+(where everything originated)
+
+
+Martin Hussels
+
+Ringo Wenzel
+(with his 'cw_ana' toolbox)
+
+Julia Löwenstein
+
+
+***
+
+
+- The Freiburg People -
+
+
+Bernd Paulus
+
+Thomas Berthold
+
+
+...and all students debugging the software and encouraging me to continue...
+
+
+***
+
+
+I apologise for the incompleteness of this list.
+If somebody thinks that he or she should be added,
+please send me an email.
+
+
+***
+
+
+Besides that, I learned a great deal from other people
+that did and do a lot more work with MATLAB.
+
+Parts of the code are based heavily on code written by
+other people. Where this is the case, I tried to mention
+it directly in the respective files.
+
+Nevertheless, to mention the most important
+sources of inspiration:
+
+
+The Matlab(TM) documentation and examples
+(c) The MathWorks, Inc.
+
+
+The people from blinkdagger
+(http://blinkdagger.com/)
+
+
+Yair Altman from undocumentedmatlab
+(http://undocumentedmatlab.com/)
+
+
+Stefan Stoll
+(EasySpin toolbox)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Thanks for your patience with all the bugs and the incompleteness of this piece of software.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"We apologise for the inconvenience"
+
+(D. Adams: "So Long, and Thanks for All the Fish")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+"Anything that happens, happens.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Anything that, in happening, causes something else to happen, causes something else to happen.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Anything that, in happening, causes itself to happen again, happens again.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+It doesn't necessarily do it in chronological order, though."
+
+
+
+
+
+(D. Adams: "Mostly Harmless")
