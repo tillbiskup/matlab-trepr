@@ -1,0 +1,13 @@
+
+Why writing a GUI?
+
+Originally, the trEPR toolbox started as a collection of scripts, soon functions, that did their job for the first couple of years for the author's purposes of standard data processing and data analysis of trEPR data.
+
+But with the years there was some demand in having a nice, relatively easy-to-use graphical users interface (GUI) for all those functions, as it was no longer easy for others than its author to get an overview of all the functions that were provided by the toolbox, given that there was never a really well-written documentation.
+
+Due to constant encouragement and support from a good friend and colleague (for details see "Help:About" - press the "About" button above or the "F1" key and wait a bit) the development of the GUI continued beyond initial stages that contained, while usable with some data, multitudinous bugs.
+
+The current version of the GUI is a complete rewrite of the original one, having both modularity and stability in mind from the very beginning.
+
+The final aim of the GUI is to provide the user with an easy-to-use and robust interface for the daily data processing and data analysis of trEPR data. Key concepts are the import of a variety of data formats and export capabilities both of figures and data for further processing with other, more specialised, types of software (including, but not restricted to, MATLAB(TM)).
+
