@@ -231,7 +231,8 @@ function poc_Callback(source,eventdata)
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
     
-    if isempty(ad.control.spectra.active)
+    % If no dataset is selected
+    if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
         return;
     end
     
@@ -246,7 +247,8 @@ function bgc_Callback(source,eventdata)
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
     
-    if isempty(ad.control.spectra.active)
+    % If no dataset is selected
+    if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
         return;
     end
     

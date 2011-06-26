@@ -4,7 +4,8 @@ contributing by some means or other.
 
 
 A very special thanks for their outstanding support
-and encouragement goes to:
+and encouragement, including but by far not restricted
+to the trEPR toolbox, goes to:
 
 Stefan Weber
 &
@@ -228,16 +229,7 @@ Anything that, in happening, causes something else to happen, causes something e
 
 
 
-
-
-
 Anything that, in happening, causes itself to happen again, happens again.
-
-
-
-
-
-
 
 
 
@@ -277,3 +269,38 @@ It doesn't necessarily do it in chronological order, though."
 
 
 (D. Adams: "Mostly Harmless")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Clearly, Douglas Adams didn't have GUI programming in mind when writing his fifth volume of the Hitchhiker's Guide trilogy.
+
+But the utter unpredictability of both the user's next step in interacting with a GUI and MATLAB(TM)'s reaction to it comes sometimes close to what Adams describes in "Mostly harmless" in terms of cause and effect.
