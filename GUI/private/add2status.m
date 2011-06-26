@@ -5,8 +5,8 @@ function status = add2status(statusmessage)
 %   STATUSMESSAGE: string/cell array containing the status message
 %
 %   STATUS: return value for the exit status
-%           -1: no tEPRgui window found
-%           -2: tEPRgui window appdata don't contain necessary fields
+%           -1: no trEPRgui window found
+%           -2: trEPRgui window appdata don't contain necessary fields
 %            0: successfully updated status
 
 % Is there currently a trEPRgui object?
@@ -45,6 +45,9 @@ ad.control.status = [ ad.control.status statusmessage ];
 setappdata(mainwindow,'control',ad.control);
 
 % Update status window
+% As MATLAB(TM) had some problems with calling a private function in some
+% special context, change the directory to the "private" dir, call the
+% function that's located there, and afterwards return to original dir.
 PWD = pwd;
 cd(fileparts(mfilename('fullpath')));
 update_statuswindow(ad.control.status);

@@ -75,7 +75,7 @@ uicontrol('Tag','processing_panel_corrections_pretrigger_pushbutton',...
     'Units','Pixels',...
     'Position',[10 10 floor((handle_size(3)-40)/2) 30],...
     'String','Offset',...
-    'Callback',{@poc_Callback}...
+    'Callback',{@corrections_pushbutton_Callback,'POC'}...
     );
 uicontrol('Tag','processing_panel_corrections_background_pushbutton',...
     'Style','pushbutton',...
@@ -85,7 +85,7 @@ uicontrol('Tag','processing_panel_corrections_background_pushbutton',...
     'Units','Pixels',...
     'Position',[floor((handle_size(3)-40)/2)+10 10 floor((handle_size(3)-40)/2) 30],...
     'String','Background',...
-    'Callback',{@bgc_Callback}...
+    'Callback',{@corrections_pushbutton_Callback,'BGC'}...
     );
 
 handle_p3 = uipanel('Tag','processing_panel_processing_panel',...
@@ -103,7 +103,8 @@ uicontrol('Tag','processing_panel_corrections_baseline_pushbutton',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[10 10 floor((handle_size(3)-40)/2) 30],...
-    'String','Baseline...'...
+    'String','Baseline...',...
+    'Callback',{@corrections_pushbutton_Callback,'BLC'}...
     );
 uicontrol('Tag','processing_panel_corrections_accumulate_pushbutton',...
     'Style','pushbutton',...
@@ -112,7 +113,8 @@ uicontrol('Tag','processing_panel_corrections_accumulate_pushbutton',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[floor((handle_size(3)-40)/2)+10 10 floor((handle_size(3)-40)/2) 30],...
-    'String','Accumulate...'...
+    'String','Accumulate...',...
+    'Callback',{@corrections_pushbutton_Callback,'ACC'}...
     );
 
 handle_p4 = uipanel('Tag','processing_panel_average_panel',...
@@ -226,7 +228,7 @@ uicontrol('Tag','processing_panel_average_y_unit_edit',...
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function poc_Callback(source,eventdata)
+function corrections_pushbutton_Callback(~,~,correction)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -236,29 +238,31 @@ function poc_Callback(source,eventdata)
         return;
     end
     
-    guiProcessingPOC(ad.control.spectra.active);
-    
-    % Update visible spectra listbox
-    update_visibleSpectra();
-end
-
-function bgc_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % If no dataset is selected
-    if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
-        return;
+    switch correction
+        case 'POC'
+            guiProcessingPOC(ad.control.spectra.active);
+        case 'BGC'
+            guiProcessingBGC(ad.control.spectra.active);
+        otherwise
+            msg = cell(1,2);
+            msg{1} = sprintf(...
+                'Correction method %s unknown or not (yet) supported.',...
+                correction);
+            msg{2} = 'If you think that this is a bug, please file a bug report.';
+            status = add2status(msg);
+            % If for whatever weird reason the trEPR GUI contained no
+            % status field, print it to the commmand line
+            if (status == -2)
+                fprintf('%s\n%s\n',msg{1},msg{2});
+            end
+            clear msg;
     end
     
-    guiProcessingBGC(ad.control.spectra.active);
-    
     % Update visible spectra listbox
     update_visibleSpectra();
 end
 
-function datasets_listbox_Callback(source,eventdata)
+function datasets_listbox_Callback(~,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -291,7 +295,7 @@ function datasets_listbox_Callback(source,eventdata)
     update_mainAxis();
 end
 
-function average_x_points_Callback(source,eventdata)
+function average_x_points_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -304,7 +308,7 @@ function average_x_points_Callback(source,eventdata)
     end
         
     % Fix values: only integers >= 1
-    [y,x] = size(ad.data{ad.control.spectra.active}.data);
+    [~,x] = size(ad.data{ad.control.spectra.active}.data);
     if (str2num(get(source,'String')) < 1)
         set(source,'String','1');
     elseif (str2num(get(source,'String')) > x)
@@ -338,7 +342,7 @@ function average_x_points_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function average_x_unit_Callback(source,eventdata)
+function average_x_unit_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -403,7 +407,7 @@ function average_x_unit_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function average_y_points_Callback(source,eventdata)
+function average_y_points_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
@@ -450,7 +454,7 @@ function average_y_points_Callback(source,eventdata)
     update_mainAxis();    
 end
 
-function average_y_unit_Callback(source,eventdata)
+function average_y_unit_Callback(source,~)
     % Get appdata of main window
     mainWindow = findobj('Tag','trepr_gui_mainwindow');
     ad = getappdata(mainWindow);
