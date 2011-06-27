@@ -25,7 +25,8 @@ hMainFigure = figure('Tag','trepr_gui_mainwindow',...
     'Resize','off',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
-    'KeyPressFcn',@keyBindings);
+    'KeyPressFcn',@keyBindings,...
+    'CloseRequestFcn',@closeGUI);
 
 
 % Create appdata structure
@@ -400,7 +401,7 @@ hbg = uibuttongroup('Tag','mainButtonGroup',...
     'Position', [guiSize(1)-mainPanelWidth-20 guiSize(2)-110 mainPanelWidth 90],...
     'Visible','off');
 % Create toggle buttons in the button group.
-u1 = uicontrol('Tag','tbLoad',...
+uicontrol('Tag','tbLoad',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -409,7 +410,7 @@ u1 = uicontrol('Tag','tbLoad',...
     'pos',[0 60 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u2 = uicontrol('Tag','tbDatasets',...
+uicontrol('Tag','tbDatasets',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -418,7 +419,7 @@ u2 = uicontrol('Tag','tbDatasets',...
     'pos',[mainToggleButtonWidth 60 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u3 = uicontrol('Tag','tbSlider',...
+uicontrol('Tag','tbSlider',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -427,7 +428,7 @@ u3 = uicontrol('Tag','tbSlider',...
     'pos',[mainToggleButtonWidth*2 60 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u4 = uicontrol('Tag','tbMeasure',...
+uicontrol('Tag','tbMeasure',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -436,7 +437,7 @@ u4 = uicontrol('Tag','tbMeasure',...
     'pos',[0 30 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u5 = uicontrol('Tag','tbDisplay',...
+uicontrol('Tag','tbDisplay',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -445,7 +446,7 @@ u5 = uicontrol('Tag','tbDisplay',...
     'pos',[mainToggleButtonWidth 30 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u6 = uicontrol('Tag','tbProcessing',...
+uicontrol('Tag','tbProcessing',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -454,7 +455,7 @@ u6 = uicontrol('Tag','tbProcessing',...
     'pos',[mainToggleButtonWidth*2 30 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u7 = uicontrol('Tag','tbAnalysis',...
+uicontrol('Tag','tbAnalysis',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -463,7 +464,7 @@ u7 = uicontrol('Tag','tbAnalysis',...
     'pos',[0 0 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-u8 = uicontrol('Tag','tbReserve1',...
+uicontrol('Tag','tbReserve1',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -473,7 +474,7 @@ u8 = uicontrol('Tag','tbReserve1',...
     'parent',hbg,...
     'Enable','off',...
     'HandleVisibility','off');
-u9 = uicontrol('Tag','tbReserve2',...
+uicontrol('Tag','tbHelp',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
@@ -490,35 +491,35 @@ try
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp1 = guiLoadPanel(...
+    guiLoadPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp2 = guiDatasetPanel(...
+    guiDatasetPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp3 = guiSliderPanel(...
+    guiSliderPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp4 = guiMeasurePanel(...
+    guiMeasurePanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp5 = guiDisplayPanel(...
+    guiDisplayPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp6 = guiProcessingPanel(...
+    guiProcessingPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp7 = guiAnalysisPanel(...
+    guiAnalysisPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp8 = uipanel('Tag','reserve_panel',...
+    uipanel('Tag','reserve_panel',...
         'parent',hMainFigure,...
         'Title','Reserve',...
         'FontUnit','Pixel','Fontsize',12,...
@@ -528,7 +529,7 @@ try
         'Units','pixels',...
         'Position',[guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
     
-    hp9 = guiHelpPanel(...
+    guiHelpPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
 catch exception
@@ -627,6 +628,8 @@ function slider_v1_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -669,6 +672,8 @@ function slider_v2_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -704,6 +709,8 @@ function slider_v3_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -746,6 +753,8 @@ function slider_h1_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -781,6 +790,8 @@ function slider_h2_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -803,6 +814,8 @@ function zoom_togglebutton_Callback(source,~)
             refresh;
         end
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -823,6 +836,8 @@ function fullscale_pushbutton_Callback(~,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
@@ -855,150 +870,44 @@ function reset_pushbutton_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
 
 function tbg_Callback(source,~)
-    try
-        panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
-        val = get(get(source,'SelectedObject'),'String');
-        switch val
-            case 'Load'
-                set(panels,'Visible','off');
-                set(hp1,'Visible','on');
-            case 'Datasets'
-                set(panels,'Visible','off');
-                set(hp2,'Visible','on');
-                % Update both list boxes
-                update_invisibleSpectra();
-                update_visibleSpectra();
-                update_datasetPanel();
-            case 'Slider'
-                set(panels,'Visible','off');
-                set(hp3,'Visible','on');
-                % Update slider panel
-                update_sliderPanel();
-            case 'Measure'
-                set(panels,'Visible','off');
-                set(hp4,'Visible','on');
-                % Update measure panel
-                update_measurePanel();
-            case 'Display'
-                set(panels,'Visible','off');
-                set(hp5,'Visible','on');
-                % Update display panel
-                update_displayPanel();
-            case 'Processing'
-                set(panels,'Visible','off');
-                set(hp6,'Visible','on');
-                % Update processing panel
-                update_processingPanel();
-            case 'Analysis'
-                set(panels,'Visible','off');
-                set(hp7,'Visible','on');
-            case 'Help'
-                set(panels,'Visible','off');
-                set(hp9,'Visible','on');
+    try 
+        status = switchMainPanel(get(get(source,'SelectedObject'),'String'));
+        
+        if status
+            % Something went wrong...
+            msgStr = 'Something went wrong with switching the panels.';
+            add2status(msgStr);
         end
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
 
 function closeGUI(~,~)
-    % TODO: Check whether there is anything that is not saved...
-    
-    % Close GUI
-    delete(hMainFigure);
+    try
+        guiClose();
+    catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
+        trEPRgui_bugreportwindow(exception);
+    end
 end
 
-function keyBindings(~,evt)
-    % TODO: Outsource this into a separate function file
+function keyBindings(src,evt)
     try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier key
-            % was pressed...
-            return;
-        end
-        
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                % Handle list of panels and buttons for switching
-                panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
-                buttons = [u1 u2 u3 u4 u5 u6 u7 u8 u9];
-                switch evt.Key
-                    case 'w'
-                        closeGUI();
-                        return;
-                    case '1'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp1,'Visible','on');
-                        set(u1,'Value',1);
-                        return;
-                    case '2'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp2,'Visible','on');
-                        set(u2,'Value',1);
-                        return;
-                    case '3'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp3,'Visible','on');
-                        set(u3,'Value',1);
-                        return;
-                    case '4'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp4,'Visible','on');
-                        set(u4,'Value',1);
-                        return;
-                    case '5'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp5,'Visible','on');
-                        set(u5,'Value',1);
-                        return;
-                    case '6'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp6,'Visible','on');
-                        set(u6,'Value',1);
-                        return;
-                    case '7'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp7,'Visible','on');
-                        set(u7,'Value',1);
-                        return;
-                    case '8'
-                        return;
-                    case '9'
-                        set(panels,'Visible','off');
-                        set(buttons,'Value',0);
-                        set(hp9,'Visible','on');
-                        set(u9,'Value',1);
-                        return;
-                end
-            end
-        end
-        switch evt.Key
-            case 'f1'
-                trEPRgui_aboutwindow();
-                return;
-            case 'f3'
-                trEPRgui_BLCwindow();
-                return;
-            case 'f9'
-                trEPRgui_statuswindow();
-                return;
-            otherwise
-                disp(evt)
-        end
+        guiKeyBindings(src,evt);
     catch exception
+        msgStr = 'An exception occurred. The bug reporter should have been opened';
+        add2status(msgStr);
         trEPRgui_bugreportwindow(exception);
     end
 end
