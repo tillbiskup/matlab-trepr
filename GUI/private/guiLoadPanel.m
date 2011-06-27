@@ -14,7 +14,6 @@ function handle = guiLoadPanel(parentHandle,position)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 defaultBackground = get(parentHandle,'Color');
-handles = guidata(parentHandle);
 
 handle = uipanel('Tag','load_panel',...
     'parent',parentHandle,...
@@ -161,304 +160,318 @@ uicontrol('Tag','load_panel_load_pushbutton_text',...
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function load_pushbutton_Callback(source,eventdata)
-    state = struct();
-    FilterSpec = '*.*';
-    
-    % Get the appdata of the main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Set directory where to load files from
-    if isfield(ad,'control') && isfield(ad.control,'lastLoadDir')
-        startDir = ad.control.lastLoadDir;
-    else
-        startDir = pwd;
-    end
+function load_pushbutton_Callback(~,~)
+    try
+        state = struct();
+        FilterSpec = '*.*';
         
-    if (get(handle_dir_cb,'Value') == 1)
-        state.dir = true;
-    else
-        state.dir = false;
-    end
-    if (get(handle_comb_cb,'Value') == 1)
-        state.comb = true;
-    else
-        state.comb = false;
-    end
+        % Get the appdata of the main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    if (state.dir)
-        FileName = uigetdir(...
-            startDir,...
-            'Select directory to load'...
-            );
-    else
-        [FileName,PathName,FilterIndex] = uigetfile(...
-            FilterSpec,...
-            'Select file(s) to load',...
-            'MultiSelect','on',...
-            startDir...
-            );
-    end
-    
-    % If the user cancels file selection, print status message and return
-    if isequal(FileName,0)
-        msg = 'Loading dataset(s) cancelled by user.';
-        % Update status
-%        PWD = pwd;
-%        cd(fileparts(mfilename('fullpath')));
-        add2status(msg);
-%        cd(PWD);
-        return;
-    end
-    
-    % In case of files, not a directory, add path to filename
-    if exist('PathName')
-        % In case of multiple files
-        if iscell(FileName)
-            for k = 1 : length(FileName)
-                FileName{k} = fullfile(PathName,FileName{k});
-            end
+        % Set directory where to load files from
+        if isfield(ad,'control') && isfield(ad.control,'lastLoadDir')
+            startDir = ad.control.lastLoadDir;
         else
-            FileName = fullfile(PathName,FileName);
+            startDir = pwd;
         end
-    end
-
-    % Set lastLoadDir in appdata
-    if exist('PathName')
-        ad.control.lastLoadDir = PathName;
-    else
-        ad.control.lastLoadDir = FileName;
-    end
-    setappdata(mainWindow,'control',ad.control);
-    
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = 'Calling trEPRload and trying to load';
-    msg = [ msgStr FileName];
-    add2status(msg);
-    clear msgStr msg;
-    
-    hMsgBox = msgbox(...
-        'Loading spectra... please wait.',...
-        'Loading spectra',...
-        'Help','modal');
-    hMessageText = findobj(...
-        findall(allchild(hMsgBox),'Type','text'),'Tag','MessageBox');
-    messageText = get(hMessageText,'String');
-    
-    data = trEPRload(FileName,'combine',state.comb);
-    
-    if isequal(data,0) || isempty(data)
-        msg = 'Data could not be loaded.';
-        add2status(msg);
-        if ishandle(hMsgBox)
-            set(hMessageText,'String',...
-                strrep(messageText,'please wait.','FAILED!'));
+        
+        if (get(handle_dir_cb,'Value') == 1)
+            state.dir = true;
         else
-            hMsgBox = msgbox(...
-                'Loading spectra... FAILED!',...
-                'Loading spectra',...
-                'Help','modal');
+            state.dir = false;
         end
-        return;
-    end
-    
-    % Check whether data{n}.data is numeric (very basic test for format)
-    fnNoData = cell(0);
-    nNoData = [];
-    if iscell(data)
-        for k=1:length(data)
-            if not(isnumeric(data{k}.data))
-                fnNoData{k} = data{k}.filename;
-                nNoData = [ nNoData k ];
-            end
-        end
-        % Remove datasets from data cell array
-        data([nNoData]) = [];
-    else
-        if not(isnumeric(data.data))
-            fnNoData = data.filename;
-            data = [];
-        end
-    end
-    
-    % Add status line
-    if not (isempty(fnNoData))
-        msgStr = cell(0);
-        msgStr{length(msgStr)+1} = ...
-            'The following files contained no numerical data (and were DISCARDED):';
-        msg = [msgStr fnNoData];
-        add2status(msg);
-        clear msgStr msg;
-    end
-    
-    if isempty(data)
-        if ishandle(hMsgBox)
-            set(hMessageText,'String',...
-                strrep(messageText,'please wait.','FAILED!'));
+        if (get(handle_comb_cb,'Value') == 1)
+            state.comb = true;
         else
-            hMsgBox = msgbox(...
-                'Loading spectra... FAILED!',...
-                'Loading spectra',...
-                'Help','modal');
+            state.comb = false;
         end
-        return;
-    end
-    
-    % Get names of successfully loaded files
-    % In parallel, add additional fields to each dataset
-    % Define default display structure to add to datasets
-    display = struct();
-    display.position.x = 1;
-    display.position.y = 1;
-    display.displacement.x = 0;
-    display.displacement.y = 0;
-    display.displacement.z = 0;
-    display.scaling.x = 1;
-    display.scaling.y = 1;
-    display.scaling.z = 1;
-    display.smoothing.x.value = 1;
-    display.smoothing.y.value = 1;
-    line = struct();
-    line.color = 'k';
-    line.style = '-';
-    line.marker = 'none';
-    line.width = 1;
-    if iscell(data)
-        fileNames = cell(0);
-        for k = 1 : length(data)
-            [p,fn,ext] = fileparts(data{k}.filename);
-            fileNames{k} = fullfile(p,[fn ext]);
-            data{k}.label = [fn ext];
-            data{k}.display = display;
-            data{k}.history = cell(0);
-            data{k}.line = line;
-            % For compatibility with old versions of trEPRread and for
-            % consistency with the naming of all other structures
-            if (isfield(data{k},'axes') && isfield(data{k}.axes,'xaxis'))
-                data{k}.axes.x = data{k}.axes.xaxis;
-                data{k}.axes = rmfield(data{k}.axes,'xaxis');
-            end
-            if (isfield(data{k},'axes') && isfield(data{k}.axes,'yaxis'))
-                data{k}.axes.y = data{k}.axes.yaxis;
-                data{k}.axes = rmfield(data{k}.axes,'yaxis');
-            end            
+        
+        if (state.dir)
+            FileName = uigetdir(...
+                startDir,...
+                'Select directory to load'...
+                );
+        else
+            [FileName,PathName,~] = uigetfile(...
+                FilterSpec,...
+                'Select file(s) to load',...
+                'MultiSelect','on',...
+                startDir...
+                );
         end
-    else
-        fileNames = data.filename;
-        [~,fn,ext] = fileparts(data.filename);
-        data.label = [fn ext];
-        data.display = display;
-        data.history = cell(0);
-        data.line = line;
-        % For compatibility with old versions of trEPRread and for
-        % consistency with the naming of all other structures
-        if (isfield(data,'axes') && isfield(data.axes,'xaxis'))
-            data.axes.x = data.axes.xaxis;
-            data.axes = rmfield(data.axes,'xaxis');
+        
+        % If the user cancels file selection, print status message and return
+        if isequal(FileName,0)
+            msg = 'Loading dataset(s) cancelled by user.';
+            % Update status
+            add2status(msg);
+            return;
         end
-        if (isfield(data,'axes') && isfield(data.axes,'yaxis'))
-            data.axes.y = data.axes.yaxis;
-            data.axes = rmfield(data.axes,'yaxis');
-        end            
-    end
-    
-    % Get indices of new datasets
-    % Necessary in case of further corrections applied to datasets after
-    % loading
-    newDataIdx = [ ...
-        length(ad.data)+1 : 1 : length(ad.data)+length(data) ];
-
-    % Add data to main GUI (appdata)
-    ad.data = [ ad.data data ];
-    ad.origdata = [ ad.origdata data ];
-    
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('%i data set(s) successfully loaded:',length(data));
-    msg = [msgStr fileNames];
-    status = add2status(msg);
-    clear msgStr msg;
-    
-    if ishandle(hMsgBox)
-        set(hMessageText,'String',...
-            strrep(messageText,'please wait.','DONE.'));
-    else
-        hMsgBox = msgbox(...
-            'Loading spectra... DONE  ',...
-            'Loading spectra',...
-            'Help','modal');
-    end
-
-    % Get appdata again after making changes to it before
-    ad = getappdata(mainWindow);
-    
-    % Add new loaded spectra to "invisible"
-    ad.control.spectra.invisible = [...
-        ad.control.spectra.invisible ...
-        newDataIdx...
-        ];
-    setappdata(mainWindow,'control',ad.control);
-    
-    update_invisibleSpectra;
-    
-    % Handle dataset corrections when checked
-    % pretrigger offset compensation
-    if (get(handle_poc_cb,'Value') == 1)
-        for k=1:length(newDataIdx)
-            guiProcessingPOC(newDataIdx(k));
+        
+        % In case of files, not a directory, add path to filename
+        if exist('PathName')
+            % In case of multiple files
+            if iscell(FileName)
+                for k = 1 : length(FileName)
+                    FileName{k} = fullfile(PathName,FileName{k});
+                end
+            else
+                FileName = fullfile(PathName,FileName);
+            end
         end
-    end
-    
-    % background subtraction
-    if (get(handle_bgc_cb,'Value') == 1)
-        for k=1:length(newDataIdx)
-            guiProcessingBGC(newDataIdx(k));
-        end
-    end
-    
-    % Try to load axis labels from file
-    if (get(handle_axislabels_cb,'Value') == 1)
-        if (isfield(ad.data{newDataIdx(end)},'axes'))
-            if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.x,'measure'))
-                ad.control.axis.labels.x.measure = ...
-                    ad.data{newDataIdx(end)}.axes.x.measure;
-            end
-            if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.x,'unit'))
-                ad.control.axis.labels.x.unit = ...
-                    ad.data{newDataIdx(end)}.axes.x.unit;
-            end
-            if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.y,'measure'))
-                ad.control.axis.labels.y.measure = ...
-                    ad.data{newDataIdx(end)}.axes.y.measure;
-            end
-            if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.y,'unit'))
-                ad.control.axis.labels.y.unit = ...
-                    ad.data{newDataIdx(end)}.axes.y.unit;
-            end
-            if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.z,'measure'))
-                ad.control.axis.labels.z.measure = ...
-                    ad.data{newDataIdx(end)}.axes.z.measure;
-            end
-            if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
-                    isfield(ad.data{newDataIdx(end)}.axes.z,'unit'))
-                ad.control.axis.labels.z.unit = ...
-                    ad.data{newDataIdx(end)}.axes.z.unit;
-            end
+        
+        % Set lastLoadDir in appdata
+        if exist('PathName')
+            ad.control.lastLoadDir = PathName;
+        else
+            ad.control.lastLoadDir = FileName;
         end
         setappdata(mainWindow,'control',ad.control);
+        
+        % Adding status line
+        msgStr = cell(0);
+        msgStr{length(msgStr)+1} = 'Calling trEPRload and trying to load';
+        msg = [ msgStr FileName];
+        add2status(msg);
+        clear msgStr msg;
+        
+        hMsgBox = msgbox(...
+            'Loading spectra... please wait.',...
+            'Loading spectra',...
+            'Help','modal');
+        hMessageText = findobj(...
+            findall(allchild(hMsgBox),'Type','text'),'Tag','MessageBox');
+        messageText = get(hMessageText,'String');
+        
+        data = trEPRload(FileName,'combine',state.comb);
+        
+        if isequal(data,0) || isempty(data)
+            msg = 'Data could not be loaded.';
+            add2status(msg);
+            if ishandle(hMsgBox)
+                set(hMessageText,'String',...
+                    strrep(messageText,'please wait.','FAILED!'));
+            else
+                hMsgBox = msgbox(...
+                    'Loading spectra... FAILED!',...
+                    'Loading spectra',...
+                    'Help','modal');
+            end
+            return;
+        end
+        
+        % Check whether data{n}.data is numeric (very basic test for format)
+        fnNoData = cell(0);
+        nNoData = [];
+        if iscell(data)
+            for k=1:length(data)
+                if not(isnumeric(data{k}.data))
+                    fnNoData{k} = data{k}.filename;
+                    nNoData = [ nNoData k ];
+                end
+            end
+            % Remove datasets from data cell array
+            data(nNoData) = [];
+        else
+            if not(isnumeric(data.data))
+                fnNoData = data.filename;
+                data = [];
+            end
+        end
+        
+        % Add status line
+        if not (isempty(fnNoData))
+            msgStr = cell(0);
+            msgStr{length(msgStr)+1} = ...
+                'The following files contained no numerical data (and were DISCARDED):';
+            msg = [msgStr fnNoData];
+            add2status(msg);
+            clear msgStr msg;
+        end
+        
+        if isempty(data)
+            if ishandle(hMsgBox)
+                set(hMessageText,'String',...
+                    strrep(messageText,'please wait.','FAILED!'));
+            else
+                hMsgBox = msgbox(...
+                    'Loading spectra... FAILED!',...
+                    'Loading spectra',...
+                    'Help','modal');
+            end
+            return;
+        end
+        
+        % Get names of successfully loaded files
+        % In parallel, add additional fields to each dataset
+        % Define default display structure to add to datasets
+        display = struct();
+        display.position.x = 1;
+        display.position.y = 1;
+        display.displacement.x = 0;
+        display.displacement.y = 0;
+        display.displacement.z = 0;
+        display.scaling.x = 1;
+        display.scaling.y = 1;
+        display.scaling.z = 1;
+        display.smoothing.x.value = 1;
+        display.smoothing.y.value = 1;
+        line = struct();
+        line.color = 'k';
+        line.style = '-';
+        line.marker = 'none';
+        line.width = 1;
+        if iscell(data)
+            fileNames = cell(0);
+            for k = 1 : length(data)
+                [p,fn,ext] = fileparts(data{k}.filename);
+                fileNames{k} = fullfile(p,[fn ext]);
+                data{k}.label = [fn ext];
+                data{k}.display = display;
+                data{k}.history = cell(0);
+                data{k}.line = line;
+                % For compatibility with old versions of trEPRread and for
+                % consistency with the naming of all other structures
+                if (isfield(data{k},'axes') && isfield(data{k}.axes,'xaxis'))
+                    data{k}.axes.x = data{k}.axes.xaxis;
+                    data{k}.axes = rmfield(data{k}.axes,'xaxis');
+                end
+                if (isfield(data{k},'axes') && isfield(data{k}.axes,'yaxis'))
+                    data{k}.axes.y = data{k}.axes.yaxis;
+                    data{k}.axes = rmfield(data{k}.axes,'yaxis');
+                end
+            end
+        else
+            fileNames = data.filename;
+            [~,fn,ext] = fileparts(data.filename);
+            data.label = [fn ext];
+            data.display = display;
+            data.history = cell(0);
+            data.line = line;
+            % For compatibility with old versions of trEPRread and for
+            % consistency with the naming of all other structures
+            if (isfield(data,'axes') && isfield(data.axes,'xaxis'))
+                data.axes.x = data.axes.xaxis;
+                data.axes = rmfield(data.axes,'xaxis');
+            end
+            if (isfield(data,'axes') && isfield(data.axes,'yaxis'))
+                data.axes.y = data.axes.yaxis;
+                data.axes = rmfield(data.axes,'yaxis');
+            end
+        end
+        
+        % Get indices of new datasets
+        % Necessary in case of further corrections applied to datasets
+        % after loading
+        newDataIdx = [ ...
+            length(ad.data)+1 : 1 : length(ad.data)+length(data) ];
+        
+        % Add data to main GUI (appdata)
+        ad.data = [ ad.data data ];
+        ad.origdata = [ ad.origdata data ];
+        
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.origdata);
+        
+        % Adding status line
+        msgStr = cell(0);
+        msgStr{length(msgStr)+1} = ...
+            sprintf('%i data set(s) successfully loaded:',length(data));
+        msg = [msgStr fileNames];
+        status = add2status(msg);
+        clear msgStr msg;
+        
+        if ishandle(hMsgBox)
+            set(hMessageText,'String',...
+                strrep(messageText,'please wait.','DONE.'));
+        else
+            hMsgBox = msgbox(...
+                'Loading spectra... DONE  ',...
+                'Loading spectra',...
+                'Help','modal');
+        end
+        
+        % Get appdata again after making changes to it before
+        ad = getappdata(mainWindow);
+        
+        % Add new loaded spectra to "invisible"
+        ad.control.spectra.invisible = [...
+            ad.control.spectra.invisible ...
+            newDataIdx...
+            ];
+        setappdata(mainWindow,'control',ad.control);
+        
+        update_invisibleSpectra;
+        
+        % Handle dataset corrections when checked
+        % pretrigger offset compensation
+        if (get(handle_poc_cb,'Value') == 1)
+            for k=1:length(newDataIdx)
+                guiProcessingPOC(newDataIdx(k));
+            end
+        end
+        
+        % background subtraction
+        if (get(handle_bgc_cb,'Value') == 1)
+            for k=1:length(newDataIdx)
+                guiProcessingBGC(newDataIdx(k));
+            end
+        end
+        
+        % Try to load axis labels from file
+        if (get(handle_axislabels_cb,'Value') == 1)
+            if (isfield(ad.data{newDataIdx(end)},'axes'))
+                if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.x,'measure'))
+                    ad.control.axis.labels.x.measure = ...
+                        ad.data{newDataIdx(end)}.axes.x.measure;
+                end
+                if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.x,'unit'))
+                    ad.control.axis.labels.x.unit = ...
+                        ad.data{newDataIdx(end)}.axes.x.unit;
+                end
+                if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.y,'measure'))
+                    ad.control.axis.labels.y.measure = ...
+                        ad.data{newDataIdx(end)}.axes.y.measure;
+                end
+                if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.y,'unit'))
+                    ad.control.axis.labels.y.unit = ...
+                        ad.data{newDataIdx(end)}.axes.y.unit;
+                end
+                if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.z,'measure'))
+                    ad.control.axis.labels.z.measure = ...
+                        ad.data{newDataIdx(end)}.axes.z.measure;
+                end
+                if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
+                        isfield(ad.data{newDataIdx(end)}.axes.z,'unit'))
+                    ad.control.axis.labels.z.unit = ...
+                        ad.data{newDataIdx(end)}.axes.z.unit;
+                end
+            end
+            setappdata(mainWindow,'control',ad.control);
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-
 end
 
 

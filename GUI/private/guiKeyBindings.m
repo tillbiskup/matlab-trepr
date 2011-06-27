@@ -1,4 +1,10 @@
 function guiKeyBindings(src,evt)
+% GUIKEYBINDINGS Private function to handle keypress events in the GUI and
+% its windows/elements
+%
+% Arguments:
+%     src - handle of calling source
+%     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -97,10 +103,17 @@ try
             return;
         otherwise
             disp(evt);
-            disp(src);
+            fprintf('       Caller: %i\n\n',src);
+            return;
     end
 catch exception
-    trEPRgui_bugreportwindow(exception);
+    try
+        trEPRgui_bugreportwindow(exception);
+    catch exception2
+        % If even displaying the bug report window fails...
+        exception = addCause(exception2, exception);
+        throw(exception);
+    end
 end
 
 

@@ -572,7 +572,7 @@ try
     axis off          % Remove axis ticks and numbers
 catch exception
     % If this happens, something probably more serious went wrong...
-    rethrow(exception);
+    throw(exception);
 end
 
 guidata(hMainFigure,guihandles);
@@ -628,9 +628,21 @@ function slider_v1_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -672,9 +684,21 @@ function slider_v2_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -709,9 +733,21 @@ function slider_v3_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -753,9 +789,21 @@ function slider_h1_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -790,9 +838,21 @@ function slider_h2_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -814,9 +874,21 @@ function zoom_togglebutton_Callback(source,~)
             refresh;
         end
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -836,9 +908,21 @@ function fullscale_pushbutton_Callback(~,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -870,9 +954,21 @@ function reset_pushbutton_Callback(source,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -886,9 +982,21 @@ function tbg_Callback(source,~)
             add2status(msgStr);
         end
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -896,9 +1004,21 @@ function closeGUI(~,~)
     try
         guiClose();
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
@@ -906,9 +1026,21 @@ function keyBindings(src,evt)
     try
         guiKeyBindings(src,evt);
     catch exception
-        msgStr = 'An exception occurred. The bug reporter should have been opened';
-        add2status(msgStr);
-        trEPRgui_bugreportwindow(exception);
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 

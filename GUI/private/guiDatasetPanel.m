@@ -245,456 +245,724 @@ uicontrol('Tag','data_panel_displaytype_popupmenu',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function show_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_invisible_listbox,'Value');
-
-    % Be on the save side if user is faster than Matlab
-    if selected == 0
-        return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_invisible_listbox,'Value');
+        
+        % Be on the save side if user is faster than Matlab
+        if selected == 0
+            return;
+        end
+        
+        % Move to visible
+        ad.control.spectra.visible = [...
+            ad.control.spectra.visible ...
+            ad.control.spectra.invisible(selected) ...
+            ];
+        
+        % Make moved entry active one
+        ad.control.spectra.active = ad.control.spectra.invisible(selected);
+        
+        % Delete in invisible
+        ad.control.spectra.invisible(selected) = [];
+       
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Moved dataset %i (%s) to visible',...
+            selected,...
+            ad.data{selected}.label);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Move to visible
-    ad.control.spectra.visible = [...
-        ad.control.spectra.visible ...
-        ad.control.spectra.invisible(selected) ...
-        ];
-    
-    % Make moved entry active one
-    ad.control.spectra.active = ad.control.spectra.invisible(selected);
-    
-    % Delete in invisible
-    ad.control.spectra.invisible(selected) = [];
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();    
-    
-    %Update main axis
-    update_mainAxis();
 end
 
 
 function hide_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
-
-    % Be on the save side if user is faster than Matlab
-    if selected == 0
-        return;
-    end
-
-    % Move to invisible
-    ad.control.spectra.invisible = [...
-        ad.control.spectra.invisible ...
-        ad.control.spectra.visible(selected) ...
-        ];
-    
-    % Delete in visible
-    ad.control.spectra.visible(selected) = [];
-    
-    % Toggle active entry
-    if (selected > length(ad.control.spectra.visible))
-        if (selected == 1)
-            ad.control.spectra.active = 0;
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(end);
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_visible_listbox,'Value');
+        
+        % Be on the save side if user is faster than Matlab
+        if selected == 0
+            return;
         end
-    else
-        ad.control.spectra.active = ad.control.spectra.visible(selected);
+        
+        % Move to invisible
+        ad.control.spectra.invisible = [...
+            ad.control.spectra.invisible ...
+            ad.control.spectra.visible(selected) ...
+            ];
+        
+        % Delete in visible
+        ad.control.spectra.visible(selected) = [];
+        
+        % Toggle active entry
+        if (selected > length(ad.control.spectra.visible))
+            if (selected == 1)
+                ad.control.spectra.active = 0;
+            else
+                ad.control.spectra.active = ad.control.spectra.visible(end);
+            end
+        else
+            ad.control.spectra.active = ad.control.spectra.visible(selected);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Moved dataset %i (%s) to invisible',...
+            selected,...
+            ad.data{selected}.label);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();
-    
-    %Update main axis
-    update_mainAxis();
 end
 
 function save_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
-
-    % Get id of selected spectrum
-    selectedId = ad.control.spectra.visible(selected);
-
-    datasetSave(selectedId);
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();
-    
-    %Update main axis
-    update_mainAxis();
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_visible_listbox,'Value');
+        
+        % Get id of selected spectrum
+        selectedId = ad.control.spectra.visible(selected);
+        
+        datasetSave(selectedId);
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function saveas_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
-
-    % Get id of selected spectrum
-    selectedId = ad.control.spectra.visible(selected);
-
-    datasetSaveAs(selectedId);
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();
-    
-    %Update main axis
-    update_mainAxis();
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_visible_listbox,'Value');
+        
+        % Get id of selected spectrum
+        selectedId = ad.control.spectra.visible(selected);
+        
+        datasetSaveAs(selectedId);
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function remove_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
-    
-    % Get id of selected spectrum
-    selectedId = ad.control.spectra.visible(selected);
-    
-    % Check whether currently selected spectrum is modified, and if so, ask
-    % the user whether to remove it anyway
-    if find(ad.control.spectra.modified==selectedId)
-        answer = questdlg(...
-            {'Dataset was modified. Remove anyway?'...
-            ' '...
-            'Note that "Remove" means that you loose the changes you made,'...
-            'but the (original) file will not be deleted from the file system.'...
-            ' '...
-            'Other options include "Save & Remove" or "Cancel".'},...
-            'Warning: Dataset Modified...',...
-            'Save & Remove','Remove','Cancel',...
-            'Save & Remove');
-        switch answer
-            case 'Save & Remove'
-                status = datasetSave(selectedId);
-                if status
-                    % That means that something went wrong with the saveAs
-                    return;
-                end
-            case 'Remove'
-            case 'Cancel'
-                return;
-            otherwise
-                return;
-        end
-    end
-    
-    removedDatasetLabel = ...
-        ad.data{selectedId}.label;
-
-    % Remove from data and origdata
-    ad.data(selectedId) = [];
-    ad.origdata(selectedId) = [];
-    
-    % Remove from modified if it's there
-    ad.control.spectra.modified(...
-        find(ad.control.spectra.modified == selectedId)) = [];
-    % Remove from missing if it's there
-    ad.control.spectra.missing(...
-        find(ad.control.spectra.missing == selectedId)) = [];
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    
-    % Delete in visible
-    ad.control.spectra.visible(selected) = [];
-    
-    % Shift numbering in spectra.visible and spectra.invisible
-    if (~isempty(ad.control.spectra.visible))
-        indices = find(ad.control.spectra.visible>selected);
-        ad.control.spectra.visible(indices) = ...
-            ad.control.spectra.visible(indices)-1;
-    end
-    if (~isempty(ad.control.spectra.invisible))
-        indices = find(ad.control.spectra.invisible>selected);
-        ad.control.spectra.invisible(indices) = ...
-            ad.control.spectra.invisible(indices)-1;
-    end
-    
-    % Shift numbering in spectra.modified
-    if (~isempty(ad.control.spectra.modified))
-        indices = find(ad.control.spectra.modified>selected);
-        ad.control.spectra.modified(indices) = ...
-            ad.control.spectra.modified(indices)-1;
-    end
-    
-    % Toggle active entry
-    if (selected > length(ad.control.spectra.visible))
-        if (selected == 1)
-            ad.control.spectra.active = [];
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(end);
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_visible_listbox,'Value');
+        
+        % Get id of selected spectrum
+        selectedId = ad.control.spectra.visible(selected);
+        
+        % Check whether currently selected spectrum is modified, and if so,
+        % ask the user whether to remove it anyway
+        if find(ad.control.spectra.modified==selectedId)
+            answer = questdlg(...
+                {'Dataset was modified. Remove anyway?'...
+                ' '...
+                'Note that "Remove" means that you loose the changes you made,'...
+                'but the (original) file will not be deleted from the file system.'...
+                ' '...
+                'Other options include "Save & Remove" or "Cancel".'},...
+                'Warning: Dataset Modified...',...
+                'Save & Remove','Remove','Cancel',...
+                'Save & Remove');
+            switch answer
+                case 'Save & Remove'
+                    status = datasetSave(selectedId);
+                    if status
+                        % That means that something went wrong with the saveAs
+                        return;
+                    end
+                case 'Remove'
+                case 'Cancel'
+                    return;
+                otherwise
+                    return;
+            end
         end
-    else
-        ad.control.spectra.active = ad.control.spectra.visible(selected);
+        
+        removedDatasetLabel = ...
+            ad.data{selectedId}.label;
+        
+        % Remove from data and origdata
+        ad.data(selectedId) = [];
+        ad.origdata(selectedId) = [];
+        
+        % Remove from modified if it's there
+        ad.control.spectra.modified(...
+            find(ad.control.spectra.modified == selectedId)) = [];
+        % Remove from missing if it's there
+        ad.control.spectra.missing(...
+            find(ad.control.spectra.missing == selectedId)) = [];
+        
+        
+        % Delete in visible
+        ad.control.spectra.visible(selected) = [];
+        
+        % Shift numbering in spectra.visible and spectra.invisible
+        if (~isempty(ad.control.spectra.visible))
+            indices = find(ad.control.spectra.visible>selected);
+            ad.control.spectra.visible(indices) = ...
+                ad.control.spectra.visible(indices)-1;
+        end
+        if (~isempty(ad.control.spectra.invisible))
+            indices = find(ad.control.spectra.invisible>selected);
+            ad.control.spectra.invisible(indices) = ...
+                ad.control.spectra.invisible(indices)-1;
+        end
+        
+        % Shift numbering in spectra.modified
+        if (~isempty(ad.control.spectra.modified))
+            indices = find(ad.control.spectra.modified>selected);
+            ad.control.spectra.modified(indices) = ...
+                ad.control.spectra.modified(indices)-1;
+        end
+        
+        % Toggle active entry
+        if (selected > length(ad.control.spectra.visible))
+            if (selected == 1)
+                ad.control.spectra.active = [];
+            else
+                ad.control.spectra.active = ad.control.spectra.visible(end);
+            end
+        else
+            ad.control.spectra.active = ad.control.spectra.visible(selected);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.origdata);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = ...
+            sprintf('Data set "%s" removed from GUI',removedDatasetLabel);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        clear msgStr;
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('Data set "%s" removed from GUI',removedDatasetLabel);
-    status = add2status(msgStr);
-    clear msgStr;    
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();
-    
-    %Update main axis
-    update_mainAxis();
 end
 
 function duplicate_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
-    
-    % Create label for duplicate
-    % That is, add number in brackets at the end: (n)
-    % But check whether there is already such a number in brackets in any
-    % of the visible spectra with the same label.
-    expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
-    l = 0;
-    token = [];
-    for k=1:length(ad.control.spectra.visible)
-        tokens = regexp(ad.data{ad.control.spectra.visible(k)}.label,expression,'tokens');
-        if ~isempty(tokens)
-            l=l+1;
-            token(l) = str2double(char(tokens{1}));
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Get selected item of listbox
+        selected = get(gh.data_panel_visible_listbox,'Value');
+        
+        % Create label for duplicate
+        % That is, add number in brackets at the end: (n)
+        % But check whether there is already such a number in brackets in
+        % any of the visible spectra with the same label.
+        expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
+        l = 0;
+        token = [];
+        for k=1:length(ad.control.spectra.visible)
+            tokens = regexp(ad.data{ad.control.spectra.visible(k)}.label,expression,'tokens');
+            if ~isempty(tokens)
+                l=l+1;
+                token(l) = str2double(char(tokens{1}));
+            end
         end
-    end
-    if ~isempty(token)
-        ad.data{selected}.label
-        if (regexp(ad.data{selected}.label,' \((\d+)\)$'))
-            duplicateLabel = regexprep(...
-                ad.data{selected}.label,...
-                ' \((\d+)\)$',sprintf(' (%i)',max(token)+1));
+        if ~isempty(token)
+            ad.data{selected}.label
+            if (regexp(ad.data{selected}.label,' \((\d+)\)$'))
+                duplicateLabel = regexprep(...
+                    ad.data{selected}.label,...
+                    ' \((\d+)\)$',sprintf(' (%i)',max(token)+1));
+            else
+                duplicateLabel = sprintf('%s (%i)',ad.data{selected}.label,max(token)+1);
+            end
         else
-            duplicateLabel = sprintf('%s (%i)',ad.data{selected}.label,max(token)+1);
+            duplicateLabel = sprintf('%s (1)',ad.data{selected}.label);
         end
-    else
-        duplicateLabel = sprintf('%s (1)',ad.data{selected}.label);
+        
+        % Actually duplicate the dataset
+        duplicate = ad.data{selected};
+        % Set label of duplicate
+        duplicate.label = duplicateLabel;
+        % IMPORTANT: Set the filename of the duplicate to empty string
+        duplicate.filename = '';
+        
+        nSpectra = length(ad.data);
+        
+        ad.data{end+1} = duplicate;
+        ad.origdata{end+1} = duplicate;
+        
+        ad.control.spectra.visible(end+1) = nSpectra+1;
+        ad.control.spectra.modified(end+1) = nSpectra+1;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.origdata);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = ...
+            sprintf(...
+            'Data set "%s" duplicated as %s',...
+            ad.data{selected}.label,...
+            duplicateLabel);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        clear msgStr;
+        
+        % Update both list boxes
+        update_invisibleSpectra();
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Actually duplicate the dataset
-    duplicate = ad.data{selected};
-    % Set label of duplicate
-    duplicate.label = duplicateLabel;
-    % IMPORTANT: Set the filename of the duplicate to empty string
-    duplicate.filename = '';
-    
-    nSpectra = length(ad.data);
-    
-    ad.data{end+1} = duplicate;
-    ad.origdata{end+1} = duplicate;
-    
-    ad.control.spectra.visible(end+1) = nSpectra+1;
-    ad.control.spectra.modified(end+1) = nSpectra+1;
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-
-    % Adding status line
-    msgstr = cell(0);
-    msgstr{length(msgstr)+1} = ...
-        sprintf(...
-        'Data set "%s" duplicated as %s',...
-        ad.data{selected}.label,...
-        duplicateLabel);
-    status = add2status(msgstr);
-    clear msgstr;
-    
-    % Update both list boxes
-    update_invisibleSpectra();
-    update_visibleSpectra();
-    
-    %Update main axis
-    update_mainAxis();
 end
 
 
 function displaytype_popupmenu_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    displayTypes = cellstr(get(source,'String'));
-    displayType = displayTypes{get(source,'Value')};
-    ad.control.axis.displayType = displayType;
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    update_mainAxis();
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        displayTypes = cellstr(get(source,'String'));
+        displayType = displayTypes{get(source,'Value')};
+        ad.control.axis.displayType = displayType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function visible_listbox_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    ad.control.spectra.active = ad.control.spectra.visible(...
-        get(gh.data_panel_visible_listbox,'Value')...
-        );
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % If user double clicked on list entry
-    if strcmp(get(gcf,'SelectionType'),'open')
-        datasetChangeLabel(ad.control.spectra.active);
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        ad.control.spectra.active = ad.control.spectra.visible(...
+            get(gh.data_panel_visible_listbox,'Value')...
+            );
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % If user double clicked on list entry
+        if strcmp(get(gcf,'SelectionType'),'open')
+            datasetChangeLabel(ad.control.spectra.active);
+        end
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();
 end
 
-function invisible_listbox_Callback(source,~);
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % If user double clicked on list entry
-    if strcmp(get(gcf,'SelectionType'),'open')
-        datasetChangeLabel(...
-            ad.control.spectra.invisible(...
-            get(source,'Value')...
-            ));
+function invisible_listbox_Callback(source,~)
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % If user double clicked on list entry
+        if strcmp(get(gcf,'SelectionType'),'open')
+            datasetChangeLabel(...
+                ad.control.spectra.invisible(...
+                get(source,'Value')...
+                ));
+        end
+        update_invisibleSpectra();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    update_invisibleSpectra();
 end
 
 function previous_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % This shall never happen, as the element should not be active in this
-    % case
-    if (length(ad.control.spectra.visible) < 2)
-        return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % This shall never happen, as the element should not be active in this
+        % case
+        if (length(ad.control.spectra.visible) < 2)
+            return;
+        end
+        
+        if (ad.control.spectra.active == ad.control.spectra.visible(1))
+            ad.control.spectra.active = ad.control.spectra.visible(end);
+        else
+            ad.control.spectra.active = ad.control.spectra.visible(...
+                find(ad.control.spectra.visible==ad.control.spectra.active)-1);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Dataset %i (%s) made active',...
+            ad.control.spectra.active,...
+            ad.data{ad.control.spectra.active}.label);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        clear msgStr;
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    if (ad.control.spectra.active == ad.control.spectra.visible(1))
-        ad.control.spectra.active = ad.control.spectra.visible(end);
-    else
-        ad.control.spectra.active = ad.control.spectra.visible(...
-            find(ad.control.spectra.visible==ad.control.spectra.active)-1);
-    end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function next_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % This shall never happen, as the element should not be active in this
-    % case
-    if (length(ad.control.spectra.visible) < 2)
-        return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % This shall never happen, as the element should not be active in
+        % this case
+        if (length(ad.control.spectra.visible) < 2)
+            return;
+        end
+        
+        if(ad.control.spectra.active == ad.control.spectra.visible(end))
+            ad.control.spectra.active = ad.control.spectra.visible(1);
+        else
+            ad.control.spectra.active = ad.control.spectra.visible(...
+                find(ad.control.spectra.visible==ad.control.spectra.active)+1);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Dataset %i (%s) made active',...
+            ad.control.spectra.active,...
+            ad.data{ad.control.spectra.active}.label);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        clear msgStr;
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-	if(ad.control.spectra.active == ad.control.spectra.visible(end))
-        ad.control.spectra.active = ad.control.spectra.visible(1);
-    else
-        ad.control.spectra.active = ad.control.spectra.visible(...
-            find(ad.control.spectra.visible==ad.control.spectra.active)+1);
-    end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -702,14 +970,46 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function datasetChangeLabel(index)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Changed label of dataset %i to "%s"',...
+            ad.control.spectra.active,...
+            ad.data{index}.label);
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        add2status(msgStr);
+        clear msgStr;
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function status = datasetSave(id)
@@ -718,34 +1018,60 @@ function status = datasetSave(id)
     % STATUS: 0 - in case save was successful
     %        -1 - in case something went wrong
 
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Check whether selected dataset has a (valid) filename
-    if ~isfield(ad.data{id},'filename') || ...
-            (strcmp(ad.data{id}.filename,''))
-        status = datasetSaveAs(id);
-        return;
-    else
-        [fpath,fname,fext] = fileparts(ad.data{id}.filename);
-        if ~strcmp(fext,'.zip')
-            ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
-            % Need to test for existing file and in case, ask user...
-            if (exist(ad.data{id}.filename,'file'))
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Check whether selected dataset has a (valid) filename
+        if ~isfield(ad.data{id},'filename') || ...
+                (strcmp(ad.data{id}.filename,''))
+            status = datasetSaveAs(id);
+            return;
+        else
+            [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+            if ~strcmp(fext,'.zip')
+                ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
+                % Need to test for existing file and in case, ask user...
+                if (exist(ad.data{id}.filename,'file'))
+                    answer = questdlg(...
+                        {'WARNING: You''re about to save the current dataset to the file'...
+                        ad.data{id}.filename ...
+                        ' '...
+                        'This file exists already! Are you sure you want to overwrite it?'...
+                        ' '...
+                        'Please hold on and think twice before you hit "Overwrite".'...
+                        'Alternatively you can press "Save as" and choose a different name.'},...
+                        'Warning: File exists already...',...
+                        'Overwrite','Save as','Cancel',...
+                        'Cancel');
+                    switch answer
+                        case 'Overwrite'
+                        case 'Save as'
+                            status = datasetSaveAs(id);
+                            return;
+                        case 'Cancel'
+                            return;
+                        otherwise
+                            return;
+                    end
+                end
+            end
+        end
+        
+        for k = 1:length(ad.data)
+            if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
                 answer = questdlg(...
                     {'WARNING: You''re about to save the current dataset to the file'...
                     ad.data{id}.filename ...
                     ' '...
-                    'This file exists already! Are you sure you want to overwrite it?'...
+                    'A dataset loaded from a file with that name has been loaded to the GUI!'...
                     ' '...
-                    'Please hold on and think twice before you hit "Overwrite".'...
-                    'Alternatively you can press "Save as" and choose a different name.'},...
-                    'Warning: File exists already...',...
-                    'Overwrite','Save as','Cancel',...
+                    'Please use "Save as" and choose a different name or press "Cancel".'},...
+                    'Warning: Dataset with same filename loaded to GUI...',...
+                    'Save as','Cancel',...
                     'Cancel');
                 switch answer
-                    case 'Overwrite'
                     case 'Save as'
                         status = datasetSaveAs(id);
                         return;
@@ -756,72 +1082,64 @@ function status = datasetSave(id)
                 end
             end
         end
-    end
-    
-    for k = 1:length(ad.data)
-        if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
-            answer = questdlg(...
-                {'WARNING: You''re about to save the current dataset to the file'...
-                ad.data{id}.filename ...
-                ' '...
-                'A dataset loaded from a file with that name has been loaded to the GUI!'...
-                ' '...
-                'Please use "Save as" and choose a different name or press "Cancel".'},...
-                'Warning: Dataset with same filename loaded to GUI...',...
-                'Save as','Cancel',...
-                'Cancel');
-            switch answer
-                case 'Save as'
-                    status = datasetSaveAs(id);
-                    return;
-                case 'Cancel'
-                    return;
-                otherwise
-                    return;
-            end
+        
+        % Do the actual saving
+        [ saveStatus, exception ] = ...
+            trEPRsave(ad.data{id}.filename,ad.data{id});
+        
+        % In case something went wrong
+        if saveStatus
+            % Adding status line
+            msgStr = cell(0);
+            msgStr{length(msgStr)+1} = ...
+                sprintf('Problems when trying to save "%s" to file',...
+                ad.data{id}.label);
+            msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            status = add2status(msgStr);
+            clear msgStr;
+            status = -1;
+            return;
+        else
+            % Get second output parameter from trEPRsave, i.e. filename
+            % (See help of trEPRsave for details)
+            filename = exception;
         end
-    end
-    
-    % Do the actual saving
-    [ saveStatus, exception ] = ...
-        trEPRsave(ad.data{id}.filename,ad.data{id});
-    
-    % In case something went wrong
-    if saveStatus
+        
+        % Remove from modified
+        ad.control.spectra.modified(...
+            find(ad.control.spectra.modified == id)) = [];
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.origdata);
+        
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...
-            sprintf('Problems when trying to save "%s" to file',...
-            ad.data{id}.label);
-        msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            sprintf('Data set "%s" saved to file',ad.data{id}.label);
+        msgStr{length(msgStr)+1} = filename;
         status = add2status(msgStr);
         clear msgStr;
-        status = -1;
-        return;
-    else
-        % Get second output parameter from trEPRsave, i.e. filename
-        % (See help of trEPRsave for details)
-        filename = exception;
+        
+        status = 0;
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Remove from modified
-    ad.control.spectra.modified(...
-        find(ad.control.spectra.modified == id)) = [];
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-    
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('Data set "%s" saved to file',ad.data{id}.label);
-    msgStr{length(msgStr)+1} = filename;
-    status = add2status(msgStr);
-    clear msgStr;
-    
-    status = 0;
 end
 
 function status = datasetSaveAs(id)
@@ -831,125 +1149,143 @@ function status = datasetSaveAs(id)
     % STATUS: 0 - in case saveAs was successful
     %        -1 - in case something went wrong
     
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Create default filename
-    [fpath,fname,fext] = fileparts(ad.data{id}.filename);
-    if ~strcmp(fext,'.zip')
-        ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
-    end
-    % Need to test for existing file and in case, change default name
-    if (exist(ad.data{id}.filename,'file'))
-        % 1. Check whether name ends with -NNN (where NNN are numbers)
-        % 2. existingFiles = dir(sprintf('%s*',filename));
-        % 2a. If name ends with -NNN, remove "-NNN" from filename before
-        % 3. regexp existingFiles for "-NNN" pattern
-        % 4. Get highest "-NNN" pattern and increment "NNN"
-        % 5. Use filename with incremented "NNN" as new default filename
-        if (regexp(fname,'_\d+$'))
-            filesInDir = ...
-                dir(sprintf('%s*',fullfile(fpath,regexprep(fname,'_\d+$',''))));
-        else
-            filesInDir = dir(sprintf('%s*',fullfile(fpath,fname)));
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Create default filename
+        [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+        if ~strcmp(fext,'.zip')
+            ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
         end
-        l=0;
-        numbers = [];
-        for k=1:length(filesInDir)
-            token = regexp(filesInDir(k).name,'_(\d+)\..*$','tokens');
-            if ~isempty(token)
-                l=l+1;
-                numbers(l) = str2double(token{1});
+        % Need to test for existing file and in case, change default name
+        if (exist(ad.data{id}.filename,'file'))
+            % 1. Check whether name ends with -NNN (where NNN are numbers)
+            % 2. existingFiles = dir(sprintf('%s*',filename));
+            % 2a. If name ends with -NNN, remove "-NNN" from filename before
+            % 3. regexp existingFiles for "-NNN" pattern
+            % 4. Get highest "-NNN" pattern and increment "NNN"
+            % 5. Use filename with incremented "NNN" as new default filename
+            if (regexp(fname,'_\d+$'))
+                filesInDir = ...
+                    dir(sprintf('%s*',fullfile(fpath,regexprep(fname,'_\d+$',''))));
+            else
+                filesInDir = dir(sprintf('%s*',fullfile(fpath,fname)));
+            end
+            l=0;
+            numbers = [];
+            for k=1:length(filesInDir)
+                token = regexp(filesInDir(k).name,'_(\d+)\..*$','tokens');
+                if ~isempty(token)
+                    l=l+1;
+                    numbers(l) = str2double(token{1});
+                end
+            end
+            if (~isempty(numbers));
+                number = max(numbers)+1;
+            else
+                number = 1;
+            end
+            ad.data{id}.filename = fullfile(...
+                fpath,...
+                sprintf('%s_%i.zip',fname,number));
+        end
+        
+        % Show dialog for file selection
+        [FileName,PathName,~] = uiputfile(...
+            '*.zip',...
+            'Save dataset in a new file',...
+            ad.data{id}.filename);
+        
+        if (FileName == 0)
+            status = -1;
+            return;
+        end
+        
+        % Set filename to save in
+        ad.data{id}.filename = fullfile(PathName, FileName);
+        
+        for k = 1:length(ad.data)
+            if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
+                answer = questdlg(...
+                    {'WARNING: You''re about to save the current dataset to the file'...
+                    ad.data{id}.filename ...
+                    ' '...
+                    'A dataset loaded from a file with that name has been loaded to the GUI!'...
+                    ' '...
+                    'Please use "Save as" and choose a different name or press "Cancel".'},...
+                    'Warning: Dataset with same filename loaded to GUI...',...
+                    'Save as','Cancel',...
+                    'Cancel');
+                switch answer
+                    case 'Save as'
+                        status = datasetSaveAs(id);
+                        return;
+                    case 'Cancel'
+                        return;
+                    otherwise
+                        return;
+                end
             end
         end
-        if (~isempty(numbers));
-            number = max(numbers)+1;
+        
+        % Do the actual saving
+        [ saveStatus, exception ] = ...
+            trEPRsave(ad.data{id}.filename,ad.data{id});
+        
+        % In case something went wrong
+        if saveStatus
+            % Adding status line
+            msgStr = cell(0);
+            msgStr{length(msgStr)+1} = ...
+                sprintf('Problems when trying to save "%s" to file',...
+                ad.data{selected}.label);
+            msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            status = add2status(msgStr);
+            clear msgStr;
+            return;
         else
-            number = 1;
+            % Get second output parameter from trEPRsave, i.e. filename
+            % (See help of trEPRsave for details)
+            filename = exception;
         end
-        ad.data{id}.filename = fullfile(...
-            fpath,...
-            sprintf('%s_%i.zip',fname,number));
-    end
-    
-    % Show dialog for file selection
-    [FileName,PathName,FilterIndex] = uiputfile(...
-        '*.zip',...
-        'Save dataset in a new file',...
-        ad.data{id}.filename);
-    
-    if (FileName == 0)
-        status = -1;
-        return;
-    end
-    
-    % Set filename to save in
-    ad.data{id}.filename = fullfile(PathName, FileName);
-    
-    for k = 1:length(ad.data)
-        if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
-            answer = questdlg(...
-                {'WARNING: You''re about to save the current dataset to the file'...
-                ad.data{id}.filename ...
-                ' '...
-                'A dataset loaded from a file with that name has been loaded to the GUI!'...
-                ' '...
-                'Please use "Save as" and choose a different name or press "Cancel".'},...
-                'Warning: Dataset with same filename loaded to GUI...',...
-                'Save as','Cancel',...
-                'Cancel');
-            switch answer
-                case 'Save as'
-                    status = datasetSaveAs(id);
-                    return;
-                case 'Cancel'
-                    return;
-                otherwise
-                    return;
-            end
-        end
-    end
-    
-    % Do the actual saving
-    [ saveStatus, exception ] = ...
-        trEPRsave(ad.data{id}.filename,ad.data{id});
-    
-    % In case something went wrong
-    if saveStatus
+        
+        % Remove from modified
+        ad.control.spectra.modified(...
+            find(ad.control.spectra.modified == id)) = [];
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.origdata);
+        
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...
-            sprintf('Problems when trying to save "%s" to file',...
-            ad.data{selected}.label);
-        msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            sprintf('Data set "%s" saved to file',ad.data{id}.label);
+        msgStr{length(msgStr)+1} = filename;
         status = add2status(msgStr);
         clear msgStr;
-        return;
-    else
-        % Get second output parameter from trEPRsave, i.e. filename
-        % (See help of trEPRsave for details)
-        filename = exception;
+        
+        status = 0;
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Remove from modified
-    ad.control.spectra.modified(...
-        find(ad.control.spectra.modified == id)) = [];
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.origdata);
-    
-    % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('Data set "%s" saved to file',ad.data{id}.label);
-    msgStr{length(msgStr)+1} = filename;
-    status = add2status(msgStr);
-    clear msgStr;
-    
-    status = 0;
 end
     
 

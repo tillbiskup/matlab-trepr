@@ -667,530 +667,800 @@ uicontrol('Tag','display_panel_displaytype_popupmenu',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function pages_buttongroup_Callback(source,~)
-    page_panels = [handle_pp1 handle_pp2 handle_pp3 handle_pp4];
-    val = get(get(source,'SelectedObject'),'String');
-    switch val
-        case 'page 1'
-            set(page_panels,'Visible','off');
-            set(handle_pp1,'Visible','on');         
-        case 'page 2'
-            set(page_panels,'Visible','off');
-            set(handle_pp2,'Visible','on');
-        case 'page 3'
-            set(page_panels,'Visible','off');
-            set(handle_pp3,'Visible','on');         
-        case 'page 4'
-            set(page_panels,'Visible','off');
-            set(handle_pp4,'Visible','on');         
+    try
+        page_panels = [handle_pp1 handle_pp2 handle_pp3 handle_pp4];
+        val = get(get(source,'SelectedObject'),'String');
+        switch val
+            case 'page 1'
+                set(page_panels,'Visible','off');
+                set(handle_pp1,'Visible','on');
+            case 'page 2'
+                set(page_panels,'Visible','off');
+                set(handle_pp2,'Visible','on');
+            case 'page 3'
+                set(page_panels,'Visible','off');
+                set(handle_pp3,'Visible','on');
+            case 'page 4'
+                set(page_panels,'Visible','off');
+                set(handle_pp4,'Visible','on');
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
 function axislabels_edit_Callback(source,~,label)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    switch label
-        case 'xmeasure'
-            ad.control.axis.labels.x.measure = get(source,'String');
-        case 'xunit'
-            ad.control.axis.labels.x.unit = get(source,'String');
-        case 'ymeasure'
-            ad.control.axis.labels.y.measure = get(source,'String');
-        case 'yunit'
-            ad.control.axis.labels.y.unit = get(source,'String');
-        case 'zmeasure'
-            ad.control.axis.labels.z.measure = get(source,'String');
-        case 'zunit'
-            ad.control.axis.labels.z.unit = get(source,'String');
-        otherwise
-            msgstr = { 'Unknown axis label in callback function call.' ...
-                sprintf('Function "%s" in file "%s"',...
-                'axislabels_edit_Callback',...
-                mfilename ...
-                )...
-                };
-            status = add2status(msgstr);
-            return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        switch label
+            case 'xmeasure'
+                ad.control.axis.labels.x.measure = get(source,'String');
+            case 'xunit'
+                ad.control.axis.labels.x.unit = get(source,'String');
+            case 'ymeasure'
+                ad.control.axis.labels.y.measure = get(source,'String');
+            case 'yunit'
+                ad.control.axis.labels.y.unit = get(source,'String');
+            case 'zmeasure'
+                ad.control.axis.labels.z.measure = get(source,'String');
+            case 'zunit'
+                ad.control.axis.labels.z.unit = get(source,'String');
+            otherwise
+                msgstr = { 'Unknown axis label in callback function call.' ...
+                    sprintf('Function "%s" in file "%s"',...
+                    'axislabels_edit_Callback',...
+                    mfilename ...
+                    )...
+                    };
+                status = add2status(msgstr);
+                return;
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();    
 end
 
 function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    if (isempty(ad.control.spectra.active))
-        return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        if (isempty(ad.control.spectra.active))
+            return;
+        end
+        
+        if (isfield(ad.data{ad.control.spectra.active},'axes'))
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.x,'measure'))
+                ad.control.axis.labels.x.measure = ...
+                    ad.data{ad.control.spectra.active}.axes.x.measure;
+            end
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.x,'unit'))
+                ad.control.axis.labels.x.unit = ...
+                    ad.data{ad.control.spectra.active}.axes.x.unit;
+            end
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.y,'measure'))
+                ad.control.axis.labels.y.measure = ...
+                    ad.data{ad.control.spectra.active}.axes.y.measure;
+            end
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.y,'unit'))
+                ad.control.axis.labels.y.unit = ...
+                    ad.data{ad.control.spectra.active}.axes.y.unit;
+            end
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.z,'measure'))
+                ad.control.axis.labels.z.measure = ...
+                    ad.data{ad.control.spectra.active}.axes.z.measure;
+            end
+            if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
+                    isfield(ad.data{ad.control.spectra.active}.axes.z,'unit'))
+                ad.control.axis.labels.z.unit = ...
+                    ad.data{ad.control.spectra.active}.axes.z.unit;
+            end
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update display panel
+        update_displayPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-
-    if (isfield(ad.data{ad.control.spectra.active},'axes'))
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.x,'measure'))
-            ad.control.axis.labels.x.measure = ...
-                ad.data{ad.control.spectra.active}.axes.x.measure;
-        end
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.x,'unit'))
-            ad.control.axis.labels.x.unit = ...
-                ad.data{ad.control.spectra.active}.axes.x.unit;
-        end
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.y,'measure'))
-            ad.control.axis.labels.y.measure = ...
-                ad.data{ad.control.spectra.active}.axes.y.measure;
-        end
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.y,'unit'))
-            ad.control.axis.labels.y.unit = ...
-                ad.data{ad.control.spectra.active}.axes.y.unit;
-        end
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.z,'measure'))
-            ad.control.axis.labels.z.measure = ...
-                ad.data{ad.control.spectra.active}.axes.z.measure;
-        end
-        if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
-                isfield(ad.data{ad.control.spectra.active}.axes.z,'unit'))
-            ad.control.axis.labels.z.unit = ...
-                ad.data{ad.control.spectra.active}.axes.z.unit;
-        end
-    end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    % Update display panel
-    update_displayPanel();
-
-    %Update main axis
-    update_mainAxis();    
 end
 
 function axislimits_edit_Callback(source,~,limit)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    switch limit
-        case 'xmin'
-            ad.control.axis.limits.x.min = str2num(get(source,'String'));
-        case 'xmax'
-            % Test whether value is larger than min for same axis
-            if (str2num(get(source,'String')) > ad.control.axis.limits.x.min)
-                ad.control.axis.limits.x.max = str2num(get(source,'String'));
-            else
-                set(source,'String',num2str(ad.control.axis.limits.x.max));
-                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        switch limit
+            case 'xmin'
+                ad.control.axis.limits.x.min = str2num(get(source,'String'));
+            case 'xmax'
+                % Test whether value is larger than min for same axis
+                if (str2num(get(source,'String')) > ad.control.axis.limits.x.min)
+                    ad.control.axis.limits.x.max = str2num(get(source,'String'));
+                else
+                    set(source,'String',num2str(ad.control.axis.limits.x.max));
+                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                    status = add2status(msgstr);
+                    return;
+                end
+            case 'ymin'
+                ad.control.axis.limits.y.min = str2num(get(source,'String'));
+            case 'ymax'
+                % Test whether value is larger than min for same axis
+                if (str2num(get(source,'String')) > ad.control.axis.limits.y.min)
+                    ad.control.axis.limits.y.max = str2num(get(source,'String'));
+                else
+                    set(source,'String',num2str(ad.control.axis.limits.y.max));
+                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                    status = add2status(msgstr);
+                    return;
+                end
+            case 'zmin'
+                ad.control.axis.limits.z.min = str2num(get(source,'String'));
+            case 'zmax'
+                % Test whether value is larger than min for same axis
+                if (str2num(get(source,'String')) > ad.control.axis.limits.z.min)
+                    ad.control.axis.limits.z.max = str2num(get(source,'String'));
+                else
+                    set(source,'String',num2str(ad.control.axis.limits.z.max));
+                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
+                    status = add2status(msgstr);
+                    return;
+                end
+            otherwise
+                msgstr = { 'Unknown axis limit in callback function call.' ...
+                    sprintf('Function "%s" in file "%s"',...
+                    'axislimits_edit_Callback',...
+                    mfilename ...
+                    )...
+                    };
                 status = add2status(msgstr);
                 return;
-            end
-        case 'ymin'
-            ad.control.axis.limits.y.min = str2num(get(source,'String'));
-        case 'ymax'
-            % Test whether value is larger than min for same axis
-            if (str2num(get(source,'String')) > ad.control.axis.limits.y.min)
-                ad.control.axis.limits.y.max = str2num(get(source,'String'));
-            else
-                set(source,'String',num2str(ad.control.axis.limits.y.max));
-                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                status = add2status(msgstr);
-                return;
-            end
-        case 'zmin'
-            ad.control.axis.limits.z.min = str2num(get(source,'String'));
-        case 'zmax'
-            % Test whether value is larger than min for same axis
-            if (str2num(get(source,'String')) > ad.control.axis.limits.z.min)
-                ad.control.axis.limits.z.max = str2num(get(source,'String'));
-            else
-                set(source,'String',num2str(ad.control.axis.limits.z.max));
-                msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                status = add2status(msgstr);
-                return;
-            end
-        otherwise
-            msgstr = { 'Unknown axis limit in callback function call.' ...
-                sprintf('Function "%s" in file "%s"',...
-                'axislimits_edit_Callback',...
-                mfilename ...
-                )...
-                };
-            status = add2status(msgstr);
-            return;
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function axislimits_auto_checkbox_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.axis.limits.auto = get(source,'Value');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    % Update display panel
-    update_displayPanel();
-
-    %Update main axis
-    update_mainAxis();
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        ad.control.axis.limits.auto = get(source,'Value');
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update display panel
+        update_displayPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function highlight_checkbox_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    if (get(source,'Value'))
-        set(gh.display_panel_highlight_method_popupmenu,...
-            'Enable','On');
-        set(gh.display_panel_highlight_value_popupmenu,...
-            'Enable','On');
-        highlightTypes = ...
-            cellstr(get(gh.display_panel_highlight_method_popupmenu,'String'));
-        highlightType = ...
-            highlightTypes{get(gh.display_panel_highlight_method_popupmenu,'Value')};
-        ad.control.axis.highlight.method = highlightType;
-    else
-        set(gh.display_panel_highlight_method_popupmenu,...
-            'Enable','Off');
-        set(gh.display_panel_highlight_value_popupmenu,...
-            'Enable','Off');
-        ad.control.axis.highlight.method = '';
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        if (get(source,'Value'))
+            set(gh.display_panel_highlight_method_popupmenu,...
+                'Enable','On');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Enable','On');
+            highlightTypes = ...
+                cellstr(get(gh.display_panel_highlight_method_popupmenu,'String'));
+            highlightType = ...
+                highlightTypes{get(gh.display_panel_highlight_method_popupmenu,'Value')};
+            ad.control.axis.highlight.method = highlightType;
+        else
+            set(gh.display_panel_highlight_method_popupmenu,...
+                'Enable','Off');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Enable','Off');
+            ad.control.axis.highlight.method = '';
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function highlight_method_popupmenu_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    highlightTypes = cellstr(get(source,'String'));
-    highlightType = highlightTypes{get(source,'Value')};
-    ad.control.axis.highlight.method = highlightType;
-    
-    switch highlightType
-        case 'color'
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'String','blue|green|red|cyan|magenta|yellow|black');
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Value',1);
-        case 'linewidth'
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'String','1 px|2 px|3 px|4 px|5 px');    
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Value',1);
-        case 'linestyle'
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'String','solid|dashed|dotted|dash-dotted');    
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Value',1);
-        case 'marker'
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'String','plus|circle|asterisk|point|cross|square|diamond|triangle up|triangle down|triangle right|triangle left|pentagram|hexagram');    
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Value',1);
-        otherwise
-            msg = sprintf('Highlight type %s currently unsupported',highlightType);
-            add2status(msg);
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        highlightTypes = cellstr(get(source,'String'));
+        highlightType = highlightTypes{get(source,'Value')};
+        ad.control.axis.highlight.method = highlightType;
+        
+        switch highlightType
+            case 'color'
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'String','blue|green|red|cyan|magenta|yellow|black');
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'Value',1);
+            case 'linewidth'
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'String','1 px|2 px|3 px|4 px|5 px');
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'Value',1);
+            case 'linestyle'
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'String','solid|dashed|dotted|dash-dotted');
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'Value',1);
+            case 'marker'
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'String','plus|circle|asterisk|point|cross|square|diamond|triangle up|triangle down|triangle right|triangle left|pentagram|hexagram');
+                set(gh.display_panel_highlight_value_popupmenu,...
+                    'Value',1);
+            otherwise
+                msg = sprintf('Highlight type %s currently unsupported',highlightType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update highlight_value_popupmenu
+        highlight_value_popupmenu_Callback(source,eventdata);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-
-    % Update highlight_value_popupmenu
-    highlight_value_popupmenu_Callback(source,eventdata);
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function highlight_value_popupmenu_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    highlightValues = ...
-        cellstr(get(gh.display_panel_highlight_value_popupmenu,'String'));
-    highlightValue = ...
-        highlightValues{get(gh.display_panel_highlight_value_popupmenu,'Value')};
-
-    highlight = struct();
-    highlight.color = struct(...
-        'blue','b',...
-        'green','g',...
-        'red','r',...
-        'cyan','c',...
-        'magenta','m',...
-        'yellow','y',...
-        'black','k');
-    highlight.linewidth = struct(...
-        'n1px',1,...
-        'n2px',2,...
-        'n3px',3,...
-        'n4px',4,...
-        'n5px',5);
-    highlight.linestyle = struct(...
-        'solid','-',...
-        'dashed','--',...
-        'dotted',':',...
-        'dashdotted','-.');
-    highlight.marker = struct(...
-        'plus','+',...
-        'circle','o',...
-        'asterisk','*',...
-        'point','.',...
-        'cross','x',...
-        'square','s',...
-        'diamond','d',...
-        'triangleup','^',...
-        'triangledown','v',...
-        'triangleright','>',...
-        'triangleleft','<',...
-        'pentagram','p',...
-        'hexagram','h');
-
-    ad.control.axis.highlight.value = ...
-        getfield(getfield(highlight,ad.control.axis.highlight.method),...
-        regexprep(strrep(strrep(highlightValue,' ',''),'-',''),'^([0-9])','n$1'));
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        highlightValues = ...
+            cellstr(get(gh.display_panel_highlight_value_popupmenu,'String'));
+        highlightValue = ...
+            highlightValues{get(gh.display_panel_highlight_value_popupmenu,'Value')};
+        
+        highlight = struct();
+        highlight.color = struct(...
+            'blue','b',...
+            'green','g',...
+            'red','r',...
+            'cyan','c',...
+            'magenta','m',...
+            'yellow','y',...
+            'black','k');
+        highlight.linewidth = struct(...
+            'n1px',1,...
+            'n2px',2,...
+            'n3px',3,...
+            'n4px',4,...
+            'n5px',5);
+        highlight.linestyle = struct(...
+            'solid','-',...
+            'dashed','--',...
+            'dotted',':',...
+            'dashdotted','-.');
+        highlight.marker = struct(...
+            'plus','+',...
+            'circle','o',...
+            'asterisk','*',...
+            'point','.',...
+            'cross','x',...
+            'square','s',...
+            'diamond','d',...
+            'triangleup','^',...
+            'triangledown','v',...
+            'triangleright','>',...
+            'triangleleft','<',...
+            'pentagram','p',...
+            'hexagram','h');
+        
+        ad.control.axis.highlight.value = ...
+            getfield(getfield(highlight,ad.control.axis.highlight.method),...
+            regexprep(strrep(strrep(highlightValue,' ',''),'-',''),'^([0-9])','n$1'));
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function grid_x_togglebutton_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    if (get(source,'Value'))
-        ad.control.axis.grid.x = 'on';
-    else
-        ad.control.axis.grid.x = 'off';
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        if (get(source,'Value'))
+            ad.control.axis.grid.x = 'on';
+        else
+            ad.control.axis.grid.x = 'off';
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function grid_y_togglebutton_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    if (get(source,'Value'))
-        ad.control.axis.grid.y = 'on';
-    else
-        ad.control.axis.grid.y = 'off';
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        if (get(source,'Value'))
+            ad.control.axis.grid.y = 'on';
+        else
+            ad.control.axis.grid.y = 'off';
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function grid_minor_togglebutton_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    if (get(source,'Value'))
-        ad.control.axis.grid.minor = 'on';
-    else
-        ad.control.axis.grid.minor = 'off';
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        if (get(source,'Value'))
+            ad.control.axis.grid.minor = 'on';
+        else
+            ad.control.axis.grid.minor = 'off';
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function grid_zero_togglebutton_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    ad.control.axis.grid.zero = get(source,'Value');
-
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    % Update main axis
-    update_mainAxis();    
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        ad.control.axis.grid.zero = get(source,'Value');
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function grid_legend_togglebutton_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
- 
-    % For some currently unknown reason, findobj seems not to work. The
-    % parent handle behaves weird...
-    legendButtons = [...
-        gh.display_panel_legend_auto_togglebutton ...
-        gh.display_panel_legend_nw_togglebutton ...
-        gh.display_panel_legend_ne_togglebutton ...
-        gh.display_panel_legend_sw_togglebutton ...
-        gh.display_panel_legend_se_togglebutton ...
-        ];
-    
-    switch source
-        case gh.display_panel_legend_auto_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.legend.location = 'Best';
-                set(legendButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.legend.location = 'none';
-                set(legendButtons,'Value',0);
-            end
-        case gh.display_panel_legend_nw_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.legend.location = 'NorthWest';
-                set(legendButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.legend.location = 'none';
-                set(legendButtons,'Value',0);
-            end
-        case gh.display_panel_legend_ne_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.legend.location = 'NorthEast';
-                set(legendButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.legend.location = 'none';
-                set(legendButtons,'Value',0);
-            end
-        case gh.display_panel_legend_sw_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.legend.location = 'SouthWest';
-                set(legendButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.legend.location = 'none';
-                set(legendButtons,'Value',0);
-            end
-        case gh.display_panel_legend_se_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.legend.location = 'SouthEast';
-                set(legendButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.legend.location = 'none';
-                set(legendButtons,'Value',0);
-            end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % For some currently unknown reason, findobj seems not to work. The
+        % parent handle behaves weird...
+        legendButtons = [...
+            gh.display_panel_legend_auto_togglebutton ...
+            gh.display_panel_legend_nw_togglebutton ...
+            gh.display_panel_legend_ne_togglebutton ...
+            gh.display_panel_legend_sw_togglebutton ...
+            gh.display_panel_legend_se_togglebutton ...
+            ];
+        
+        switch source
+            case gh.display_panel_legend_auto_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.legend.location = 'Best';
+                    set(legendButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.legend.location = 'none';
+                    set(legendButtons,'Value',0);
+                end
+            case gh.display_panel_legend_nw_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.legend.location = 'NorthWest';
+                    set(legendButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.legend.location = 'none';
+                    set(legendButtons,'Value',0);
+                end
+            case gh.display_panel_legend_ne_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.legend.location = 'NorthEast';
+                    set(legendButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.legend.location = 'none';
+                    set(legendButtons,'Value',0);
+                end
+            case gh.display_panel_legend_sw_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.legend.location = 'SouthWest';
+                    set(legendButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.legend.location = 'none';
+                    set(legendButtons,'Value',0);
+                end
+            case gh.display_panel_legend_se_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.legend.location = 'SouthEast';
+                    set(legendButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.legend.location = 'none';
+                    set(legendButtons,'Value',0);
+                end
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
 end
 
 function normalise_togglebutton_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
- 
-    % For some currently unknown reason, findobj seems not to work. The
-    % parent handle behaves weird...
-    normaliseButtons = [...
-        gh.display_panel_normalise_pkpk_togglebutton ...
-        gh.display_panel_normalise_amplitude_togglebutton ...
-        ];
-    
-    switch source
-        case gh.display_panel_normalise_pkpk_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.normalisation = 'pkpk';
-                set(normaliseButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.normalisation = 'none';
-                set(normaliseButtons,'Value',0);
-            end
-        case gh.display_panel_normalise_amplitude_togglebutton
-            if (get(source,'Value'))
-                ad.control.axis.normalisation = 'amplitude';
-                set(normaliseButtons,'Value',0);
-                set(source,'Value',1);
-            else
-                ad.control.axis.normalisation = 'none';
-                set(normaliseButtons,'Value',0);
-            end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % For some currently unknown reason, findobj seems not to work. The
+        % parent handle behaves weird...
+        normaliseButtons = [...
+            gh.display_panel_normalise_pkpk_togglebutton ...
+            gh.display_panel_normalise_amplitude_togglebutton ...
+            ];
+        
+        switch source
+            case gh.display_panel_normalise_pkpk_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.normalisation = 'pkpk';
+                    set(normaliseButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.normalisation = 'none';
+                    set(normaliseButtons,'Value',0);
+                end
+            case gh.display_panel_normalise_amplitude_togglebutton
+                if (get(source,'Value'))
+                    ad.control.axis.normalisation = 'amplitude';
+                    set(normaliseButtons,'Value',0);
+                    set(source,'Value',1);
+                else
+                    ad.control.axis.normalisation = 'none';
+                    set(normaliseButtons,'Value',0);
+                end
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        %Update main axis
+        update_mainAxis();
+        
+        %Update slider panel
+        update_sliderPanel();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    %Update main axis
-    update_mainAxis();    
-    
-    %Update slider panel
-    update_sliderPanel();    
 end
 
 
 function displaytype_popupmenu_Callback(source,eventdata)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    displayTypes = cellstr(get(source,'String'));
-    displayType = displayTypes{get(source,'Value')};
-    ad.control.axis.displayType = displayType;
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    update_mainAxis();
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        displayTypes = cellstr(get(source,'String'));
+        displayType = displayTypes{get(source,'Value')};
+        ad.control.axis.displayType = displayType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

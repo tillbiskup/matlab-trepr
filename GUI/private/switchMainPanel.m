@@ -1,4 +1,11 @@
 function status = switchMainPanel(panelName)
+% SWITCHMAINPANEL Private function to switch between panels of the main GUI
+%
+% panelName - string with the name of the panel, i.e. the value of the
+%             return value of the buttongroup keypress event (aka the
+%             'String' value of the respective button pressed)
+%
+% status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 try
     % Get handles of main window
@@ -86,7 +93,13 @@ try
     
     status = 0;
 catch exception
-    trEPRgui_bugreportwindow(exception);
+    try
+        trEPRgui_bugreportwindow(exception);
+    catch exception2
+        % If even displaying the bug report window fails, what lasts to do?
+        exception = addCause(exception2, exception);
+        throw(exception);
+    end
     status = -1;
 end
 
