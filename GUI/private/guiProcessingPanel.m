@@ -229,294 +229,402 @@ uicontrol('Tag','processing_panel_average_y_unit_edit',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function corrections_pushbutton_Callback(~,~,correction)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % If no dataset is selected
-    if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
-        return;
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % If no dataset is selected
+        if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
+            return;
+        end
+        
+        switch correction
+            case 'POC'
+                guiProcessingPOC(ad.control.spectra.active);
+            case 'BGC'
+                guiProcessingBGC(ad.control.spectra.active);
+            otherwise
+                msg = cell(1,2);
+                msg{1} = sprintf(...
+                    'Correction method %s unknown or not (yet) supported.',...
+                    correction);
+                msg{2} = 'If you think that this is a bug, please file a bug report.';
+                status = add2status(msg);
+                % If for whatever weird reason the trEPR GUI contained no
+                % status field, print it to the commmand line
+                if (status == -2)
+                    fprintf('%s\n%s\n',msg{1},msg{2});
+                end
+                clear msg;
+        end
+        
+        % Update visible spectra listbox
+        update_visibleSpectra();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    switch correction
-        case 'POC'
-            guiProcessingPOC(ad.control.spectra.active);
-        case 'BGC'
-            guiProcessingBGC(ad.control.spectra.active);
-        otherwise
-            msg = cell(1,2);
-            msg{1} = sprintf(...
-                'Correction method %s unknown or not (yet) supported.',...
-                correction);
-            msg{2} = 'If you think that this is a bug, please file a bug report.';
-            status = add2status(msg);
-            % If for whatever weird reason the trEPR GUI contained no
-            % status field, print it to the commmand line
-            if (status == -2)
-                fprintf('%s\n%s\n',msg{1},msg{2});
-            end
-            clear msg;
-    end
-    
-    % Update visible spectra listbox
-    update_visibleSpectra();
 end
 
 function datasets_listbox_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    ad.control.spectra.active = ad.control.spectra.visible(...
-        get(gh.processing_panel_datasets_listbox,'Value')...
-        );
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);
-    
-    % If user double clicked on list entry
-    if strcmp(get(gcf,'SelectionType'),'open')
-        datasetChangeLabel(ad.control.spectra.active);
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        ad.control.spectra.active = ad.control.spectra.visible(...
+            get(gh.processing_panel_datasets_listbox,'Value')...
+            );
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % If user double clicked on list entry
+        if strcmp(get(gcf,'SelectionType'),'open')
+            datasetChangeLabel(ad.control.spectra.active);
+        end
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function average_x_points_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    if not (ad.control.spectra.active)
-        return;
-    end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    % Fix values: only integers >= 1
-    [~,x] = size(ad.data{ad.control.spectra.active}.data);
-    if (str2num(get(source,'String')) < 1)
-        set(source,'String','1');
-    elseif (str2num(get(source,'String')) > x)
-        set(source,'String',num2str(x));
-    else
-        set(source,...
-            'String',...
-            num2str(round(str2num(get(source,'String')))));
-    end
-    
-    ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
-        str2num(get(source,'String'));
-    filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-    filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-    ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-        filterType;
+        % Get handles of main window
+        gh = guihandles(mainWindow);
         
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();    
+        if not (ad.control.spectra.active)
+            return;
+        end
+        
+        % Fix values: only integers >= 1
+        [~,x] = size(ad.data{ad.control.spectra.active}.data);
+        if (str2num(get(source,'String')) < 1)
+            set(source,'String','1');
+        elseif (str2num(get(source,'String')) > x)
+            set(source,'String',num2str(x));
+        else
+            set(source,...
+                'String',...
+                num2str(round(str2num(get(source,'String')))));
+        end
+        
+        ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
+            str2num(get(source,'String'));
+        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
+        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
+        ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
+            filterType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function average_x_unit_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    if not (ad.control.spectra.active)
-        return;
-    end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    [y,x] = size(ad.data{ad.control.spectra.active}.data);
-    x = linspace(1,x,x);
-    y = linspace(1,y,y);
-    if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-            && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
-            && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
-            && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
-        x = ad.data{ad.control.spectra.active}.axes.x.values;
-    end
-
-    % Get "atomic" value
-    atomic = x(2)-x(1);
-
-    % Fix values: only those in range of the axis are allowed
-    if (str2num(get(source,'String')) < atomic)
-        set(source,'String',num2str(atomic));
-    elseif (str2num(get(source,'String')) > (atomic*length(x)))
-        set(source,'String',num2str(atomic*length(x)));
-    else
-        set(source,...
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        if not (ad.control.spectra.active)
+            return;
+        end
+        
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        x = linspace(1,x,x);
+        y = linspace(1,y,y);
+        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
+            x = ad.data{ad.control.spectra.active}.axes.x.values;
+        end
+        
+        % Get "atomic" value
+        atomic = x(2)-x(1);
+        
+        % Fix values: only those in range of the axis are allowed
+        if (str2num(get(source,'String')) < atomic)
+            set(source,'String',num2str(atomic));
+        elseif (str2num(get(source,'String')) > (atomic*length(x)))
+            set(source,'String',num2str(atomic*length(x)));
+        else
+            set(source,...
+                'String',...
+                num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+                );
+        end
+        
+        set(gh.processing_panel_average_x_points_edit,...
             'String',...
-            num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+            num2str(round(str2num(get(source,'String'))/atomic))...
             );
-    end
-
-    set(gh.processing_panel_average_x_points_edit,...
-        'String',...
-        num2str(round(str2num(get(source,'String'))/atomic))...
-        );
-
-    ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
-        round(str2num(get(source,'String'))/atomic);
-    filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-    filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-    ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-        filterType;
         
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();    
+        ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
+            round(str2num(get(source,'String'))/atomic);
+        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
+        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
+        ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
+            filterType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function average_y_points_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
-    if not (ad.control.spectra.active)
-        return;
-    end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    % Fix values: only integers >= 1
-    [y,x] = size(ad.data{ad.control.spectra.active}.data);
-    if (str2num(get(source,'String')) < 1)
-        set(source,'String','1');
-    elseif (str2num(get(source,'String')) > y)
-        set(source,'String',num2str(x));
-    else
-        set(source,...
-            'String',...
-            num2str(round(str2num(get(source,'String')))));
-    end
-    
-    ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
-        str2num(get(source,'String'));
-    filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-    filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-    ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
-        filterType;
+        % Get handles of main window
+        gh = guihandles(mainWindow);
         
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();    
+        if not (ad.control.spectra.active)
+            return;
+        end
+        
+        % Fix values: only integers >= 1
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        if (str2num(get(source,'String')) < 1)
+            set(source,'String','1');
+        elseif (str2num(get(source,'String')) > y)
+            set(source,'String',num2str(x));
+        else
+            set(source,...
+                'String',...
+                num2str(round(str2num(get(source,'String')))));
+        end
+        
+        ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
+            str2num(get(source,'String'));
+        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
+        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
+        ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
+            filterType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function average_y_unit_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    if not (ad.control.spectra.active)
-        return;
-    end
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
         
-    [y,x] = size(ad.data{ad.control.spectra.active}.data);
-    x = linspace(1,x,x);
-    y = linspace(1,y,y);
-    if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-            && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
-            && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
-            && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
-        y = ad.data{ad.control.spectra.active}.axes.y.values;
-    end
-
-    % Get "atomic" value
-    atomic = y(2)-y(1);
-
-    % Fix values: only those in range of the axis are allowed
-    if (str2num(get(source,'String')) < atomic)
-        set(source,'String',num2str(atomic));
-    elseif (str2num(get(source,'String')) > (atomic*length(y)))
-        set(source,'String',num2str(atomic*length(y)));
-    else
-        set(source,...
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        if not (ad.control.spectra.active)
+            return;
+        end
+        
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        x = linspace(1,x,x);
+        y = linspace(1,y,y);
+        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
+            y = ad.data{ad.control.spectra.active}.axes.y.values;
+        end
+        
+        % Get "atomic" value
+        atomic = y(2)-y(1);
+        
+        % Fix values: only those in range of the axis are allowed
+        if (str2num(get(source,'String')) < atomic)
+            set(source,'String',num2str(atomic));
+        elseif (str2num(get(source,'String')) > (atomic*length(y)))
+            set(source,'String',num2str(atomic*length(y)));
+        else
+            set(source,...
+                'String',...
+                num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+                );
+        end
+        
+        set(gh.processing_panel_average_y_points_edit,...
             'String',...
-            num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+            num2str(round(str2num(get(source,'String'))/atomic))...
             );
-    end
-
-    set(gh.processing_panel_average_y_points_edit,...
-        'String',...
-        num2str(round(str2num(get(source,'String'))/atomic))...
-        );
-
-    ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
-        round(str2num(get(source,'String'))/atomic);
-    filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-    filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-    ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
-        filterType;
         
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update processing panel
-    update_processingPanel();
-    
-    % Update slider panel
-    update_sliderPanel();
-    
-    % Update visible spectra listboxes (in diverse panels!)
-    update_visibleSpectra();
-
-    %Update main axis
-    update_mainAxis();    
+        ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
+            round(str2num(get(source,'String'))/atomic);
+        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
+        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
+        ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
+            filterType;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update processing panel
+        update_processingPanel();
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        % Update visible spectra listboxes (in diverse panels!)
+        update_visibleSpectra();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -524,13 +632,31 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function datasetChangeLabel(index)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 end

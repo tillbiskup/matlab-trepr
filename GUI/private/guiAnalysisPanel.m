@@ -53,34 +53,43 @@ handle_p1 = uipanel('Tag','analysis_panel_xxx_panel',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Set setslider checkbox
-% Get appdata of main window
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
-ad = getappdata(mainWindow);
-
-% Get guihandles of main window
-gh = guihandles(mainWindow);
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function analysis_setslider_checkbox_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    ad.control.help.setslider = get(source,'Value');
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'control',ad.control);  
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();    
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        ad.control.help.setslider = get(source,'Value');
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

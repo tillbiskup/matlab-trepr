@@ -131,22 +131,39 @@ hPanelText = uicontrol('Tag','helptext_display',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Set setslider checkbox
-% Get appdata of main window
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
-ad = getappdata(mainWindow);
-
-% Get guihandles of main window
-gh = guihandles(mainWindow);
-
-% Read text for welcome message from file and display it
-helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
-helpText = textFileRead(helpTextFile);
-% Workaround: Get rid of the second paragraph saying that one
-% sees this text only until pressing one of the panel switch
-% buttons.
-helpText(3:4) = [];
-set(hPanelText,'String',helpText);
+try
+    % Get appdata of main window
+    mainWindow = guiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+    
+    % Read text for welcome message from file and display it
+    helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
+    helpText = textFileRead(helpTextFile);
+    % Workaround: Get rid of the second paragraph saying that one
+    % sees this text only until pressing one of the panel switch
+    % buttons.
+    helpText(3:4) = [];
+    set(hPanelText,'String',helpText);
+catch exception
+    try
+        msgStr = ['An exception occurred. '...
+            'The bug reporter should have been opened'];
+        add2status(msgStr);
+    catch exception2
+        exception = addCause(exception2, exception);
+        disp(msgStr);
+    end
+    try
+        trEPRgui_bugreportwindow(exception);
+    catch exception3
+        % If even displaying the bug report window fails...
+        exception = addCause(exception3, exception);
+        throw(exception);
+    end
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -154,63 +171,81 @@ set(hPanelText,'String',helpText);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function helptext_popupmenu_Callback(source,~)
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    helpTexts = cellstr(get(source,'String'));
-    helpText = helpTexts{get(source,'Value')};
-    
-    set(gh.helptext_display_title,'String',helpText);
-    
-    switch helpText
-        case 'Welcome'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
-            helpText = textFileRead(helpTextFile);
-            % Workaround: Get rid of the second paragraph saying that one
-            % sees this text only until pressing one of the panel switch
-            % buttons.
-            helpText(3:4) = [];
-            set(hPanelText,'String',helpText);
-        case 'Why this GUI?'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','whygui.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Key concepts'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','keyconcepts.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Key bindings'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','keybindings.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Known bugs'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','knownbugs.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Report a bug'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','bugreport.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Disclaimer'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','disclaimer.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        case 'Other resources'
-            % Read text for welcome message from file and display it
-            helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','resources.txt');
-            helpText = textFileRead(helpTextFile);
-            set(hPanelText,'String',helpText);
-        otherwise
-            % That shall never happen
-            disp('guiHelpPanel(): Unknown helptext');
-            set(hPanelText,'String','');
+    try
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        helpTexts = cellstr(get(source,'String'));
+        helpText = helpTexts{get(source,'Value')};
+        
+        set(gh.helptext_display_title,'String',helpText);
+        
+        switch helpText
+            case 'Welcome'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
+                helpText = textFileRead(helpTextFile);
+                % Workaround: Get rid of the second paragraph saying that one
+                % sees this text only until pressing one of the panel switch
+                % buttons.
+                helpText(3:4) = [];
+                set(hPanelText,'String',helpText);
+            case 'Why this GUI?'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','whygui.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Key concepts'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','keyconcepts.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Key bindings'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','keybindings.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Known bugs'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','knownbugs.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Report a bug'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','bugreport.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Disclaimer'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','disclaimer.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            case 'Other resources'
+                % Read text for welcome message from file and display it
+                helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','resources.txt');
+                helpText = textFileRead(helpTextFile);
+                set(hPanelText,'String',helpText);
+            otherwise
+                % That shall never happen
+                add2status('guiHelpPanel(): Unknown helptext');
+                set(hPanelText,'String','');
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
 end
 
