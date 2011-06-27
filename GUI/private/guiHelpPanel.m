@@ -142,6 +142,10 @@ gh = guihandles(mainWindow);
 % Read text for welcome message from file and display it
 helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
 helpText = textFileRead(helpTextFile);
+% Workaround: Get rid of the second paragraph saying that one
+% sees this text only until pressing one of the panel switch
+% buttons.
+helpText(3:4) = [];
 set(hPanelText,'String',helpText);
 
 
@@ -163,6 +167,10 @@ function helptext_popupmenu_Callback(source,~)
             % Read text for welcome message from file and display it
             helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
             helpText = textFileRead(helpTextFile);
+            % Workaround: Get rid of the second paragraph saying that one
+            % sees this text only until pressing one of the panel switch
+            % buttons.
+            helpText(3:4) = [];
             set(hPanelText,'String',helpText);
         case 'Why this GUI?'
             % Read text for welcome message from file and display it

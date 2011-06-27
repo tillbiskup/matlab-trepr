@@ -1,14 +1,12 @@
 
 Welcome to the new GUI of the trEPR toolbox.
 
-NOTE: This message will only be displayed until you press one of the above buttons. But you can find it in the help panel via the "Help" button above.
-
-The main goals of this redesign of the GUI were, besides improvements on the coding, a reduction in size so that it fits even to such small monitors as that of the smallest MacBook Pro with a resolution of only 1280x800 px.
+NOTE: This message will disappear once you press one of the above buttons. You can find it again in the help panel via the "Help" button above.
 
 
 HOW TO USE THE GUI?
 
-A very brief introduction
+-= A very brief introduction =-
 
 1. Load data
 

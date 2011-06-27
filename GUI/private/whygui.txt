@@ -9,5 +9,7 @@ Due to constant encouragement and support from a good friend and colleague (for 
 
 The current version of the GUI is a complete rewrite of the original one, having both modularity and stability in mind from the very beginning.
 
+The main goals of this redesign of the GUI were, besides improvements on the coding, a reduction in size so that it fits even to such small monitors as that of the smallest MacBook Pro with a resolution of only 1280x800 px.
+
 The final aim of the GUI is to provide the user with an easy-to-use and robust interface for the daily data processing and data analysis of trEPR data. Key concepts are the import of a variety of data formats and export capabilities both of figures and data for further processing with other, more specialised, types of software (including, but not restricted to, MATLAB(TM)).
 
