@@ -16,7 +16,13 @@ FUNCTION KEYS (F1...F12)
 
 F1 - "Help:About" window
 
-F2 - "Status" window
+F2 - Informations about currently active dataset
+
+F3 - Baseline correction
+
+F4 - Accumulation
+
+F9 - "Status" window
 
 
 
