@@ -3,9 +3,21 @@ HOW TO REPORT A BUG?
 
 This software is still under development, and therefore you may encounter bugs rather frequent. To help improve its usability, reports of such encounters are highly welcome.
 
+NEW
+
+A bug report helper has been added that displays a window containing all the necessary information that shall go into an email to the toolbox author.
+
+If this window shows up, simply follow the instructions, and please, SAVE your data immediately afterwards.
+
+If you encounter an error/bug, but the bug report helper doesn't appear, please continue to read.
+
+
+A FEW DETAILS
+
 A more detailed account of this topic can be found on the website of the trEPR toolbox. Simply press the "Website" button above or "About" for the URL and contact details of the toolbox author.
 
 The better a bug report the faster (hopefully) the fixing of the bug reported.
+
 
 CHECKLIST
 
