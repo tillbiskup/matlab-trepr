@@ -485,51 +485,56 @@ u9 = uicontrol('Tag','tbReserve2',...
 
 % Create the main control panels
 
-hp0 = guiWelcomePanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp1 = guiLoadPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp2 = guiDatasetPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp3 = guiSliderPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp4 = guiMeasurePanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp5 = guiDisplayPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp6 = guiProcessingPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp7 = guiAnalysisPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
-hp8 = uipanel('Tag','reserve_panel',...
-    'parent',hMainFigure,...
-    'Title','Reserve',...
-    'FontUnit','Pixel','Fontsize',12,...
-    'FontWeight','bold',...
-    'BackgroundColor',defaultBackground,...
-    'Visible','off',...
-    'Units','pixels','Position',position);
-
-hp9 = guiHelpPanel(...
-    hMainFigure,...
-    [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
-
+try
+    hp0 = guiWelcomePanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp1 = guiLoadPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp2 = guiDatasetPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp3 = guiSliderPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp4 = guiMeasurePanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp5 = guiDisplayPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp6 = guiProcessingPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp7 = guiAnalysisPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp8 = uipanel('Tag','reserve_panel',...
+        'parent',hMainFigure,...
+        'Title','Reserve',...
+        'FontUnit','Pixel','Fontsize',12,...
+        'FontWeight','bold',...
+        'BackgroundColor',defaultBackground,...
+        'Visible','off',...
+        'Units','pixels',...
+        'Position',[guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+    
+    hp9 = guiHelpPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 20 mainPanelWidth guiSize(2)-140]);
+catch exception
+    % Hm... something serious must have gone wrong...
+    rethrow(exception);
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -557,12 +562,17 @@ set(hPlotAxes,'XLim',[-.0001,0.0002]);
 % set(hPlotAxes,'XLim',[-10 20000]);
     
 % Display splash
-set(hMainFigure,'CurrentAxes',hPlotAxes);
-[path,~,~] = fileparts(mfilename('fullpath'));
-splash = imread(fullfile(path,'private','TREPRtoolboxSplash.png'),'png');
-%splash = imread(fullfile(path,'private','TAtoolboxSplash.png'),'png');
-image(splash);
-axis off          % Remove axis ticks and numbers
+try
+    set(hMainFigure,'CurrentAxes',hPlotAxes);
+    [path,~,~] = fileparts(mfilename('fullpath'));
+    splash = imread(fullfile(path,'private','TREPRtoolboxSplash.png'),'png');
+    %splash = imread(fullfile(path,'private','TAtoolboxSplash.png'),'png');
+    image(splash);
+    axis off          % Remove axis ticks and numbers
+catch exception
+    % If this happens, something probably more serious went wrong...
+    rethrow(exception);
+end
 
 guidata(hMainFigure,guihandles);
 if (nargout == 1)
@@ -590,273 +600,309 @@ add2status('trEPR GUI main window initialised successfully.');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function slider_v1_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Depending on display type settings
-    switch ad.control.axis.displayType
-        case '1D along x'
-            ad.data{ad.control.spectra.active}.display.position.y = ...
-                int16(get(source,'Value'));
-        case '1D along y'
-            ad.data{ad.control.spectra.active}.display.position.x = ...
-                int16(get(source,'Value'));
-        otherwise
-            msg = sprintf('Display type %s currently unsupported',displayType);
-            add2status(msg);            
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.position.y = ...
+                    int16(get(source,'Value'));
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.position.x = ...
+                    int16(get(source,'Value'));
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function slider_v2_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Convert slider value to scaling factor
-    if (get(source,'Value') > 0)
-        scalingFactor = get(source,'Value')+1;
-    else
-        scalingFactor = 1/(abs(get(source,'Value'))+1);
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Convert slider value to scaling factor
+        if (get(source,'Value') > 0)
+            scalingFactor = get(source,'Value')+1;
+        else
+            scalingFactor = 1/(abs(get(source,'Value'))+1);
+        end
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{ad.control.spectra.active}.display.scaling.y = ...
+                    scalingFactor;
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.scaling.z = ...
+                    scalingFactor;
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.scaling.z = ...
+                    scalingFactor;
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Depending on display type settings
-    switch ad.control.axis.displayType
-        case '2D plot'
-            ad.data{ad.control.spectra.active}.display.scaling.y = ...
-                scalingFactor;
-        case '1D along x'
-            ad.data{ad.control.spectra.active}.display.scaling.z = ...
-                scalingFactor;
-        case '1D along y'
-            ad.data{ad.control.spectra.active}.display.scaling.z = ...
-                scalingFactor;
-        otherwise
-            msg = sprintf('Display type %s currently unsupported',displayType);
-            add2status(msg);            
-    end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function slider_v3_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Depending on display type settings
-    switch ad.control.axis.displayType
-        case '2D plot'
-            ad.data{ad.control.spectra.active}.display.displacement.y = ...
-                get(source,'Value');
-        case '1D along x'
-            ad.data{ad.control.spectra.active}.display.displacement.z = ...
-                get(source,'Value');
-        case '1D along y'
-            ad.data{ad.control.spectra.active}.display.displacement.z = ...
-                get(source,'Value');
-        otherwise
-            msg = sprintf('Display type %s currently unsupported',displayType);
-            add2status(msg);            
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{ad.control.spectra.active}.display.displacement.y = ...
+                    get(source,'Value');
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.displacement.z = ...
+                    get(source,'Value');
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.displacement.z = ...
+                    get(source,'Value');
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function slider_h1_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Convert slider value to scaling factor
-    if (get(source,'Value') > 0)
-        scalingFactor = get(source,'Value')+1;
-    else
-        scalingFactor = 1/(abs(get(source,'Value'))+1);
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Convert slider value to scaling factor
+        if (get(source,'Value') > 0)
+            scalingFactor = get(source,'Value')+1;
+        else
+            scalingFactor = 1/(abs(get(source,'Value'))+1);
+        end
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{ad.control.spectra.active}.display.scaling.x = ...
+                    scalingFactor;
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.scaling.x = ...
+                    scalingFactor;
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.scaling.y = ...
+                    scalingFactor;
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Depending on display type settings
-    switch ad.control.axis.displayType
-        case '2D plot'
-            ad.data{ad.control.spectra.active}.display.scaling.x = ...
-                scalingFactor;
-        case '1D along x'
-            ad.data{ad.control.spectra.active}.display.scaling.x = ...
-                scalingFactor;
-        case '1D along y'
-            ad.data{ad.control.spectra.active}.display.scaling.y = ...
-                scalingFactor;
-        otherwise
-            msg = sprintf('Display type %s currently unsupported',displayType);
-            add2status(msg);            
-    end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function slider_h2_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Depending on display type settings
-    switch ad.control.axis.displayType
-        case '2D plot'
-            ad.data{ad.control.spectra.active}.display.displacement.x = ...
-                get(source,'Value');
-        case '1D along x'
-            ad.data{ad.control.spectra.active}.display.displacement.x = ...
-                get(source,'Value');
-        case '1D along y'
-            ad.data{ad.control.spectra.active}.display.displacement.y = ...
-                get(source,'Value');
-        otherwise
-            msg = sprintf('Display type %s currently unsupported',displayType);
-            add2status(msg);            
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{ad.control.spectra.active}.display.displacement.x = ...
+                    get(source,'Value');
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.displacement.x = ...
+                    get(source,'Value');
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.displacement.y = ...
+                    get(source,'Value');
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-    
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function zoom_togglebutton_Callback(source,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-
-    if (get(source,'Value'))
-        zh = zoom(mainWindow);
-        % set(zh,'UIContextMenu',handles.axisToolsContextMenu);
-        set(zh,'Enable','on');
-        set(zh,'Motion','both');
-        set(zh,'Direction','in');
-    else
-        zh = zoom(mainWindow);
-        set(zh,'Enable','off');
-        refresh;
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        if (get(source,'Value'))
+            zh = zoom(mainWindow);
+            % set(zh,'UIContextMenu',handles.axisToolsContextMenu);
+            set(zh,'Enable','on');
+            set(zh,'Motion','both');
+            set(zh,'Direction','in');
+        else
+            zh = zoom(mainWindow);
+            set(zh,'Enable','off');
+            refresh;
+        end
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
 end
 
 function fullscale_pushbutton_Callback(~,~)
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-
-    set(gh.zoom_togglebutton,'Value',0);
-    zh = zoom(mainWindow);
-    set(zh,'Enable','off');
-
-    %Update main axis
-    update_mainAxis();    
+    try
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        set(gh.zoom_togglebutton,'Value',0);
+        zh = zoom(mainWindow);
+        set(zh,'Enable','off');
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
+    end
 end
 
 function reset_pushbutton_Callback(source,~)
-    if (get(source,'Value') == 0) || (isempty(ad.control.spectra.active))
-        return;
+    try
+        if (get(source,'Value') == 0) || (isempty(ad.control.spectra.active))
+            return;
+        end
+        
+        % Get appdata of main window
+        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        ad = getappdata(mainWindow);
+        
+        % Reset displacement and scaling for current spectrum
+        ad.data{ad.control.spectra.active}.display.displacement.x = 0;
+        ad.data{ad.control.spectra.active}.display.displacement.y = 0;
+        ad.data{ad.control.spectra.active}.display.displacement.z = 0;
+        
+        ad.data{ad.control.spectra.active}.display.scaling.x = 1;
+        ad.data{ad.control.spectra.active}.display.scaling.y = 1;
+        ad.data{ad.control.spectra.active}.display.scaling.z = 1;
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        
+        % Update slider panel
+        update_sliderPanel();
+        
+        %Update main axis
+        update_mainAxis();
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
-    
-    % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
-    ad = getappdata(mainWindow);
-    
-    % Reset displacement and scaling for current spectrum
-    ad.data{ad.control.spectra.active}.display.displacement.x = 0;
-    ad.data{ad.control.spectra.active}.display.displacement.y = 0;
-    ad.data{ad.control.spectra.active}.display.displacement.z = 0;
-
-    ad.data{ad.control.spectra.active}.display.scaling.x = 1;
-    ad.data{ad.control.spectra.active}.display.scaling.y = 1;
-    ad.data{ad.control.spectra.active}.display.scaling.z = 1;
-    
-    % Update appdata of main window
-    setappdata(mainWindow,'data',ad.data);
-
-    % Update slider panel
-    update_sliderPanel();
-
-    %Update main axis
-    update_mainAxis();
 end
 
 function tbg_Callback(source,~)
-    panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
-    val = get(get(source,'SelectedObject'),'String');
-    switch val
-        case 'Load'
-            set(panels,'Visible','off');
-            set(hp1,'Visible','on');         
-        case 'Datasets'
-            set(panels,'Visible','off');
-            set(hp2,'Visible','on');
-            % Update both list boxes
-            update_invisibleSpectra();
-            update_visibleSpectra();
-            update_datasetPanel();
-        case 'Slider'
-            set(panels,'Visible','off');
-            set(hp3,'Visible','on');         
-            % Update slider panel
-            update_sliderPanel();
-        case 'Measure'
-            set(panels,'Visible','off');
-            set(hp4,'Visible','on');         
-            % Update measure panel
-            update_measurePanel();
-        case 'Display'
-            set(panels,'Visible','off');
-            set(hp5,'Visible','on');         
-            % Update display panel
-            update_displayPanel();
-        case 'Processing'
-            set(panels,'Visible','off');
-            set(hp6,'Visible','on');         
-            % Update processing panel
-            update_processingPanel();
-        case 'Analysis'
-            set(panels,'Visible','off');
-            set(hp7,'Visible','on');         
-        case 'Help'
-            set(panels,'Visible','off');
-            set(hp9,'Visible','on');         
+    try
+        panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
+        val = get(get(source,'SelectedObject'),'String');
+        switch val
+            case 'Load'
+                set(panels,'Visible','off');
+                set(hp1,'Visible','on');
+            case 'Datasets'
+                set(panels,'Visible','off');
+                set(hp2,'Visible','on');
+                % Update both list boxes
+                update_invisibleSpectra();
+                update_visibleSpectra();
+                update_datasetPanel();
+            case 'Slider'
+                set(panels,'Visible','off');
+                set(hp3,'Visible','on');
+                % Update slider panel
+                update_sliderPanel();
+            case 'Measure'
+                set(panels,'Visible','off');
+                set(hp4,'Visible','on');
+                % Update measure panel
+                update_measurePanel();
+            case 'Display'
+                set(panels,'Visible','off');
+                set(hp5,'Visible','on');
+                % Update display panel
+                update_displayPanel();
+            case 'Processing'
+                set(panels,'Visible','off');
+                set(hp6,'Visible','on');
+                % Update processing panel
+                update_processingPanel();
+            case 'Analysis'
+                set(panels,'Visible','off');
+                set(hp7,'Visible','on');
+            case 'Help'
+                set(panels,'Visible','off');
+                set(hp9,'Visible','on');
+        end
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
 end
 
@@ -868,87 +914,92 @@ function closeGUI(~,~)
 end
 
 function keyBindings(~,evt)
-    if isempty(evt.Character) && isempty(evt.Key)
-        % In case "Character" is the empty string, i.e. only modifier key
-        % was pressed...
-        return;
-    end
+    % TODO: Outsource this into a separate function file
+    try
+        if isempty(evt.Character) && isempty(evt.Key)
+            % In case "Character" is the empty string, i.e. only modifier key
+            % was pressed...
+            return;
+        end
         
-    if ~isempty(evt.Modifier)
-        if (strcmpi(evt.Modifier{1},'command')) || ...
-                (strcmpi(evt.Modifier{1},'control'))
-            % Handle list of panels and buttons for switching
-            panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
-            buttons = [u1 u2 u3 u4 u5 u6 u7 u8 u9];
-            switch evt.Key
-                case 'w'
-                    closeGUI();
-                    return;
-                case '1'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp1,'Visible','on');
-                    set(u1,'Value',1);
-                    return;
-                case '2'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp2,'Visible','on');
-                    set(u2,'Value',1);
-                    return;
-                case '3'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp3,'Visible','on');
-                    set(u3,'Value',1);
-                    return;
-                case '4'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp4,'Visible','on');
-                    set(u4,'Value',1);
-                    return;
-                case '5'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp5,'Visible','on');
-                    set(u5,'Value',1);
-                    return;
-                case '6'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp6,'Visible','on');
-                    set(u6,'Value',1);
-                    return;
-                case '7'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp7,'Visible','on');
-                    set(u7,'Value',1);
-                    return;
-                case '8'
-                    return;
-                case '9'
-                    set(panels,'Visible','off');
-                    set(buttons,'Value',0);
-                    set(hp9,'Visible','on');
-                    set(u9,'Value',1);
-                    return;
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                % Handle list of panels and buttons for switching
+                panels = [hp0 hp1 hp2 hp3 hp4 hp5 hp6 hp7 hp8 hp9];
+                buttons = [u1 u2 u3 u4 u5 u6 u7 u8 u9];
+                switch evt.Key
+                    case 'w'
+                        closeGUI();
+                        return;
+                    case '1'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp1,'Visible','on');
+                        set(u1,'Value',1);
+                        return;
+                    case '2'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp2,'Visible','on');
+                        set(u2,'Value',1);
+                        return;
+                    case '3'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp3,'Visible','on');
+                        set(u3,'Value',1);
+                        return;
+                    case '4'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp4,'Visible','on');
+                        set(u4,'Value',1);
+                        return;
+                    case '5'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp5,'Visible','on');
+                        set(u5,'Value',1);
+                        return;
+                    case '6'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp6,'Visible','on');
+                        set(u6,'Value',1);
+                        return;
+                    case '7'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp7,'Visible','on');
+                        set(u7,'Value',1);
+                        return;
+                    case '8'
+                        return;
+                    case '9'
+                        set(panels,'Visible','off');
+                        set(buttons,'Value',0);
+                        set(hp9,'Visible','on');
+                        set(u9,'Value',1);
+                        return;
+                end
             end
         end
-    end
-    switch evt.Key
-        case 'f1'
-            trEPRgui_aboutwindow();
-            return;
-        case 'f3'
-            trEPRgui_BLCwindow();
-            return;
-        case 'f9'
-            trEPRgui_statuswindow();
-            return;
-        otherwise
-            disp(evt)
+        switch evt.Key
+            case 'f1'
+                trEPRgui_aboutwindow();
+                return;
+            case 'f3'
+                trEPRgui_BLCwindow();
+                return;
+            case 'f9'
+                trEPRgui_statuswindow();
+                return;
+            otherwise
+                disp(evt)
+        end
+    catch exception
+        trEPRgui_bugreportwindow(exception);
     end
 end
 
