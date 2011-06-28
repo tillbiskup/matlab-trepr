@@ -491,8 +491,18 @@ function remove_pushbutton_Callback(~,~)
         % Get selected item of listbox
         selected = get(gh.data_panel_visible_listbox,'Value');
         
-        % Get id of selected spectrum
-        selectedId = ad.control.spectra.visible(selected);
+        % Fix for too slow MATLAB(r)
+        if ~isempty(ad.control.spectra.visible)
+            % If for whatever reason, selectedId is larger than the visible
+            % spectra array, simply return
+            if selected > length(ad.control.spectra.visible)
+                return;
+            end
+            % Get id of selected spectrum
+            selectedId = ad.control.spectra.visible(selected);
+        else
+            return;
+        end
         
         % Check whether currently selected spectrum is modified, and if so,
         % ask the user whether to remove it anyway
