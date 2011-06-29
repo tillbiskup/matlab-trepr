@@ -1,0 +1,9 @@
+
+ACCUMULATION SETTINGS
+
+The accumulation settings panel lets you choose between (currently two) different types of accumulation: cumulative sum and weighted sum.
+
+Normally you want to choose the first option, cumulative sum. This performs a simple sum operation on the selected datasets (of course handling all other things as choosing the overlapping part of the axes and interpolate if necessary).
+
+If you choose "Weighted" it performs a sum weighted by the best achievable signal to noise ratio. Additionally, you can specify the minimum and maximum weighting factor.
+

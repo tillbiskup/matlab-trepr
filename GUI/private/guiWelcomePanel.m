@@ -41,7 +41,8 @@ hPanelText = uicontrol('Tag','welcome_message',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Read text for welcome message from file and display it
-welcomeMessageFile = fullfile(trEPRtoolboxdir,'GUI','private','welcome.txt');
+welcomeMessageFile = fullfile(trEPRtoolboxdir,...
+        'GUI','private','helptexts','main','welcome.txt');
 welcomeMessageText = textFileRead(welcomeMessageFile);
 set(hPanelText,'String',welcomeMessageText);
 

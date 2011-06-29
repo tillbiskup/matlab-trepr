@@ -98,6 +98,9 @@ try
         case 'f3'
             trEPRgui_BLCwindow();
             return;
+        case 'f4'
+            trEPRgui_ACCwindow();
+            return;
         case 'f9'
             trEPRgui_statuswindow();
             return;

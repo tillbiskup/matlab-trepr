@@ -1,0 +1,7 @@
+
+RESULTS SUMMARY
+
+The summary of results panel will show a summary report of the accumulation performed, with all important and interesting parameters necessary to make a sound decision whether to go for the current accumulation results or to change parameters and try again or simply to discard the results and return to the GUI.
+
+Details of what gets included into the report will follow soon.
+

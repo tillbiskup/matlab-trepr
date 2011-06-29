@@ -1,0 +1,24 @@
+
+INTERPOLATION METHODS
+
+Given the fact that you want to accumulate datasets that do not share identical values for their axes, you need to perform an interpolation on at least one of them to be able to sum them up.
+
+Here, the "master dataset" settings from the datasets panel becomes important, as it sets the reference all other datasets get interpolated to.
+
+In the simplest case, you have just different step sizes of the axes with partly identical values (e.g., one spectrum with 1 G field resolution, another one with 0.5 G field resolution).
+
+If you want to go for the larger stepping, you can set the interpolation method to none and simply select the dataset with the larger stepping as the master.
+
+Otherwise, you need to choose between one of several interpolation methods:
+
+	nearest - Nearest neighbour interpolation
+
+	linear - Linear interpolation
+
+	spline - Cubic spline interpolation
+
+	cubic - Piecewise cubic Hermite interpolation
+
+For further details, refer to the MATLAB(r) documentation for the "interp1" function.
+
+
