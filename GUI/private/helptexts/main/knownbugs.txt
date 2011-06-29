@@ -34,7 +34,7 @@ PROCESSING
 
 "Baseline" & "Accumulate"
 
-These two functions are not implemented yet. A preview of the "Baseline correction window" can be seen if you type "trEPRgui_BLCwindow" in the MATLAB(TM) command window.
+These two functions are not implemented yet. A preview of each GUI window can bee seen using the shortcuts "F3" and "F4" respectively. 
 
 
 ANALYSIS
