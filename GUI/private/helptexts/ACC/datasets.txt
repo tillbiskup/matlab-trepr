@@ -1,7 +1,7 @@
 
 DATASETS
 
-The datasets panel lets you choose which of the datasets currently loaded in the main GUI should be accumulated, define which dataset to use as a "master" (more about that below) and choose a label for the accumulated data.
+The datasets panel lets you choose which of the datasets currently loaded in the main GUI should be accumulated, and define which dataset to use as a "master" (more about that below).
 
 
 Datasets lists
@@ -15,8 +15,8 @@ Master dataset
 
 Only important if you have datasets with different spacing of the axes and/or if you use interpolation (i.e., in case of nonidentical axis values, but overlapping axes regions), this popup menu lets you choose which dataset to use as a master defining the "template" the axes of all other datasets get interpolated to (if necessary).
 
- 
-Label for new dataset
 
-Every dataset loaded has a label (although not necessarily a unique one, as they get recognised internally not by their label, so you are free to use whatever label suits best your needs). As accumulation creates a new dataset, you can (and should) specify a label for it here.
+Dimensions
+
+Critically for deciding which datasets to accumulate and which one to define as "master" is an overview of the crucial parameters for each dataset, i.e. its size, the min and max values and steppings of the axes. All that can be conveniently read from the dimensions panel for the dataset currently highlighted in the list of accumulated (i.e. "to accumulate) datasets.
 

@@ -21,6 +21,7 @@ hMainFigure = figure('Tag','trEPRgui_ACC_helpwindow',...
     'Units','Pixels',...
     'Position',[50,250,450,450],...
     'Resize','off',...
+    'KeyPressFcn',@keypress_Callback,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
@@ -56,7 +57,8 @@ uicontrol('Tag','helptopic_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'pos',[120 guiSize(2)-70 guiSize(1)-130 20],...
-    'String','Introduction|Datasets|Display settings|Accumulation settings|Interpolation method|Results summary',...
+    'String','Introduction|Datasets|Settings|Results|Key bindings',...
+    'KeyPressFcn',@keypress_Callback,...
     'Callback',@helptext_popupmenu_Callback...
     );
 
@@ -136,45 +138,81 @@ function helptext_popupmenu_Callback(source,~)
         
         switch helpText
             case 'Introduction'
-                % Read text for welcome message from file and display it
+                % Read text from file and display it
                 helpTextFile = fullfile(...
                     trEPRtoolboxdir,'GUI','private','helptexts','ACC','intro.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Datasets'
-                % Read text for welcome message from file and display it
+                % Read text from file and display it
                 helpTextFile = fullfile(...
                     trEPRtoolboxdir,'GUI','private','helptexts','ACC','datasets.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Display settings'
-                % Read text for welcome message from file and display it
+            case 'Settings'
+                % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','display.txt');
+                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','settings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Accumulation settings'
-                % Read text for welcome message from file and display it
+            case 'Results'
+                % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','accumulation.txt');
+                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','results.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Interpolation method'
-                % Read text for welcome message from file and display it
+            case 'Report'
+                % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','interpolation.txt');
+                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','report.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Results summary'
-                % Read text for welcome message from file and display it
+            case 'Key bindings'
+                % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','summary.txt');
+                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','keybindings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             otherwise
                 % That shall never happen
                 add2status('guiHelpPanel(): Unknown helptext');
                 set(textdisplay,'String','');
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function keypress_Callback(src,evt)
+    try
+        if isempty(evt.Character) && isempty(evt.Key)
+            % In case "Character" is the empty string, i.e. only modifier key
+            % was pressed...
+            return;
+        end
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                switch evt.Key
+                    case 'w'
+                        delete(hMainFigure);
+                        return;
+                end
+            end
         end
     catch exception
         try

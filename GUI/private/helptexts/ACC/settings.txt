@@ -1,4 +1,13 @@
 
+ACCUMULATION SETTINGS
+
+The accumulation settings panel lets you choose between (currently two) different types of accumulation: cumulative sum and weighted sum.
+
+Normally you want to choose the first option, cumulative sum. This performs a simple sum operation on the selected datasets (of course handling all other things as choosing the overlapping part of the axes and interpolate if necessary).
+
+If you choose "Weighted" it performs a sum weighted by the best achievable signal to noise ratio. Additionally, you can specify the minimum and maximum weighting factor.
+
+
 INTERPOLATION METHODS
 
 Given the fact that you want to accumulate datasets that do not share identical values for their axes, you need to perform an interpolation on at least one of them to be able to sum them up.
@@ -10,8 +19,6 @@ In the simplest case, you have just different step sizes of the axes with partly
 If you want to go for the larger stepping, you can set the interpolation method to none and simply select the dataset with the larger stepping as the master.
 
 Otherwise, you need to choose between one of several interpolation methods:
-
-	nearest - Nearest neighbour interpolation
 
 	linear - Linear interpolation
 

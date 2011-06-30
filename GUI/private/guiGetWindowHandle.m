@@ -28,6 +28,7 @@ try
     
     windowTags = struct();
     windowTags.trEPRgui = 'trepr_gui_mainwindow';
+    windowTags.trEPRgui_ACC = 'trepr_gui_ACCwindow';
     % Add here list of other window tags
     
     % Define default tag
