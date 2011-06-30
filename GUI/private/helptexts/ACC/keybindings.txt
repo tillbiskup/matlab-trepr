@@ -1,4 +1,6 @@
 
+KEY BINDINGS
+
 There are a couple of key bindings that may make life easier when working with this GUI.
 
 
