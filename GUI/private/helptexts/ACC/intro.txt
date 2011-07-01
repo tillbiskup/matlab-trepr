@@ -6,7 +6,7 @@ A rather short introduction to the ACC GUI
 
 -=IF IN A HURRY=-
 
-Given that you want to accumulate similar datasets and did not do any special things to them, the default settings should be fine. Select your datasets to accumulate, hit "Apply", inspect your results (using the display settings in the results panel), have a look at the proposed label for the accumulated data, aand if everything is fine, "Close" the GUI and your accumulated data will be in the main GUI. If unhappy, "Discard" and try other settings, or "Discard" and "Close".
+Given that you want to accumulate similar datasets and did not do any special things to them, the default settings should be fine. Select your datasets to accumulate, hit "Apply", inspect your results (using the display settings in the results panel), have a look at the proposed label for the accumulated data, and if everything is fine, "Close" the GUI and your accumulated data will be in the main GUI. If unhappy, "Discard" and try other settings, or "Discard" and "Close".
 
 NOTE: The accumulated data gets written to the main GUI only when closing the ACC GUI (and only if you hit "Apply" before).
 
