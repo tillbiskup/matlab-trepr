@@ -12,7 +12,7 @@ if ( exist('matlabroot') )
 	
 	if ispc
         platform = [system_dependent('getos'),' ',system_dependent('getwinsys')];
-	elseif ( strcmp(computer, 'MAC') == 1 )
+	elseif ( strfind(computer, 'MAC') == 1 )
 		[fail, input] = unix('sw_vers');
 
         if ~fail

@@ -70,7 +70,7 @@ function trEPRinfo
 	fprintf('================================================================================\n\n');
 	fprintf(' trEPR, a Matlab toolbox for transient Electron Paramagnetic Resonance  \n\n');
 	fprintf('   Release:          %s (%s) \n', trEPRtoolboxRevisionNumber, trEPRtoolboxRevisionDate);
-	fprintf('   Directory:        %s \n',strrep(which('trEPRinfo'), 'm-files/trEPRinfo.m', ''));
+	fprintf('   Directory:        %s \n',trEPRtoolboxdir);
 	fprintf('   Matlab version:   %s \n',version);
 	fprintf('   Platform:         %s \n\n',DisplayPlatform);
 	fprintf('================================================================================\n\n');
