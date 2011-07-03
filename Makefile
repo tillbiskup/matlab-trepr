@@ -6,7 +6,7 @@
 
 # The version should not only be changed in this file but as well
 # in the file trEPRtoolboxRevision in the MFILEDIR.
-VERSION=0.2.0a
+VERSION=0.2.3b
 
 MFILEDIR=m-files
 DOCDIR=doc

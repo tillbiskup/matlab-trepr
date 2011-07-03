@@ -20,7 +20,7 @@
 
 <listitem>
 <label>Web site</label>
-<callback>web http://physik.fu-berlin.de/~biskup/forschung/datenauswertung/trEPR-toolbox/ -browser;</callback>
+<callback>web http://till-biskup.de/de/software/matlab/trepr/ -browser;</callback>
 <icon>$toolbox/matlab/icons/webicon.gif</icon>
 </listitem>
 
