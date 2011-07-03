@@ -1,32 +1,5 @@
-% Copyright (C) 2008 Till Biskup
-%
-% This file ist free software.
-%
-%****f* global_scripts/iniFileRead.m
-%
-% AUTHOR
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% MAINTAINER
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% COPYRIGHT
-%	(c) 2008 Till Biskup
-%	This file is free software
-% CREATION DATE
-%	2008/02/22
-% VERSION
-%	$Revision: 528 $
-% MODIFICATION DATE
-%	$Date: 2008-02-22 16:26:56 +0100 (Fr, 22 Feb 2008) $
-% KEYWORDS
-%	metaGen, metadata
-%
-% SYNOPSIS
-%	metadata = iniFileRead ( filename )
-%	metadata = iniFileRead ( filename, params )
-%
-% DESCRIPTION
-%	iniFileRead reads in a dsc-file containing metadata in a way that conforms
-%	to the metaGen file format and puts them into a cascaded struct structure.
+% INIFILEREAD Read a dsc-file containing metadata in a way that conforms to
+% the metaGen file format and puts them into a cascaded struct structure.
 %
 % INPUT PARAMETERS
 %	filename (STRING)
@@ -94,10 +67,11 @@
 %	the additional parameter "params".
 %
 % TODO
-%	* Change handling of whitespace characters (subfunctions) thus that it is really
-%	  all kinds of whitespace that is dealt with, not only spaces.
-%
-% SOURCE
+%	* Change handling of whitespace characters (subfunctions) thus that it
+%	  is really all kinds of whitespace that is dealt with, not only spaces.
+
+%    Copyright (C) 2008 Till Biskup
+%    $Revision: 528 $  $Date: 2008-02-22 16:26:56 +0100 (Fr, 22 Feb 2008) $
 
 function [ metadata ] = iniFileRead ( filename, varargin )
 
@@ -164,15 +138,6 @@ function [ metadata ] = iniFileRead ( filename, varargin )
 		end
 		
 	end
-
-
-	% check for the availability of the routines we depend on
-
-	% Uncomment the following lines if necessary
-
-%	if ( exist('trEPR_read_fsc2_file.m') ~= 2 )
-%		error('\n\tThe function %s this function critically depends on is not available.\n','trEPR_read_fsc2_file');
-%	end
 
 	% ...and here the 'real' stuff goes in
 
@@ -362,5 +327,3 @@ function str = removeLeadingWhiteSpace ( str )
 	end
 
 end % end of subfunction
-
-%******

@@ -1,36 +1,5 @@
-% Copyright (C) 2008 Till Biskup
-%
-% This file ist free software.
-%
-%****f* global_scripts/iniFileWrite.m
-%
-% AUTHOR
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% MAINTAINER
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% COPYRIGHT
-%	(c) 2008 Till Biskup
-%	This file is free software
-% CREATION DATE
-%	2008/02/22
-% VERSION
-%	$Revision: 559 $
-% MODIFICATION DATE
-%	$Date: 2008-02-29 09:01:47 +0100 (Fr, 29 Feb 2008) $
-% KEYWORDS
-%	metaGen, metadata
-%
-% SYNOPSIS
-%	iniFileWrite ( filename, metadata )
-%	status = iniFileWrite ( filename, metadata )
-%	status = iniFileWrite ( filename, metadata, comment )
-%	status = iniFileWrite ( filename, metadata, params )
-%	status = iniFileWrite ( filename, metadata, params, comment )
-%	status = iniFileWrite ( filename, metadata, comment, params )
-%
-% DESCRIPTION
-%	iniFileWrite writes metadata from a cascaded struct structure in a 
-%	dsc-file in a way that conforms to the metaGen file format.
+% INIFILEWRITE Write metadata from a cascaded struct structure in a
+% dsc-file in a way that conforms to the metaGen file format. 
 %
 % INPUT PARAMETERS
 %	filename (STRING)
@@ -131,7 +100,9 @@
 %
 %		iniFileWrite ( 'out.dsc', metadata, commentHeader );
 %
-% SOURCE
+
+%    Copyright (C) 2008 Till Biskup
+%    $Revision: 559 $  $Date: 2008-02-29 09:01:47 +0100 (Fr, 29 Feb 2008) $
 
 function [ varargout ] = iniFileWrite ( filename, metadata, varargin )
 
@@ -272,15 +243,6 @@ function [ varargout ] = iniFileWrite ( filename, metadata, varargin )
 		end
 		
 	end
-
-
-	% check for the availability of the routines we depend on
-
-	% Uncomment the following lines if necessary
-
-%	if ( exist('trEPR_read_fsc2_file.m') ~= 2 )
-%		error('\n\tThe function %s this function critically depends on is not available.\n','trEPR_read_fsc2_file');
-%	end
 
 	% ...and here the 'real' stuff goes in
 	
@@ -542,6 +504,3 @@ function filename = checkFileExistence (filename)
 	end		% end if exist(filename)
 
 end		% end subfunction
-
-
-%******
