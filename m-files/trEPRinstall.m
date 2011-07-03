@@ -1,7 +1,7 @@
 function trEPRinstall
 % TRPERINSTALL  Install the trEPR toolbox (set Matlab path)
 
-% Copyright (C) 2007 Till Biskup, <till@till-biskup.de>
+% Copyright (C) 2007,2011 Till Biskup, <till@till-biskup.de>
 % This file ist free software.
 % $Revision$  $Date$
 
@@ -19,19 +19,22 @@ trEPRtoolboxExampleDir = sprintf('%s/examples',trEPRtoolboxBaseDir);
 
 % Print out some greeting message
 
-fprintf('=========================================================================\n\n');
-fprintf('  Welcome to the installation procedure of  \n\n');
-fprintf('  trEPR, a Matlab toolbox for transient Electron Paramagnetic Resonance  \n\n');
+fprintf('------------------------------------------------------------------\n\n');
+fprintf('  Welcome to the INSTALLATION PROCEDURE of\n\n');
+fprintf('  trEPR TOOLBOX\n');
+fprintf('  a Matlab toolbox for transient Electron Paramagnetic Resonance\n\n');
 fprintf('  Revision %s \n\n',trEPRtoolboxRevisionNumber);
-fprintf('=========================================================================\n\n');
+fprintf('------------------------------------------------------------------\n\n');
 	
 % First of all, check whether there is a version of the trEPR toolbox installed
 % and if so, print out a short message and abort further processing
 	
-if ( findstr(path,'trEPR'))
+if ( strfind(path,'trEPR'))
 
-	fprintf('PLEASE NOTE:\n\n  It seems as if you have already installed the trEPR toolbox.\n');
-	fprintf('  Typein "trEPRinfo" to get some information about the installed version.\n\n');
+	fprintf('PLEASE NOTE:\n\n');
+    fprintf('It seems as if you have already installed the trEPR toolbox.\n');
+	fprintf('Type "trEPRinfo" to receive information about the\n');
+    fprintf('currently installed version.\n\n')
 	return;
     
     % TODO: Remove path to installed toolbox, install new path
@@ -53,14 +56,14 @@ if ( strfind(pwd,trEPRtoolboxProgDir) ~= 0 )
     fprintf('Adding the trEPR toolbox directories to the MATLAB(TM) search path...\n')
 	
 	trEPRtoolboxRootDir = strrep(pwd,trEPRtoolboxProgDir,'');
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxBaseDir]);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir]);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/GUI']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/IO']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/preprocessing']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxProgDir '/common']);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxDocDir]);
-	path(path,[trEPRtoolboxRootDir trEPRtoolboxExampleDir]);
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxBaseDir));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxProgDir));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxProgDir,'/GUI'));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxProgDir,'/IO'));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxProgDir,'/preprocessing'));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxProgDir,'/common'));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxDocDir));
+	addpath(fullfile(trEPRtoolboxRootDir,trEPRtoolboxExampleDir));
 	  
 end
 
