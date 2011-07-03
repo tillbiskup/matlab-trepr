@@ -105,8 +105,8 @@ try
             trEPRgui_statuswindow();
             return;
         otherwise
-            disp(evt);
-            fprintf('       Caller: %i\n\n',src);
+%             disp(evt);
+%             fprintf('       Caller: %i\n\n',src);
             return;
     end
 catch exception
