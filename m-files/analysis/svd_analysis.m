@@ -274,10 +274,6 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
 		error('\n\tThe function %s this function critically depends on is not available.\n', 'save_figure');
 
-	elseif ( exist('get_file_basename.m') ~= 2 )
-
-		error('\n\tThe function %s this function critically depends on is not available.\n', 'get_file_basename');
-
 	elseif ( exist('autocorr.m') ~= 2 )
 
 		error('\n\tThe function %s this function critically depends on is not available.\n', 'autocorr');
@@ -363,7 +359,7 @@ function [ varargout ] = svd_analysis ( filename, varargin )
 
 	% read base filename from filename
 	
-	file_basename = get_file_basename ( filename );
+	[path, file_basename, ext] = fileparts ( filename );
 	
 	% check which output format for the results was chosen
 	
