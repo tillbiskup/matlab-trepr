@@ -120,7 +120,7 @@ closeBtn = uicontrol('Tag','msgwindow_close_pushbutton',...
 
 % Read text for welcome message from file and display it
 [path,~,~] = fileparts(mfilename);
-contributorsMessageFile = fullfile(path,'private','contributors.txt');
+contributorsMessageFile = fullfile(path,'private','helptexts','main','contributors.txt');
 contributorsMessageText = textFileRead(contributorsMessageFile);
 set(hMsg3,'String',contributorsMessageText);
 
