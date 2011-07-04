@@ -1057,12 +1057,6 @@ if (mainGuiWindow)
         end
         % set appdata
         setappdata(hMainFigure,'data',ad.data);
-
-        % For debug purposes, display axes limits for datasets
-        disp(k);
-        disp([ad.data{k}.axes.x.values(1) ad.data{k}.axes.x.values(end)]);
-        disp([ad.data{k}.axes.y.values(1) ad.data{k}.axes.y.values(end)]);
-        disp([min(min(ad.data{k}.data)) max(max(ad.data{k}.data))]);
     end
     
     updateSpectra();

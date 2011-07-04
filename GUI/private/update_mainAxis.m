@@ -481,8 +481,11 @@ if (ad.control.axis.limits.auto)
     ad.control.axis.limits.x.max = max(xmax);
     ad.control.axis.limits.y.min = min(ymin);
     ad.control.axis.limits.y.max = max(ymax);
-    ad.control.axis.limits.z.min = min(zmin);
-    ad.control.axis.limits.z.max = max(zmax);
+    % Adjust z limits so that the axis limits are a bit wider than the
+    % actual z limits
+    zAmplitude = max(zmax)-min(zmin);
+    ad.control.axis.limits.z.min = min(zmin)-0.025*zAmplitude;
+    ad.control.axis.limits.z.max = max(zmax)+0.025*zAmplitude;
 else
 %     ad.control.axis.limits.x.min = ...
 %         ad.data{ad.control.spectra.active}.axes.x.values(1);
