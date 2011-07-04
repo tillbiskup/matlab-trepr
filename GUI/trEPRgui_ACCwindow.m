@@ -1027,6 +1027,44 @@ if (mainGuiWindow)
         setappdata(hMainFigure,'control',ad.control);
     end
     
+    % TODO: Apply scaling and displacement to spectra
+    for k=1:length(ad.data)
+        % Handle displacement along all three axes
+        if (ad.data{k}.display.displacement.x ~= 0)
+            % Get axis stepping
+            xStep = ad.data{k}.axes.x.values(2)-ad.data{k}.axes.x.values(1);
+            % Set new axes values
+            ad.data{k}.axes.x.values = ad.data{k}.axes.x.values + ...
+                (xStep*ad.data{k}.display.displacement.x);
+        end
+        if (ad.data{k}.display.displacement.y ~= 0)
+            % Get axis stepping
+            yStep = ad.data{k}.axes.y.values(2)-ad.data{k}.axes.y.values(1);
+            % Set new axes values
+            ad.data{k}.axes.y.values = ad.data{k}.axes.y.values + ...
+                (yStep*ad.data{k}.display.displacement.y);
+        end
+        if (ad.data{k}.display.displacement.z ~= 0)
+            ad.data{k}.data = ...
+                ad.data{k}.data + ad.data{k}.display.displacement.z;
+        end
+        % Handle scaling along all three axes
+        if (ad.data{k}.display.scaling.x ~= 0)
+        end
+        if (ad.data{k}.display.scaling.y ~= 0)
+        end
+        if (ad.data{k}.display.scaling.z ~= 0)
+        end
+        % set appdata
+        setappdata(hMainFigure,'data',ad.data);
+
+        % For debug purposes, display axes limits for datasets
+        disp(k);
+        disp([ad.data{k}.axes.x.values(1) ad.data{k}.axes.x.values(end)]);
+        disp([ad.data{k}.axes.y.values(1) ad.data{k}.axes.y.values(end)]);
+        disp([min(min(ad.data{k}.data)) max(max(ad.data{k}.data))]);
+    end
+    
     updateSpectra();
     updateDimensionPanel('Datasets');
 %     update_position_display();
