@@ -54,7 +54,7 @@ try
     accData.label = parameters.label;
     % filename - empty string
     accData.filename = '';
-    % parameters - struct, mostly for compatibility reasons
+    % parameters - struct, contains experimental parameters
     accData.parameters = struct();
     % display - struct
     accData.display = struct();
@@ -78,6 +78,10 @@ try
     
     % Set fields that can be taken from master dataset
     accData.line = data{parameters.datasets == parameters.master}.line;
+    accData.parameters = ...
+        data{parameters.datasets == parameters.master}.parameters;
+    accData.display.position = ...
+        data{parameters.datasets == parameters.master}.display.position;
     
     % Check for axes steppings and handle interpolation accordingly, or,
     % for the time being, complain that interpolation is not supported yet.
@@ -128,7 +132,7 @@ try
     
     switch parameters.method
         case 'cumulative'
-            accData.data = sum(accData.data,3);
+            accData.data = sum(accData.data,3)/length(data);
         case 'weighted'
             accData = [];
             accReport = {...

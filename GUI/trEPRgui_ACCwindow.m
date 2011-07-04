@@ -991,6 +991,7 @@ ad.control.axis.limits.z = struct();
 ad.control.axis.limits.z.min = 0;
 ad.control.axis.limits.z.max = 1;
 ad.control.axis.normalisation = 'none';
+ad.control.axis.displayType = '2D plot';
 % acc - struct
 ad.acc = struct();
 ad.acc.datasets = [];
@@ -1035,7 +1036,9 @@ if (mainGuiWindow)
         setappdata(hMainFigure,'control',ad.control);
     end
     
-    % TODO: Apply scaling and displacement to spectra
+    % Apply scaling and displacement to spectra
+    % TODO: - Scaling
+    %       - Frequency correction when displacing along the field axis...!
     for k=1:length(ad.data)
         % Handle displacement along all three axes
         if (ad.data{k}.display.displacement.x ~= 0)
@@ -1072,7 +1075,7 @@ if (mainGuiWindow)
 %     update_position_display();
 end
 
-%update_axes();
+%updateAxes();
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -1127,9 +1130,33 @@ function tbg_Callback(source,~)
     end
 end
 
-function slider_Callback(~,~)
+function slider_Callback(source,~)
     try
-        return;
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+        ad = getappdata(mainWindow);
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '1D along x'
+                ad.acc.data.display.position.y = ...
+                    int16(get(source,'Value'));
+            case '1D along y'
+                ad.acc.data.display.position.x = ...
+                    int16(get(source,'Value'));
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',displayType);
+                add2status(msg);
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'acc',ad.acc);
+        
+        % Update slider panel
+        updateSliderPanel()
+        
+        %Update main axis
+        updateAxes();
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -1295,7 +1322,13 @@ function pushbutton_Callback(~,~,action)
                 set(gh.summary_panel_edit,'String',accReport);
                 
                 % Plot accumulated dataset
-                update_axes();
+                updateAxes();
+                
+                % Update slider panel
+                updateSliderPanel()
+                
+                % Update results panel dimension panel
+                updateDimensionPanel('Results');
                 
                 return;
             case 'Discard'
@@ -1312,8 +1345,15 @@ function pushbutton_Callback(~,~,action)
                 set(gh.summary_panel_edit,'String',...
                     'Accumulated data discarded');
                 
-                update_axes();
+                % Update main axes
+                updateAxes();
+
+                % Update slider panel
+                updateSliderPanel()
                 
+                % Update Dimensions Panel
+                updateDimensionPanel('Results');
+
                 return;
             case 'Close'
                 % Get appdata of main window
@@ -1371,10 +1411,13 @@ function displaytype_popupmenu_Callback(source,~)
         switch ad.control.axis.displayType
             case '2D plot'
                 set(gh.slider,'Enable','Off');
+                updateAxes()
             case '1D along x'
                 set(gh.slider,'Enable','On');
+                updateAxes()
             case '1D along y'
                 set(gh.slider,'Enable','On');
+                updateAxes()
             otherwise
                 % unknown
                 return;
@@ -1409,7 +1452,7 @@ function data_pushbutton_Callback(~,~,action)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(hMainFigure);
+        gh = guihandles(mainWindow);
         
         switch action
             case 'add'
@@ -1423,6 +1466,7 @@ function data_pushbutton_Callback(~,~,action)
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
+                updateDimensionPanel('Datasets');
             case 'remove'
                 if isempty(ad.control.spectra.accumulated)
                     return;
@@ -1434,6 +1478,7 @@ function data_pushbutton_Callback(~,~,action)
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
+                updateDimensionPanel('Datasets');
             otherwise
                 % unknown action
                 return;
@@ -1612,14 +1657,9 @@ function updateDimensionPanel(panel)
             case 'Datasets'
                 if isempty(ad.control.spectra.active) || ...
                         (ad.control.spectra.active == 0)
-                    set(gh.data_panel_dimensions_size_x_edit,'String','1');
-                    set(gh.data_panel_dimensions_size_y_edit,'String','1');
-                    set(gh.data_panel_dimensions_min_x_edit,'String','1');
-                    set(gh.data_panel_dimensions_min_y_edit,'String','1');
-                    set(gh.data_panel_dimensions_max_x_edit,'String','1');
-                    set(gh.data_panel_dimensions_max_y_edit,'String','1');
-                    set(gh.data_panel_dimensions_step_x_edit,'String','1');
-                    set(gh.data_panel_dimensions_step_y_edit,'String','1');
+                    set(findall(...
+                        allchild(gh.data_panel_dimensions_panel),...
+                        'Style','Edit'),'String','1');
                 else
                     [ydim,xdim] = size(ad.data{ad.control.spectra.active}.data);
                     set(gh.data_panel_dimensions_size_x_edit,'String',...
@@ -1643,6 +1683,32 @@ function updateDimensionPanel(panel)
                 end
                 return
             case 'Results'
+                if isempty(ad.acc.data)
+                    set(findall(...
+                        allchild(gh.results_panel_dimensions_panel),...
+                        'Style','Edit'),'String','1');
+                else
+                    disp('OK!');
+                    [ydim,xdim] = size(ad.acc.data.data);
+                    set(gh.results_panel_dimensions_size_x_edit,'String',...
+                        num2str(xdim));
+                    set(gh.results_panel_dimensions_size_y_edit,'String',...
+                        num2str(ydim));
+                    set(gh.results_panel_dimensions_min_x_edit,'String',...
+                        num2str(ad.acc.data.axes.x.values(1)));
+                    set(gh.results_panel_dimensions_min_y_edit,'String',...
+                        num2str(ad.acc.data.axes.y.values(1)));
+                    set(gh.results_panel_dimensions_max_x_edit,'String',...
+                        num2str(ad.acc.data.axes.x.values(end)));
+                    set(gh.results_panel_dimensions_max_y_edit,'String',...
+                        num2str(ad.acc.data.axes.y.values(end)));
+                    set(gh.results_panel_dimensions_step_x_edit,'String',...
+                        num2str(ad.acc.data.axes.x.values(2)-...
+                        ad.acc.data.axes.x.values(1)));
+                    set(gh.results_panel_dimensions_step_y_edit,'String',...
+                        num2str(ad.acc.data.axes.y.values(2)-...
+                        ad.acc.data.axes.y.values(1)));
+                end
             otherwise
                 % Default
         end
@@ -1784,10 +1850,90 @@ function updateSpectra()
     end 
 end
 
-function update_axes()
+function updateSliderPanel()
     try
         mainWindow = findobj('Tag','trepr_gui_ACCwindow');
-        % Get appdata from BLC GUI
+        % Get appdata from ACC GUI
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        if isempty(ad.acc.data)
+            set(findall(...
+                allchild(gh.results_panel_position_panel),...
+                'Style','Edit'),'String','1');
+            return;
+        end
+
+        % Get dimensions and axes of current dataset
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        x = linspace(1,x,x);
+        y = linspace(1,y,y);
+        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
+            x = ad.data{ad.control.spectra.active}.axes.x.values;
+        end
+        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
+            y = ad.data{ad.control.spectra.active}.axes.y.values;
+        end
+        % In case that we loaded 1D data...
+        if isscalar(x)
+            x = [x x+1];
+        end
+        if isscalar(y)
+            y = [y y+1];
+        end
+        
+        % update position panel
+        set(...
+            gh.results_panel_position_x_index_edit,...
+            'string',...
+            ad.acc.data.display.position.x...
+            );
+        set(...
+            gh.results_panel_position_x_unit_edit,...
+            'string',...
+            x(ad.acc.data.display.position.x)...
+            );
+        set(...
+            gh.results_panel_position_y_index_edit,...
+            'string',...
+            ad.acc.data.display.position.y...
+            );
+        set(...
+            gh.results_panel_position_y_unit_edit,...
+            'string',...
+            y(ad.acc.data.display.position.y)...
+            );
+    catch exception
+        try
+            msgstr = ['an exception occurred. '...
+                'the bug reporter should have been opened'];
+            add2status(msgstr);
+        catch exception2
+            exception = addcause(exception2, exception);
+            disp(msgstr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % if even displaying the bug report window fails...
+            exception = addcause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function updateAxes()
+    try
+        mainWindow = findobj('Tag','trepr_gui_ACCwindow');
+        % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
         
         % Get handles from main window
@@ -1795,7 +1941,7 @@ function update_axes()
         
         if isempty(ad.acc.data)
             % Display splash
-            set(hMainFigure,'CurrentAxes',hPlotAxes);
+            set(mainWindow,'CurrentAxes',gh.mainAxis);
             splash = imread(fullfile(trEPRtoolboxdir,...
                 'GUI','private','splashes','ACCGUISplash.png'),'png');
             image(splash);
@@ -1819,7 +1965,7 @@ function update_axes()
                 && not (isempty(ad.acc.data.axes.y.values)))
             y = ad.acc.data.axes.y.values;
         end
-        
+                
         switch ad.control.axis.displayType
             case '2D plot'
                 imagesc(...
@@ -1840,7 +1986,152 @@ function update_axes()
                     ad.acc.data.axes.y.measure,...
                     ad.acc.data.axes.y.unit));
             case '1D along x'
+                % Enable position slider only if second axis has more than one value
+                if (length(y)>1)
+                    set(gh.slider,...
+                        'Enable','on',...
+                        'Min',1,'Max',length(y),...
+                        'SliderStep',[1/(length(y)) 10/(length(y))],...
+                        'Value',ad.acc.data.display.position.y...
+                        );
+                else
+                    set(gh.slider,...
+                        'Enable','off'...
+                        );
+                end
+                % Do the actual plotting
+                cla reset;
+                [y,x] = size(ad.acc.data.data);
+                x = linspace(1,x,x);
+                if (isfield(ad.acc.data,'axes') ...
+                        && isfield(ad.acc.data.axes,'x') ...
+                        && isfield(ad.acc.data.axes.x,'values') ...
+                        && not (isempty(ad.acc.data.axes.x.values)))
+                    x = ad.acc.data.axes.x.values;
+                end
+                y = ad.acc.data.data(...
+                    ad.acc.data.display.position.y,...
+                    :);
+                % In case that we loaded 1D data...
+                if isscalar(x)
+                    x = [x x+1];
+                end
+                if isscalar(y)
+                    y = [y y+1];
+                end
+                plot(...
+                    x,...
+                    y,...
+                    'Color',ad.acc.data.line.color,...
+                    'LineStyle',ad.acc.data.line.style,...
+                    'Marker',ad.acc.data.line.marker,...
+                    'LineWidth',ad.acc.data.line.width...
+                    );
+                if (ad.control.axis.grid.zero)
+                    line(...
+                        [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
+                        [0 0],...
+                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                        'Parent',gca);
+                end
+                % Set limits of axis
+                if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
+                    xLimits = [ad.control.axis.limits.x.min-1 ad.control.axis.limits.x.max+1];
+                else
+                    xLimits = [ad.control.axis.limits.x.min ad.control.axis.limits.x.max];
+                end
+                if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
+                    yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+                else
+                    yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+                end
+                set(gca,...
+                    'XLim',xLimits,...
+                    'YLim',yLimits...
+                    );
+                % Plot axis labels
+                xlabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.x.measure,...
+                    ad.control.axis.labels.x.unit));
+                ylabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.z.measure,...
+                    ad.control.axis.labels.z.unit));
             case '1D along y'
+                % Enable position slider only if second axis has more than one value
+                if (length(x)>1)
+                    set(gh.slider,...
+                        'Enable','on',...
+                        'Min',1,'Max',length(x),...
+                        'SliderStep',[1/(length(x)) 10/(length(x))],...
+                        'Value',ad.acc.data.display.position.x...
+                        );
+                else
+                    set(gh.slider,...
+                        'Enable','off'...
+                        );
+                end
+                % Do the actual plotting
+                cla reset;
+                [y,x] = size(ad.data{k}.data);
+                y = linspace(1,y,y);
+                if (isfield(ad.acc.data,'axes') ...
+                        && isfield(ad.acc.data.axes,'y') ...
+                        && isfield(ad.acc.data.axes.y,'values') ...
+                        && not (isempty(ad.acc.data.axes.y.values)))
+                    y = ad.acc.data.axes.y.values;
+                end
+                x = ad.acc.data.data(...
+                    :,...
+                    ad.acc.data.display.position.x...
+                    );
+                % In case that we loaded 1D data...
+                if isscalar(x)
+                    x = [x x+1];
+                end
+                if isscalar(y)
+                    y = [y y+1];
+                end
+                plot(...
+                    y,...
+                    x,...
+                    'Color',ad.acc.data.line.color,...
+                    'LineStyle',ad.acc.data.line.style,...
+                    'Marker',ad.acc.data.line.marker,...
+                    'LineWidth',ad.acc.data.line.width...
+                    );
+                if (ad.control.axis.grid.zero)
+                    line(...
+                        [ad.control.axis.limits.y.min ad.control.axis.limits.y.max],...
+                        [0 0],...
+                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                        'Parent',gca);
+                end
+                % Set limits of axis
+                if (ad.control.axis.limits.y.min==ad.control.axis.limits.y.max)
+                    xLimits = [ad.control.axis.limits.y.min-1 ad.control.axis.limits.y.max+1];
+                else
+                    xLimits = [ad.control.axis.limits.y.min ad.control.axis.limits.y.max];
+                end
+                if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
+                    yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+                else
+                    yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+                end
+                set(gca,...
+                    'XLim',xLimits,...
+                    'YLim',yLimits...
+                    );
+                % Plot axis labels
+                xlabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.y.measure,...
+                    ad.control.axis.labels.y.unit));
+                ylabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.z.measure,...
+                    ad.control.axis.labels.z.unit));
             otherwise
                 % unknown
         end
