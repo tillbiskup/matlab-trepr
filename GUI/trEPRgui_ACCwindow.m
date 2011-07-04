@@ -916,7 +916,8 @@ uicontrol('Tag','apply_pushbutton',...
     'String','Apply',...
     'TooltipString','Apply current settings (perform actual accumulation)',...
     'pos',[guiSize(1)-mainPanelWidth-20 20 (mainPanelWidth)/3 40],...
-    'Enable','on'...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'Apply'}...
     );
 uicontrol('Tag','discard_pushbutton',...
     'Style','pushbutton',...
@@ -926,7 +927,8 @@ uicontrol('Tag','discard_pushbutton',...
     'String','Discard',...
     'TooltipString','Discard last performed accumulation',...
     'pos',[guiSize(1)-((mainPanelWidth)/3*2)-20 20 (mainPanelWidth)/3 40],...
-    'Enable','on'...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'Discard'}...
     );
 uicontrol('Tag','close_pushbutton',...
     'Style','pushbutton',...
@@ -989,11 +991,25 @@ ad.control.axis.limits.z = struct();
 ad.control.axis.limits.z.min = 0;
 ad.control.axis.limits.z.max = 1;
 ad.control.axis.normalisation = 'none';
+% acc - struct
+ad.acc = struct();
+ad.acc.datasets = [];
+ad.acc.master = [];
+ad.acc.method = '';
+ad.acc.weights.min = 1;
+ad.acc.weights.max = 1;
+ad.acc.noise.x.min = 1;
+ad.acc.noise.x.max = 1;
+ad.acc.noise.y.min = 1;
+ad.acc.noise.y.max = 1;
+ad.acc.interpolation = '';
+ad.acc.label = '';
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
+setappdata(hMainFigure,'acc',ad.acc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -1005,14 +1021,6 @@ if (mainGuiWindow)
     % Check for availability of necessary fields in appdata
     if (isfield(admain,'data') ~= 0)
         ad.data = admain.data;
-        % Add BLC specific fields to each dataset
-        for k = 1:length(ad.data)
-            ad.data{k}.blc.fit = ad.configuration.fit;
-            [y,~] = size(ad.data{k}.data);
-            for l = 1:length(ad.data{k}.blc.fit.point)
-                ad.data{k}.blc.fit.point(l).position = round(y/2);
-            end
-        end
         setappdata(hMainFigure,'data',ad.data);
         ad.origdata = admain.data;
         setappdata(hMainFigure,'origdata',ad.origdata);
@@ -1249,7 +1257,74 @@ function pushbutton_Callback(~,~,action)
         end
         
         switch action
+            case 'Apply'
+                setAccParameters();
+
+                % Get appdata of main window
+                mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+                ad = getappdata(mainWindow);
+        
+                % Get handles of main window
+                gh = guihandles(mainWindow);
+                
+                accDatasets = cell(length(ad.control.spectra.accumulated),1);
+                for k=1:length(ad.control.spectra.accumulated)
+                    accDatasets{k} = ...
+                        ad.data{ad.control.spectra.accumulated(k)};
+                end
+                
+                [accData,accReport] = trEPRACC(accDatasets,ad.acc);
+                
+                if ~isempty(accData)
+                    % Add note to accReport if accumulation was successful
+                    accReport = [...
+                        accReport{1:2}...
+                        {...
+                        'PLEASE NOTE: Your accumulated data will be written'...
+                        'to the main GUI when you close this window, NOT BEFORE.'...
+                        ' '...
+                        }...
+                        accReport{3:end}...
+                        ];
+                    ad.acc.data = accData;
+                else
+                    ad.acc.data = [];
+                end
+                setappdata(mainWindow,'acc',ad.acc);
+                
+                set(gh.summary_panel_edit,'String',accReport);
+                
+                % Plot accumulated dataset
+                update_axes();
+                
+                return;
+            case 'Discard'
+                % Get appdata of main window
+                mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+                ad = getappdata(mainWindow);
+                
+                % Get handles of main window
+                gh = guihandles(mainWindow);
+                
+                ad.acc.data = [];
+                setappdata(mainWindow,'acc',ad.acc);
+                
+                set(gh.summary_panel_edit,'String',...
+                    'Accumulated data discarded');
+                
+                update_axes();
+                
+                return;
             case 'Close'
+                % Get appdata of main window
+                mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+                ad = getappdata(mainWindow);
+
+                % TODO: Add accData to main GUI
+                if ~isempty(ad.acc.data)
+                    % Add accData to main GUI
+                end
+
                 % Look for ACC GUI Help window and if its there, close as
                 % well
                 hHelpWindow = findobj('Tag','trEPRgui_ACC_helpwindow');
@@ -1281,13 +1356,19 @@ end
 
 function displaytype_popupmenu_Callback(source,~)
     try
+        % Get appdata of main window
+        ad = getappdata(hMainFigure);
+
         % Get handles of main window
         gh = guihandles(hMainFigure);
         
         displayTypes = cellstr(get(source,'String'));
-        displayType = displayTypes{get(source,'Value')};
+        ad.control.axis.displayType = displayTypes{get(source,'Value')};
         
-        switch displayType
+        % Get appdata of main window
+        setappdata(hMainFigure,'control',ad.control);
+
+        switch ad.control.axis.displayType
             case '2D plot'
                 set(gh.slider,'Enable','Off');
             case '1D along x'
@@ -1712,113 +1793,133 @@ function update_axes()
         % Get handles from main window
         gh = guidata(mainWindow);
         
-        if isempty(ad.data) || isempty(ad.control.spectra.visible)
+        if isempty(ad.acc.data)
+            % Display splash
+            set(hMainFigure,'CurrentAxes',hPlotAxes);
+            splash = imread(fullfile(trEPRtoolboxdir,...
+                'GUI','private','splashes','ACCGUISplash.png'),'png');
+            image(splash);
+            axis off          % Remove axis ticks and numbers
             return;
         end
         
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
-        backarea = ad.data{ad.control.spectra.active}.blc.fit.area.back;
-        leftarea = ad.data{ad.control.spectra.active}.blc.fit.area.left;
-        rightarea = ad.data{ad.control.spectra.active}.blc.fit.area.right;
-        
-        cla reset;
-        hold on;
-        % Plot 2D data
-        imagesc(ad.data{ad.control.spectra.active}.data,'Parent',gh.axis3);
-        % Plot red line with position in time
-        plot(gh.axis3,...
-            [ad.data{ad.control.spectra.active}.display.position.x ...
-            ad.data{ad.control.spectra.active}.display.position.x],...
-            [1,y],...
-            'r-');
-        hold off;
-        set(gh.axis3,'XLim',[1 x]);
-        set(gh.axis3,'YLim',[1 y]);
-        set(gh.axis3,'YDir','normal');
-        
-        % Plot patch indicating the averaged area at the end of the time
-        % trace
-        patch([x-backarea x-backarea x x],[1 y y 1],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','m',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis3);
-        % Plot patches indicating the fit areas
-        patch([1 1 x x],[1 1+leftarea 1+leftarea 1],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis3);
-        patch([1 1 x x],[y-rightarea y y y-rightarea],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis3);
-        
-        % Plot B0 spectrum at given position in time
-        B0Spectrum = ad.data{ad.control.spectra.active}.data(...
-            :,ad.data{ad.control.spectra.active}.display.position.x);
-        plot(gh.axis1,...
-            [1:1:y],...
-            B0Spectrum,...
-            'k-');
-        set(gh.axis1,'XLim',[1 y]);
-        z = [ min(min(ad.data{ad.control.spectra.active}.data)) ...
-            max(max(ad.data{ad.control.spectra.active}.data)) ];
-        ZLim = [z(1)-((z(2)-z(1))/10) z(2)+((z(2)-z(1))/10)];
-        set(gh.axis1,'YLim',ZLim);
-        set(gh.axis1,'YTickLabel',[]);
-        
-        % Plot patches indicating the fit areas
-        patch([1 1 leftarea+1 leftarea+1],[ZLim(1) ZLim(2) ZLim(2) ZLim(1)],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis1);
-        patch([y-rightarea y-rightarea y y],[ZLim(1) ZLim(2) ZLim(2) ZLim(1)],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis1);
-        
-        % Plot averaged B0 spectra for fitting
-        meanData = mean(ad.data{ad.control.spectra.active}.data(...
-            :,x-ad.data{ad.control.spectra.active}.blc.fit.area.back:x...
-            ),2);
-        z = [ min(meanData) max(meanData) ];
-        ZLim = [z(1)-((z(2)-z(1))/10) z(2)+((z(2)-z(1))/10)];
-        hold on;
-        plot(gh.axis2,...
-            [1:1:y],...
-            meanData,...
-            'k-');
-        for k=1:length(ad.data{ad.control.spectra.active}.blc.fit.point)
-            if (ad.data{ad.control.spectra.active}.blc.fit.point(k).active)
-                line(...
-                    [ ad.data{ad.control.spectra.active}.blc.fit.point(k).position ...
-                    ad.data{ad.control.spectra.active}.blc.fit.point(k).position ],...
-                    [ ZLim(1) ZLim(2) ],...
-                    'Color','r',...
-                    'Parent',gh.axis2);
-            end
+        % Be as robust as possible: if there is no axes, default is indices
+        [y,x] = size(ad.acc.data.data);
+        x = linspace(1,x,x);
+        y = linspace(1,y,y);
+        if (isfield(ad.acc.data,'axes') ...
+                && isfield(ad.acc.data.axes,'x') ...
+                && isfield(ad.acc.data.axes.x,'values') ...
+                && not (isempty(ad.acc.data.axes.x.values)))
+            x = ad.acc.data.axes.x.values;
         end
-        hold off;
-        set(gh.axis2,'XLim',[1 y]);
-        set(gh.axis2,'YLim',ZLim);
-        set(gh.axis2,'YTickLabel',[]);
+        if (isfield(ad.acc.data,'axes') ...
+                && isfield(ad.acc.data.axes,'y') ...
+                && isfield(ad.acc.data.axes.y,'values') ...
+                && not (isempty(ad.acc.data.axes.y.values)))
+            y = ad.acc.data.axes.y.values;
+        end
         
-        % Plot patches indicating the fit areas
-        patch([1 1 leftarea+1 leftarea+1],[ZLim(1) ZLim(2) ZLim(2) ZLim(1)],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis2);
-        patch([y-rightarea y-rightarea y y],[ZLim(1) ZLim(2) ZLim(2) ZLim(1)],[0 0 0 0],...
-            'EdgeColor','none',...
-            'FaceColor','r',...
-            'FaceAlpha',0.4,...
-            'Parent',gh.axis2);
+        switch ad.control.axis.displayType
+            case '2D plot'
+                imagesc(...
+                    x,...
+                    y,...
+                    ad.data{ad.control.spectra.active}.data...
+                    );
+                set(gca,'YDir','normal');
+                % Plot axis labels
+                % TODO: Check whether it is save to rely on measure/unit
+                %       from the accumulated dataset
+                xlabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.acc.data.axes.x.measure,...
+                    ad.acc.data.axes.x.unit));
+                ylabel(gca,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.acc.data.axes.y.measure,...
+                    ad.acc.data.axes.y.unit));
+            case '1D along x'
+            case '1D along y'
+            otherwise
+                % unknown
+        end
         
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function setAccParameters()
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+        ad = getappdata(mainWindow);
+        
+        if isempty(ad.control.spectra.accumulated)
+            return;
+        end
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        % Ids of datasets to accumulate
+        ad.acc.datasets = ad.control.spectra.accumulated;
+        
+        % Id of master dataset
+        ad.acc.master = ad.control.spectra.accumulated(...
+            get(gh.data_panel_master_popupmenu,'Value'));
+        
+        % Accumulation method
+        accMethods = ...
+            cellstr(get(gh.accumulation_panel_method_popupmenu,'String'));
+        ad.acc.method = ...
+            accMethods{get(gh.accumulation_panel_method_popupmenu,'Value')};
+        
+        % Interpolation method
+        interpolationMethods = ...
+            cellstr(get(gh.interpolation_panel_method_popupmenu,'String'));
+        ad.acc.interpolation = ...
+            interpolationMethods{...
+            get(gh.interpolation_panel_method_popupmenu,'Value')};
+        
+        % Weights
+        ad.acc.weights.min = ...
+            str2double(get(gh.accumulation_panel_weights_min_edit,'String'));
+        ad.acc.weights.max = ...
+            str2double(get(gh.accumulation_panel_weights_max_edit,'String'));
+        
+        % Noise determination area
+        % TODO: Fix handling of "end" - eventually don't get the string
+        % here but set ad.acc.noise in the callback of the respective edits
+        ad.acc.noise.x.min = ...
+            str2double(get(gh.sn_panel_x_min_edit,'String'));
+        ad.acc.noise.x.max = ...
+            str2double(get(gh.sn_panel_x_max_edit,'String'));
+        ad.acc.noise.y.min = ...
+            str2double(get(gh.sn_panel_y_min_edit,'String'));
+        ad.acc.noise.y.max = ...
+            str2double(get(gh.sn_panel_y_max_edit,'String'));
+
+        % Label of accumulated dataset
+        ad.acc.label = get(gh.results_panel_label_edit,'String');
+        
+        % Set appdata of ACC GUI
+        setappdata(mainWindow,'acc',ad.acc);
     catch exception
         try
             msgStr = ['An exception occurred. '...
