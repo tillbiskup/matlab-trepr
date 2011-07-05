@@ -76,9 +76,6 @@ try
     accData.line = struct();
     % history - cell array of structs
     accData.history = cell(0);
-    % acc - struct containing all the parameters from the accumulation
-    % TODO: Shall that get written directly to history?
-    accData.acc = struct();
     
     % Set fields that can be taken from master dataset
     accData.line = data{parameters.datasets == parameters.master}.line;
@@ -160,8 +157,6 @@ try
             return;
     end
     
-    % TODO: Write history!
-    
     % TODO: Write acc summary (that gets added to the acc dataset)
     
     % Tell user that accumulation succeeded and (finally) give details
@@ -211,7 +206,33 @@ try
         sprintf('Interpolation method: %s',parameters.interpolation)...
         }...
         ];
+        
+    % Write history!
+    history = struct();
+    history.date = datestr(now,31);
+    history.method = mfilename;
     
+    % Fiddle around with parameters structure, as it gets to hold all
+    % information about the accumulated datasets as well
+    history.parameters = parameters;
+    history.parameters = rmfield(history.parameters,'datasets');
+    for k=1:length(data)
+        % Assemble structure that holds all necessary information about the
+        % accumulated datasets
+        history.parameters.datasets{k}.axes = data{k}.axes;
+        history.parameters.datasets{k}.label = data{k}.label;
+        history.parameters.datasets{k}.filename = data{k}.filename;
+        history.parameters.datasets{k}.header = data{k}.header;
+        history.parameters.datasets{k}.history = data{k}.history;
+    end
+    
+    % Assign complete accReport to info field of history
+    history.info = accReport;
+    
+    % Assign history to dataset of accumulated data
+    accData.history = cell(0);
+    accData.history{1} = history;
+
     % For debug purposes, display all parameters necessary for accumulation
 %     disp(accData);
 %     
