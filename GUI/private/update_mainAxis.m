@@ -43,7 +43,8 @@ setMinMax();
 ad = getappdata(mainWindow);
 
 % Set current axes to the main axes of main GUI
-mainAxes = findobj(allchild(gh.mainAxes_panel),'Type','axes');
+mainAxes = findobj(allchild(gh.mainAxes_panel),...
+    'Type','axes','-not','Tag','legend');
 set(mainWindow,'CurrentAxes',mainAxes);
 
 
@@ -79,6 +80,7 @@ switch ad.control.axis.displayType
             ad.data{ad.control.spectra.active}.data...
             );
         set(gca,'YDir','normal');
+        set(gca,'Tag','mainAxis');
         % Plot axis labels
         xlabel(gca,...
             sprintf('{\\it %s} / %s',...
@@ -408,6 +410,8 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
+mainAxes = findobj(allchild(gh.mainAxes_panel),'Type','axes');
+
 % If there is no legend to be displayed
 if (isequal(ad.control.axis.legend.location,'none'))
     legend('off');
@@ -419,7 +423,7 @@ for k = 1 : length(ad.control.spectra.visible)
     legendLabels{k} = strrep(ad.data{k}.label,'_','\_');
 end
 
-legend(legendLabels,'Location',ad.control.axis.legend.location);
+legend(mainAxes,legendLabels,'Location',ad.control.axis.legend.location);
 
 end
 
