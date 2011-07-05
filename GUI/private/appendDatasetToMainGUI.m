@@ -1,4 +1,4 @@
-function status = appendDatasetToMainGUI(dataset)
+function status = appendDatasetToMainGUI(dataset,varargin)
 % APPENDDATASETTOMAINGUI Append dataset to main GUI.
 %
 % Usage:
@@ -6,6 +6,16 @@ function status = appendDatasetToMainGUI(dataset)
 %
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
+
+% Parse input arguments using the inputParser functionality
+p = inputParser;   % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Function name to be included in error messages
+p.KeepUnmatched = true; % Enable errors on unmatched arguments
+p.StructExpand = true; % Enable passing arguments in a structure
+
+p.addRequired('dataset', @(x)isstruct(x) || ~iscell(x));
+p.addParamValue('modified',false,@islogical);
+p.parse(dataset,varargin{:});
 
 try
     % First, find main GUI window
@@ -30,7 +40,10 @@ try
     % Make new dataset immediately visible
     ad.control.spectra.visible(end+1) = newId;
     
-    % TODO: Handle whether it should go to modified as well
+    % Handle whether it should go to modified as well
+    if (p.Results.modified)
+        ad.control.spectra.modified(end+1) = newId;
+    end
     
     % Write appdata
     setappdata(mainWindow,'data',ad.data);

@@ -1364,7 +1364,8 @@ function pushbutton_Callback(~,~,action)
                 % TODO: Add accData to main GUI
                 if isfield(ad.acc,'data') && ~isempty(ad.acc.data)
                     % Add accData to main GUI
-                    status = appendDatasetToMainGUI(ad.acc.data);
+                    status = appendDatasetToMainGUI(...
+                        ad.acc.data,'modified',true);
                     if status
                         disp('Hmm... some problems with appending accumulated dataset to main GUI.');
                     end
