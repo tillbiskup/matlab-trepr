@@ -1361,7 +1361,7 @@ function pushbutton_Callback(~,~,action)
                 ad = getappdata(mainWindow);
 
                 % TODO: Add accData to main GUI
-                if ~isempty(ad.acc.data)
+                if isfield(ad.acc,'data') && ~isempty(ad.acc.data)
                     % Add accData to main GUI
                 end
 
@@ -1688,7 +1688,6 @@ function updateDimensionPanel(panel)
                         allchild(gh.results_panel_dimensions_panel),...
                         'Style','Edit'),'String','1');
                 else
-                    disp('OK!');
                     [ydim,xdim] = size(ad.acc.data.data);
                     set(gh.results_panel_dimensions_size_x_edit,'String',...
                         num2str(xdim));
