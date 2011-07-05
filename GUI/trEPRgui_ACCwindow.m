@@ -873,9 +873,10 @@ uicontrol('Tag','results_panel_report_save_pushbutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'String','Save',...
-    'TooltipString','Save report shown on the left to file',...
+    'TooltipString','Save report shown on the left to text file',...
     'pos',[((panel_size-20)/3*2)+10 10 (panel_size-20)/3 30],...
-    'Enable','on'...
+    'Enable','on',...
+    'Callback',{@report_save_pushbutton_Callback}...
     );
 
 reportPanelSize = get(pp4,'Position');
@@ -1363,6 +1364,10 @@ function pushbutton_Callback(~,~,action)
                 % TODO: Add accData to main GUI
                 if isfield(ad.acc,'data') && ~isempty(ad.acc.data)
                     % Add accData to main GUI
+                    status = appendDatasetToMainGUI(ad.acc.data);
+                    if status
+                        disp('Hmm... some problems with appending accumulated dataset to main GUI.');
+                    end
                 end
 
                 % Look for ACC GUI Help window and if its there, close as
@@ -1572,6 +1577,69 @@ function keypress_Callback(src,evt)
                 fprintf('       Caller: %i\n\n',src);
                 return;
         end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function report_save_pushbutton_Callback(~,~)
+    try
+        % Get appdata of main window
+        ad = getappdata(hMainFigure);
+
+        % Get handles of main window
+        gh = guihandles(hMainFigure);
+        
+        % If we don't have the necessary parameters, silently return
+        if ~isfield(ad.acc,'data') || isempty(ad.acc.data)
+            return;
+        end
+        
+        % Set default filename
+        defaultFileName = sprintf('%s-%s.txt',...
+            strrep(ad.acc.data.label,' ','_'),...
+            datestr(now,30));
+        % Open file selection dialogue
+        [FileName,PathName] = uiputfile(...
+            '*.txt','Select file to save the accumulation report to',...
+            defaultFileName);
+        % Check whether user hit "Cancel" and if so, return
+        if isequal(FileName,0) || isequal(PathName,0)
+            return;
+        end
+        % Save to text file
+        fid = fopen(fullfile(PathName,FileName),'w+');
+        if (fid == -1)
+            msgText = [...
+                'Error while trying to save accumulation report. '...
+                'Cannot write to file '...
+                fullfile(PathName,FileName)...
+                ];
+            msgbox(msgText,'Cannot write file','error');
+            return;
+        end
+        report = get(gh.summary_panel_edit,'String');
+        % Remove message about the acc dataset getting written to the main
+        % GUI only when pressing the "Close" button
+        report(3:5) = [];
+        for k=1:length(report)
+            fprintf(fid,'%s\n',report{k});
+        end
+        fclose(fid);
     catch exception
         try
             msgStr = ['An exception occurred. '...

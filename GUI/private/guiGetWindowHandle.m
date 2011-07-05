@@ -17,6 +17,8 @@ function handle = guiGetWindowHandle(varargin)
 % name of the respective m-file the particular GUI window gets defined in.
 %
 % If no identifier is given, the handle of the main GUI window is returned.
+%
+% If no handle could be found, an empty cell array will be returned.
 
 try
     % Check whether we are called with input argument
