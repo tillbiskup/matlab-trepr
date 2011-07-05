@@ -1,4 +1,30 @@
 function [accData,accReport] = trEPRACC(data,parameters)
+% TREPRACC Accumulate datasets given as a cell array in data with the
+% parameters provided in parameters.
+%
+% data       - cell array 
+%              datasets to accumulate (at least two datasets)
+% parameters - structure
+%              parameter structure as collected by the trEPRgui_ACCwindow
+%
+% accData    - structure
+%              contains both the accumulated data (in accData.data)
+%              and all usual parameters of a dataset and the parameters
+%              from the accumulation in the history.parameters field
+% accReport  - cell array of strings
+%              textual report of the accumulation process
+%              used for the trEPRgui_ACCwindow
+%              a copy is copied to the history.info field
+
+% Parse input arguments using the inputParser functionality
+p = inputParser;   % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Function name to be included in error messages
+p.KeepUnmatched = true; % Enable errors on unmatched arguments
+p.StructExpand = true; % Enable passing arguments in a structure
+
+p.addRequired('data', @(x)iscell(x));
+p.addRequired('parameters', @(x)isstruct(x));
+p.parse(data,parameters);
 
 try
     if (length(data) < 2)
@@ -45,6 +71,9 @@ try
             };
         return;
     end
+    
+    % TODO: Sanitise parameters structure (look for necessary fields and
+    % values and if not provided, set default values)
     
     % Predefine fields for accData
     accData = struct();
@@ -157,8 +186,6 @@ try
             return;
     end
     
-    % TODO: Write acc summary (that gets added to the acc dataset)
-    
     % Tell user that accumulation succeeded and (finally) give details
     % accReport will end in being a cell array
     % The maximum line length for accReport is 56 characters (in Linux)
@@ -207,7 +234,7 @@ try
         }...
         ];
         
-    % Write history!
+    % Write history
     history = struct();
     history.date = datestr(now,31);
     history.method = mfilename;
@@ -232,14 +259,6 @@ try
     % Assign history to dataset of accumulated data
     accData.history = cell(0);
     accData.history{1} = history;
-
-    % For debug purposes, display all parameters necessary for accumulation
-%     disp(accData);
-%     
-%     disp(parameters);
-%     disp(parameters.weights);
-%     disp(parameters.noise.x);
-%     disp(parameters.noise.y);
     
 catch exception
     throw(exception);

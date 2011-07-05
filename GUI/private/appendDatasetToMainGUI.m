@@ -13,7 +13,7 @@ p.FunctionName = mfilename; % Function name to be included in error messages
 p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
-p.addRequired('dataset', @(x)isstruct(x) || ~iscell(x));
+p.addRequired('dataset', @(x)isstruct(x) || iscell(x));
 p.addParamValue('modified',false,@islogical);
 p.parse(dataset,varargin{:});
 
