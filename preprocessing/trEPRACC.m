@@ -14,12 +14,12 @@ try
     
     % First step: Check whether axes overlap, and if not, return with error
     % Get axes limits (and other things, minimising for loops) for datasets
-    xMin = zeros(length(data),1);
-    xMax = zeros(length(data),1);
-    yMin = zeros(length(data),1);
-    yMax = zeros(length(data),1);
-    xStep = zeros(length(data),1);
-    yStep = zeros(length(data),1);
+    xMin = zeros(1,length(data));
+    xMax = zeros(1,length(data));
+    yMin = zeros(1,length(data));
+    yMax = zeros(1,length(data));
+    xStep = zeros(1,length(data));
+    yStep = zeros(1,length(data));
     accLabels = cell(1,length(data));
     for k=1:length(data)
         xMin(k) = data{k}.axes.x.values(1);
@@ -28,6 +28,10 @@ try
         yMax(k) = data{k}.axes.y.values(end);
         xStep(k) = data{k}.axes.x.values(end)-data{k}.axes.x.values(end-1);
         yStep(k) = data{k}.axes.y.values(2)-data{k}.axes.y.values(1);
+        % Helping Matlab not making silly rounding mistakes, or at least
+        % make them somewhat equal
+        xStep(k) = round(xStep(k)*1e12)/1e12;
+        yStep(k) = round(yStep(k)*1e12)/1e12;
         accLabels{k} = data{k}.label;
     end
     
@@ -101,14 +105,16 @@ try
     % TODO: Account for master dataset
     xLimits = [ max(xMin) min(xMax) ];
     yLimits = [ max(yMin) min(yMax) ];
-    
+
     % Make axes of final accumulated dataset
-    accData.axes.x.values = xLimits(1):xStep(1):xLimits(2);
+    accData.axes.x.values = linspace(xLimits(1),xLimits(2),...
+        int32((xLimits(2)-xLimits(1))/xStep(1))+1);
     accData.axes.x.measure = ...
         data{parameters.datasets == parameters.master}.axes.x.measure;
     accData.axes.x.unit = ...
         data{parameters.datasets == parameters.master}.axes.x.unit;
-    accData.axes.y.values = yLimits(1):yStep(1):yLimits(2);
+    accData.axes.y.values = linspace(yLimits(1),yLimits(2),...
+        int32((yLimits(2)-yLimits(1))/yStep(1))+1);
     accData.axes.y.measure = ...
         data{parameters.datasets == parameters.master}.axes.y.measure;
     accData.axes.y.unit = ...
@@ -147,7 +153,8 @@ try
             accReport = {...
                 'Accumulation FAILED!'...
                 ' '...
-                'PROBLEM:  Unknown accumulation method.'...
+                sprintf('PROBLEM:  Unknown accumulation method "%s".',...
+                parameters.method)...
                 'SOLUTION: File bug report.'...
                 };
             return;
