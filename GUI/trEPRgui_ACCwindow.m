@@ -1574,8 +1574,8 @@ function keypress_Callback(src,evt)
                 trEPRgui_ACC_helpwindow();
                 return;
             otherwise
-                disp(evt);
-                fprintf('       Caller: %i\n\n',src);
+%                 disp(evt);
+%                 fprintf('       Caller: %i\n\n',src);
                 return;
         end
     catch exception
