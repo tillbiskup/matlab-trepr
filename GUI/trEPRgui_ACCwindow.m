@@ -1214,13 +1214,87 @@ function accumulated_listbox_Callback(source,~)
     end
 end
 
-function position_edit_Callback(~,~,position)
+function position_edit_Callback(source,~,position)
     try
-        if isempty(position)
+        if isempty(position) || ~isfield(ad.acc,'data') || ...
+                isempty(ad.acc.data)
             return;
         end
         
-        return;
+        % If value is empty or NaN after conversion to numeric, restore
+        % previous entry and return
+        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String'))))
+            % Update slider panel
+            updateSliderPanel();
+            return;
+        end
+        
+        % Get appdata of ACC GUI
+        mainWindow = guiGetWindowHandle('trEPRgui_ACC');
+        ad = getappdata(mainWindow);
+        
+        % Be as robust as possible: if there is no axes, default is indices
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        x = linspace(1,x,x);
+        y = linspace(1,y,y);
+        if (isfield(ad.acc.data,'axes') ...
+                && isfield(ad.acc.data.axes,'x') ...
+                && isfield(ad.acc.data.axes.x,'values') ...
+                && not (isempty(ad.acc.data.axes.x.values)))
+            x = ad.acc.data.axes.x.values;
+        end
+        if (isfield(ad.acc.data,'axes') ...
+                && isfield(ad.acc.data.axes,'y') ...
+                && isfield(ad.acc.data.axes.y,'values') ...
+                && not (isempty(ad.acc.data.axes.y.values)))
+            y = ad.acc.data.axes.y.values;
+        end
+        
+        switch position
+            case 'xindex'
+                value = round(str2double(get(source,'String')));
+                if (value > length(x)) value = length(x); end
+                if (value < 1) value = 1; end
+                ad.acc.data.display.position.x = ...
+                    value;
+            case 'xunit'
+                value = str2double(get(source,'String'));
+                if (value < x(1)) value = x(1); end
+                if (value > x(end)) value = x(end); end
+                ad.acc.data.display.position.x = ...
+                    interp1(...
+                    x,[1:length(x)],...
+                    value,...
+                    'nearest'...
+                    );
+            case 'yindex'
+                value = round(str2double(get(source,'String')));
+                if (value > length(y)) value = length(y); end
+                if (value < 1) value = 1; end
+                ad.acc.data.display.position.y = ...
+                    value;
+            case 'yunit'
+                value = str2double(get(source,'String'));
+                if (value < y(1)) value = y(1); end
+                if (value > y(end)) value = y(end); end
+                ad.acc.data.display.position.y = ...
+                    interp1(...
+                    y,[1:length(y)],...
+                    value,...
+                    'nearest'...
+                    );
+            otherwise
+                return;
+        end
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'acc',ad.acc);
+        
+        % Update slider panel
+        updateSliderPanel();
+        
+        %Update main axis
+        updateAxes();
     catch exception
         try
             msgStr = ['An exception occurred. '...
