@@ -7,6 +7,9 @@ function status = appendDatasetToMainGUI(dataset,varargin)
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
 
+% (c) 2011, Till Biskup
+% 2011-07-04
+
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
 p.FunctionName = mfilename; % Function name to be included in error messages

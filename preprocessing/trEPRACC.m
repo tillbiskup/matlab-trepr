@@ -16,6 +16,9 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              used for the trEPRgui_ACCwindow
 %              a copy is copied to the history.info field
 
+% (c) 2011, Till Biskup
+% 2011-07-04
+
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
 p.FunctionName = mfilename; % Function name to be included in error messages
