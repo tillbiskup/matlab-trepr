@@ -244,6 +244,8 @@ function corrections_pushbutton_Callback(~,~,correction)
                 guiProcessingPOC(ad.control.spectra.active);
             case 'BGC'
                 guiProcessingBGC(ad.control.spectra.active);
+            case 'ACC'
+                trEPRgui_ACCwindow();
             otherwise
                 msg = cell(1,2);
                 msg{1} = sprintf(...
