@@ -27,6 +27,30 @@ try
         return;
     end
     
+    % Sanitise dataset a bit - check for some of the necessary fields in
+    % structure we need not to crash the GUI immediately
+    if ~isfield(dataset,'label')
+        dataset.label = 'New dataset';
+    end
+    if ~isfield(dataset,'display')
+        dataset.display.position.x = 1;
+        dataset.display.position.y = 1;
+        dataset.display.displacement.x = 0;
+        dataset.display.displacement.y = 0;
+        dataset.display.displacement.z = 0;
+        dataset.display.scaling.x = 1;
+        dataset.display.scaling.y = 1;
+        dataset.display.scaling.z = 1;
+        dataset.display.smoothing.x.value = 1;
+        dataset.display.smoothing.y.value = 1;
+    end
+    if ~isfield(dataset,'line')
+        dataset.line.color = 'k';
+        dataset.line.style = '-';
+        dataset.line.marker = 'none';
+        dataset.line.width = 1;
+    end
+    
     % Get appdata of main window
     ad = getappdata(mainWindow);
     
