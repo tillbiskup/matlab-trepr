@@ -1251,7 +1251,7 @@ function status = datasetSaveAs(id)
             msgStr = cell(0);
             msgStr{length(msgStr)+1} = ...
                 sprintf('Problems when trying to save "%s" to file',...
-                ad.data{selected}.label);
+                ad.data{id}.label);
             msgStr{length(msgStr)+1} = ad.data{id}.filename;
             status = add2status(msgStr);
             clear msgStr;
