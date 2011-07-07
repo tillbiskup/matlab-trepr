@@ -47,6 +47,13 @@ mainAxes = findobj(allchild(gh.mainAxes_panel),...
     'Type','axes','-not','Tag','legend');
 set(mainWindow,'CurrentAxes',mainAxes);
 
+% Just to be on the save side, check whether we have a currently active
+% spectrum
+if ~(ad.control.spectra.active)
+    msg = 'update_mainAxis(): No active spectrum';
+    add2status(msg);
+    return;
+end
 
 % Plot depending on display type settings
 % Be as robust as possible: if there is no axes, default is indices

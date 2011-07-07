@@ -72,6 +72,12 @@ try
         ad.control.spectra.modified(end+1) = newId;
     end
     
+    % In case there is currently no active spectrum, make the newly
+    % appended one the active one
+    if ~(ad.control.spectra.active)
+        ad.control.spectra.active = newId;
+    end
+    
     % Write appdata
     setappdata(mainWindow,'data',ad.data);
     setappdata(mainWindow,'origdata',ad.data);
