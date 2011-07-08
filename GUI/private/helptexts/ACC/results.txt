@@ -30,7 +30,9 @@ Every dataset loaded has a label (although not necessarily a unique one, as they
 
 Report
 
-To the left, below the main axes, you can find a more detailed report of the actual accumulation that was performed, as well with any problems that might have occured during that process.
+To the left, below the main axes, you can find a more detailed report of the actual accumulation that was performed, along with any problems that might have occured during that process.
+
+A more detailed description of the report is given in the respective help topic.
 
 To save that report to a text file, you may use the "save" button provided in the report subpanel of the results panel.
 

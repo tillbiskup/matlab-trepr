@@ -37,4 +37,6 @@ Otherwise, you need to choose between one of several interpolation methods:
 
 For further details, refer to the MATLAB(r) documentation for the "interp1" function.
 
+Note: If you specify here whatever interpolation method, but the accumulation function detects that no interpolation is necessary, it will not perform any interpolation and state that fact in the accumulation report.
 
+Vice versa, if the accumulation function detects that interpolation is necessary to accumulate datasets, but you didn't specify an interpolation method here, it will use "linear" as a default and tell you about it in the accumulation report.
