@@ -44,7 +44,7 @@ try
     % Assign masterId, i.e. the position of the master dataset in the list
     % of datasets instead of the index corresponding to the total number of 
     % datasets 
-    masterId = find(parameters.datasets==parameters.master)
+    masterId = find(parameters.datasets==parameters.master);
     
     % First step: Check whether axes overlap, and if not, return with error
     % Get axes limits (and other things, minimising for loops) for datasets
