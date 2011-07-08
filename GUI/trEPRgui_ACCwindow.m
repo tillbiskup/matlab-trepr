@@ -1433,8 +1433,13 @@ function pushbutton_Callback(~,~,action)
                 mainWindow = guiGetWindowHandle('trEPRgui_ACC');
                 ad = getappdata(mainWindow);
 
-                % TODO: Add accData to main GUI
+                % Add accData to main GUI
                 if isfield(ad.acc,'data') && ~isempty(ad.acc.data)
+                    msgStr = {...
+                        'Datasets have been successfully accumulated'...
+                        'Now trying to append accumulated data to main GUI'...
+                        };
+                    add2status(msgStr);
                     % Add accData to main GUI
                     status = appendDatasetToMainGUI(...
                         ad.acc.data,'modified',true);

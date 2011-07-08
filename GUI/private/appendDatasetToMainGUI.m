@@ -84,11 +84,11 @@ try
     setappdata(mainWindow,'control',ad.control);
     
     % Adding status line
-    msgStr = cell(0);
-    msgStr{length(msgStr)+1} = ...
-        sprintf('Dataset successfully appended to main GUI');
-    status = add2status(msgStr);
-    clear msgStr msg;
+    msg = {...
+        'Dataset successfully appended to main GUI'...
+        sprintf('Label: %s',dataset.label)...
+        }
+    status = add2status(msg);
     
     % Update main GUI's axes and panels
     update_visibleSpectra();
