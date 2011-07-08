@@ -50,6 +50,7 @@ try
     xStep = zeros(1,length(data));
     yStep = zeros(1,length(data));
     accLabels = cell(1,length(data));
+    interpolate = false;
     for k=1:length(data)
         xMin(k) = data{k}.axes.x.values(1);
         xMax(k) = data{k}.axes.x.values(end);
@@ -62,6 +63,13 @@ try
         xStep(k) = round(xStep(k)*1e12)/1e12;
         yStep(k) = round(yStep(k)*1e12)/1e12;
         accLabels{k} = data{k}.label;
+        if (k ~= parameters.master) && ...
+                ((min(ismember(data{k}.axes.x.values,...
+                data{parameters.master}.axes.x.values)==0)) || ...
+                (min(ismember(data{k}.axes.y.values,...
+                data{parameters.master}.axes.y.values)==0)))
+            interpolate = true;
+        end
     end
     
     if ((max(xMin) >= min(xMax)) || (max(yMin) >= min(yMax)))
@@ -118,22 +126,88 @@ try
     
     % Check for axes steppings and handle interpolation accordingly, or,
     % for the time being, complain that interpolation is not supported yet.
-    if ((min(xStep) ~= max(xStep)) || (min(yStep) ~= max(yStep)))
-        accData = [];
-        accReport = {...
-            'Accumulation FAILED!'...
-            ' '...
-            'PROBLEM:  Interpolation not yet implemented.'...
-            'SOLUTION: File bug report.'...
-            };
-        return;
+    if ((min(xStep) ~= max(xStep)) || (min(yStep) ~= max(yStep))) || ...
+            interpolate
+        % If no interpolation method is set, default is linear
+        if strcmp(parameters.interpolation,'none')
+            parameters.interpolation = 'linear';
+        end
+        
+        % Step 1: Define size of master dataset to be used for accumulation
+        % Use 1D table lookup to do so
+        
+        % x axis
+        if xMin(parameters.master) < max(xMin)
+            xLimits(1) = interp1(...
+                data{parameters.master}.axes.x.values,...
+                data{parameters.master}.axes.x.values,...
+                max(xMin),...
+                'nearest');
+            % Account for the situation of linear interpolation and limits
+            % of the master dataset that are still larger than one or more
+            % of the other datasets (produces NaN otherwise).
+            if strcmp(parameters.interpolation,'linear') && ...
+                    (xLimits(1) < max(xMin))
+                xLimits(1) = xLimits(1) + xStep(parameters.master);
+            end
+        else
+            xLimits(1) = xMin(parameters.master);
+        end
+        if xMax(parameters.master) > min(xMax)
+            xLimits(2) = interp1(...
+                data{parameters.master}.axes.x.values,...
+                data{parameters.master}.axes.x.values,...
+                min(xMax),...
+                'nearest');
+            % Account for the situation of linear interpolation and limits
+            % of the master dataset that are still larger than one or more
+            % of the other datasets (produces NaN otherwise).
+            if strcmp(parameters.interpolation,'linear') && ...
+                    (xLimits(2) > min(xMax))
+                xLimits(2) = xLimits(2) - xStep(parameters.master);
+            end
+        else
+            xLimits(2) = xMax(parameters.master);
+        end
+        % y axis
+        if yMin(parameters.master) < max(yMin)
+            yLimits(1) = interp1(...
+                data{parameters.master}.axes.y.values,...
+                data{parameters.master}.axes.y.values,...
+                max(yMin),...
+                'nearest');
+            % Account for the situation of linear interpolation and limits
+            % of the master dataset that are still larger than one or more
+            % of the other datasets (produces NaN otherwise).
+            if strcmp(parameters.interpolation,'linear') && ...
+                    (yLimits(1) < max(yMin))
+                yLimits(1) = yLimits(1) + yStep(parameters.master);
+            end
+        else
+            yLimits(1) = yMin(parameters.master);
+        end
+        if yMax(parameters.master) > min(yMax)
+            yLimits(2) = interp1(...
+                data{parameters.master}.axes.y.values,...
+                data{parameters.master}.axes.y.values,...
+                min(yMax),...
+                'nearest');
+            % Account for the situation of linear interpolation and limits
+            % of the master dataset that are still larger than one or more
+            % of the other datasets (produces NaN otherwise).
+            if strcmp(parameters.interpolation,'linear') && ...
+                    (yLimits(2) > min(yMax))
+                yLimits(2) = yLimits(2) - yStep(parameters.master);
+            end
+        else
+            yLimits(2) = yMax(parameters.master);
+        end
+    else
+        % Cut data dimensions to respective size
+        % TODO: Account for master dataset
+        xLimits = [ max(xMin) min(xMax) ];
+        yLimits = [ max(yMin) min(yMax) ];
     end
-    % TODO: For the interpolation, account for master dataset
-    
-    % Cut data dimensions to respective size
-    % TODO: Account for master dataset
-    xLimits = [ max(xMin) min(xMax) ];
-    yLimits = [ max(yMin) min(yMax) ];
 
     % Make axes of final accumulated dataset
     accData.axes.x.values = linspace(xLimits(1),xLimits(2),...
@@ -156,13 +230,55 @@ try
         length(accData.axes.x.values),...
         length(data));
     
-    for k=1:length(data)
-        % For now, make it easy, first get the indices, then cut the matrix
-        xmini = find(data{k}.axes.x.values==xLimits(1));
-        xmaxi = find(data{k}.axes.x.values==xLimits(2));
-        ymini = find(data{k}.axes.y.values==yLimits(1));
-        ymaxi = find(data{k}.axes.y.values==yLimits(2));
-        accData.data(:,:,k) = data{k}.data(ymini:ymaxi,xmini:xmaxi);
+    % Check for axes steppings and handle interpolation accordingly, or,
+    % for the time being, complain that interpolation is not supported yet.
+    if ((min(xStep) ~= max(xStep)) || (min(yStep) ~= max(yStep))) || ...
+            interpolate
+        % Step 2: Perform 2D interpolation
+        % ZI = interp2(X,Y,Z,XI,YI,method)
+        % X and Y must be monotonic, and have the same format ("plaid") as
+        % if they were produced by meshgrid. 
+        % Matrices X and Y must be the same size as Z.
+        %
+        % [X,Y] = meshgrid(x,y)        
+        [mXgrid,mYgrid] = meshgrid(...
+            data{parameters.master}.axes.x.values(...
+            find(data{parameters.master}.axes.x.values==xLimits(1)):...
+            find(data{parameters.master}.axes.x.values==xLimits(2))),...
+            data{parameters.master}.axes.y.values(...
+            find(data{parameters.master}.axes.y.values==yLimits(1)):...
+            find(data{parameters.master}.axes.y.values==yLimits(2))));
+        accData.data(:,:,parameters.master) = ...
+            data{parameters.master}.data(...
+            find(data{parameters.master}.axes.y.values==yLimits(1)):...
+            find(data{parameters.master}.axes.y.values==yLimits(2)),...
+            find(data{parameters.master}.axes.x.values==xLimits(1)):...
+            find(data{parameters.master}.axes.x.values==xLimits(2)));
+        size(accData.data(:,:,parameters.master))
+        for k=1:length(data)
+            if k ~= parameters.master
+                [xgrid,ygrid] = meshgrid(...
+                    data{k}.axes.x.values,...
+                    data{k}.axes.y.values);
+                accData.data(:,:,k) = interp2(...
+                    xgrid,...
+                    ygrid,...
+                    data{k}.data,...
+                    mXgrid,...
+                    mYgrid,...
+                    parameters.interpolation);
+            end
+        end
+    else
+        for k=1:length(data)
+            % For now, make it easy, first get the indices, then cut the
+            % matrix 
+            xmini = find(data{k}.axes.x.values==xLimits(1));
+            xmaxi = find(data{k}.axes.x.values==xLimits(2));
+            ymini = find(data{k}.axes.y.values==yLimits(1));
+            ymaxi = find(data{k}.axes.y.values==yLimits(2));
+            accData.data(:,:,k) = data{k}.data(ymini:ymaxi,xmini:xmaxi);
+        end
     end
     
     switch parameters.method
