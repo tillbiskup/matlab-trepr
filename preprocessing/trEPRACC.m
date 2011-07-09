@@ -364,6 +364,19 @@ try
     history = struct();
     history.date = datestr(now,31);
     history.method = mfilename;
+    % Get username of current user
+    % In worst case, username is an empty string. So nothing should really
+    % rely on it.
+    % Windows style
+    history.system.username = getenv('UserName');
+    % Unix style
+    if isempty(history.system.username)
+        history.system.username = getenv('USER');
+    end
+    history.system.platform = platform;
+    history.system.matlab = version;
+    history.system.trEPR= trEPRtoolboxRevision;
+    
     
     % Fiddle around with parameters structure, as it gets to hold all
     % information about the accumulated datasets as well

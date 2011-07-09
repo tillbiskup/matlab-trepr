@@ -28,7 +28,6 @@ hMainFigure = figure('Tag','trepr_gui_mainwindow',...
     'KeyPressFcn',@keyBindings,...
     'CloseRequestFcn',@closeGUI);
 
-
 % Create appdata structure
 ad = struct();
 % data - empty cell array
@@ -108,7 +107,20 @@ ad.control.axis.limits.z = struct();
 ad.control.axis.limits.z.min = 0;
 ad.control.axis.limits.z.max = 1;
 ad.control.axis.normalisation = 'none';
-
+% control.system - struct
+ad.control.system = struct();
+% Get username of current user
+% In worst case, username is an empty string. So nothing should really rely
+% on it.
+% Windows style
+ad.control.system.username = getenv('UserName');
+% Unix style
+if isempty(ad.control.system.username)
+    ad.control.system.username = getenv('USER'); 
+end
+ad.control.system.platform = platform;
+ad.control.system.matlab = version;
+ad.control.system.trEPR = trEPRtoolboxRevision;
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);

@@ -95,6 +95,9 @@ try
         case 'f1'
             trEPRgui_aboutwindow();
             return;
+        case 'f2'
+            trEPRgui_infowindow();
+            return;
         case 'f3'
             trEPRgui_BLCwindow();
             return;
