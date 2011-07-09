@@ -1908,7 +1908,8 @@ uicontrol('Tag','history_panel_records_listbox',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[10 10 panel_size 70],...
-    'String',''...
+    'String','',...
+    'Callback',{@history_listbox_Callback}...
     );
 
 p4p2 = uipanel('Tag','history_panel_summary_panel',...
@@ -2016,7 +2017,7 @@ uicontrol('Tag','history_panel_matlabversionlabel_text',...
     'BackgroundColor',defaultBackground,...
     'Visible','on',...
     'Units','pixels',...
-    'String','Matlab Version: ',...
+    'String','Matlab version: ',...
     'Position',[10 30 115 20]);
 uicontrol('Tag','history_panel_matlabversion_text',...
     'Style','text',...
@@ -2151,6 +2152,7 @@ ad.control.spectra = struct();
 ad.control.spectra.active = 0;
 ad.control.spectra.loaded = [];
 ad.control.spectra.modified = [];
+ad.control.spectra.history = cell(0);
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
@@ -2180,11 +2182,18 @@ if (mainGuiWindow)
             ];
         ad.control.spectra = rmfield(ad.control.spectra,'visible');
         ad.control.spectra = rmfield(ad.control.spectra,'invisible');
+        % Set history record cell array to default value
+        for k=1:length(ad.control.spectra.loaded)
+            ad.control.spectra.history{k} = 0;
+        end
         setappdata(hMainFigure,'control',ad.control);
     end
     
     updateDatasets();
     updateGeneralPanel();
+    updateParameterPanel();
+    updateDisplayPanel();
+    updateHistoryPanel();
 %    updateDimensionPanel('Datasets');
 %     update_position_display();
 end
@@ -2238,7 +2247,7 @@ end
 function dataset_listbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle('trEPRgui_infowindow');
+        mainWindow = guiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         ad.control.spectra.active = ad.control.spectra.loaded(...
@@ -2250,6 +2259,42 @@ function dataset_listbox_Callback(source,~)
         
         % Update panels
         updateGeneralPanel();
+        updateParameterPanel();
+        updateDisplayPanel();
+        updateHistoryPanel();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function history_listbox_Callback(source,~)
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        
+        ad.control.spectra.history{ad.control.spectra.active} = ... 
+            get(source,'Value');
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update panels
+        updateHistoryPanel();
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -2387,6 +2432,7 @@ function switchPanel(panelName)
                     'full filename (with path), label, and header '...
                     'information. In case of Bruker BES3T files, '...
                     '"header" displays the content of the DSC file.']);
+                updateGeneralPanel()
             case 'Parameters'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
@@ -2399,6 +2445,7 @@ function switchPanel(panelName)
                     ['Be careful with editing the highlighted '...
                     'fields, as that may corrupt your data!']...
                     });
+                updateParameterPanel()
             case 'Display'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
@@ -2409,6 +2456,7 @@ function switchPanel(panelName)
                     'dataset, including position in x and y, '...
                     'scaling, displacement, smoothing, axis labels '...
                     'and limits, but as well the line style.']);
+                updateDisplayPanel()
             case 'History'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
@@ -2421,7 +2469,10 @@ function switchPanel(panelName)
                     ['If there is a report from a given record, '...
                     'it will be displayed as well.']...
                     });
+                updateHistoryPanel()
             otherwise
+                msgStr = 'trEPRgui_infowindow(): Unknown panel.';
+                add2status(msgStr);
                 return;
         end
     catch exception
@@ -2445,7 +2496,7 @@ end
 
 function updateDatasets()
     try
-        mainWindow = findobj('Tag','trepr_gui_infowindow');
+        mainWindow = guiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
         
@@ -2461,7 +2512,7 @@ function updateDatasets()
         loaded = ad.control.spectra.loaded;
         
         % Get names for display in listbox
-        if length(loaded)>0
+        if ~isempty(loaded)
             set(lbox,'Enable','on');
             labels = cell(0);
             for k=1:length(loaded)
@@ -2472,7 +2523,7 @@ function updateDatasets()
             if (get(lbox,'Value')>length(loaded))
                 set(lbox,'Value',length(loaded));
             end
-            if ((get(lbox,'Value')==0) && (length(loaded)>0))
+            if ((get(lbox,'Value')==0) && (~isempty(loaded)))
                 set(lbox,'Value',1);
             end
             ad.control.spectra.active = loaded(get(lbox,'Value'));
@@ -2509,10 +2560,9 @@ function updateDatasets()
     end 
 end
 
-
 function updateGeneralPanel()
     try
-        mainWindow = findobj('Tag','trepr_gui_infowindow');
+        mainWindow = guiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
         
@@ -2540,6 +2590,155 @@ function updateGeneralPanel()
         end
         set(gh.general_panel_header_edit,'String',...
             ad.data{ad.control.spectra.active}.header);
+
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
+end
+
+function updateParameterPanel()
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from info GUI
+        ad = getappdata(mainWindow);
+        
+        if isempty(ad.data)
+            return;
+        end
+        
+        % Get handles from info GUI
+        gh = guidata(mainWindow);
+        
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
+end
+
+function updateDisplayPanel()
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from info GUI
+        ad = getappdata(mainWindow);
+        
+        if isempty(ad.data)
+            return;
+        end
+        
+        % Get handles from info GUI
+        gh = guidata(mainWindow);
+        
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
+end
+
+function updateHistoryPanel()
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from info GUI
+        ad = getappdata(mainWindow);
+        
+        % Get handles from info GUI
+        gh = guidata(mainWindow);
+        
+        % To shorten lines, assign Id of currently active dataset
+        selectedId = ad.control.spectra.active;
+        
+        % If no data or no history
+        if isempty(ad.data) || isempty(ad.data{selectedId}.history)
+            % Empty all strings
+            set(gh.history_panel_records_listbox,'String','');
+            set(gh.history_panel_records_listbox,'Enable','inactive');
+            set(gh.history_panel_date_text,'String','');
+            set(gh.history_panel_method_text,'String','');
+            set(gh.history_panel_operator_text,'String','');
+            set(gh.history_panel_platform_text,'String','');
+            set(gh.history_panel_matlabversion_text,'String','');
+            set(gh.history_panel_toolboxversion_text,'String','');
+            set(gh.history_panel_parameter_edit,'String','');
+            set(gh.history_panel_report_edit,'String','');
+            return;
+        end
+        
+        % Set selected history record for currently active dataset
+        if ~(ad.control.spectra.history{selectedId})
+            ad.control.spectra.history{selectedId} = 1;
+        end
+        historyId = ad.control.spectra.history{selectedId};
+        
+        % Get labels for history records listbox
+        recordLabels = ...
+            cell(length(ad.data{selectedId}.history),1);
+        for k=1:length(ad.data{selectedId}.history)
+            recordLabels{k} = ad.data{selectedId}.history{k}.method;
+        end
+        % Set history records listbox
+        set(gh.history_panel_records_listbox,'Enable','on');
+        set(gh.history_panel_records_listbox,'String',recordLabels);
+        set(gh.history_panel_records_listbox,'Value',...
+            ad.control.spectra.history{selectedId});
+        
+        % Set summary panel strings
+        set(gh.history_panel_date_text,'String',...
+            ad.data{selectedId}.history{historyId}.date);
+        set(gh.history_panel_method_text,'String',...
+            ad.data{selectedId}.history{historyId}.method);
+        set(gh.history_panel_operator_text,'String',...
+            ad.data{selectedId}.history{historyId}.system.username);
+        
+        % Set system panel strings
+        set(gh.history_panel_platform_text,'String',...
+            ad.data{selectedId}.history{historyId}.system.platform);
+        set(gh.history_panel_matlabversion_text,'String',...
+            ad.data{selectedId}.history{historyId}.system.matlab);
+        set(gh.history_panel_toolboxversion_text,'String',...
+            ad.data{selectedId}.history{historyId}.system.trEPR);
+        
+        % Set report panel
+        set(gh.history_panel_report_edit,'String',...
+            ad.data{selectedId}.history{historyId}.info);
 
     catch exception
         try
