@@ -334,7 +334,9 @@ function load_pushbutton_Callback(~,~)
             for k = 1 : length(data)
                 [p,fn,ext] = fileparts(data{k}.filename);
                 fileNames{k} = fullfile(p,[fn ext]);
-                data{k}.label = [fn ext];
+                if ~isfield(data{k},'label')
+                    data{k}.label = [fn ext];
+                end
                 data{k}.display = display;
                 data{k}.history = cell(0);
                 data{k}.line = line;
@@ -352,7 +354,9 @@ function load_pushbutton_Callback(~,~)
         else
             fileNames = data.filename;
             [~,fn,ext] = fileparts(data.filename);
-            data.label = [fn ext];
+            if ~isfield(data,'label')
+                data.label = [fn ext];
+            end
             data.display = display;
             data.history = cell(0);
             data.line = line;
