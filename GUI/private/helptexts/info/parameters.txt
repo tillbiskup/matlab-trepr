@@ -55,7 +55,9 @@ End - Position on the field axis where the field sweep ended.
 
 Step - Stepping of the magnetic field axis.
 
-Calibration - ... (Information will come as soon as I sorted out how to implement this field properly.)
+Calibration start - Position of the field axis where the field sweep started, measured with an NMR gaussmeter.
+
+Calibration end - Position of the field axis where the field sweep ended, measured with an NMR gaussmeter.
 
 
 BRIDGE
@@ -64,11 +66,17 @@ Information about the microwave bridge used to record the data and its settings.
 
 MW frequency - Microwave frequency the experiment was performed at.
 
+Calib. fq. start - Microwave frequency at the start of the experiment, read from a frequency counter.
+
+Calib. fq. end - Microwave frequency at the end of the experiment/current run, read from a frequency counter.
+
 Attenuation - Attenuation (in dB)
 
 Power - Actual microwave power (as different MW bridges have different maximum power and therefore, the "attenuation" field is not sufficient).
 
-Calibration - ... (Information will come as soon as I sorted out how to implement this field properly.)
+Bandwidth - Bandwidth of the video amplifier in the MW bridge.
+
+Amplification - Amplification in the video amplifier of the MW bridge.
 
 Model - A string identifying the model of the bridge used, e.g. "Bruker ER 046 XK-T".
 
