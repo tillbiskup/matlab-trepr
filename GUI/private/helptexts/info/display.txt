@@ -1,0 +1,36 @@
+
+DISPLAY SETTINGS
+
+This panel contains information regarding the actual display of the current dataset in the main GUI. Most of these settings you can set as well within the main GUI in the repective panels.
+
+
+DISPLAY
+
+All the information contained in the "display" structure of a dataset that was loaded into the main GUI.
+
+Position - Position in x and y, both as index of the axes vectors and in axis units.
+
+Scaling - Scaling in x,y,z, both as index of the axes vectors and in axis units.
+
+Displacement - Displacement in x,y,z, both as index of the axes vectors and in axis units.
+
+Smoothing - Running average settings in x and y, both as index of the axes vectors and in axis units. The "type" control holds the method currently used for the smoothing (running average filtering)
+
+
+AXES
+
+All the information contained in the "axis" structure of a dataset that was loaded into the main GUI.
+
+Axis labels - Labels of the x,y,z axes.
+
+Axis limits - Limits of the x,y,z axes
+
+
+LINE
+
+All the information contained in the "line" structure of a dataset that was loaded into the main GUI.
+
+Color - ... (More information will follow as soon as I sorted out how to implement this field.)
+
+Line settings - Line width, line style and markers for the current 1D display.
+
