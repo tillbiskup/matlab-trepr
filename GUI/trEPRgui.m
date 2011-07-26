@@ -118,7 +118,7 @@ ad.control.system.username = getenv('UserName');
 if isempty(ad.control.system.username)
     ad.control.system.username = getenv('USER'); 
 end
-ad.control.system.platform = platform;
+ad.control.system.platform = deblank(platform);
 ad.control.system.matlab = version;
 ad.control.system.trEPR = trEPRtoolboxRevision;
 
