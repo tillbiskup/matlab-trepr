@@ -1512,6 +1512,12 @@ function displaytype_popupmenu_Callback(source,~)
         % Get appdata of main window
         setappdata(hMainFigure,'control',ad.control);
 
+        % If no datasets are loaded, return
+        % NOTE: As we return only here, the display type gets set for later
+        if isempty(ad.data)
+            return;
+        end
+
         switch ad.control.axis.displayType
             case '2D plot'
                 set(gh.slider,'Enable','Off');
@@ -2025,7 +2031,8 @@ function updateSliderPanel()
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        if isempty(ad.acc.data)
+        if ~isfield(ad.acc,'data') || isempty(ad.acc.data) || ...
+                ~isfield(ad,'data') || isempty(ad.data)
             set(findall(...
                 allchild(gh.results_panel_position_panel),...
                 'Style','Edit'),'String','1');
@@ -2105,7 +2112,7 @@ function updateAxes()
         % Get handles from main window
         gh = guidata(mainWindow);
         
-        if isempty(ad.acc.data)
+        if ~isfield(ad.acc,'data') || isempty(ad.acc.data)
             % Display splash
             set(mainWindow,'CurrentAxes',gh.mainAxis);
             splash = imread(fullfile(trEPRtoolboxdir,...
