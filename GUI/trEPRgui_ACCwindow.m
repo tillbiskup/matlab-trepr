@@ -1027,6 +1027,9 @@ setappdata(hMainFigure,'acc',ad.acc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+msgStr = 'ACC GUI window opened';
+add2status(msgStr);
+
 
 % Load data from Main GUI
 mainGuiWindow = findobj('Tag','trepr_gui_mainwindow');
@@ -1462,6 +1465,7 @@ function pushbutton_Callback(~,~,action)
                     end
                 else
                     msgStr = {...
+                        'ACC GUI window closed.'...
                         'No datasets have been successfully accumulated. '...
                         'Alternatively, user discarded accumulation.'...
                         'Therefore, no dataset added.'
