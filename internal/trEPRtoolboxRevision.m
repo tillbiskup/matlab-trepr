@@ -1,60 +1,18 @@
-% Copyright (C) 2007 Till Biskup
+% TREPRTOOLBOXREVISION Return trEPR toolbox revision number and date
 %
-% This file ist free software.
+% Usage
+%   trEPRtoolboxRevision
+%   [revision] = trEPRtoolboxRevision;
+%   [revision,date] = trEPRtoolboxRevision;
 %
-%****f* global_scripts/trEPRtoolboxRevision.m
+% revision - string
+%            version number of the trEPR toolbox
+% date     - string
+%            date of the trEPR toolbox
 %
-% AUTHOR
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% MAINTAINER
-%	Till Biskup <till.biskup@physik.fu-berlin.de>
-% COPYRIGHT
-%	(c) 2007 Till Biskup
-%	This file is free software
-% CREATION DATE
-%	2007/06/27
-% VERSION
-%	$Revision: 1307 $
-% MODIFICATION DATE
-%	$Date: 2011-06-22 06:48:31 +0100 (Mi, 22 Jun 2011) $
-% KEYWORDS
-%	trEPR toolbox, revision, date
-%
-% SYNOPSIS
-%	trEPRtoolboxRevision
-%
-% DESCRIPTION
-%	Return the revision number and revision date of the current
-%	trEPR toolbox revision.
-%
-%	This script is used to centrally manage the revision number and date
-%	of the toolbox.
-%
-% INPUT PARAMETERS
-%	Currently, there are no input parameters
-%
-% OUTPUT PARAMETERS
-%	RevisionNumber (optional)
-%		current revision number of the trEPR toolbox
-%
-%	RevisionDate (optional)
-%		release date of the current revision of the trEPR toolbox
-%
-% EXAMPLE
-%	You can simply typein the function name. This will produce a similar
-%	output to the following:
-%
-%		>> trEPRtoolboxRevision
-%		0.1.1 2007-04-24
-%		>>
-%
-%	You can also call the function with one or two output parameters,
-%	as follows
-%
-%		[ RevisionNumber ] = trEPRtoolboxRevision;
-%		[ RevisionNumber, RevisionDate ] = trEPRtoolboxRevision;
-%
-% SOURCE
+
+% (c) 2007-11, Till Biskup
+% 2011-07-30
 
 function [ varargout ] = trEPRtoolboxRevision
 
@@ -84,8 +42,8 @@ function [ varargout ] = trEPRtoolboxRevision
 	% If you have questions, call the trEPRinfo routine at the command prompt and
 	% contact the maintainer via the email address given there.
 	
-	trEPRtoolboxRevisionNumber = '0.2.3b';
-	trEPRtoolboxRevisionDate = '2011-06-21';
+	trEPRtoolboxRevisionNumber = '0.3.0beta';
+	trEPRtoolboxRevisionDate = '2011-07-30';
 	
 	if (nargout == 1)
 		% in case the function is called with one output parameter
@@ -104,5 +62,3 @@ function [ varargout ] = trEPRtoolboxRevision
 		fprintf('%s %s\n',trEPRtoolboxRevisionNumber,trEPRtoolboxRevisionDate)
 	
 	end
-
-%******
