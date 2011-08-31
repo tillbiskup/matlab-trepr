@@ -1,6 +1,8 @@
-function status = update_mainAxis()
+function status = update_mainAxis(varargin)
 % UPDATE_MAINAXIS Helper function that updates the main axis
 %   of the trEPR GUI, namely trEPR_gui_mainwindow.
+%
+%   handle (optional) - figure handle to plot to
 %
 %   STATUS: return value for the exit status
 %           -1: no tEPR_gui_mainwindow found
@@ -43,9 +45,13 @@ setMinMax();
 ad = getappdata(mainWindow);
 
 % Set current axes to the main axes of main GUI
-mainAxes = findobj(allchild(gh.mainAxes_panel),...
-    'Type','axes','-not','Tag','legend');
-set(mainWindow,'CurrentAxes',mainAxes);
+if (nargin > 0) && ishandle(varargin{1})
+    mainAxes = newplot(varargin{1});
+else
+    mainAxes = findobj(allchild(gh.mainAxes_panel),...
+        'Type','axes','-not','Tag','legend');
+    set(mainWindow,'CurrentAxes',mainAxes);
+end
 
 % Just to be on the save side, check whether we have a currently active
 % spectrum
