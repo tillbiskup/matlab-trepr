@@ -1,3 +1,25 @@
+% FIG2FILE Save Matlab figure window to file
+%
+% Usage
+%   fig2file(figHandle,fileName,fileType);
+%   status = fig2file(figHandle,fileName,fileType);
+%
+% figHandle - handle
+%             Handle of the Matlab figure to be saved
+% fileName  - string
+%             Name of the file the figure should be saved to
+%             Should at least be a filename with extension
+% fileType  - string
+%             currently one out of: fig|eps|pdf|png
+%
+% status    - string
+%             Empty string if everything is fine
+%             Otherwise it contains an error description
+%
+
+% (c) 2011, Till Biskup
+% 2011-07-31
+
 function status = fig2file(figHandle,fileName,fileType)
 
 try
