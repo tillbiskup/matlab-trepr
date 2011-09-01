@@ -61,6 +61,7 @@ if isempty(ad.control.spectra.visible)
     set(visPanelChildren,'Enable','off');
     set(dTypePanelChildren,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
+    set(gh.display_panel_datasets_listbox,'Enable','off');
     set(gh.data_panel_visible_listbox,'Enable','off');
     set(gh.display_panel_displaytype_popupmenu,'Enable','off');
 else
@@ -69,6 +70,7 @@ else
     set(gh.data_panel_visible_listbox,'Enable','on');
     set(dTypePanelChildren,'Enable','on');
     set(gh.processing_panel_datasets_listbox,'Enable','on');
+    set(gh.display_panel_datasets_listbox,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
     set(gh.display_panel_displaytype_popupmenu,'Enable','on');
 
@@ -105,6 +107,15 @@ set(procPLbox,'String',labels);
 % Highlight currently active
 if ad.control.spectra.active
     set(procPLbox,'Value',find(vis==ad.control.spectra.active));
+end
+
+% Update list of spectra of the display panel
+dispPLbox = gh.display_panel_datasets_listbox;
+set(dispPLbox,'String',labels);
+
+% Highlight currently active
+if ad.control.spectra.active
+    set(dispPLbox,'Value',find(vis==ad.control.spectra.active));
 end
 
 

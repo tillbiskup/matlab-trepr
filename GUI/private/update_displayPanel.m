@@ -69,6 +69,40 @@ else
     set(editHandles,'Enable','On');
 end
 
+% Set line settings
+if ad.control.spectra.active
+    % Set line colour
+    if ischar(ad.data{ad.control.spectra.active}.line.color)
+        set(gh.display_panel_colour_type2_popupmenu,...
+            'Value',strfind('bgrcmyk',...
+            ad.data{ad.control.spectra.active}.line.color));
+    end
+    
+    % Set line width
+    set(gh.display_panel_linewidth_popupmenu,'Value',...
+        ad.data{ad.control.spectra.active}.line.width);
+
+    % Set line style
+    lineStyles = {'-','--',':','-.','none'};
+    lineStyle = ad.data{ad.control.spectra.active}.line.style;
+    for k=1:length(lineStyles)
+        if strcmp(lineStyles{k},lineStyle)
+            lineStyleIndex = k;
+        end
+    end
+    set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+    
+    % Set line marker
+    lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+    lineMarker = ad.data{ad.control.spectra.active}.line.marker;
+    for k=1:length(lineMarkers)
+        if strcmp(lineMarkers{k},lineMarker)
+            lineMarkerIndex = k;
+        end
+    end
+    set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+end
+
 % Update display type popupmenu
 displayTypes = cellstr(get(gh.display_panel_displaytype_popupmenu,'String'));
 for k=1:length(displayTypes)
