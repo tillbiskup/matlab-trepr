@@ -53,14 +53,18 @@ uicontrol('Tag','helptopic_text',...
     'Position',[10 guiSize(2)-70 100 20],...
     'String','Choose topic'...
     );
-uicontrol('Tag','helptopic_popupmenu',...
+hpm = uicontrol('Tag','helptopic_popupmenu',...
     'Style','popupmenu',...
     'Parent',hMainFigure,...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'pos',[120 guiSize(2)-70 guiSize(1)-130 20],...
-    'String','Introduction|Datasets|Settings|Results|Report|Key bindings',...
+    'String',sprintf('%s%s',...
+    'Welcome|New features|Key bindings|',...
+    'Load panel|Datasets panel|Slider panel|',...
+    'Measure panel|Display panel|Processing panel|',...
+    'Analysis panel|Help panel'),...
     'KeyPressFcn',@keypress_Callback,...
     'Callback',@helptext_popupmenu_Callback...
     );
@@ -105,10 +109,47 @@ try
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end
-    % Read text for welcome message from file and display it
-    helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','helptexts','ACC','intro.txt');
-    helpText = textFileRead(helpTextFile);
-    set(textdisplay,'String',helpText);
+    
+    % Try to show the help topic related to the currently active panel
+    % Get gui handles of main figure
+    % Get guihandles of main GUI window
+    mainWindow = guiGetWindowHandle;
+    mgh = guihandles(mainWindow);
+    if get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')
+        helpTopicOffset = 3;
+        switch get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')
+            case 'tbLoad'
+                helpText = 'Load panel';
+                set(hpm,'Value',helpTopicOffset+1);
+            case 'tbDatasets'
+                helpText = 'Datasets panel';
+                set(hpm,'Value',helpTopicOffset+2);
+            case 'tbSlider'
+                helpText = 'Slider panel';
+                set(hpm,'Value',helpTopicOffset+3);
+            case 'tbMeasure'
+                helpText = 'Measure panel';
+                set(hpm,'Value',helpTopicOffset+4);
+            case 'tbDisplay'
+                helpText = 'Display panel';
+                set(hpm,'Value',helpTopicOffset+5);
+            case 'tbProcessing'
+                helpText = 'Processing panel';
+                set(hpm,'Value',helpTopicOffset+6);
+            case 'tbAnalysis'
+                helpText = 'Analysis panel';
+                set(hpm,'Value',helpTopicOffset+7);
+            case 'tbHelp'
+                helpText = 'Help panel';
+                set(hpm,'Value',helpTopicOffset+8);
+            otherwise
+                % That shall never happen
+                add2status('trEPRgui_helpwindow(): Unknown panel');
+        end
+    else
+        helpText = 'Welcome';
+    end
+    helptext_selector(helpText);
 catch exception
     try
         msgStr = ['An exception occurred. '...
@@ -139,48 +180,7 @@ function helptext_popupmenu_Callback(source,~)
         helpTexts = cellstr(get(source,'String'));
         helpText = helpTexts{get(source,'Value')};
         
-        switch helpText
-            case 'Introduction'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','intro.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Datasets'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','datasets.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Settings'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','settings.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Results'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','results.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Report'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','report.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Key bindings'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','keybindings.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            otherwise
-                % That shall never happen
-                add2status('guiHelpPanel(): Unknown helptext');
-                set(textdisplay,'String','');
-        end
+        helptext_selector(helpText);
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -239,5 +239,102 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function helptext_selector(helpText)
+    try
+        switch helpText
+            case 'Welcome'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','welcome.txt');
+                helpText = textFileRead(helpTextFile);
+                % Workaround: Get rid of the second paragraph saying that one
+                % sees this text only until pressing one of the panel switch
+                % buttons.
+                helpText(3:4) = [];
+                set(textdisplay,'String',helpText);
+            case 'New features'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','newfeatures.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Key bindings'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','keybindings.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Load panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','load_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Datasets panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','datasets_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Slider panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','slider_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Measure panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','measure_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Display panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','display_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Processing panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','processing_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Analysis panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','analysis_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Help panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRtoolboxdir,'GUI','private','helptexts','main','help_panel.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            otherwise
+                % That shall never happen
+                add2status('trEPRgui_helpwindow(): Unknown helptext');
+                set(textdisplay,'String','');
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
 
 end

@@ -13,9 +13,9 @@ You can simply close the GUI window, even if there are modified spectra. So curr
 
 DATASETS PANEL
 
-"Line style" & "Get info"
+"Undo" & "Get info"
 
-These two functions are not implemented yet. But if you want to change the line style of a given dataset, you might manipulate manually its data structure via getappdata/setappdata. Details can be found on the toolbox webpage in the FAQ section.
+These two functions are not implemented yet.
 
 
 MEASURE
@@ -25,16 +25,16 @@ Not quite sure whether it works absolutely correct in case of zooming or other "
 
 DISPLAY
 
--= page 3/4 =-
+-= pages 4-6 =-
 
-Functions are not implemented yet.
+Most functions are not implemented yet, with the notable exception of "Export figure" function that exports (saves) the current display to figure files (Matlab FIG, EPS, PDF, or PNG format).
 
 
 PROCESSING
 
-"Baseline" & "Accumulate"
+"Baseline"
 
-These two functions are not implemented yet. A preview of each GUI window can bee seen using the shortcuts "F3" and "F4" respectively. 
+The baseline correction (BLC) is not implemented yet. A preview of a very preliminary version of its GUI window can bee seen using the shortcut "F3". 
 
 
 ANALYSIS

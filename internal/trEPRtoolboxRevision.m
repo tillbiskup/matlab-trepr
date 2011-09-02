@@ -12,7 +12,7 @@
 %
 
 % (c) 2007-11, Till Biskup
-% 2011-07-30
+% 2011-09-02
 
 function [ varargout ] = trEPRtoolboxRevision
 
@@ -43,7 +43,7 @@ function [ varargout ] = trEPRtoolboxRevision
 	% contact the maintainer via the email address given there.
 	
 	trEPRtoolboxRevisionNumber = '0.3.0beta';
-	trEPRtoolboxRevisionDate = '2011-07-30';
+	trEPRtoolboxRevisionDate = '2011-09-02';
 	
 	if (nargout == 1)
 		% in case the function is called with one output parameter
