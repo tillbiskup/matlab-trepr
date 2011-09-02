@@ -54,12 +54,10 @@ end
 % Change enable status of pushbuttons and other elements
 currActiveButtons = findobj('Parent',gh.data_panel_currentlyactive_panel);
 visPanelChildren = findobj('Parent',gh.data_panel_visible_panel,'-not','Style','Listbox');
-%dTypePanelChildren = findobj('Parent',gh.data_panel_displaytype_panel);
 if isempty(ad.control.spectra.visible)
     set(gh.data_panel_hide_pushbutton,'Enable','off');
     set(currActiveButtons,'Enable','off');
     set(visPanelChildren,'Enable','off');
-%    set(dTypePanelChildren,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
     set(gh.display_panel_datasets_listbox,'Enable','off');
     set(gh.data_panel_visible_listbox,'Enable','off');
@@ -70,7 +68,6 @@ else
     set(gh.data_panel_hide_pushbutton,'Enable','on');
     set(currActiveButtons,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
-%    set(dTypePanelChildren,'Enable','on');
     set(gh.processing_panel_datasets_listbox,'Enable','on');
     set(gh.display_panel_datasets_listbox,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');

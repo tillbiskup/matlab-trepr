@@ -18,7 +18,7 @@
 %
 
 % (c) 2011, Till Biskup
-% 2011-07-31
+% 2011-08-31
 
 function status = fig2file(figHandle,fileName,fileType)
 
