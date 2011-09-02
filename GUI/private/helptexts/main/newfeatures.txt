@@ -1,0 +1,22 @@
+
+WHAT'S NEW IN THE TREPR TOOLBOX/GUI?
+
+Basically, the complete toolbox got reimplemented for version 0.3, and the GUI rewritten with a complete new layout (and underlying code).
+
+
+-= New features in v. 0.3.0beta =-
+
+An incomplete list of changes within v. 0.3.0beta as of early September 2011, in decreasing order of their implementation date:
+
+* This help window
+
+* Permanently visible help button in main GUI, opening context-sensitive help for the currently active panel.
+
+* Display type and prev/next buttons for spectra permanently visible
+
+* Export current display to independent Matlab(r) figure
+
+* Export current display to file (Matlab(r) FIG, EPS, PDF, or PNG)
+
+* Line settings for currently active dataset (colour, line width, style, marker) 
+
