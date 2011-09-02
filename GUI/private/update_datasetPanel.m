@@ -20,12 +20,12 @@ gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
 
 % Update display type popupmenu
-displayTypes = cellstr(get(gh.data_panel_displaytype_popupmenu,'String'));
-for k=1:length(displayTypes)
-    if strcmp(displayTypes(k),ad.control.axis.displayType)
-        set(gh.data_panel_displaytype_popupmenu,'Value',k)
-    end
-end
+% displayTypes = cellstr(get(gh.data_panel_displaytype_popupmenu,'String'));
+% for k=1:length(displayTypes)
+%     if strcmp(displayTypes(k),ad.control.axis.displayType)
+%         set(gh.data_panel_displaytype_popupmenu,'Value',k)
+%     end
+% end
 
 status = 0;
 

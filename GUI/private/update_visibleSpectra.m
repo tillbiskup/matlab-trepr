@@ -54,25 +54,29 @@ end
 % Change enable status of pushbuttons and other elements
 currActiveButtons = findobj('Parent',gh.data_panel_currentlyactive_panel);
 visPanelChildren = findobj('Parent',gh.data_panel_visible_panel,'-not','Style','Listbox');
-dTypePanelChildren = findobj('Parent',gh.data_panel_displaytype_panel);
+%dTypePanelChildren = findobj('Parent',gh.data_panel_displaytype_panel);
 if isempty(ad.control.spectra.visible)
     set(gh.data_panel_hide_pushbutton,'Enable','off');
     set(currActiveButtons,'Enable','off');
     set(visPanelChildren,'Enable','off');
-    set(dTypePanelChildren,'Enable','off');
+%    set(dTypePanelChildren,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
     set(gh.display_panel_datasets_listbox,'Enable','off');
     set(gh.data_panel_visible_listbox,'Enable','off');
-    set(gh.display_panel_displaytype_popupmenu,'Enable','off');
+    set(gh.displaytype_popupmenu,'Enable','off');
+    set(gh.previous_pushbutton,'Enable','off');
+    set(gh.next_pushbutton,'Enable','off');
 else
     set(gh.data_panel_hide_pushbutton,'Enable','on');
     set(currActiveButtons,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
-    set(dTypePanelChildren,'Enable','on');
+%    set(dTypePanelChildren,'Enable','on');
     set(gh.processing_panel_datasets_listbox,'Enable','on');
     set(gh.display_panel_datasets_listbox,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
-    set(gh.display_panel_displaytype_popupmenu,'Enable','on');
+    set(gh.displaytype_popupmenu,'Enable','on');
+    set(gh.previous_pushbutton,'Enable','on');
+    set(gh.next_pushbutton,'Enable','on');
 
     % Show additional controls in visible_listbox only if there are more
     % than two datasets currently visible
@@ -92,8 +96,8 @@ else
     
     % Set displayType in ad.control.axis
     if isempty(ad.control.axis.displayType)
-        displayTypes = cellstr(get(gh.data_panel_displaytype_popupmenu,'String'));
-        displayType = displayTypes{get(gh.data_panel_displaytype_popupmenu,'Value')};
+        displayTypes = cellstr(get(gh.displaytype_popupmenu,'String'));
+        displayType = displayTypes{get(gh.displaytype_popupmenu,'Value')};
         ad.control.axis.displayType = displayType;
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
