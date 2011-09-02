@@ -1233,6 +1233,9 @@ function previous_pushbutton_Callback(~,~)
         % Update slider panel
         update_sliderPanel();
         
+        % Update display panel
+        update_displayPanel();
+        
         % Update visible spectra listboxes (in diverse panels!)
         update_visibleSpectra();
         
@@ -1299,6 +1302,9 @@ function next_pushbutton_Callback(~,~)
         
         % Update slider panel
         update_sliderPanel();
+        
+        % Update display panel
+        update_displayPanel();
         
         % Update visible spectra listboxes (in diverse panels!)
         update_visibleSpectra();

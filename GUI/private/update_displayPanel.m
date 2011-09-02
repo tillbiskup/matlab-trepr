@@ -103,13 +103,14 @@ if ad.control.spectra.active
     set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
 end
 
-% % Update display type popupmenu
-% displayTypes = cellstr(get(gh.display_panel_displaytype_popupmenu,'String'));
-% for k=1:length(displayTypes)
-%     if strcmp(displayTypes(k),ad.control.axis.displayType)
-%         set(gh.display_panel_displaytype_popupmenu,'Value',k)
-%     end
-% end
+% Set 3D export panel
+if ad.control.spectra.active
+    [dimx,dimy] = size(ad.data{ad.control.spectra.active}.data);
+    set(gh.display_panel_3D_original_x_edit,'String',num2str(dimy));
+    set(gh.display_panel_3D_original_y_edit,'String',num2str(dimx));
+    set(gh.display_panel_3D_size_x_edit,'String',num2str(dimy));
+    set(gh.display_panel_3D_size_y_edit,'String',num2str(dimx));
+end
 
 status = 0;
 
