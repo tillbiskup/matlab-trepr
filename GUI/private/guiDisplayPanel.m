@@ -1055,7 +1055,7 @@ uicontrol('Tag','display_panel_3D_factor_x_edit',...
     'Position',[100 200 (handle_size(3)-130)/2 25],...
     'String','1',...
     'TooltipString','Factor by which to reduce the number of datapoints in x',...
-    'Callback',{@threeDdisplay_edit_Callback,'xfactor'}...
+    'Callback',{@show3d_edit_Callback,'xfactor'}...
     );
 uicontrol('Tag','display_panel_3D_factor_y_edit',...
     'Style','edit',...
@@ -1066,7 +1066,7 @@ uicontrol('Tag','display_panel_3D_factor_y_edit',...
     'Position',[100+(handle_size(3)-130)/2 200 (handle_size(3)-130)/2 25],...
     'String','1',...
     'TooltipString','Factor by which to reduce the number of datapoints in y',...
-    'Callback',{@threeDdisplay_edit_Callback,'yfactor'}...
+    'Callback',{@show3d_edit_Callback,'yfactor'}...
     );
 uicontrol('Tag','display_panel_3D_size_text',...
     'Style','text',...
@@ -1120,8 +1120,7 @@ uicontrol('Tag','display_panel_offset_auto_checkbox',...
     'Position',[100 140 handle_size(3)-120 20],...
     'String',' automatic',...
     'TooltipString','Toggle between automatic and manual offset',...
-    'Value',1,...
-    'Callback',{@highlight_checkbox_Callback}...
+    'Value',1 ...
     );
 uicontrol('Tag','display_panel_3D_offset_type_popupmenu',...
     'Style','popupmenu',...
@@ -1142,7 +1141,7 @@ uicontrol('Tag','display_panel_3D_offset_x_edit',...
     'Position',[100 110 (handle_size(3)-130)/2 25],...
     'String','0',...
     'TooltipString','Offset by which to shift the (reduced) data in x',...
-    'Callback',{@threeDdisplay_edit_Callback,'xoffset'}...
+    'Callback',{@show3d_edit_Callback,'xoffset'}...
     );
 uicontrol('Tag','display_panel_3D_offset_y_edit',...
     'Style','edit',...
@@ -1153,7 +1152,7 @@ uicontrol('Tag','display_panel_3D_offset_y_edit',...
     'Position',[100+(handle_size(3)-130)/2 110 (handle_size(3)-130)/2 25],...
     'String','0',...
     'TooltipString','Offset by which to shift the (reduced) data in y',...
-    'Callback',{@threeDdisplay_edit_Callback,'yoffset'}...
+    'Callback',{@show3d_edit_Callback,'yoffset'}...
     );
 uicontrol('Tag','display_panel_3D_display_type_text',...
     'Style','text',...
@@ -2439,7 +2438,7 @@ function axesexport_pushbutton_Callback(~,~)
     end
 end
 
-function threeDdisplay_edit_Callback(source,~,label)
+function show3d_edit_Callback(source,~,label)
     try
         % Get appdata and handles of main window
         mainWindow = guiGetWindowHandle;
@@ -2448,6 +2447,9 @@ function threeDdisplay_edit_Callback(source,~,label)
         
         switch label
             case 'xfactor'
+                if isnan(str2double(get(source,'String')))
+                    set(source,'String','1');
+                end
                 if (round(str2double(get(source,'String'))) < 1)
                     set(source,'String','1');
                 end
@@ -2459,6 +2461,9 @@ function threeDdisplay_edit_Callback(source,~,label)
                 set(source,'String',...
                     round(str2double(get(source,'String'))));
             case 'yfactor'
+                if isnan(str2double(get(source,'String')))
+                    set(source,'String','1');
+                end
                 if (round(str2double(get(source,'String'))) < 1)
                     set(source,'String','1');
                 end
@@ -2471,6 +2476,9 @@ function threeDdisplay_edit_Callback(source,~,label)
                     round(str2double(get(source,'String'))));
             case 'xoffset'
                 [~,dimx] = size(ad.data{ad.control.spectra.active}.data);
+                if isnan(str2double(get(source,'String')))
+                    set(source,'String','0');
+                end
                 if (round(str2double(get(source,'String'))) < 0)
                     set(source,'String','0');
                 end
@@ -2484,6 +2492,9 @@ function threeDdisplay_edit_Callback(source,~,label)
                     round(str2double(get(source,'String'))));
             case 'yoffset'
                 [dimy,~] = size(ad.data{ad.control.spectra.active}.data);
+                if isnan(str2double(get(source,'String')))
+                    set(source,'String','0');
+                end
                 if (round(str2double(get(source,'String'))) < 0)
                     set(source,'String','0');
                 end
@@ -2526,6 +2537,13 @@ end
 
 function show3d_pushbutton_Callback(~,~)
     try
+        % Make 3D representation window effectively a singleton
+        singleton = findobj('Tag','trepr_gui_3Drepresentation');
+        if (singleton)
+            figure(singleton);
+            return;
+        end
+
         % Get appdata and handles of main window
         mainWindow = guiGetWindowHandle;
         ad = getappdata(mainWindow);
@@ -2535,7 +2553,7 @@ function show3d_pushbutton_Callback(~,~)
         if isempty(ad.control.spectra.active) || ~ad.control.spectra.active 
             return;
         end
-        
+                
         % Get 3D representation type
         representationTypes = cellstr(...
             get(gh.display_panel_3D_display_type_popupmenu,'String'));
@@ -2568,6 +2586,9 @@ function show3d_pushbutton_Callback(~,~)
         figHandle = threeDrepresentation(...
             ad.data{ad.control.spectra.active},...
             threeDrepresentationParameters);
+        
+        % Set tag for figure window containing 3D representation
+        set(figHandle,'Tag','trepr_gui_3Drepresentation');
 
     catch exception
         try
@@ -2589,7 +2610,54 @@ function show3d_pushbutton_Callback(~,~)
 end
 function export3d_pushbutton_Callback(~,~)
     try
-        return;
+        % Look for 3D representation window
+        figHandle = findobj('Tag','trepr_gui_3Drepresentation');
+        if isempty(figHandle)
+            return;
+        end
+        
+        % Get appdata and handles of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
+        
+        % Set focus on figure window with 3D representation
+        figure(figHandle);
+
+        % Get file type to save to
+        fileTypes = cellstr(...
+            get(gh.display_panel_3D_filetype_popupmenu,'String'));
+        fileType = fileTypes{...
+            get(gh.display_panel_3D_filetype_popupmenu,'Value')};
+        
+        % Generate default file name if possible, be very defensive
+        if ad.control.spectra.visible
+            [p,f,e] = ...
+                fileparts(ad.data{ad.control.spectra.active}.filename);
+            fileNameSuggested = [f '-3D'];
+            clear p f e;
+        else
+            fileNameSuggested = '';
+        end
+        
+        % Ask user for file name
+        [fileName,pathName] = uiputfile(...
+            sprintf('*.%s',fileType),...
+            'Get filename to export 3D representation to',...
+            fileNameSuggested);
+        % If user aborts process, return
+        if fileName == 0
+            return;
+        end
+        % Create filename with full path
+        fileName = fullfile(pathName,fileName);
+        
+        % Save figure, depending on settings for file type and format
+        status = fig2file(figHandle,fileName,fileType);
+        if status
+            add2status(msg);
+        end
+        
     catch exception
         try
             msgStr = ['An exception occurred. '...

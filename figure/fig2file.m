@@ -28,7 +28,7 @@ try
             set(figHandle,'Visible','On');
             saveas(figHandle,fileName,'fig');
         case 'eps'
-            print(figHandle,'-depsc',fileName);
+            print(figHandle,'-depsc2',fileName);
         case 'pdf'
             print(figHandle,'-dpdf',fileName);
         case 'png'
