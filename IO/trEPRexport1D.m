@@ -6,6 +6,9 @@
 %
 % data       - struct
 %              data to plot
+%              The actual data are in the field 'data', as the data struct
+%              is assumed to originate from the trEPR toolbox and the
+%              respective importer (trEPRload) function.
 % fileName   - string
 %              Name of the file the figure should be saved to
 %              Should at least be a filename with extension
@@ -27,6 +30,12 @@ try
     % Check whether we have data
     if ~isfield(data,'data') || isempty(data.data)
         status = 'No data';
+        return;
+    end
+    
+    % Check whether data are 2D
+    if min(size(data.data)) < 2
+        status = 'Data are (most probably) not 2D';
         return;
     end
     
@@ -159,7 +168,7 @@ try
             if strcmpi(parameters.crosssection.direction,'x') ...
                     && isfield(data.display.smoothing,'x') ...
                     && (data.display.smoothing.x.value > 1) ...
-                    && isfield(data.display.smoothing.y,'filterfun')
+                    && isfield(data.display.smoothing.x,'filterfun')
                 filterfun = str2func(data.display.smoothing.x.filterfun);
                 crosssection = ...
                     filterfun(crosssection,data.display.smoothing.x.value);
@@ -205,6 +214,7 @@ try
             % Handle not supported file types
             status = sprintf('File type %s (currently) not supported',...
                 parameters.filetype);
+            return;
     end
     
     % Finally, set status to empty string

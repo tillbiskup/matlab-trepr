@@ -961,7 +961,8 @@ uicontrol('Tag','display_panel_dataexport_pushbutton',...
     'String','Export',...
     'TooltipString',sprintf('%s\n%s',...
     'Export currently active dataset in current (x or y) display',...
-    'to file with given type')...
+    'to file with given type'),...
+    'Callback',{@dataexport_pushbutton_Callback}...
     );
 
 handle_p12 = uipanel('Tag','display_panel_3Ddisplay_panel',...
@@ -1447,11 +1448,11 @@ function axislimits_edit_Callback(source,~,limit)
         
         switch limit
             case 'xmin'
-                ad.control.axis.limits.x.min = str2num(get(source,'String'));
+                ad.control.axis.limits.x.min = str2double(get(source,'String'));
             case 'xmax'
                 % Test whether value is larger than min for same axis
                 if (str2num(get(source,'String')) > ad.control.axis.limits.x.min)
-                    ad.control.axis.limits.x.max = str2num(get(source,'String'));
+                    ad.control.axis.limits.x.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.x.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
@@ -1459,11 +1460,11 @@ function axislimits_edit_Callback(source,~,limit)
                     return;
                 end
             case 'ymin'
-                ad.control.axis.limits.y.min = str2num(get(source,'String'));
+                ad.control.axis.limits.y.min = str2double(get(source,'String'));
             case 'ymax'
                 % Test whether value is larger than min for same axis
                 if (str2num(get(source,'String')) > ad.control.axis.limits.y.min)
-                    ad.control.axis.limits.y.max = str2num(get(source,'String'));
+                    ad.control.axis.limits.y.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.y.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
@@ -1471,11 +1472,11 @@ function axislimits_edit_Callback(source,~,limit)
                     return;
                 end
             case 'zmin'
-                ad.control.axis.limits.z.min = str2num(get(source,'String'));
+                ad.control.axis.limits.z.min = str2double(get(source,'String'));
             case 'zmax'
                 % Test whether value is larger than min for same axis
                 if (str2num(get(source,'String')) > ad.control.axis.limits.z.min)
-                    ad.control.axis.limits.z.max = str2num(get(source,'String'));
+                    ad.control.axis.limits.z.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.z.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
@@ -2414,11 +2415,101 @@ function axesexport_pushbutton_Callback(~,~)
         % Save figure, depending on settings for file type and format
         status = fig2file(newFig,fileName,fileType);
         if status
-            add2status(msg);
+            add2status(status);
         end
         
         % Close figure window
         close(newFig);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function dataexport_pushbutton_Callback(~,~)
+    try
+        % Get appdata and handles of main window
+        mainWindow = guiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
+
+        % Get file type to save to
+        fileTypes = cellstr(...
+            get(gh.display_panel_dataexport_filetype_popupmenu,'String'));
+        fileType = fileTypes{...
+            get(gh.display_panel_dataexport_filetype_popupmenu,'Value')};
+        
+        % Generate default file name if possible, be very defensive
+        if ad.control.spectra.visible
+            [p,f,e] = ...
+                fileparts(ad.data{ad.control.spectra.visible(1)}.filename);
+            fileNameSuggested = [f '-1Dcrosssection'];
+            clear p f e;
+        else
+            fileNameSuggested = '';
+        end
+        
+        switch fileType
+            case 'ASCII'
+                fileExtension = 'dat';
+            otherwise
+                fileExtension = '';
+        end
+        
+        % Ask user for file name
+        [fileName,pathName] = uiputfile(...
+            sprintf('*.%s',fileExtension),...
+            'Get filename to save 1D cross section of currently active dataset to',...
+            fileNameSuggested);
+        % If user aborts process, return
+        if fileName == 0
+            return;
+        end
+        % Create filename with full path
+        fileName = fullfile(pathName,fileName);
+        
+        % Create parameters structure
+        export1Dparameters = struct();
+        switch ad.control.axis.displayType
+            case '1D along x'
+                export1Dparameters.crosssection.direction = 'x';
+                export1Dparameters.crosssection.position = ...
+                    ad.data{ad.control.spectra.active}.display.position.y;
+            case '1D along y'
+                export1Dparameters.crosssection.direction = 'y';
+                export1Dparameters.crosssection.position = ...
+                    ad.data{ad.control.spectra.active}.display.position.x;
+            otherwise
+                msg = 'Cannot determine cross section direction (2D mode)';
+                add2status(msg);
+        end
+        export1Dparameters.header.character = ...
+            get(gh.display_panel_dataexport_header_edit,'String');
+        export1Dparameters.axis.include = ...
+            get(gh.display_panel_dataexport_includeaxis_checkbox,'Value');
+        export1Dparameters.file.type = fileType;
+        export1Dparameters.file.overwrite = 1;
+        
+        % Save 1D cross section, depending on settings for file type and
+        % additional parameters
+        status = trEPRexport1D(...
+            ad.data{ad.control.spectra.active},fileName,export1Dparameters);
+        if status
+            add2status(status);
+        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -2608,6 +2699,7 @@ function show3d_pushbutton_Callback(~,~)
         end
     end
 end
+
 function export3d_pushbutton_Callback(~,~)
     try
         % Look for 3D representation window
