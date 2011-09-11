@@ -24,7 +24,9 @@ hMainFigure = figure('Tag','trepr_gui_statuswindow',...
     'Position',[30,50,950,250],...
     'Resize','off',...
     'NumberTitle','off', ...
-    'Menu','none','Toolbar','none');
+    'Menu','none','Toolbar','none',...
+    'KeyPressFcn',@keyBindings,...
+    'CloseRequestFcn',@closeGUI);
 
 defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
@@ -71,6 +73,69 @@ update_statuswindow(statusstring);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function closeGUI(~,~)
+    try
+        delete(hMainFigure);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            TAgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function keyBindings(src,evt)
+    try
+    if ~isempty(evt.Modifier)
+        if (strcmpi(evt.Modifier{1},'command')) || ...
+                (strcmpi(evt.Modifier{1},'control'))
+            switch evt.Key
+                case 'w'
+                    closeGUI();
+                    return;
+                otherwise
+                    return;
+            end
+        end
+    end
+    switch evt.Key
+        case 'f1'
+            return;
+        otherwise
+%             disp(evt);
+%             fprintf('       Caller: %i\n\n',src);
+            return;
+    end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            TAgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
