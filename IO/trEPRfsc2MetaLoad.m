@@ -185,6 +185,7 @@ end
 % fieldName - string
 %             string containing the valid field name for a struct
 function fieldName = str2fieldName(string)
+
 % Eliminate brackets
 string = strrep(strrep(string,')',''),'(','');
 fieldName = regexp(lower(string),' ','split');
@@ -202,32 +203,26 @@ end
 
 % PARSEBLOCKS Internal function parsing blocks of the metafile
 %
+% A given block is parsed, the lines split by the first appearance of the
+% delimiter ":", the first part converted into a field name for a struct
+% and  the second part assigned to that field of the struct.
+%
 % blockData  - cell array of strings
 %              block data to be parsed
 % parameters - struct
 %              structure containing key-value pairs
 function parameters = parseBlocks(blockData)
+
 % Assign output parameter
 parameters = struct();
-% Parse parameter file entries
-% 1st step: split lines into single strings
 blockLines = cellfun(...
-    @(x) regexp(x,':','split'),...
+    @(x) regexp(x,':','split','once'),...
     blockData,...
     'UniformOutput', false);
 for k=1:length(blockLines)
     % Fill parameters structure
     if ~isempty(blockLines{k}{1}) % Prevent empty lines being parsed
         if isnan(str2double(blockLines{k}{2}))
-            % If there is more than one split string (here: ":"),
-            % restore the original string
-            % (Bit tricky, see Matlab help for regexp for details)
-            if length(blockLines{k}(2:end)) > 1
-                splitstr = cell(1,length(blockLines{k}(2:end))-1);
-                splitstr(:) = cellstr(':');
-                tmpCell = [blockLines{k}(2:end); [splitstr {''}]];
-                blockLines{k}{2} = [tmpCell{:}];
-            end
             parameters = setfield(parameters,...
                 str2fieldName(blockLines{k}{1}),...
                 strtrim(blockLines{k}{2})...
