@@ -18,7 +18,7 @@
 %
 
 % (c) 2011, Till Biskup
-% 2011-08-31
+% 2011-09-23
 
 function status = fig2file(figHandle,fileName,fileType)
 
@@ -28,7 +28,7 @@ try
             set(figHandle,'Visible','On');
             saveas(figHandle,fileName,'fig');
         case 'eps'
-            print(figHandle,'-depsc2',fileName);
+            print(figHandle,'-depsc2','-painters',fileName);
         case 'pdf'
             print(figHandle,'-dpdf',fileName);
         case 'png'
