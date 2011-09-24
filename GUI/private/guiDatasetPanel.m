@@ -527,10 +527,10 @@ function remove_pushbutton_Callback(~,~)
         
         % Remove from modified if it's there
         ad.control.spectra.modified(...
-            find(ad.control.spectra.modified == selectedId)) = [];
+            ad.control.spectra.modified == selectedId) = [];
         % Remove from missing if it's there
         ad.control.spectra.missing(...
-            find(ad.control.spectra.missing == selectedId)) = [];
+            ad.control.spectra.missing == selectedId) = [];
         
         
         % Delete in visible
@@ -538,19 +538,19 @@ function remove_pushbutton_Callback(~,~)
         
         % Shift numbering in spectra.visible and spectra.invisible
         if (~isempty(ad.control.spectra.visible))
-            indices = find(ad.control.spectra.visible>selected);
+            indices = find(ad.control.spectra.visible>selectedId);
             ad.control.spectra.visible(indices) = ...
                 ad.control.spectra.visible(indices)-1;
         end
         if (~isempty(ad.control.spectra.invisible))
-            indices = find(ad.control.spectra.invisible>selected);
+            indices = find(ad.control.spectra.invisible>selectedId);
             ad.control.spectra.invisible(indices) = ...
                 ad.control.spectra.invisible(indices)-1;
         end
         
         % Shift numbering in spectra.modified
         if (~isempty(ad.control.spectra.modified))
-            indices = find(ad.control.spectra.modified>selected);
+            indices = find(ad.control.spectra.modified>selectedId);
             ad.control.spectra.modified(indices) = ...
                 ad.control.spectra.modified(indices)-1;
         end
