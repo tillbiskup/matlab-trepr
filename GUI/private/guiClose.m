@@ -3,8 +3,8 @@ function guiClose()
 try
     % TODO: Check whether there is anything that is not saved...
     
-    % Close GUI
-    delete(guiGetWindowHandle);
+    % Close all GUI windows currently open
+    delete(findobj('-regexp','Tag','trepr_gui_*'));
     
 catch exception
     % Hm... that should really not happen.

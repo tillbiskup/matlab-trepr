@@ -11,14 +11,14 @@ function varargout = trEPRgui_helpwindow(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trEPRgui_helpwindow');
+singleton = findobj('Tag','trepr_gui_helpwindow');
 if (singleton)
     figure(singleton);
     return;
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trEPRgui_helpwindow',...
+hMainFigure = figure('Tag','trepr_gui_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : ACC : Help Window',...
     'Units','Pixels',...
