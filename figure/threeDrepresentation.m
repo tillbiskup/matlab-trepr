@@ -105,6 +105,8 @@ try
             switch parameters.type
                 case 'surf'
                     parameters.surface.MeshStyle = 'row';
+                case 'surfc'
+                    parameters.surface.MeshStyle = 'row';
                 case 'mesh'
                     parameters.surface.MeshStyle = 'both';
             end
@@ -112,6 +114,8 @@ try
         if ~isfield(parameters.surface,'LineStyle')
             switch parameters.type
                 case 'surf'
+                    parameters.surface.LineStyle = '-';
+                case 'surfc'
                     parameters.surface.LineStyle = '-';
                 case 'trisurf'
                     parameters.surface.LineStyle = 'none';
@@ -121,6 +125,9 @@ try
         parameters.surface.EdgeColor = [0.7 0.7 0.7];
         switch parameters.type
             case 'surf'
+                parameters.surface.MeshStyle = 'row';
+                parameters.surface.LineStyle = '-';
+            case 'surfc'
                 parameters.surface.MeshStyle = 'row';
                 parameters.surface.LineStyle = '-';
             case 'mesh'
@@ -137,9 +144,14 @@ try
     switch parameters.type
         case 'surf'
             hSurf = surf(hAxes,x,y,z);
-             set(hSurf,'EdgeColor',parameters.surface.EdgeColor);
-             set(hSurf,'MeshStyle',parameters.surface.MeshStyle);
-             set(hSurf,'LineStyle',parameters.surface.LineStyle);
+            set(hSurf,'EdgeColor',parameters.surface.EdgeColor);
+            set(hSurf,'MeshStyle',parameters.surface.MeshStyle);
+            set(hSurf,'LineStyle',parameters.surface.LineStyle);
+        case 'surfc'
+            hSurfC = surfc(hAxes,x,y,z,...
+                'MeshStyle',parameters.surface.MeshStyle,...
+                'EdgeColor',parameters.surface.EdgeColor);
+            set(hSurfC,'LineStyle',parameters.surface.LineStyle);
         case 'mesh'
             hMesh = mesh(hAxes,x,y,z);
             set(hMesh,'MeshStyle',parameters.surface.MeshStyle);
