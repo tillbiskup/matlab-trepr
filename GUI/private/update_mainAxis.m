@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Is there currently a trEPRgui object?
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
