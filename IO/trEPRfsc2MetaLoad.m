@@ -1,4 +1,4 @@
-function [data,message] = trEPRfsc2MetaLoad(filename)
+function [data,warnings] = trEPRfsc2MetaLoad(filename)
 % TREPRFSC2METALOAD Read metafile of fsc2 recorded transient spectra
 %
 % Usage
@@ -10,14 +10,14 @@ function [data,message] = trEPRfsc2MetaLoad(filename)
 % data     - struct
 %            structure containing data and additional fields
 %
-% warning  - cell array of strings
+% warnings - cell array of strings
 %            empty if there are no warnings
 %
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 
 % (c) 2011, Till Biskup
-% 2011-09-13
+% 2011-10-29
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -27,6 +27,8 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('filename', @(x)ischar(x));
 p.parse(filename);
+
+warnings = cell(0);
 
 % Define identifierString for metafile file format
 identifierString = 'metadata fsc2 program trEPR';
@@ -38,7 +40,10 @@ try
     % If there is no filename specified, return
     if isempty(filename)
         data = struct();
-        message = {'No filename or file does not exist'};
+        warnings{end+1} = struct(...
+            'identifier','trEPRfsc2MetaLoad:nofile',...
+            'message','No filename or file does not exist'...
+            );
         return;
     end
     % If filename does not exist, try to add extension
@@ -48,7 +53,10 @@ try
             filename = fullfile(fpath,[fname '.meta']);
         else
             data = struct();
-            message = {'No filename or file does not exist'};
+            warnings{end+1} = struct(...
+                'identifier','trEPRfsc2MetaLoad:nofile',...
+                'message','No filename or file does not exist'...
+                );
             return;
         end
     end
@@ -71,7 +79,10 @@ try
     % Check for correct file format
     if ~findstr(metaFile{1},identifierString)
             data = struct();
-            message = {'File seems to be of wrong format'};
+            warnings{end+1} = struct(...
+                'identifier','trEPRfsc2MetaLoad:fileformat',...
+                'message','File seems to be of wrong format'...
+                );
             return;
     end
     
@@ -171,9 +182,6 @@ try
     data = struct();
     
     data = block;
-    
-    % Assinging empty cell array to warning
-    message = cell(0);    
 catch exception
     throw(exception);
 end
