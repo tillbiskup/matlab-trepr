@@ -19,17 +19,19 @@ function varargout = trEPRspeksimLoad(filename, varargin)
     
     if iscell(filename)
         % Read all files and combine them
-        content = loadFile(filename,'combine');
+        [content,warnings] = loadFile(filename,'combine');
         % assign output argument
         if ~nargout
             % of no output argument is given, assign content to
             % a variable in the workspace with the same name as
             % the file
-            [pathstr, name, ext] = fileparts(filename{1});
+            [~, name, ext] = fileparts(filename{1});
             name = cleanFileName([name ext]);
             assignin('base',name,content);
+            assignin('base','warnings',warnings);
         else
             varargout{1} = content;
+            varargout{2} = warnings;
         end
     else
         switch exist(filename)
@@ -40,34 +42,38 @@ function varargout = trEPRspeksimLoad(filename, varargin)
                     fprintf('%s does not exist...\n',filename);
                 else
                     % Read all files and combine them
-                    content = loadFile(filename,'all');
+                    [content,warnings] = loadFile(filename,'all');
                     % assign output argument
                     if ~nargout
                         % of no output argument is given, assign content to
                         % a variable in the workspace with the same name as
                         % the file
-                        [pathstr, name, ext] = fileparts(filename);
+                        [~, name, ext] = fileparts(filename);
                         name = cleanFileName([name ext]);
                         assignin('base',name,content);
+                        assignin('base','warnings',warnings);
                     else
                         varargout{1} = content;
+                        varargout{2} = warnings;
                     end
                 end
             case 2
                 % If name is an M-file on your MATLAB search path. It also
                 % returns 2 when name is the full pathname to a file or the
                 % name of an ordinary file on your MATLAB search path.
-                content = loadFile(filename);
+                [content,warnings] = loadFile(filename);
                 % assign output argument
                 if ~nargout
                     % of no output argument is given, assign content to a
                     % variable in the workspace with the same name as the
                     % file
-                    [pathstr, name, ext] = fileparts(filename);
+                    [~, name, ext] = fileparts(filename);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content);
+                    assignin('base','warnings',warnings);
                 else
                     varargout{1} = content;
+                    varargout{2} = warnings;
                 end
             case 7
                 % If name is a directory.
@@ -80,6 +86,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
     
     if ~exist('content','var') && nargout
         varargout{1} = [];
+        varargout{2} = [];
     end
 
 end
@@ -87,9 +94,10 @@ end
     
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
-function content = loadFile(filename,varargin)
-    % Assign an empty struct to the output argument
+function [content,warnings] = loadFile(filename,varargin)
+    % Assign an empty struct/cell to the output arguments
     content = struct();
+    warnings = cell(0);
 
     % Check for additional input argument
     if nargin > 1 && strcmp(varargin{1},'all')
@@ -242,10 +250,12 @@ function content = loadFile(filename,varargin)
         % If only a single filename is provided as input argument
         % Check whether file is in speksim format.
         if ~checkFileFormat(filename)
-            warning(...
-                'trEPRspeksimLoad:wrongformat',...
+            warnings{end+1} = struct(...
+                'identifier','trEPRspeksimLoad:wrongformat',...
+                'message',sprintf(...
                 'File %s seems not to be in speksim format...',...
-                filename);
+                filename)...
+                );
             return
         end
 
@@ -301,6 +311,9 @@ function content = loadFile(filename,varargin)
         content.parameters.recorder.sensitivity.value = [];
         content.parameters.recorder.sensitivity.unit = '';
     end
+    
+    % Set Version string of content structure
+    content.version = '1.1';
 end
 
 % --- Check whether the file is in speksim format

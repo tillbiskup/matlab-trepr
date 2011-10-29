@@ -1,4 +1,4 @@
-function [data,message] = trEPRbrukerBES3Tload(filename)
+function [data,warnings] = trEPRbrukerBES3Tload(filename)
 % TREPRBRUKERBES3TLOAD Read Bruker Xepr ASCII export of transient spectra
 %
 % Usage
@@ -10,7 +10,7 @@ function [data,message] = trEPRbrukerBES3Tload(filename)
 % data     - struct
 %            structure containing data and additional fields
 %
-% warning  - cell array of strings
+% warnings - cell array of strings
 %            empty if there are no warnings
 %
 % If no data could be loaded, data is an empty struct.
@@ -28,11 +28,16 @@ p.StructExpand = true; % Enable passing arguments in a structure
 p.addRequired('filename', @(x)ischar(x));
 p.parse(filename);
 
+warnings = cell(0);
+
 try
     % If there is no filename specified, return
     if isempty(filename)
         data = struct();
-        message = {'No filename or file does not exist'};
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerBES3Tload:nofile',...
+            'message','No filename or file does not exist'...
+            );
         return;
     end
     % If filename does not exist, try to add extension
@@ -42,7 +47,10 @@ try
             filename = fullfile(fpath,[fname '.DTA']);
         else
             data = struct();
-            message = {'No filename or file does not exist'};
+            warnings{end+1} = struct(...
+                'identifier','trEPRbrukerBES3Tload:nofile',...
+                'message','No filename or file does not exist'...
+                );
             return;
         end
     end
@@ -64,11 +72,13 @@ try
         if ~strfind(tline,'#DESC	1.2 * DESCRIPTOR INFORMATION')
             fclose(fid);
             data = struct();
-            message = {...
-                sprintf('Problems reading file %s',filename)...
-                'Seems not to be a proper Bruker BES3T file.'...
+            warnings{end+1} = struct(...
+                'identifier','trEPRbrukerBES3Tload:wrongFormat',...
+                'message',[sprintf('Problems reading file %s. ',filename)...
+                'Seems not to be a proper Bruker BES3T file. '...
                 'Could not understand DSC file.'...
-                };
+                ]...
+                );
             return;        
         end
         % Read whole DSC file in one pass into cell array
@@ -146,10 +156,10 @@ try
         fclose(fid);
     else % meaning: file could not be opened
         data = struct();
-        message = {...
-            sprintf('Problems reading file %s',filename)...
-            msg...
-            };
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerBES3Tload:fileOpen',...
+            'message',sprintf('Problems reading file %s: %s',filename,msg)...
+            );
         return;
     end
     
@@ -166,10 +176,10 @@ try
         fclose(fid);
     else
         data = struct();
-        message = {...
-            sprintf('Problems reading file %s',filename)...
-            msg...
-            };
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerBES3Tload:fileOpen',...
+            'message',sprintf('Problems reading file %s: %s',filename,msg)...
+            );
         return;
     end
     
@@ -181,6 +191,10 @@ try
     [y,x] = size(data.data);
     if ~(y==YPTS && x==XPTS)
         disp('WARNING: data seem to have wrong dimensions!');
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerBES3Tload:dataDimensions',...
+            'message','WARNING: data seem to have wrong dimensions!'...
+            );
     end
     
     % Set other fields of data structure
@@ -208,8 +222,8 @@ try
     data.parameters.laser.wavelength = [];
     data.parameters.laser.repetitionRate = [];
     
-    % Assinging empty cell array to warning
-    message = cell(0);
+    % Set Version string of content structure
+    content.version = '1.1';
 catch exception
     throw(exception);
 end

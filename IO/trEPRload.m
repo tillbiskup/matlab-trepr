@@ -27,7 +27,7 @@ function varargout = trEPRload(filename, varargin)
     if iscell(filename)
         sort(filename);
         if p.Results.combine
-            content = combineFile(filename);
+            [content,warnings] = combineFile(filename);
         else
             for k=1:length(filename)
                 switch exist(filename{k})
@@ -39,7 +39,7 @@ function varargout = trEPRload(filename, varargin)
                         % It also returns 2 when name is the full pathname
                         % to a file or the name of an ordinary file on your
                         % MATLAB search path. 
-                        content{k} = loadFile(filename{k});
+                        [content{k},warnings{k}] = loadFile(filename{k});
                     otherwise
                         % If none of the above possibilities match
                         fprintf('%s could not be loaded...\n',filename{k});
@@ -51,21 +51,25 @@ function varargout = trEPRload(filename, varargin)
             % variable in the workspace with the same name as the
             % file
             if p.Results.combine
-                [pathstr, name, ext] = fileparts(filename{1});
+                [~, name, ext] = fileparts(filename{1});
                 name = cleanFileName([name ext]);
                 assignin('base',name,content);
+                assignin('base','warnings',warnings);
             else
                 for k=1:length(content)
-                    [pathstr, name, ext, versn] = fileparts(...
+                    [~, name, ext] = fileparts(...
                         content{k}.filename);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content{k});
+                    assignin('base','warnings',warnings);
                 end
             end
         elseif exist('content','var')
             varargout{1} = content;
+            varargout{2} = warnings;
         else
             varargout{1} = 0;
+            varargout{2} = [];
         end
     elseif isstruct(filename) && isfield(filename,'name')
         % That might be the case if the user uses "dir" as input for the
@@ -80,7 +84,7 @@ function varargout = trEPRload(filename, varargin)
             end
         end
         if p.Results.combine
-            content = combineFile(filenames);
+            [content,warnings] = combineFile(filenames);
         else
             for k=1:length(filenames)
                 switch exist(filenames{k})
@@ -92,7 +96,7 @@ function varargout = trEPRload(filename, varargin)
                         % It also returns 2 when name is the full pathname
                         % to a file or the name of an ordinary file on your
                         % MATLAB search path. 
-                        content{k} = loadFile(filenames{k});
+                        [content{k},warnings{k}] = loadFile(filenames{k});
                     otherwise
                         % If none of the above possibilities match
                         fprintf('%s could not be loaded...\n',filenames{k});
@@ -104,21 +108,25 @@ function varargout = trEPRload(filename, varargin)
             % variable in the workspace with the same name as the
             % file
             if p.Results.combine
-                [pathstr, name, ext] = fileparts(filenames{1});
+                [~, name, ext] = fileparts(filenames{1});
                 name = cleanFileName([name ext]);
                 assignin('base',name,content);
+                assignin('base','warnings',warnings);
             else
                 for k=1:length(content)
-                    [pathstr, name, ext, versn] = fileparts(...
+                    [~, name, ext] = fileparts(...
                         content{k}.filename);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content{k});
+                    assignin('base','warnings',warnings);
                 end
             end
         elseif exist('content','var')
             varargout{1} = content;
+            varargout{2} = warnings;
         else
             varargout{1} = 0;
+            varargout{2} = [];
         end
     else    % -> if iscell(filename)
         switch exist(filename)
@@ -133,56 +141,62 @@ function varargout = trEPRload(filename, varargin)
                     for k = 1 : length(files)
                         filenames{k} = files(k).name;
                     end
-                    content = combineFile(filenames);
+                    [content,warnings] = combineFile(filenames);
                     % assign output argument
                     if ~nargout
                         % of no output argument is given, assign content to
                         % a variable in the workspace with the same name as
                         % the file
-                        [pathstr, name, ext] = fileparts(filename);
+                        [~, name, ext] = fileparts(filename);
                         name = cleanFileName([name ext]);
                         assignin('base',name,content);
+                        assignin('base','warnings',warnings);
                     else
                         varargout{1} = content;
+                        varargout{2} = warnings;
                     end
                 end
             case 2
                 % If name is an M-file on your MATLAB search path. It also
                 % returns 2 when name is the full pathname to a file or the
                 % name of an ordinary file on your MATLAB search path.
-                content = loadFile(filename);
+                [content,warnings] = loadFile(filename);
                 % assign output argument
                 if ~nargout
                     % of no output argument is given, assign content to a
                     % variable in the workspace with the same name as the
                     % file
-                    [pathstr, name, ext, versn] = fileparts(filename);
+                    [~, name, ext] = fileparts(filename);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content);
+                    assignin('base','warnings',warnings);
                 else
                     varargout{1} = content;
+                    varargout{2} = warnings;
                 end
             case 7
                 % If name is a directory.
-                content = loadDir(filename,'combine',p.Results.combine);
+                [content,warnings] = loadDir(filename,'combine',p.Results.combine);
                 if ~nargout
                     % of no output argument is given, assign content to a
                     % variable in the workspace with the same name as the
                     % file
                     if iscell(content)
                         for k=1:length(content)
-                            [pathstr, name, ext, versn] = fileparts(...
+                            [~, name, ext] = fileparts(...
                                 content{k}.filename);
                             name = cleanFileName([name ext]);
                             assignin('base',name,content{k});
                         end
                     else
-                        [pathstr, name, ext, versn] = fileparts(filename);
+                        [~, name, ext] = fileparts(filename);
                         name = cleanFileName([name ext]);
                         assignin('base',name,content);
+                        assignin('base','warnings',warnings);
                     end
                 else
                     varargout{1} = content;
+                    varargout{2} = warnings;
                 end
             otherwise
                 % If none of the above possibilities match
@@ -192,13 +206,14 @@ function varargout = trEPRload(filename, varargin)
     
     if ~exist('content','var') && nargout
         varargout{1} = 0;
+        varargout{2} = [];
     end
     
 end
 
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
-function content = loadFile(filename)
+function [content,warnings] = loadFile(filename)
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
@@ -268,7 +283,7 @@ function content = loadFile(filename)
                 functionHandle = str2func(getfield(...
                     getfield(fileFormats,binaryFileFormats{k}),...
                     'function'));
-                data = functionHandle(filename);
+                [data,warnings] = functionHandle(filename);
                 if ~isstruct(data)
                     content.data = data;
                 else
@@ -291,7 +306,7 @@ function content = loadFile(filename)
                 functionHandle = str2func(getfield(...
                     getfield(fileFormats,asciiFileFormats{k}),...
                     'function'));
-                data = functionHandle(filename);
+                [data,warnings] = functionHandle(filename);
                 if ~isstruct(data)
                     content.data = data;
                 else
@@ -333,16 +348,20 @@ function content = loadFile(filename)
             % For backwards compatibility
             content.axes.xaxis = content.axes.x;
             content.axes.yaxis = content.axes.y;
+            
+            % Assign warnings
+            warnings = [];
         end
     end
     if ~exist('content') 
         content = []; 
+        warnings = [];
     end
 end
 
 % --- Sequentially read all files in a directory provided their name does
 % not start with a dot and it is a 'real' file and no directory
-function content = loadDir(dirname,varargin)
+function [content,warnings] = loadDir(dirname,varargin)
     
     % Get names of files in the directory and remove all files whose name
     % starts with a "." and all directories. The names are stored as a cell
@@ -362,11 +381,11 @@ function content = loadDir(dirname,varargin)
     % files and directories, try to read every single file
     if ~isempty(filesInDir)
         if (nargin >= 3) && (strcmp(varargin{1},'combine') && varargin{2})
-            content = combineFile(filesInDir);
+            [content,warnings] = combineFile(filesInDir);
         else
             l = 1;
             for k=1:length(filesInDir)
-                fileContent = loadFile(char(filesInDir(k)));
+                [fileContent,warnings] = loadFile(char(filesInDir(k)));
                 if ~isempty(fileContent)
                     content{l} = fileContent;
                     l = l+1;
@@ -382,7 +401,7 @@ end
 
 % --- load files, combine them and return struct with the content of the
 % file together with the filename and possibly more info
-function content = combineFile(filename)
+function [content,warnings] = combineFile(filename)
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
@@ -435,7 +454,7 @@ function content = combineFile(filename)
                 functionHandle = str2func(getfield(...
                     getfield(fileFormats,asciiFileFormats{k}),...
                     'function'));
-                data = functionHandle(filename);
+                [data,warnings] = functionHandle(filename);
                 if ~isstruct(data)
                     content.data = data;
                 else
@@ -458,6 +477,7 @@ function content = combineFile(filename)
     end
     if ~exist('content') 
         content = []; 
+        warnings = [];
     end
 end
 

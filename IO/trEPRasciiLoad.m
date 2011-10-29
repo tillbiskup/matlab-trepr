@@ -20,17 +20,19 @@ function varargout = trEPRasciiLoad(filename, varargin)
             % If name is an M-file on your MATLAB search path. It also
             % returns 2 when name is the full pathname to a file or the
             % name of an ordinary file on your MATLAB search path.
-            content = loadFile(filename);
+            [content,warnings] = loadFile(filename);
             % assign output argument
             if ~nargout
                 % of no output argument is given, assign content to a
                 % variable in the workspace with the same name as the
                 % file
-                [pathstr, name, ext] = fileparts(filename);
+                [~, name, ext] = fileparts(filename);
                 name = cleanFileName([name ext]);
                 assignin('base',name,content);
+                assignin('base','warnings',warnings);
             else
                 varargout{1} = content;
+                varargout{2} = warnings;
             end
         case 7
             % If name is a directory.
@@ -42,6 +44,7 @@ function varargout = trEPRasciiLoad(filename, varargin)
 
     if ~exist('content','var') && nargout
         varargout{1} = [];
+        varargout{2} = [];
     end
 
 end
@@ -49,9 +52,10 @@ end
     
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
-function content = loadFile(filename)
-    % Assign an empty struct to the output argument
+function [content,warnings] = loadFile(filename)
+    % Assign an empty struct/cell to the output arguments
     content = struct();
+    warnings = cell(0);
 
     % Open file
     fid = fopen(filename);
@@ -86,10 +90,12 @@ function content = loadFile(filename)
         'ascii_save_timeslice'...
         };
     if isempty(strmatch(identifierString,knownFormats))
-        warning(...
-            'trEPRasciiLoad:wrongformat',...
+        warnings{end+1} = struct(...
+            'identifier','trEPRasciiLoad:wrongformat',...
+            'message',sprintf(...
             'File %s seems not to be in appropriate format...',...
-            filename);
+            filename)...
+            );
         return
     end
     

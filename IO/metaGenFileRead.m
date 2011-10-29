@@ -74,7 +74,9 @@
 %    Copyright (C) 2008 Till Biskup
 %    $Revision: 528 $  $Date: 2008-02-22 16:26:56 +0100 (Fr, 22 Feb 2008) $
 
-function [ metadata ] = readMetaGenFile ( filename, varargin )
+function [ metadata,warnings ] = metaGenFileRead ( filename, varargin )
+
+    warnings = cell(0);
 
 	fprintf('\n%% FUNCTION CALL: $Id: readMetaGenFile.m 528 2008-02-22 15:26:56Z till $\n%%\n');
 
@@ -98,13 +100,13 @@ function [ metadata ] = readMetaGenFile ( filename, varargin )
 
 	% Uncomment the following lines if necessary
 
-	if ( ~isstr(filename) )
+	if ( ~ischar(filename) )
 
 		error('\n\tThe function is called with the wrong format for the input argument %s.\n\tPlease use "help readMetaGenFile" to get help.','filename');
 
 	end
 
-	if ( length(filename) == 0 )
+	if ( isempty(filename) )
 
 		error('\n\tThe function is called with an empty string for the input argument %s.\n\tPlease use "help CatalogueOfSpectraPage" to get help.','filename');
 

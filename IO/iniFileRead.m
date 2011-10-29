@@ -73,7 +73,9 @@
 %    Copyright (C) 2008 Till Biskup
 %    $Revision: 528 $  $Date: 2008-02-22 16:26:56 +0100 (Fr, 22 Feb 2008) $
 
-function [ metadata ] = iniFileRead ( filename, varargin )
+function [ metadata,warnings ] = iniFileRead ( filename, varargin )
+
+    warnings = cell(0);
 
 	% check for the right number of input and output parameters
 
@@ -101,7 +103,7 @@ function [ metadata ] = iniFileRead ( filename, varargin )
 
 	end
 
-	if ( length(filename) == 0 )
+	if ( isempty(filename) )
 
 		error('\n\tThe function is called with an empty string for the input argument %s.\n\tPlease use "help CatalogueOfSpectraPage" to get help.','filename');
 

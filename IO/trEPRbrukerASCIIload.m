@@ -1,4 +1,4 @@
-function [ data, warning ] = trEPRbrukerASCIIload(filename)
+function [ data, warnings ] = trEPRbrukerASCIIload(filename)
 % TREPRBRUKERASCIILOAD Read Bruker Xepr ASCII export of transient spectra
 %
 % Usage
@@ -29,11 +29,16 @@ p.StructExpand = true; % Enable passing arguments in a structure
 p.addRequired('filename', @(x)ischar(x));
 p.parse(filename);
 
+warnings = cell(0);
+
 try
     % If there is no filename specified or filename does not exist, return
     if isempty(filename) && ~exist(filename,'file')
         data = struct();
-        warning = {'No filename or file does not exist'};
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerASCIIload:nofile',...
+            'message','No filename or file does not exist'...
+            );
         return;
     end
     % Import raw data, using Matlab's "importdata"
@@ -46,10 +51,11 @@ try
             strcmp(tokens{4},'Field') && strcmp(tokens{6},'Intensity'))
         disp('Hmm... doesn''t look like a Bruker Xepr TREPR ASCII file');
         data = struct();
-        warning = {...
-            'Wrong file format'...
+        warnings{end+1} = struct(...
+            'identifier','trEPRbrukerASCIIload:fileformat',...
+            'message',...
             'File doesn''t look like a Bruker Xepr TREPR ASCII file'...
-            };
+            );
         return;
     end
     
@@ -98,8 +104,8 @@ try
     data.parameters.laser.wavelength = [];
     data.parameters.laser.repetitionRate = [];
     
-    % Assinging empty cell array to warning
-    warning = cell(0);
+    % Set Version string of content structure
+    content.version = '1.1';
 catch exception
     throw(exception);
 end
