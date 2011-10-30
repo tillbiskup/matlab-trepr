@@ -19,9 +19,11 @@ try
         if (strcmpi(evt.Modifier{1},'command')) || ...
                 (strcmpi(evt.Modifier{1},'control'))
             switch evt.Key
+                % CLOSE GUI: Ctrl+w || Cmd+w
                 case 'w'
                     guiClose();
                     return;
+                % SWITCH PANEL: Ctrl/Cmd+1..9
                 case '1'
                     status = switchMainPanel('Load');
                     if status
@@ -87,6 +89,16 @@ try
                         msgStr = 'Something went wrong with switching the panels.';
                         add2status(msgStr);
                     end
+                    return;
+                % SWITCH DISPLAY MODE: Ctrl/Cmd+x/y/z
+                case 'x'
+                    switchDisplayType('1D along x');
+                    return;
+                case 'y'
+                    switchDisplayType('1D along y');
+                    return;
+                case 'z'
+                    switchDisplayType('2D plot');
                     return;
             end
         end

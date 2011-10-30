@@ -9,7 +9,7 @@ function status = switchMainPanel(panelName)
 
 try
     % Get handles of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    mainWindow = guiGetWindowHandle;
     gh = guihandles(mainWindow);
     
     panels = [...
