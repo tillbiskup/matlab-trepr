@@ -1,12 +1,16 @@
 function [data,warnings] = trEPRfsc2MetaLoad(filename)
-% TREPRFSC2METALOAD Read metafile of fsc2 recorded transient spectra
+% TREPRFSC2METALOAD Read metafile of fsc2 recorded transient spectra and
+% load subsequently all corresponding datasets.
+%
+% After loading the datasets, additional parameters read from the metafile
+% are applied to the metadata of the respective dataasets.
 %
 % Usage
 %   data = trEPRfsc2MetaLoad(filename)
 %   [data,warning] = trEPRfsc2MetaLoad(filename)
 %
 % filename - string
-%            name of a valid filename (of a Bruker BES3T file)
+%            name of a valid filename (of a fsc2 metafile)
 % data     - struct
 %            structure containing data and additional fields
 %
@@ -17,7 +21,13 @@ function [data,warnings] = trEPRfsc2MetaLoad(filename)
 % In such case, warning may hold some further information what happened.
 
 % (c) 2011, Till Biskup
-% 2011-10-29
+% 2011-10-30
+
+% If called without parameter, do something useful: display help
+if ~nargin
+    help trEPRfsc2MetaLoad
+    return;
+end
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -32,9 +42,6 @@ warnings = cell(0);
 
 % Define identifierString for metafile file format
 identifierString = 'metadata fsc2 program trEPR';
-
-% Define number of lines in each subblock of the calibration data block
-nLinesCalibDataSubblock = 6;
 
 try
     % If there is no filename specified, return
@@ -77,7 +84,7 @@ try
     fclose(fh);
     
     % Check for correct file format
-    if ~findstr(metaFile{1},identifierString)
+    if ~strfind(metaFile{1},identifierString)
             data = struct();
             warnings{end+1} = struct(...
                 'identifier','trEPRfsc2MetaLoad:fileformat',...
@@ -136,6 +143,20 @@ try
                     lineNumbers(find(...
                     lineNumbers > getfield(blocks,blocknames{k}), 1 ))-2 ...
                     ));
+                % Set number of lines in each subblock of the calibration
+                % block depending on the measurement type specified in the
+                % general block
+                switch block.general.measurementType
+                    case 'Normal'
+                        nLinesCalibDataSubblock = 7;
+                    otherwise
+                        data = struct();
+                        warnings{end+1} = struct(...
+                            'identifier','trEPRfsc2MetaLoad:measurementType',...
+                            'message','Cannot determine type of measurement.'...
+                            );
+                        return;
+                end
             case 'parameters'
                 % Read key-value pairs into structure
                 block.parameters = parseBlocks(metaFile(...
@@ -156,6 +177,17 @@ try
                     lineNumbers > getfield(blocks,blocknames{k}),1))-2 ...
                     -getfield(blocks,blocknames{k}))...
                     /nLinesCalibDataSubblock;
+                % Check whether we have the correct number of blocks (needs
+                % to be a natural number), therefore divide by 1 and look
+                % for the remainder
+                if rem(noScans,1)
+                    data = struct();
+                    warnings{end+1} = struct(...
+                        'identifier','trEPRfsc2MetaLoad:calibrationBlock',...
+                        'message','Problems parsing calibration block.'...
+                        );
+                    return;
+                end
                 % For each scan, read key-value pairs into structure
                 for l = 1:noScans
                     block.calibrationData(l) = parseBlocks(metaFile(...
