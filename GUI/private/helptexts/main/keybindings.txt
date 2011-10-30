@@ -10,6 +10,14 @@ Ctrl-1 ... Ctrl-9
 
 
 
+SWITCHING DISPLAY MODE
+
+Ctrl-x ... Ctrl-z
+
+(Mac: Ctrl or Command)
+
+
+
 FUNCTION KEYS (F1...F12)
 
 F1 - "Help:About" window

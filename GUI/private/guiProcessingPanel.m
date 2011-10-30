@@ -353,14 +353,15 @@ function average_x_points_Callback(source,~)
         
         % Fix values: only integers >= 1
         [~,x] = size(ad.data{ad.control.spectra.active}.data);
-        if (str2num(get(source,'String')) < 1)
+        if (str2double(get(source,'String')) < 1) || ...
+                isnan(str2double(get(source,'String')))
             set(source,'String','1');
-        elseif (str2num(get(source,'String')) > x)
+        elseif (str2double(get(source,'String')) > x)
             set(source,'String',num2str(x));
         else
             set(source,...
                 'String',...
-                num2str(round(str2num(get(source,'String')))));
+                num2str(round(str2double(get(source,'String')))));
         end
         
         ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
@@ -430,24 +431,25 @@ function average_x_unit_Callback(source,~)
         atomic = x(2)-x(1);
         
         % Fix values: only those in range of the axis are allowed
-        if (str2num(get(source,'String')) < atomic)
+        if (str2double(get(source,'String')) < atomic) || ...
+                isnan(str2double(get(source,'String')))
             set(source,'String',num2str(atomic));
-        elseif (str2num(get(source,'String')) > (atomic*length(x)))
+        elseif (str2double(get(source,'String')) > (atomic*length(x)))
             set(source,'String',num2str(atomic*length(x)));
         else
             set(source,...
                 'String',...
-                num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+                num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
                 );
         end
         
         set(gh.processing_panel_average_x_points_edit,...
             'String',...
-            num2str(round(str2num(get(source,'String'))/atomic))...
+            num2str(round(str2double(get(source,'String'))/atomic))...
             );
         
         ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
-            round(str2num(get(source,'String'))/atomic);
+            round(str2double(get(source,'String'))/atomic);
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
@@ -501,14 +503,15 @@ function average_y_points_Callback(source,~)
         
         % Fix values: only integers >= 1
         [y,x] = size(ad.data{ad.control.spectra.active}.data);
-        if (str2num(get(source,'String')) < 1)
+        if (str2double(get(source,'String')) < 1) || ...
+                isnan(str2double(get(source,'String')))
             set(source,'String','1');
-        elseif (str2num(get(source,'String')) > y)
+        elseif (str2double(get(source,'String')) > y)
             set(source,'String',num2str(x));
         else
             set(source,...
                 'String',...
-                num2str(round(str2num(get(source,'String')))));
+                num2str(round(str2double(get(source,'String')))));
         end
         
         ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
@@ -578,24 +581,25 @@ function average_y_unit_Callback(source,~)
         atomic = y(2)-y(1);
         
         % Fix values: only those in range of the axis are allowed
-        if (str2num(get(source,'String')) < atomic)
+        if (str2double(get(source,'String')) < atomic) || ...
+                isnan(str2double(get(source,'String')))
             set(source,'String',num2str(atomic));
-        elseif (str2num(get(source,'String')) > (atomic*length(y)))
+        elseif (str2double(get(source,'String')) > (atomic*length(y)))
             set(source,'String',num2str(atomic*length(y)));
         else
             set(source,...
                 'String',...
-                num2str(round(str2num(get(source,'String'))/atomic)*atomic)...
+                num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
                 );
         end
         
         set(gh.processing_panel_average_y_points_edit,...
             'String',...
-            num2str(round(str2num(get(source,'String'))/atomic))...
+            num2str(round(str2double(get(source,'String'))/atomic))...
             );
         
         ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
-            round(str2num(get(source,'String'))/atomic);
+            round(str2double(get(source,'String'))/atomic);
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
