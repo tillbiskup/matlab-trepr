@@ -1,11 +1,32 @@
 function varargout = trEPRfsc2Load(filename, varargin)
-% Load fsc2 files measured at the transient spectrometer in Berlin, save
-% the header and try to extract from the header necessary functions such as
-% the axes.
+% TREPRFSC2LOAD Load fsc2 files measured at the transient spectrometer in
+% Berlin, save the header and try to extract from the header necessary
+% functions such as the axes.
 %
 % NOTE: This is not a general routine to read fsc2 files as there exists
 %       no such format. fsc2 files are in general simple ASCII files with 
 %       varying headers depending on the actual script used to record them.
+%
+% Usage
+%   data = trEPRfsc2Load(filename)
+%   [data,warning] = trEPRfsc2Load(filename)
+%
+% filename - string
+%            name of a valid filename (of a fsc2 file)
+% data     - struct
+%            structure containing data and additional fields
+%
+% warnings - cell array of strings
+%            empty if there are no warnings
+%
+% If no data could be loaded, data is an empty struct.
+% In such case, warning may hold some further information what happened.
+
+% If called without parameter, do something useful: display help
+if ~nargin
+    help trEPRfsc2Load
+    return;
+end
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -158,7 +179,7 @@ function [content,warnings] = loadFile(filename)
                     content.parameters.laser = setfield(...
                         content.parameters.laser,...
                         'repetitionRate',...
-                        str2double(tokens{2}{1}));
+                        str2double(tokens{1}{1}));
                 end
             end
         end

@@ -204,16 +204,44 @@ try
                     );
             otherwise
                 % That shall not happen!
-                fprintf(...
+                warnings{end+1} = struct(...
+                    'identifier','trEPRfsc2MetaLoad:parser',...
+                    'message',sprintf(...
                     'Parse error: Unknown block name %s\n',...
-                    blocknames{k});
+                    blocknames{k})...
+                    );
+                return;
         end
     end
     
-    % For the time being, assing empty struct to data
-    data = struct();
+    % Assing cell array of right size to data
+    data = cell(length(block.calibrationData),1);
     
-    data = block;
+    % For each calibration data block, read corresponding data file and
+    % process the metadata accordingly
+    %
+    % Get file path of the metafile, assuming that the data files are in
+    % the same directory. That prevents confusion steming from the fact
+    % that the metafile contains the full paths of the files on the
+    % original system (computer attached to the spectrometer)
+    [metaFilePath,~,~] = ...
+        fileparts(filename);
+    for k=1:length(block.calibrationData)
+        [~,dataFileName,dataFileExtension] = ...
+            fileparts(block.calibrationData(k).fileName);
+        % Assuming that the data files are in the same directory as the
+        % metafile
+        [data{k},warning{k}] = trEPRfsc2Load(...
+            fullfile(metaFilePath,[dataFileName dataFileExtension]));
+        data{k}.filename = ...
+            fullfile(metaFilePath,[dataFileName dataFileExtension]);
+        data{k}.file.name = ...
+            fullfile(metaFilePath,[dataFileName dataFileExtension]);
+        data{k}.file.format = 'fsc2';
+        % TODO: Assign parameters from metafile to datasets
+    end
+    
+    %data = block;
 catch exception
     throw(exception);
 end

@@ -292,6 +292,8 @@ function [content,warnings] = loadFile(filename)
                 if ~isfield(content,'filename')
                     content.filename = filename;
                 end
+                content.file.name = filename;
+                content.file.format = binaryFileFormats{k};
                 break;
            end
        end
@@ -315,6 +317,8 @@ function [content,warnings] = loadFile(filename)
                 if ~isfield(content,'filename')
                     content.filename = filename;
                 end
+                content.file.name = filename;
+                content.file.format = asciiFileFormats{k};
                 break;
             end
         end
@@ -336,6 +340,8 @@ function [content,warnings] = loadFile(filename)
                 return;
             end
             content.filename = filename;
+            content.file.name = filename;
+            content.file.format = 'unspecified ASCII';
             % Create axis informations from dimensions
             [y,x] = size(content.data);
             content.axes.x.values = linspace(1,x,x);
