@@ -240,7 +240,7 @@ function load_pushbutton_Callback(~,~)
         
         % Adding status line
         msgStr = cell(0);
-        msgStr{length(msgStr)+1} = 'Calling trEPRload and trying to load';
+        msgStr{end+1} = 'Calling trEPRload and trying to load';
         msg = [ msgStr FileName];
         add2status(msg);
         clear msgStr msg;
@@ -274,7 +274,15 @@ function load_pushbutton_Callback(~,~)
         end
         
         if ~isempty(warnings)
-            % TODO: Do something, at least, add warnings to status messages
+            % Add warnings to status messages
+            msgStr = cell(0);
+            msgStr{end+1} = 'Some warnings occurred when trying to load ';
+            msg = [ msgStr FileName ];
+            for k=1:length(warnings)
+                msg = [ msg warnings{k}.identifier warnings{k}.message ];
+            end
+            add2status(msg);
+            clear msgStr msg;
         end
         
         % Check whether data{n}.data is numeric (very basic test for format)
