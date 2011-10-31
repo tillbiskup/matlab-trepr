@@ -252,7 +252,7 @@ function load_pushbutton_Callback(~,~)
         hMessageText = findobj(hMsgBox,'Tag','msgwindow_text');
         messageText = get(hMessageText,'String');
         
-        data = trEPRload(FileName,'combine',state.comb);
+        [data,warnings] = trEPRload(FileName,'combine',state.comb);
         
         if isequal(data,0) || isempty(data)
             msg = 'Data could not be loaded.';
@@ -271,6 +271,10 @@ function load_pushbutton_Callback(~,~)
                     'Help','modal');
             end
             return;
+        end
+        
+        if ~isempty(warnings)
+            % TODO: Do something, at least, add warnings to status messages
         end
         
         % Check whether data{n}.data is numeric (very basic test for format)
@@ -341,7 +345,7 @@ function load_pushbutton_Callback(~,~)
         if iscell(data)
             fileNames = cell(0);
             for k = 1 : length(data)
-                [p,fn,ext] = fileparts(data{k}.filename);
+                [p,fn,ext] = fileparts(data{k}.file.name);
                 fileNames{k} = fullfile(p,[fn ext]);
                 if ~isfield(data{k},'label')
                     data{k}.label = [fn ext];
@@ -361,8 +365,8 @@ function load_pushbutton_Callback(~,~)
                 end
             end
         else
-            fileNames = data.filename;
-            [~,fn,ext] = fileparts(data.filename);
+            fileNames = data.file.name;
+            [~,fn,ext] = fileparts(data.file.name);
             if ~isfield(data,'label')
                 data.label = [fn ext];
             end

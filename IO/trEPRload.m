@@ -290,9 +290,6 @@ function [content,warnings] = loadFile(filename)
                     content = data;
                 end
                 if ~iscell(content)
-                    if ~isfield(content,'filename')
-                        content.filename = filename;
-                    end
                     content.file.name = filename;
                     content.file.format = binaryFileFormats{k};
                 end
@@ -317,9 +314,6 @@ function [content,warnings] = loadFile(filename)
                     content = data;
                 end
                 if ~iscell(content)
-                    if ~isfield(content,'filename')
-                        content.filename = filename;
-                    end
                     content.file.name = filename;
                     content.file.format = asciiFileFormats{k};
                 end
@@ -343,7 +337,6 @@ function [content,warnings] = loadFile(filename)
                 content = [];
                 return;
             end
-            content.filename = filename;
             content.file.name = filename;
             content.file.format = 'unspecified ASCII';
             % Create axis informations from dimensions

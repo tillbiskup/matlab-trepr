@@ -24,12 +24,15 @@ try
     filenames = unzip(filename);
 catch
     err = lasterror;
-    fprintf('%s\n%s\n"%s"\n%s\n',...
+    warning = sprintf('%s\n%s\n"%s"\n%s\n',...
         err.identifier,...
         'Problems with unzipping:',...
         filename,...
         'seems not to be a valid zip file. Aborted.');
-    if nargout, varargout{1} = logical(false); end;
+    if nargout
+        varargout{1} = logical(false);
+        varargout{2} = warning;
+    end
     return;
 end
 for k=1:length(filenames)
@@ -52,6 +55,7 @@ if exist('data','var')
 end
 if nargout
     varargout{1} = struct;
+    varargout{2} = cell(0);
 else
     varname=char(DOMnode.getDocumentElement.getNodeName);
     assignin('caller',varname,struct);

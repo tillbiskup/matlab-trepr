@@ -986,19 +986,19 @@ function status = datasetSave(id)
         ad = getappdata(mainWindow);
         
         % Check whether selected dataset has a (valid) filename
-        if ~isfield(ad.data{id},'filename') || ...
-                (strcmp(ad.data{id}.filename,''))
+        if ~isfield(ad.data{id}.file,'name') || ...
+                (strcmp(ad.data{id}.file.name,''))
             status = datasetSaveAs(id);
             return;
         else
-            [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+            [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
             if ~strcmp(fext,'.zip')
-                ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
+                ad.data{id}.file.name = fullfile(fpath,[fname '.zip']);
                 % Need to test for existing file and in case, ask user...
-                if (exist(ad.data{id}.filename,'file'))
+                if (exist(ad.data{id}.file.name,'file'))
                     answer = questdlg(...
                         {'WARNING: You''re about to save the current dataset to the file'...
-                        ad.data{id}.filename ...
+                        ad.data{id}.file.name ...
                         ' '...
                         'This file exists already! Are you sure you want to overwrite it?'...
                         ' '...
@@ -1022,10 +1022,10 @@ function status = datasetSave(id)
         end
         
         for k = 1:length(ad.data)
-            if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
+            if (strcmp(ad.data{k}.file.name,ad.data{id}.file.name)) && (k ~= id)
                 answer = questdlg(...
                     {'WARNING: You''re about to save the current dataset to the file'...
-                    ad.data{id}.filename ...
+                    ad.data{id}.file.name ...
                     ' '...
                     'A dataset loaded from a file with that name has been loaded to the GUI!'...
                     ' '...
@@ -1047,7 +1047,7 @@ function status = datasetSave(id)
         
         % Do the actual saving
         [ saveStatus, exception ] = ...
-            trEPRsave(ad.data{id}.filename,ad.data{id});
+            trEPRsave(ad.data{id}.file.name,ad.data{id});
         
         % In case something went wrong
         if saveStatus
@@ -1056,7 +1056,7 @@ function status = datasetSave(id)
             msgStr{length(msgStr)+1} = ...
                 sprintf('Problems when trying to save "%s" to file',...
                 ad.data{id}.label);
-            msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            msgStr{length(msgStr)+1} = ad.data{id}.file.name;
             status = add2status(msgStr);
             clear msgStr;
             status = -1;
@@ -1068,8 +1068,7 @@ function status = datasetSave(id)
         end
         
         % Remove from modified
-        ad.control.spectra.modified(...
-            find(ad.control.spectra.modified == id)) = [];
+        ad.control.spectra.modified(ad.control.spectra.modified == id) = [];
         
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
@@ -1117,12 +1116,12 @@ function status = datasetSaveAs(id)
         ad = getappdata(mainWindow);
         
         % Create default filename
-        [fpath,fname,fext] = fileparts(ad.data{id}.filename);
+        [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
         if ~strcmp(fext,'.zip')
-            ad.data{id}.filename = fullfile(fpath,[fname '.zip']);
+            ad.data{id}.file.name = fullfile(fpath,[fname '.zip']);
         end
         % Need to test for existing file and in case, change default name
-        if (exist(ad.data{id}.filename,'file'))
+        if (exist(ad.data{id}.file.name,'file'))
             % 1. Check whether name ends with -NNN (where NNN are numbers)
             % 2. existingFiles = dir(sprintf('%s*',filename));
             % 2a. If name ends with -NNN, remove "-NNN" from filename before
@@ -1158,7 +1157,7 @@ function status = datasetSaveAs(id)
         [FileName,PathName,~] = uiputfile(...
             '*.zip',...
             'Save dataset in a new file',...
-            ad.data{id}.filename);
+            ad.data{id}.file.name);
         
         if (FileName == 0)
             status = -1;
@@ -1166,13 +1165,13 @@ function status = datasetSaveAs(id)
         end
         
         % Set filename to save in
-        ad.data{id}.filename = fullfile(PathName, FileName);
+        ad.data{id}.file.name = fullfile(PathName, FileName);
         
         for k = 1:length(ad.data)
-            if (strcmp(ad.data{k}.filename,ad.data{id}.filename)) && (k ~= id)
+            if (strcmp(ad.data{k}.file.name,ad.data{id}.file.name)) && (k ~= id)
                 answer = questdlg(...
                     {'WARNING: You''re about to save the current dataset to the file'...
-                    ad.data{id}.filename ...
+                    ad.data{id}.file.name ...
                     ' '...
                     'A dataset loaded from a file with that name has been loaded to the GUI!'...
                     ' '...
@@ -1194,7 +1193,7 @@ function status = datasetSaveAs(id)
         
         % Do the actual saving
         [ saveStatus, exception ] = ...
-            trEPRsave(ad.data{id}.filename,ad.data{id});
+            trEPRsave(ad.data{id}.file.name,ad.data{id});
         
         % In case something went wrong
         if saveStatus
@@ -1203,7 +1202,7 @@ function status = datasetSaveAs(id)
             msgStr{length(msgStr)+1} = ...
                 sprintf('Problems when trying to save "%s" to file',...
                 ad.data{id}.label);
-            msgStr{length(msgStr)+1} = ad.data{id}.filename;
+            msgStr{length(msgStr)+1} = ad.data{id}.file.name;
             status = add2status(msgStr);
             clear msgStr;
             return;
@@ -1215,7 +1214,7 @@ function status = datasetSaveAs(id)
         
         % Remove from modified
         ad.control.spectra.modified(...
-            find(ad.control.spectra.modified == id)) = [];
+            (ad.control.spectra.modified == id)) = [];
         
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
