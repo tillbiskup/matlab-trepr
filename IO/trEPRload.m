@@ -284,16 +284,18 @@ function [content,warnings] = loadFile(filename)
                     getfield(fileFormats,binaryFileFormats{k}),...
                     'function'));
                 [data,warnings] = functionHandle(filename);
-                if ~isstruct(data)
+                if ~isstruct(data) && ~iscell(data)
                     content.data = data;
                 else
                     content = data;
                 end
-                if ~isfield(content,'filename')
-                    content.filename = filename;
+                if ~iscell(content)
+                    if ~isfield(content,'filename')
+                        content.filename = filename;
+                    end
+                    content.file.name = filename;
+                    content.file.format = binaryFileFormats{k};
                 end
-                content.file.name = filename;
-                content.file.format = binaryFileFormats{k};
                 break;
            end
        end
@@ -309,16 +311,18 @@ function [content,warnings] = loadFile(filename)
                     getfield(fileFormats,asciiFileFormats{k}),...
                     'function'));
                 [data,warnings] = functionHandle(filename);
-                if ~isstruct(data)
+                if ~isstruct(data) && ~iscell(data)
                     content.data = data;
                 else
                     content = data;
                 end
-                if ~isfield(content,'filename')
-                    content.filename = filename;
+                if ~iscell(content)
+                    if ~isfield(content,'filename')
+                        content.filename = filename;
+                    end
+                    content.file.name = filename;
+                    content.file.format = asciiFileFormats{k};
                 end
-                content.file.name = filename;
-                content.file.format = asciiFileFormats{k};
                 break;
             end
         end
