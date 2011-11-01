@@ -161,10 +161,18 @@ function [content,warnings] = loadFile(filename)
         'Laser repetition rate','laser.repetitionRate','valueunit';
         };
     
-    % Extract information from header. Use therefore only the last n lines
-    % of the header because it is known that the crucial information is
-    % summed up there.
-    for k=length(content.header)-30:length(content.header)
+    % Extract information from header. As we know that the parameters can
+    % be found at the very end of the file header, and that in new versions
+    % of the fsc2 program they start with the headline "PARAMETERS", we can
+    % first search therefore, and for compatibility with old files recorded
+    % with older versions of the fsc2 program, use only the last n lines of
+    % the header assuming that this is sufficient.
+    [value,lineNumber] = max(strcmp(content.header,'% PARAMETERS'));
+    if (value == 0)
+        lineNumber = length(content.header)-30;
+    end
+
+    for k=lineNumber:length(content.header)
         for l=1:length(matching) % length(matching) = nRows of matching
             if ~isempty(strfind(content.header{k},matching{l,1})) ...
                     && isempty(getCascadedField(...
