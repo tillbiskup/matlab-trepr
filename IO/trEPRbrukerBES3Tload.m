@@ -57,7 +57,7 @@ try
     
     % Read Bruker DSC file and get minimum set of parameters
     % First, create filename for DSC file
-    [fpath,fname,fext] = fileparts(filename);
+    [fpath,fname,~] = fileparts(filename);
     dscFilename = fullfile(fpath,[fname,'.DSC']);
     
     % Open DSC file and read line by line
@@ -93,11 +93,11 @@ try
             % binary data)
             if (strfind(tline,'XPTS'))
                 XPTS = str2double(...
-                    regexp(tline,'XPTS[^\d\c](\d+)','tokens','once'));
+                    regexp(tline,'XPTS[^\d\c](.+)','tokens','once'));
             end
             if (strfind(tline,'YPTS'))
                 YPTS = str2double(...
-                    regexp(tline,'YPTS[^\d\c](\d+)','tokens','once'));
+                    regexp(tline,'YPTS[^\d\c](.+)','tokens','once'));
             end
             % Try to get parameters for x axis
             if (strfind(tline,'XMIN'))
@@ -168,7 +168,9 @@ try
     data.axes.y.values = linspace(YMIN,YMIN+YWID,YPTS);
     
     % Read Bruker BES3T binary data
-    [fid,msg] = fopen(filename);
+    [fpath,fname,~] = fileparts(filename);
+    dtaFilename = fullfile(fpath,[fname,'.DTA']);
+    [fid,msg] = fopen(dtaFilename);
     % If fopen was successful, fid > 2, otherwise fid == -1
     if fid > 2
         % Data are binary, big endian, double precision
@@ -223,7 +225,7 @@ try
     data.parameters.laser.repetitionRate = [];
     
     % Set Version string of content structure
-    content.version = '1.1';
+    data.version = '1.1';
 catch exception
     throw(exception);
 end
