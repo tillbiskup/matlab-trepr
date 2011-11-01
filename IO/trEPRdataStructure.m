@@ -19,6 +19,7 @@ function varargout = trEPRdataStructure(varargin)
 %             either empty trEPR toolbox data structure or 
 %             trEPR toolbox data structure with field types as values
 %
+% See also TREPRFSC2LOAD.
 
 % (c) 2011, Till Biskup
 % 2011-10-31
@@ -261,7 +262,7 @@ dataModel.parameters = struct(...
         )...
     );
 dataModel.header = 'iscell';
-dataModel.info = 'ischaruct';
+dataModel.info = 'istruct';
 dataModel.file = struct(...
     'name','ischar', ...
     'type','ischar' ...
@@ -278,8 +279,32 @@ if nargin && ischar(varargin{1})
             if nargout
                 varargout{1} = dataModel;
             end
+        case 'check'
+            if nargin < 2
+                fprintf('No structure to check...\n');
+                return;
+            end
+            if ~isstruct(varargin{2})
+                fprintf('%s has wrong type',inputname(2));
+                return;
+            end
+            % Very basic check: Just compare for identical fields
+            inputFieldNames = getFieldNameList(varargin{2});
+            standardFieldNames = getFieldNameList(dataStructure);
+            
+            if length(inputFieldNames) ~= length(standardFieldNames)
+                fprintf('Number of fields not identical!\n');
+                return;
+            elseif sum(strcmp(inputFieldNames,standardFieldNames))/...
+                    length(standardFieldNames) < 1
+                fprintf('Not all fields identical!\n');
+                return;
+            else
+                fprintf('Basic test passed! Structure seems fine...\n');
+                return;
+            end
         otherwise
-            fprintf('Commad ''%s'' unknown\n',varargin{1});
+            fprintf('Command ''%s'' unknown\n',varargin{1});
     end
 else
     if nargout
@@ -287,4 +312,22 @@ else
     end
 end
 
+end
+
+function fieldNameList = getFieldNameList(structure)
+fieldNameList = cell(0);
+    function traverse(structure,parent)
+        fieldNames = fieldnames(structure);
+        for k=1:length(fieldNames)
+            if isstruct(structure.(fieldNames{k})) && ...
+                    ~isempty(fieldnames(structure.(fieldNames{k})))
+                % It is important to check whether the struct is empty, as
+                % it would not get added to the list of field names.
+                traverse(structure.(fieldNames{k}),[parent '.' fieldNames{k}]);
+            else
+                fieldNameList{end+1} = sprintf('%s.%s',parent,fieldNames{k});
+            end
+        end
+    end
+traverse(structure,'structure');
 end
