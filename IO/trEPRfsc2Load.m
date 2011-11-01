@@ -128,7 +128,12 @@ function [content,warnings] = loadFile(filename)
     % Cell array correlating struct fieldnames and strings in the header.
     % The first entry contains the string to be searched for in the header
     % of the fsc2 file, the second entry contains the corresponding field
-    % name of the "content.parameters" struct.
+    % name of the "content.parameters" struct. The third parameter,
+    % finally, tells the program how to parse the corresponding entry.
+    % Here, "numeric" means that the numbers of the field should be treated
+    % as numbers, "string" means to treat the whole field as string, and
+    % "valueunit" splits the field in a numeric value and a string
+    % containing the unit.
     matching = {...
         'Number of runs','runs','numeric';...
         'Start field','field.start','numeric';...

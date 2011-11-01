@@ -5,19 +5,27 @@ function varargout = trEPRdataStructure(varargin)
 % Usage
 %   structure = trEPRdataStructure;
 %   structure = trEPRdataStructure(<command>)
-%   [?,?] = trEPRfsc2MetaLoad(<command>,structure)
+%   [missingFields,wrongType] = trEPRfsc2MetaLoad(<command>,structure)
 %
-% <command> - string
-%             one of 'structure', 'model' or 'check'
-%             'structure' - return (empty) trEPR toolbox data structure
-%             'model' -     return trEPR toolbox data structure with field
-%                           types as values
-%             'check' -     check given structure for compliance with the
-%                           toolbox data structure
+%   <command> - string 
+%               one of 'structure', 'model' or 'check'
+%               'structure' - return (empty) trEPR toolbox data structure
+%               'model' -     return trEPR toolbox data structure with
+%                             field types as values
+%               'check' -     check given structure for compliance with the
+%                             toolbox data structure
 %
-% structure - struct
-%             either empty trEPR toolbox data structure or 
-%             trEPR toolbox data structure with field types as values
+%   structure - struct
+%               either empty trEPR toolbox data structure or 
+%               trEPR toolbox data structure with field types as values
+%
+%   missingFields - cell array
+%                   List of fields missing in the structure with respect to
+%                   the toolbox data structure
+%
+%   wrongType -     cell array
+%                   List of fields in structure having the wrong type with
+%                   respect to the toolbox data structure
 %
 % See also TREPRFSC2LOAD.
 
