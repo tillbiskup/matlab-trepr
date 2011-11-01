@@ -21,6 +21,8 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
+%
+% See also TREPRLOAD.
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -335,7 +337,7 @@ function [content,warnings] = loadFile(filename)
         content.parameters.transient.length/content.parameters.transient.points * ...
         content.parameters.transient.triggerPosition;
     content.axes.x.measure = 'time';
-    content.axes.x.unit = 'us';
+    content.axes.x.unit = content.parameters.transient.unit;
     
     if reverse
         content.axes.y.values = ...
@@ -349,7 +351,7 @@ function [content,warnings] = loadFile(filename)
             content.parameters.field.stop;
     end
     content.axes.y.measure = 'magnetic field';
-    content.axes.y.unit = 'G';
+    content.axes.y.unit = content.parameters.field.unit;
     
     % Set Version string of content structure
     content.version = '1.1';
