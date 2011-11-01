@@ -86,7 +86,7 @@ end
 function [content,warnings] = loadFile(filename)
     warnings = cell(0);
 
-    % Preassign values to the parameters struct
+    % Preassign values to the content struct
     content = trEPRdataStructure;
 
     % Open file
@@ -138,6 +138,7 @@ function [content,warnings] = loadFile(filename)
     % "valueunit" splits the field in a numeric value and a string
     % containing the unit.
     matching = {...
+        'Measurement start','date','string'
         'Number of runs','runs','numeric';...
         'Start field','field.start','numeric';...
         'End field','field.stop','numeric';...
@@ -173,8 +174,12 @@ function [content,warnings] = loadFile(filename)
     % first search therefore, and for compatibility with old files recorded
     % with older versions of the fsc2 program, use only the last n lines of
     % the header assuming that this is sufficient.
-    [value,lineNumber] = max(strcmp(content.header,'% PARAMETERS'));
+    [value,lineNumber] = max(strcmp(content.header,'% GENERAL'));
     if (value == 0)
+        [value,lineNumber] = max(strcmp(content.header,'% PARAMETERS'));
+        if (value == 0)
+            lineNumber = length(content.header)-30;
+        end
         lineNumber = length(content.header)-30;
     end
 
@@ -371,6 +376,13 @@ function [content,warnings] = loadFile(filename)
     end
     content.axes.y.measure = 'magnetic field';
     content.axes.y.unit = content.parameters.field.unit;
+    
+    % Fix date string
+    if ~isempty(content.parameters.date)
+        content.parameters.date = ...
+            datestr(datenum(...
+            content.parameters.date,'ddd mmm dd, yyyy; HH:MM:SS'),31);
+    end
     
     % Set Version string of content structure
     content.version = '1.1';
