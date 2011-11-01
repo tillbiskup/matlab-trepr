@@ -1,17 +1,39 @@
 function varargout = trEPRload(filename, varargin)
-    % Loads files or scans whole directories for readable files
-    % If called with no output argument, the data are written to variables
-    % in the workspace that have the same* name as the file(s) read.
-    %
-    % The function is in principle only a wrapper for other functions that
-    % are specialized to read the different kinds of input files.
-    % Configuration of these functions via the file 'trEPRload.ini' - see
-    % there for details. Only if it is an ascii file and no function is
-    % found from the configuration file, 'importdata' is called to try to
-    % handle the data.
-    % 
-    % *Same means here that a regexprep is performed removing all
-    % non-allowed characters for MATLAB variables from the filename.
+% TREPRLOAD Load files or scans whole directories for readable files
+%
+% Usage
+%   trEPRload(filename)
+%   [data] = trEPRload(filename)
+%   [data,warnings] = trEPRload(filename)
+%
+%   filename - string
+%              name of a valid filename (of a fsc2 file)
+%   data     - struct
+%              structure containing data and additional fields
+%
+%   warnings - cell array of strings
+%              empty if there are no warnings
+%
+% If no data could be loaded, data is an empty struct.
+% In such case, warning may hold some further information what happened.
+%
+% If called with no output argument, the data are written to variables
+% in the workspace that have the same* name as the file(s) read.
+%
+% The function is in principle only a wrapper for other functions that
+% are specialized to read the different kinds of input files.
+% Configuration of these functions via the file 'trEPRload.ini' - see
+% there for details. Only if it is an ascii file and no function is
+% found from the configuration file, 'importdata' is called to try to
+% handle the data.
+%
+% *Same means here that a regexprep is performed removing all
+% non-allowed characters for MATLAB variables from the filename.
+%
+% See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
+
+% (c) 2009-2011, Till Biskup
+% 2011-11-01
 
     % Parse input arguments using the inputParser functionality
     p = inputParser;   % Create an instance of the inputParser class.

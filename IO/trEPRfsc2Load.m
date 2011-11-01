@@ -11,18 +11,18 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %   data = trEPRfsc2Load(filename)
 %   [data,warning] = trEPRfsc2Load(filename)
 %
-% filename - string
-%            name of a valid filename (of a fsc2 file)
-% data     - struct
-%            structure containing data and additional fields
+%   filename - string
+%              name of a valid filename (of a fsc2 file)
+%   data     - struct
+%              structure containing data and additional fields
 %
-% warnings - cell array of strings
-%            empty if there are no warnings
+%   warnings - cell array of strings
+%              empty if there are no warnings
 %
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 %
-% See also TREPRLOAD.
+% See also TREPRLOAD, TREPRFSC2METALOAD.
 
 % (c) 2009-2011, Till Biskup
 % 2011-11-01

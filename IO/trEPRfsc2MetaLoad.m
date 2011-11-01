@@ -19,6 +19,8 @@ function [data,warnings] = trEPRfsc2MetaLoad(filename)
 %
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
+%
+% See also TREPRLOAD, TREPRFSC2LOAD.
 
 % (c) 2011, Till Biskup
 % 2011-11-01
