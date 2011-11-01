@@ -30,7 +30,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRFSC2LOAD.
 
 % (c) 2011, Till Biskup
-% 2011-10-31
+% 2011-11-01
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
