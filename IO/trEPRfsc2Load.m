@@ -96,7 +96,7 @@ function [content,warnings] = loadFile(filename)
     content.header{1} = fgetl(fid);
     k=2;
     
-    while strmatch(content.header{k-1}(1),'%')% == 1
+    while strcmp(content.header{k-1}(1),'%')% == 1
         content.header{k} = fgetl(fid);
         k=k+1;
     end
@@ -186,7 +186,7 @@ function [content,warnings] = loadFile(filename)
                     matching{l,2}));
                 switch matching{l,3}
                     case 'numeric'
-                        [tokens names] = regexp(...
+                        [tokens ~] = regexp(...
                             char(content.header{k}),...
                             '(?<value>[0-9.]+)\s*(?<unit>\w*)',...
                             'tokens','names');
@@ -209,7 +209,7 @@ function [content,warnings] = loadFile(filename)
                             matching{l,2},...
                             string);
                     case 'valueunit'
-                        [tokens names] = regexp(...
+                        [tokens ~] = regexp(...
                             char(content.header{k}),...
                             '(?<value>[0-9.]+)\s*(?<unit>\w*)',...
                             'tokens','names');
@@ -247,9 +247,9 @@ function [content,warnings] = loadFile(filename)
             'Could not determine data dimensions from file %s...',...
             filename)...
             );
-        return;
         % Assign an empty struct/cell to the output arguments
         content = struct();
+        return;
     end
     
     % Check for direction of field axis
@@ -343,9 +343,9 @@ function [content,warnings] = loadFile(filename)
             'Could not determine data dimensions from file %s...',...
             filename)...
             );
-        return;
         % Assign an empty struct/cell to the output arguments
         content = struct();
+        return;
     end
     
     content.axes.x.values = ...
@@ -393,7 +393,7 @@ function value = getCascadedField (struct, fieldName)
     nDots = strfind(fieldName,'.');
     switch length(nDots)
         case 0
-            value = getfield(struct,fieldName);
+            value = struct.(fieldName);
         case 1
             value = getfield(getfield(...
                 struct,...
