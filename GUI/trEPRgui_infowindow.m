@@ -356,7 +356,7 @@ uicontrol('Tag','general_panel_fileformat_edit',...
     'BackgroundColor',noneditableBackground,...
     'Visible','on',...
     'Units','pixels',...
-    'String','File format (not yet supported...)',...
+    'String','File format',...
     'Position',[80 10 mainPanelWidth*2-80 25]);
 
 p1p2 = uipanel('Tag','general_panel_label_panel',...
@@ -2936,12 +2936,14 @@ function updateGeneralPanel()
         gh = guidata(mainWindow);
         
         [filepath,filename,fileext] = ...
-            fileparts(ad.data{ad.control.spectra.active}.filename);
+            fileparts(ad.data{ad.control.spectra.active}.file.name);
         if filepath
             filepath = [filepath '/'];
         end
         set(gh.general_panel_filepath_edit,'String',filepath);
         set(gh.general_panel_filename_edit,'String',[filename fileext]);
+        set(gh.general_panel_fileformat_edit,'String',...
+            ad.data{ad.control.spectra.active}.file.format);
         set(gh.general_panel_label_edit,'String',...
             ad.data{ad.control.spectra.active}.label);
         
@@ -3026,7 +3028,7 @@ function updateParameterPanel()
         selectedId = ad.control.spectra.active;
         
         % Set fields according to parameters of current dataset
-        if isfield(ad.data{selectedId}.parameters,'nruns')
+        if isfield(ad.data{selectedId}.parameters,'runs')
             set(gh.parameter_panel_nruns_edit,'String',...
                 num2str(ad.data{selectedId}.parameters.runs));
         else
@@ -3034,7 +3036,7 @@ function updateParameterPanel()
         end
         if isfield(ad.data{selectedId}.parameters,'nruns')
             set(gh.parameter_panel_temperature_edit,'String',...
-                num2str(ad.data{selectedId}.parameters.temperature));
+                num2str(ad.data{selectedId}.parameters.temperature.value));
         else
             set(gh.parameter_panel_temperature_edit,'String','N/A');
         end
@@ -3045,7 +3047,7 @@ function updateParameterPanel()
             set(gh.parameter_panel_operator_edit,'String','N/A');
         end
         if isfield(ad.data{selectedId}.parameters,'transient')
-            if isfield(ad.data{selectedId}.parameters.transient,'point')
+            if isfield(ad.data{selectedId}.parameters.transient,'points')
                 set(gh.parameter_panel_npts_edit,'String',...
                     num2str(ad.data{selectedId}.parameters.transient.points));
             else
@@ -3095,7 +3097,7 @@ function updateParameterPanel()
             end
             if isfield(ad.data{selectedId}.parameters.recorder,'timeBase')
                 set(gh.parameter_panel_timebase_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.recorder.timeBase));
+                    num2str(ad.data{selectedId}.parameters.recorder.timeBase.value));
             else
                 set(gh.parameter_panel_timebase_edit,'String','N/A');
             end
@@ -3158,20 +3160,27 @@ function updateParameterPanel()
         if isfield(ad.data{selectedId}.parameters,'bridge')
             if isfield(ad.data{selectedId}.parameters.bridge,'MWfrequency')
                 set(gh.parameter_panel_mwfrequency_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.MWfrequency));
+                    num2str(ad.data{selectedId}.parameters.bridge.MWfrequency.value));
             else
                 set(gh.parameter_panel_mwfrequency_edit,'String','N/A');
             end
             if isfield(ad.data{selectedId}.parameters.bridge,'attenuation')
                 set(gh.parameter_panel_attenuation_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.attenuation));
+                    num2str(ad.data{selectedId}.parameters.bridge.attenuation.value));
             else
                 set(gh.parameter_panel_attenuation_edit,'String','N/A');
             end
+            if isfield(ad.data{selectedId}.parameters.bridge,'power')
+                set(gh.parameter_panel_mwpower_edit,'String',...
+                    num2str(ad.data{selectedId}.parameters.bridge.power.value));
+                set(gh.parameter_panel_mwpowerunit_edit,'String',...
+                    num2str(ad.data{selectedId}.parameters.bridge.power.unit));
+            else
+                set(gh.parameter_panel_mwpower_edit,'String','N/A');
+                set(gh.parameter_panel_mwpowerunit_edit,'String','N/A');
+            end
         else
         end
-        set(gh.parameter_panel_mwpower_edit,'String','0');
-        set(gh.parameter_panel_mwpowerunit_edit,'String','mW');
         set(gh.parameter_panel_mwcalibratedstart_edit,'String','N/A');
         set(gh.parameter_panel_mwcalibratedend_edit,'String','N/A');
         set(gh.parameter_panel_bridgemodel_edit,'String','N/A');
@@ -3179,13 +3188,13 @@ function updateParameterPanel()
         if isfield(ad.data{selectedId}.parameters,'laser')
             if isfield(ad.data{selectedId}.parameters.laser,'wavelength')
                 set(gh.parameter_panel_wavelength_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.laser.wavelength));
+                    num2str(ad.data{selectedId}.parameters.laser.wavelength.value));
             else
                 set(gh.parameter_panel_wavelength_edit,'String','N/A');
             end
             if isfield(ad.data{selectedId}.parameters.laser,'repetitionRate')
                 set(gh.parameter_panel_repetitionrate_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.laser.repetitionRate));
+                    num2str(ad.data{selectedId}.parameters.laser.repetitionRate.value));
             else
                 set(gh.parameter_panel_repetitionrate_edit,'String','N/A');
             end
