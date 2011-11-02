@@ -38,3 +38,12 @@ Ctrl-w
 
 (Mac: Ctrl or Command)
 
+
+
+ADDITIONAL KEY BINDINGS
+
+Ctrl-i - Informations about currently active dataset
+
+(Mac: Ctrl or Command)
+
+
