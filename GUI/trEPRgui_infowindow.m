@@ -2371,6 +2371,9 @@ if (mainGuiWindow)
         for k=1:length(ad.control.spectra.loaded)
             ad.control.spectra.history{k} = 0;
         end
+        if ~ad.control.spectra.active
+            ad.control.spectra.active = 1;
+        end
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -2982,228 +2985,70 @@ function updateParameterPanel()
         % Get handles from info GUI
         gh = guidata(mainWindow);
         
+        % Cell array matching GUI edit fields to data structure
+        % The first column contains the GUI edit field tags.
+        % The second column contains the default string of the field.
+        % The third column contains the corresponding field in the
+        % parameters part of the data structure.
+        matching = {...
+            'parameter_panel_nruns_edit','0','runs'; ...
+            'parameter_panel_temperature_edit','0','temperature.value'; ...
+            'parameter_panel_operator_edit','N/A','operator'; ...
+            'parameter_panel_npts_edit','0','transient.points'; ...
+            'parameter_panel_triggerposition_edit','0','transient.triggerPosition'; ...
+            'parameter_panel_length_edit','0','transient.length'; ...
+            'parameter_panel_length_unit_edit','us','transient.unit'; ...
+            'parameter_panel_sensitivity_edit','0','recorder.sensitivity.value'; ...
+            'parameter_panel_sensitivity_unit_edit','mV','recorder.sensitivity.unit'; ...
+            'parameter_panel_averages_edit','0','recorder.averages'; ...
+            'parameter_panel_timebase_edit','0','recorder.timeBase.value'; ...
+            'parameter_panel_timebaseunit_edit','us','recorder.timeBase.unit'; ...
+            'parameter_panel_bandwidth_edit','0','recorder.bandwidth.value'; ...
+            'parameter_panel_bandwidthunit_edit','MHz','recorder.bandwidth.unit'; ...
+            'parameter_panel_recordermodel_edit','N/A','recorder.model'; ...
+            'parameter_panel_fieldstart_edit','0','field.start'; ...
+            'parameter_panel_fieldstartunit_edit','G','field.unit'; ...
+            'parameter_panel_fieldend_edit','0','field.stop'; ...
+            'parameter_panel_fieldendunit_edit','G','field.unit'; ...
+            'parameter_panel_fieldstep_edit','0','field.step'; ...
+            'parameter_panel_fieldstepunit_edit','G','field.unit'; ...
+            'parameter_panel_fieldstartcalibrated_edit','N/A',''; ...
+            'parameter_panel_fieldendcalibrated_edit','N/A',''; ...
+            'parameter_panel_mwfrequency_edit','0','bridge.MWfrequency.value'; ...
+            'parameter_panel_attenuation_edit','0','bridge.attenuation.value'; ...
+            'parameter_panel_mwpower_edit','0','bridge.power.value'; ...
+            'parameter_panel_mwpowerunit_edit','mW','bridge.power.unit'; ...
+            'parameter_panel_mwcalibratedstart_edit','N/A',''; ...
+            'parameter_panel_mwcalibratedend_edit','N/A',''; ...
+            'parameter_panel_bridgemodel_edit','N/A','bridge.model'; ...
+            'parameter_panel_wavelength_edit','0','laser.wavelength.value'; ...
+            'parameter_panel_repetitionrate_edit','0','laser.repetitionRate.value'; ...
+            'parameter_panel_laserpower_edit','0','laser.power.value'; ...
+            'parameter_panel_laserpowerunit_edit','mJ','laser.power.unit'; ...
+            'parameter_panel_lasermodel_edit','N/A','laser.model'; ...
+            'parameter_panel_opodye_edit','N/A','laser.opoDye'; ...
+            };
+        
         if isempty(ad.data)
             % Set all edit fields to default values
-            set(gh.parameter_panel_nruns_edit,'String','0');
-            set(gh.parameter_panel_temperature_edit,'String','0');
-            set(gh.parameter_panel_operator_edit,'String','N/A');
-            set(gh.parameter_panel_npts_edit,'String','0');
-            set(gh.parameter_panel_triggerposition_edit,'String','0');
-            set(gh.parameter_panel_length_edit,'String','0');
-            set(gh.parameter_panel_length_unit_edit,'String','us');
-            set(gh.parameter_panel_sensitivity_edit,'String','0');
-            set(gh.parameter_panel_sensitivity_unit_edit,'String','mV');
-            set(gh.parameter_panel_averages_edit,'String','0');
-            set(gh.parameter_panel_timebase_edit,'String','0');
-            set(gh.parameter_panel_timebaseunit_edit,'String','us');
-            set(gh.parameter_panel_bandwidth_edit,'String','0');
-            set(gh.parameter_panel_bandwidthunit_edit,'String','MHz');
-            set(gh.parameter_panel_recordermodel_edit,'String','N/A');
-            set(gh.parameter_panel_fieldstart_edit,'String','0');
-            set(gh.parameter_panel_fieldstartunit_edit,'String','G');
-            set(gh.parameter_panel_fieldend_edit,'String','0');
-            set(gh.parameter_panel_fieldendunit_edit,'String','G');
-            set(gh.parameter_panel_fieldstep_edit,'String','0');
-            set(gh.parameter_panel_fieldstepunit_edit,'String','G');
-            set(gh.parameter_panel_fieldstartcalibrated_edit,'String','N/A');
-            set(gh.parameter_panel_fieldendcalibrated_edit,'String','N/A');
-            set(gh.parameter_panel_mwfrequency_edit,'String','0');
-            set(gh.parameter_panel_attenuation_edit,'String','0');
-            set(gh.parameter_panel_mwpower_edit,'String','0');
-            set(gh.parameter_panel_mwpowerunit_edit,'String','mW');
-            set(gh.parameter_panel_mwcalibratedstart_edit,'String','N/A');
-            set(gh.parameter_panel_mwcalibratedend_edit,'String','N/A');
-            set(gh.parameter_panel_bridgemodel_edit,'String','N/A');
-            set(gh.parameter_panel_wavelength_edit,'String','0');
-            set(gh.parameter_panel_repetitionrate_edit,'String','0');
-            set(gh.parameter_panel_laserpower_edit,'String','0');
-            set(gh.parameter_panel_laserpowerunit_edit,'String','mJ');
-            set(gh.parameter_panel_lasermodel_edit,'String','N/A');
-            set(gh.parameter_panel_opodye_edit,'String','N/A');
+            for k=1:length(matching)
+                set(gh.(matching{k,1}),'String',matching{k,2});
+            end
             return;
-        end
-        
-        % To shorten lines, assign Id of currently active dataset
-        selectedId = ad.control.spectra.active;
-        
-        % Set fields according to parameters of current dataset
-        if isfield(ad.data{selectedId}.parameters,'runs')
-            set(gh.parameter_panel_nruns_edit,'String',...
-                num2str(ad.data{selectedId}.parameters.runs));
         else
-            set(gh.parameter_panel_nruns_edit,'String','N/A');
+            for k=1:length(matching)
+                if ~isempty(matching{k,3}) && ~isempty(...
+                        getCascadedField(...
+                        ad.data{ad.control.spectra.active}.parameters,...
+                        matching{k,3}))
+                    set(gh.(matching{k,1}),'String',...
+                        getCascadedField(...
+                        ad.data{ad.control.spectra.active}.parameters,...
+                        matching{k,3})...
+                        );
+                end
+            end
         end
-        if isfield(ad.data{selectedId}.parameters,'nruns')
-            set(gh.parameter_panel_temperature_edit,'String',...
-                num2str(ad.data{selectedId}.parameters.temperature.value));
-        else
-            set(gh.parameter_panel_temperature_edit,'String','N/A');
-        end
-        if isfield(ad.data{selectedId}.parameters,'operator')
-            set(gh.parameter_panel_operator_edit,'String',...
-                ad.data{selectedId}.parameters.operator);
-        else
-            set(gh.parameter_panel_operator_edit,'String','N/A');
-        end
-        if isfield(ad.data{selectedId}.parameters,'transient')
-            if isfield(ad.data{selectedId}.parameters.transient,'points')
-                set(gh.parameter_panel_npts_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.transient.points));
-            else
-                set(gh.parameter_panel_npts_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.transient,'triggerPosition')
-                set(gh.parameter_panel_triggerposition_edit,'String',...
-                    num2str(...
-                    ad.data{selectedId}.parameters.transient.triggerPosition));
-            else
-                set(gh.parameter_panel_triggerposition_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.transient,'length')
-                set(gh.parameter_panel_length_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.transient.length));
-            else
-                set(gh.parameter_panel_length_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.transient,'unit')
-                set(gh.parameter_panel_length_unit_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.transient.unit));
-            else
-                set(gh.parameter_panel_length_unit_edit,'String','N/A');
-            end
-        else
-            set(gh.parameter_panel_npts_edit,'String','N/A');
-            set(gh.parameter_panel_triggerposition_edit,'String','N/A');
-            set(gh.parameter_panel_length_edit,'String','N/A');
-            set(gh.parameter_panel_length_unit_edit,'String','N/A');
-        end
-        
-        if isfield(ad.data{selectedId}.parameters,'recorder')
-            if isfield(ad.data{selectedId}.parameters.recorder,'sensitivity')
-                set(gh.parameter_panel_sensitivity_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.recorder.sensitivity.value));
-                set(gh.parameter_panel_sensitivity_unit_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.recorder.sensitivity.unit));
-            else
-                set(gh.parameter_panel_sensitivity_edit,'String','N/A');
-                set(gh.parameter_panel_sensitivity_unit_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.recorder,'averages')
-                set(gh.parameter_panel_averages_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.recorder.averages));
-            else
-                set(gh.parameter_panel_averages_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.recorder,'timeBase')
-                set(gh.parameter_panel_timebase_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.recorder.timeBase.value));
-            else
-                set(gh.parameter_panel_timebase_edit,'String','N/A');
-            end
-            
-            set(gh.parameter_panel_timebaseunit_edit,'String','us');
-            
-            set(gh.parameter_panel_bandwidth_edit,'String','0');
-            set(gh.parameter_panel_bandwidthunit_edit,'String','MHz');
-            
-            set(gh.parameter_panel_recordermodel_edit,'String','N/A');
-            
-        else
-            set(gh.parameter_panel_sensitivity_edit,'String','N/A');
-            set(gh.parameter_panel_sensitivity_unit_edit,'String','N/A');
-            set(gh.parameter_panel_averages_edit,'String','N/A');
-            set(gh.parameter_panel_timebase_edit,'String','N/A');
-            set(gh.parameter_panel_timebaseunit_edit,'String','us');
-            set(gh.parameter_panel_bandwidth_edit,'String','0');
-            set(gh.parameter_panel_bandwidthunit_edit,'String','MHz');
-            set(gh.parameter_panel_recordermodel_edit,'String','N/A');
-        end
-        
-        if isfield(ad.data{selectedId}.parameters,'field')
-            if isfield(ad.data{selectedId}.parameters.field,'start')
-                set(gh.parameter_panel_fieldstart_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.field.start));
-            else
-                set(gh.parameter_panel_fieldstart_edit,'String','N/A');
-            end
-            set(gh.parameter_panel_fieldstartunit_edit,'String','G');
-            if isfield(ad.data{selectedId}.parameters.field,'stop')
-                set(gh.parameter_panel_fieldend_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.field.stop));
-            else
-                set(gh.parameter_panel_fieldend_edit,'String','N/A');
-            end
-            set(gh.parameter_panel_fieldendunit_edit,'String','G');
-            if isfield(ad.data{selectedId}.parameters.field,'step')
-                set(gh.parameter_panel_fieldstep_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.field.step));
-            else
-                set(gh.parameter_panel_fieldstep_edit,'String','N/A');
-            end
-        
-            set(gh.parameter_panel_fieldstepunit_edit,'String','G');
-            
-            set(gh.parameter_panel_fieldstartcalibrated_edit,'String','N/A');
-            set(gh.parameter_panel_fieldendcalibrated_edit,'String','N/A');
-        else
-            set(gh.parameter_panel_fieldstart_edit,'String','N/A');
-            set(gh.parameter_panel_fieldstartunit_edit,'String','G');
-            set(gh.parameter_panel_fieldend_edit,'String','N/A');
-            set(gh.parameter_panel_fieldendunit_edit,'String','G');
-            set(gh.parameter_panel_fieldstep_edit,'String','N/A');
-            set(gh.parameter_panel_fieldstepunit_edit,'String','G');
-            set(gh.parameter_panel_fieldstartcalibrated_edit,'String','N/A');
-            set(gh.parameter_panel_fieldendcalibrated_edit,'String','N/A');
-        end
-        
-        if isfield(ad.data{selectedId}.parameters,'bridge')
-            if isfield(ad.data{selectedId}.parameters.bridge,'MWfrequency')
-                set(gh.parameter_panel_mwfrequency_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.MWfrequency.value));
-            else
-                set(gh.parameter_panel_mwfrequency_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.bridge,'attenuation')
-                set(gh.parameter_panel_attenuation_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.attenuation.value));
-            else
-                set(gh.parameter_panel_attenuation_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.bridge,'power')
-                set(gh.parameter_panel_mwpower_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.power.value));
-                set(gh.parameter_panel_mwpowerunit_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.bridge.power.unit));
-            else
-                set(gh.parameter_panel_mwpower_edit,'String','N/A');
-                set(gh.parameter_panel_mwpowerunit_edit,'String','N/A');
-            end
-        else
-        end
-        set(gh.parameter_panel_mwcalibratedstart_edit,'String','N/A');
-        set(gh.parameter_panel_mwcalibratedend_edit,'String','N/A');
-        set(gh.parameter_panel_bridgemodel_edit,'String','N/A');
-        
-        if isfield(ad.data{selectedId}.parameters,'laser')
-            if isfield(ad.data{selectedId}.parameters.laser,'wavelength')
-                set(gh.parameter_panel_wavelength_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.laser.wavelength.value));
-            else
-                set(gh.parameter_panel_wavelength_edit,'String','N/A');
-            end
-            if isfield(ad.data{selectedId}.parameters.laser,'repetitionRate')
-                set(gh.parameter_panel_repetitionrate_edit,'String',...
-                    num2str(ad.data{selectedId}.parameters.laser.repetitionRate.value));
-            else
-                set(gh.parameter_panel_repetitionrate_edit,'String','N/A');
-            end
-        else
-        end
-        
-        set(gh.parameter_panel_laserpower_edit,'String','0');
-        set(gh.parameter_panel_laserpowerunit_edit,'String','mJ');
-        set(gh.parameter_panel_lasermodel_edit,'String','N/A');
-        set(gh.parameter_panel_opodye_edit,'String','N/A');
         
     catch exception
         try
@@ -3339,6 +3184,20 @@ function updateHistoryPanel()
             throw(exception);
         end
     end 
+end
+
+% --- Get field of cascaded struct
+function value = getCascadedField (struct, fieldName)
+    % Get number of "." in fieldName
+    nDots = strfind(fieldName,'.');
+    if isempty(nDots)
+        value = struct.(fieldName);
+    else
+        struct = struct.(fieldName(1:nDots(1)-1));
+        value = getCascadedField(...
+            struct,...
+            fieldName(nDots(1)+1:end));
+    end    
 end
 
 end
