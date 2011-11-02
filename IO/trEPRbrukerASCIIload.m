@@ -72,12 +72,16 @@ try
     
     % Creating x axis (time)
     data.axes.x.values = rawData.data(1:a(1),2);
-    data.axes.x.measure = 'time';
+    data.axes.x.measure = lower(tokens{2}{1});
     data.axes.x.unit = tokens{3}{1};
     
     % Creating y axis (field)
     data.axes.y.values = rawData.data(1:a(1):end,3);
-    data.axes.y.measure = 'magnetic field';
+    if strcmpi(tokens{4}{1},'Field')
+        data.axes.y.measure = 'magnetic field';
+    else
+        data.axes.x.measure = lower(tokens{4}{1});
+    end
     data.axes.y.unit = tokens{5}{1};
     
     % Creating z axis (field)
