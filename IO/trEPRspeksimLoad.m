@@ -25,6 +25,9 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
+% (c) 2009-2011, Till Biskup
+% 2011-11-02
+
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
     parser.FunctionName = mfilename; % Function name included in error messages
