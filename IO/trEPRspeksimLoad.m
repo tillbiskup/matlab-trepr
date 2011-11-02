@@ -205,6 +205,7 @@ function [content,warnings] = loadFile(filename,varargin)
         content.parameters.field.start = str2double(B0{1});
         content.parameters.field.stop = str2double(B0{1});
         content.parameters.field.step = 0;
+        content.parameters.axes.y.values = str2double(B0{1});
     end
     
     % Assign other parameters, as far as possible
@@ -229,7 +230,7 @@ function [content,warnings] = loadFile(filename,varargin)
                 );
     end
     content.axes.y.measure = 'magnetic field';
-    content.parameters.bridge.MWfrequency.value = tokens{1}{3};
+    content.parameters.bridge.MWfrequency.value = str2double(tokens{1}{3});
     content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     
     timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
