@@ -100,6 +100,10 @@ try
                 case 'z'
                     switchDisplayType('2D plot');
                     return;
+                % Other commands
+                case 'i'
+                    trEPRgui_infowindow();
+                    return;
             end
         end
     end

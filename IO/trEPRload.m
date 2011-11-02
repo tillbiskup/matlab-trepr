@@ -67,6 +67,14 @@ function varargout = trEPRload(filename, varargin)
                         fprintf('%s could not be loaded...\n',filename{k});
                 end
             end
+            % Concatenate all the warnings messages
+            warningsArray = cell(0);
+            for k=1:length(warnings)
+                if ~isempty(warnings{k})
+                    warningsArray = [ warningsArray warnings{k} ];
+                end
+            end
+            warnings = warningsArray;
         end
         if ~nargout && exist('content','var')
             % If no output argument is given, assign content to a
@@ -124,6 +132,14 @@ function varargout = trEPRload(filename, varargin)
                         fprintf('%s could not be loaded...\n',filenames{k});
                 end
             end
+            % Concatenate all the warnings messages
+            warningsArray = cell(0);
+            for k=1:length(warnings)
+                if ~isempty(warnings{k})
+                    warningsArray = [ warningsArray warnings{k} ];
+                end
+            end
+            warnings = warningsArray;
         end
         if ~nargout && exist('content','var')
             % If no output argument is given, assign content to a

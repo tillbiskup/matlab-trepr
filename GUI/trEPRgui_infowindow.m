@@ -2861,7 +2861,7 @@ function updateDatasets()
         mainWindow = guiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
-        
+            
         if isempty(ad.data)
             return;
         end
@@ -2888,7 +2888,6 @@ function updateDatasets()
             if ((get(lbox,'Value')==0) && (~isempty(loaded)))
                 set(lbox,'Value',1);
             end
-            ad.control.spectra.active = loaded(get(lbox,'Value'));
         else
             set(lbox,'String','');
             set(lbox,'Enable','off');

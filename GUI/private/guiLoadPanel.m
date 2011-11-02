@@ -355,7 +355,7 @@ function load_pushbutton_Callback(~,~)
             for k = 1 : length(data)
                 [p,fn,ext] = fileparts(data{k}.file.name);
                 fileNames{k} = fullfile(p,[fn ext]);
-                if ~isfield(data{k},'label')
+                if ~isfield(data{k},'label') || isempty(data{k}.label)
                     data{k}.label = [fn ext];
                 end
                 data{k}.display = display;
@@ -375,7 +375,7 @@ function load_pushbutton_Callback(~,~)
         else
             fileNames = data.file.name;
             [~,fn,ext] = fileparts(data.file.name);
-            if ~isfield(data,'label')
+            if ~isfield(data,'label') || isempty(data.label)
                 data.label = [fn ext];
             end
             data.display = display;
