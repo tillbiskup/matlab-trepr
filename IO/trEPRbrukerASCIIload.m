@@ -29,6 +29,9 @@ p.StructExpand = true; % Enable passing arguments in a structure
 p.addRequired('filename', @(x)ischar(x));
 p.parse(filename);
 
+    
+% Preassign values to the data struct
+data = trEPRdataStructure;
 warnings = cell(0);
 
 try
@@ -74,11 +77,15 @@ try
     
     % Creating y axis (field)
     data.axes.y.values = rawData.data(1:a(1):end,3);
-    data.axes.y.measure = 'field';
+    data.axes.y.measure = 'magnetic field';
     data.axes.y.unit = tokens{5}{1};
     
+    % Creating z axis (field)
+    data.axes.z.measure = lower(tokens{6}{1});
+    
     % Write additional fields
-    data.filename = filename;
+    data.file.name = filename;
+    data.file.format = 'BrukerASCII';
     data.label = filename;
     data.header = rawData.textdata;
     
@@ -90,22 +97,12 @@ try
     data.parameters.field.stop = data.axes.y.values(end);
     data.parameters.field.step = ...
         data.axes.y.values(2)-data.axes.y.values(1);
-    data.parameters.recorder.sensitivity.value = [];
-    data.parameters.recorder.sensitivity.unit = '';
-    data.parameters.recorder.averages = [];
-    data.parameters.recorder.timeBase = [];
     data.parameters.transient.points = length(data.axes.x.values);
-    data.parameters.transient.triggerPosition = [];
     data.parameters.transient.length = ...
         data.axes.x.values(end)-data.axes.x.values(1);
-    data.parameters.bridge.MWfrequency = [];
-    data.parameters.bridge.attenuation = [];
-    data.parameters.temperature = [];
-    data.parameters.laser.wavelength = [];
-    data.parameters.laser.repetitionRate = [];
     
     % Set Version string of content structure
-    content.version = '1.1';
+    data.version = '1.1';
 catch exception
     throw(exception);
 end
