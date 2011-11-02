@@ -27,7 +27,7 @@ function varargout = trEPRdataStructure(varargin)
 %                   List of fields in structure having the wrong type with
 %                   respect to the toolbox data structure
 %
-% See also TREPRFSC2LOAD.
+% See also TREPRLOAD.
 
 % (c) 2011, Till Biskup
 % 2011-11-01

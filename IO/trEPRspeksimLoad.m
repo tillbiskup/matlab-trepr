@@ -1,11 +1,29 @@
 function varargout = trEPRspeksimLoad(filename, varargin)
-% Load data measured at the transient spectrometer in Freiburg (speksim),
-% save the header and try to extract from the header necessary functions
-% such as the axes.
+% TREPRSPEKSIMLOAD Load data from trEPR spectrometer in Freiburg (speksim)
 %
-% Filename can be a single filename, a file basename (meaning that all
-% files with that basename are loaded and combined) or a cell array
-% containing filenames to be loaded and combined.
+% Usage
+%   trEPRspeksimLoad(filename);
+%   [data] = trEPRspeksimLoad(filename);
+%   [data,warnings] = trEPRspeksimLoad(filename);
+%   [data,warnings] = trEPRspeksimLoad(filename,command);
+%
+%   filename - string
+%              single filename, a file basename or a cell array
+%              in the latter two cases all those files are loaded
+%   command -  string
+%              'combine' or 'all'
+%              If 'combine', the multiple files are combined
+%              If 'all', filename is interpreted as file basename and all
+%              files are combined
+%   data     - struct
+%              structure containing data and additional fields
+%              Complies to the conventions of the toolbox data structure,
+%              cf. trEPRdataStructure
+%
+%   warnings - cell array of strings
+%              empty if there are no warnings
+%                
+% See also TREPRLOAD, TREPRDATASTRUCTURE.
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -95,222 +113,147 @@ end
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
 function [content,warnings] = loadFile(filename,varargin)
-    % Assign an empty struct/cell to the output arguments
-    content = struct();
+    % Assign defaults to the output arguments
+    % Preassign values to the content struct
+    content = trEPRdataStructure;
     warnings = cell(0);
 
     % Check for additional input argument
-    if nargin > 1 && strcmp(varargin{1},'all')
-        % This is used in case filename is only a file basename.
-        % Read all files having filename as their file basename.
-        fileNames = dir(sprintf('%s.*',filename));
-        files = cell(length(fileNames),1);
-        l = 1;
-        for k = 1 : length(fileNames)
-            if exist(fileNames(k).name,'file') && ...
-                    checkFileFormat(fileNames(k).name)
-                files{k} = importdata(fileNames(k).name,' ',5);
-                content.data(l,:) = reshape(files{k}.data',1,[]);
-                B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                content.axes.y.values(l) = str2double(B0{1});
-                l=l+1
-            end
+    if nargin > 1 
+        switch varargin{1}
+            case 'all'
+                % This is used in case filename is only a file basename.
+                % Read all files having filename as their file basename.
+                fileNames = dir(sprintf('%s.*',filename));
+                files = cell(length(fileNames),1);
+                l = 1;
+                for k = 1 : length(fileNames)
+                    if exist(fileNames(k).name,'file') && ...
+                            checkFileFormat(fileNames(k).name)
+                        files{k} = importdata(fileNames(k).name,' ',5);
+                        content.data(l,:) = reshape(files{k}.data',1,[]);
+                        % Parsing the header for the magnetic field value
+                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
+                        content.axes.y.values(l) = str2double(B0{1});
+                        l=l+1;
+                    end
+                end
+                % In case we have not loaded anything
+                if isempty(fieldnames(content))
+                    content = [];
+                    warnings = cell(0);
+                    return;
+                end
+                
+                content.parameters.field.start = ...
+                    content.axes.y.values(1);
+                content.parameters.field.stop = ...
+                    content.axes.y.values(end);
+                content.parameters.field.step = ...
+                    content.axes.y.values(2) - content.axes.y.values(1);
+            case 'combine'
+                % This is used in case filename is a cell array of file names
+                files = cell(length(filename),1);
+                l = 1;
+                for k = 1 : length(filename)
+                    if exist(filename{k},'file') && ...
+                            checkFileFormat(filename{k})
+                        files{k} = importdata(filename{k},' ',5);
+                        content.data(l,:) = reshape(files{k}.data',1,[]);
+                        % Parsing the header for the magnetic field value
+                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
+                        content.axes.y.values(l) = str2double(B0{1});
+                        l=l+1;
+                    end
+                end
+                % In case we have not loaded anything
+                if isempty(fieldnames(content))
+                    content = [];
+                    warnings = cell(0);
+                    return;
+                end
+                
+                content.parameters.field.start = ...
+                    content.axes.y.values(1);
+                content.parameters.field.stop = ...
+                    content.axes.y.values(end);
+                content.parameters.field.step = ...
+                    content.axes.y.values(2) - content.axes.y.values(1);
+            otherwise
         end
-        
-        % In case we have not loaded anything
-        if isempty(fieldnames(content))
-            content = [];
-            return;
-        end
-            
-        content.parameters.field.start = ...
-            content.axes.y.values(1);
-        content.parameters.field.stop = ...
-            content.axes.y.values(end);
-        content.parameters.field.step = ...
-            content.axes.y.values(2) - content.axes.y.values(1);
-        
-        content.header = files{1}.textdata;
-        
-        content.axes.y.measure = 'magnetic field';
-        content.axes.y.unit = 'G';
-        
-        timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
-        content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
-        % Get rid of the NAN at the end of the time profile
-        content.data = content.data(:,1:timeParams{2});
-        % Bug fix for some very weird MATLAB problems with accuracy
-        content.parameters.transient.length = ...
-            floor(content.parameters.transient.length*1e8)/1e8;
-        % The floor is important due to the fact that the trigger position
-        % might be between two points.
-        content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
-        MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
-        
-        % Create axis informations from parameters
-        content.axes.x.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
-        content.axes.x.measure = 'time';
-        content.axes.x.unit = 's';
-
-        % For backwards compatibility
-        content.axes.xaxis = content.axes.x;
-        content.axes.yaxis = content.axes.y;
-        
-        % Assign default (empty) values to parameters not readable from
-        % file (for completeness of the parameters structure, necessary for
-        % some functions of the trEPR GUI)
-        content.parameters.temperature = '';
-        content.parameters.bridge.attenuation = '';
-        content.parameters.laser.wavelength = '';
-        content.parameters.laser.repetitionRate = '';
-        content.parameters.recorder.averages = [];
-        content.parameters.recorder.sensitivity.value = [];
-        content.parameters.recorder.sensitivity.unit = '';
-    
-    elseif nargin > 1 && strcmp(varargin{1},'combine')
-        % This is used in case filename is a cell array of file names
-        files = cell(length(filename),1);
-        l = 1;
-        for k = 1 : length(filename)
-            if exist(filename{k},'file') && ...
-                    checkFileFormat(filename{k})
-                files{k} = importdata(filename{k},' ',5);
-                content.data(l,:) = reshape(files{k}.data',1,[]);
-                B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                content.axes.y.values(l) = str2double(B0{1});
-                l=l+1;
-            end
-        end
-        
-        % In case we have not loaded anything
-        if isempty(fieldnames(content))
-            content = [];
-            return;
-        end
-        
-        content.parameters.field.start = ...
-            content.axes.y.values(1);
-        content.parameters.field.stop = ...
-            content.axes.y.values(end);
-        content.parameters.field.step = ...
-            content.axes.y.values(2) - content.axes.y.values(1);
-
-        content.header = files{1}.textdata;
-        
-        content.axes.y.measure = 'magnetic field';
-        content.axes.y.unit = 'G';
-
-        timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
-        content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
-        % Get rid of the NAN at the end of the time profile
-        content.data = content.data(:,1:timeParams{2});
-        % Bug fix for some very weird MATLAB problems with accuracy
-        content.parameters.transient.length = ...
-            floor(content.parameters.transient.length*1e8)/1e8;
-        % The floor is important due to the fact that the trigger position
-        % might be between two points.
-        content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
-        MWfreq = regexp(files{1}.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
-
-        % Create axis informations from parameters
-        content.axes.x.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
-        content.axes.x.measure = 'time';
-        content.axes.x.unit = 's';
-
-        % For backwards compatibility
-        content.axes.xaxis = content.axes.x;
-        content.axes.yaxis = content.axes.y;
-
-        % Assign default (empty) values to parameters not readable from
-        % file (for completeness of the parameters structure, necessary for
-        % some functions of the trEPR GUI)
-        content.parameters.temperature = '';
-        content.parameters.bridge.attenuation = '';
-        content.parameters.laser.wavelength = '';
-        content.parameters.laser.repetitionRate = '';
-        content.parameters.recorder.averages = [];
-        content.parameters.recorder.sensitivity.value = [];
-        content.parameters.recorder.sensitivity.unit = '';
-
     else
         % If only a single filename is provided as input argument
         % Check whether file is in speksim format.
+        files = cell(length(filename),1);
         if ~checkFileFormat(filename)
+            content = [];
             warnings{end+1} = struct(...
                 'identifier','trEPRspeksimLoad:wrongformat',...
                 'message',sprintf(...
                 'File %s seems not to be in speksim format...',...
                 filename)...
                 );
-            return
+            return;
         end
 
-        file = importdata(filename,' ',5);
-        content.data = reshape(file.data',1,[]);
-        B0 = regexp(file.textdata{2},'B0 = ([0-9.]*)','tokens');
+        files{1} = importdata(filename,' ',5);
+        content.data = reshape(files{1}.data',1,[]);
+        B0 = regexp(files{1}.textdata{2},'B0 = ([0-9.]*)','tokens');
         content.parameters.field.start = str2double(B0{1});
         content.parameters.field.stop = str2double(B0{1});
         content.parameters.field.step = 0;
-
-        content.header = file.textdata;
-        
-        timeParams = textscan(file.textdata{4},'%f %f %f %f %f %f');
-        content.parameters.transient.points = timeParams{2};
-        content.parameters.transient.length = ...
-            (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
-            timeParams{2};
-        % Get rid of the NAN at the end of the time profile
-        content.data = content.data(1:timeParams{2});
-        % Bug fix for some very weird MATLAB problems with accuracy
-        content.parameters.transient.length = ...
-            floor(content.parameters.transient.length*1e8)/1e8;
-        % The floor is important due to the fact that the trigger position
-        % might be between two points.
-        content.parameters.transient.triggerPosition = ...
-            floor(abs(timeParams{3}) / ...
-            (content.parameters.transient.length / timeParams{2}));
-        MWfreq = regexp(file.textdata{2},'mw = ([0-9.]*)','tokens');
-        content.parameters.bridge.MWfrequency = str2double(MWfreq{1});
-
-        % Create axis informations from parameters
-        content.axes.x.values = ...
-            linspace(timeParams{3},timeParams{4},timeParams{2});
-        content.axes.x.measure = 'time';
-        content.axes.x.unit = 's';
-
-        content.axes.y.values = [];
-        content.axes.y.measure = '';
-        content.axes.y.unit = '';
-        
-        % For backwards compatibility
-        content.axes.xaxis = content.axes.x;
-        content.axes.yaxis = content.axes.y;
-
-        % Assign default (empty) values to parameters not readable from
-        % file (for completeness of the parameters structure, necessary for
-        % some functions of the trEPR GUI)
-        content.parameters.temperature = '';
-        content.parameters.bridge.attenuation = '';
-        content.parameters.laser.wavelength = '';
-        content.parameters.laser.repetitionRate = '';
-        content.parameters.recorder.averages = [];
-        content.parameters.recorder.sensitivity.value = [];
-        content.parameters.recorder.sensitivity.unit = '';
     end
+    
+    % Assign other parameters, as far as possible
+    
+    % Header of first file goes to header
+    content.header = files{1}.textdata;
+
+    % Parse field and MW frequency values
+    [tokens ~] = regexp(...
+        files{1}.textdata{2},...
+        'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+        'tokens');
+    switch tokens{1}{2}
+        case 'Gauss'
+            content.axes.y.unit = 'G';
+        otherwise
+            warnings{end+1} = struct(...
+                'identifier','trEPRspeksimLoad:parseError',...
+                'message',sprintf(...
+                'Could not recognise unit for magnetic field: ''%s''',...
+                tokens{1}{2})...
+                );
+    end
+    content.axes.y.measure = 'magnetic field';
+    content.parameters.bridge.MWfrequency.value = tokens{1}{3};
+    content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+    
+    timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
+    units = textscan(files{1}.textdata{5},'%s %s');
+    content.parameters.transient.points = timeParams{2};
+    content.parameters.transient.length = ...
+        (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
+        timeParams{2};
+    % Get rid of the NAN at the end of the time profile
+    content.data = content.data(:,1:timeParams{2});
+    % Bug fix for some very weird MATLAB problems with accuracy
+    content.parameters.transient.length = ...
+        floor(content.parameters.transient.length*1e8)/1e8;
+    % The floor is important due to the fact that the trigger position
+    % might be between two points.
+    content.parameters.transient.triggerPosition = ...
+        floor(abs(timeParams{3}) / ...
+        (content.parameters.transient.length / timeParams{2}));
+    
+    % Create axis informations from parameters
+    content.axes.x.values = ...
+        linspace(timeParams{3},timeParams{4},timeParams{2});
+    content.axes.x.measure = 'time';
+    content.axes.x.unit = char(units{1});
+    
+    % Get label string from third line of file/header
+    content.label = strtrim(files{1}.textdata{3});
     
     % Set Version string of content structure
     content.version = '1.1';
