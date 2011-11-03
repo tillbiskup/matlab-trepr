@@ -251,6 +251,8 @@ function corrections_pushbutton_Callback(~,~,correction)
                 guiProcessingBGC(ad.control.spectra.active);
             case 'ACC'
                 trEPRgui_ACCwindow();
+            case 'BLC'
+                trEPRgui_BLCwindow();
             otherwise
                 msg = cell(1,2);
                 msg{1} = sprintf(...
