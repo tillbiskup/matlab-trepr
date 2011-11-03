@@ -10,7 +10,7 @@ function varargout = trEPRgui_BLCwindow(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_BLCwindow');
+singleton = guiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -264,7 +264,7 @@ uicontrol('Tag','sliderposition_y_index_edit',...
     'String','0',...
     'Callback',{@position_edit_Callback,'yindex'}...
     );
-uicontrol('Tag','slider_panel_position_y_unit_edit',...
+uicontrol('Tag','sliderposition_y_unit_edit',...
     'Style','edit',...
     'Parent',pp1_p3,...
     'BackgroundColor',[1 1 1],...
@@ -284,6 +284,7 @@ uicontrol('Tag','slider_panel_show_position_checkbox',...
     'Units','Pixels',...
     'Position',[20 40 mainPanelWidth-30 25],...
     'String','Show position in main display',...
+    'Value',1,...
     'Callback',{@showposition_checkbox_Callback}...
     );
 uicontrol('Tag','timepoint_panel_maximum_pushbutton',...
@@ -295,7 +296,7 @@ uicontrol('Tag','timepoint_panel_maximum_pushbutton',...
     'Units','Pixels',...
     'Position',[mainPanelWidth-135 10 105 25],...
     'String','Set to maximum',...
-    'Callback',{@timepoint_panel_maximum_pushbutton_Callback}...
+    'Callback',{@sliderpanel_maximum_pushbutton_Callback}...
     );
 
 pp2_p1 = uipanel('Tag','fitarea_panel',...
@@ -734,6 +735,7 @@ ad.control.spectra.missing = [];
 ad.control.axis = struct();
 ad.control.axis.grid = struct();
 ad.control.axis.grid.zero = true;
+ad.control.axis.position = true;
 ad.control.axis.limits = struct();
 ad.control.axis.limits.auto = true;
 ad.control.axis.limits.x = struct();
@@ -791,6 +793,7 @@ if (mainGuiWindow)
     end
     if (isfield(admain,'control') ~= 0)
         ad.control = admain.control;
+        ad.control.axis.position = true;
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -833,11 +836,11 @@ function tbg_Callback(source,~)
 end
 
 function fitarea_panel_slider_Callback(source,~,area)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
     try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
         switch area
             case 'left'
                 ad.data{ad.control.spectra.active}.blc.fit.area.left = ...
@@ -849,27 +852,41 @@ function fitarea_panel_slider_Callback(source,~,area)
                 ad.data{ad.control.spectra.active}.blc.fit.area.back = ...
                     int16(get(source,'Value'));
         end
-    catch
-        disp('Something went wrong!');
+    
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'data',ad.data);
+        
+        updateAxes();
+        update_position_display();
+        update_fitarea_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'data',ad.data);
-    
-    updateAxes();
-    update_position_display();
-    update_fitarea_display();
 end
 
 function addpoints_panel_checkbox_Callback(source,~,point)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get handles from main window
-    gh = guidata(mainWindow);
-
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
     try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get handles from main window
+        gh = guidata(mainWindow);
+        
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
         switch point
             case 1
                 if get(source,'Value')
@@ -896,98 +913,213 @@ function addpoints_panel_checkbox_Callback(source,~,point)
                     ad.data{ad.control.spectra.active}.blc.fit.point(2).active = false;
                 end
         end
-    catch
-        disp('Something went wrong!');
+        
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'data',ad.data);
+        
+        updateAxes();
+        update_position_display();
+        update_fitarea_display();
+        update_addpoint_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'data',ad.data);
-    
-    updateAxes();
-    update_position_display();
-    update_fitarea_display();
-    update_addpoint_display();
 end
 
 function addpoints_panel_slider_Callback(source,~,point)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
     try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
         ad.data{ad.control.spectra.active}.blc.fit.point(point).position = ...
             int16(get(source,'value'));
-    catch
-        disp('Something went wrong!');
+    
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'data',ad.data);
+        
+        updateAxes();
+        update_position_display();
+        update_fitarea_display();
+        update_addpoint_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'data',ad.data);
-    
-    updateAxes();
-    update_position_display();
-    update_fitarea_display();
-    update_addpoint_display();
 end
 
 function position_slider_Callback(source,~)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
     try
-        ad.data{ad.control.spectra.active}.display.position.x = ...
-            int16(get(source,'value'));
-    catch
-        disp('Something went wrong!');
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
+        % Depending on display type settings
+        switch ad.control.axis.displayType
+            case '1D along x'
+                ad.data{ad.control.spectra.active}.display.position.y = ...
+                    int16(get(source,'value'));
+            case '1D along y'
+                ad.data{ad.control.spectra.active}.display.position.x = ...
+                    int16(get(source,'value'));
+            otherwise
+                msg = sprintf('Display type %s currently unsupported',...
+                    ad.control.axis.displayType);
+                add2status(msg);
+        end
+        
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'data',ad.data);
+        
+        updateAxes();
+        update_position_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'data',ad.data);
-    
-    updateAxes();
-    update_position_display();
 end
 
-function timepoint_panel_maximum_pushbutton_Callback(~,~)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-    
+function showposition_checkbox_Callback(source,~)
     try
-        [~,imax] = max(max(ad.data{ad.control.spectra.active}.data));
-        ad.data{ad.control.spectra.active}.display.position.x = imax;
-    catch
-        disp('Something went wrong!');
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
+        ad.control.axis.position = get(source,'Value');
+        
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'control',ad.control);
+        
+        % Update display
+        updateAxes();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'data',ad.data);
-    
-    updateAxes();
-    update_position_display();
+end
+
+function sliderpanel_maximum_pushbutton_Callback(~,~)
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
+        [~,ximax] = max(max(ad.data{ad.control.spectra.active}.data));
+        [~,yimax] = max(ad.data{ad.control.spectra.active}.data(:,ximax));
+        ad.data{ad.control.spectra.active}.display.position.x = ximax;
+        ad.data{ad.control.spectra.active}.display.position.y = yimax;
+        
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'data',ad.data);
+        
+        updateAxes();
+        update_position_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 function visible_panel_listbox_Callback(source,~)
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-    
     try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
         ad.control.spectra.active = ad.control.spectra.visible(...
             get(source,'Value')...
             );
-    catch
-        disp('Something went wrong!');
+        
+        % Set appdata from BLC GUI
+        setappdata(mainWindow,'control',ad.control);
+        
+        updateAxes();
+        update_position_display();
+        update_fitarea_display();
+        update_addpoint_display();
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
     end
-    
-    % Set appdata from BLC GUI
-    setappdata(mainWindow,'control',ad.control);
-    
-    updateAxes();
-    update_position_display();
-    update_fitarea_display();
-    update_addpoint_display();
 end
 
 function close_pushbutton_Callback(~,~)
@@ -1091,6 +1223,10 @@ function keypress_Callback(src,evt)
             % was pressed...
             return;
         end
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...
                     (strcmpi(evt.Modifier{1},'control'))
@@ -1106,6 +1242,21 @@ function keypress_Callback(src,evt)
                         return;
                     case '3'
                         switchPanel('Correction');
+                        return;
+                    case 'x'
+                        ad.control.axis.displayType = '1D along x';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
+                        return;
+                    case 'y'
+                        ad.control.axis.displayType = '1D along y';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
+                        return;
+                    case 'z'
+                        ad.control.axis.displayType = '2D plot';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
                         return;
                 end
             end
@@ -1184,7 +1335,7 @@ function switchPanel(panelName)
 end
 
 function updateAxes()
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
+    mainWindow = guiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1200,6 +1351,12 @@ function updateAxes()
         backarea = ad.data{ad.control.spectra.active}.blc.fit.area.back;
         leftarea = ad.data{ad.control.spectra.active}.blc.fit.area.left;
         rightarea = ad.data{ad.control.spectra.active}.blc.fit.area.right;
+
+        % Set displayType popupmenu
+        displayTypes = cellstr(...
+            get(gh.results_panel_displaytype_popupmenu,'String'));
+        [~,index] = max(strcmp(ad.control.axis.displayType,displayTypes));
+        set(gh.results_panel_displaytype_popupmenu,'Value',index);
         
         cla(gh.axis1,'reset');
         axes(gh.axis1);
@@ -1208,12 +1365,20 @@ function updateAxes()
                 hold on;
                 % Plot 2D data
                 imagesc(ad.data{ad.control.spectra.active}.data,'Parent',gh.axis1);
-                % Plot red line with position in time
-                plot(gh.axis1,...
-                    [ad.data{ad.control.spectra.active}.display.position.x ...
-                    ad.data{ad.control.spectra.active}.display.position.x],...
-                    [1,y],...
-                    'r-');
+                if ad.control.axis.position
+                    % Plot red line with position in time
+                    plot(gh.axis1,...
+                        [ad.data{ad.control.spectra.active}.display.position.x ...
+                        ad.data{ad.control.spectra.active}.display.position.x],...
+                        [1,y],...
+                        'r-');
+                    % Plot red line with position in field
+                    plot(gh.axis1,...
+                        [1,x],...
+                        [ad.data{ad.control.spectra.active}.display.position.y ...
+                        ad.data{ad.control.spectra.active}.display.position.y],...
+                        'r-');
+                end
                 hold off;
                 set(gh.axis1,'XLim',[1 x]);
                 set(gh.axis1,'YLim',[1 y]);
@@ -1241,8 +1406,9 @@ function updateAxes()
                     'Parent',gh.axis1);
             case '1D along x'
                 % Plot time trace at given position in spectrum
+                hold on;
                 plot(gh.axis1,...
-                    [1:1:x],...
+                    1:1:x,...
                     ad.data{ad.control.spectra.active}.data(...
                     ad.data{ad.control.spectra.active}.display.position.y,:),...
                     'k-');
@@ -1251,6 +1417,15 @@ function updateAxes()
                     max(max(ad.data{ad.control.spectra.active}.data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/10) z(2)+((z(2)-z(1))/10)];
                 set(gh.axis1,'YLim',ZLim);
+                if ad.control.axis.position
+                    % Plot red line with position in time
+                    plot(gh.axis1,...
+                        [ad.data{ad.control.spectra.active}.display.position.x ...
+                        ad.data{ad.control.spectra.active}.display.position.x],...
+                        ZLim,...
+                        'r-');
+                end
+                hold off;
                 set(gh.axis1,'YTickLabel',[]);
                 xlabel(gh.axis1,'{\it time} / points');
                 
@@ -1262,19 +1437,42 @@ function updateAxes()
                     'FaceColor','m',...
                     'FaceAlpha',0.4,...
                     'Parent',gh.axis1);
+                
+                % Enable position slider only if second axis has more than one value
+                if (y>1)
+                    set(gh.position_slider,...
+                        'Min',1,'Max',y,...
+                        'Value',...
+                        ad.data{ad.control.spectra.active}.display.position.y,...
+                        'SliderStep',[1/(y-1) 10/(y-1)],...
+                        'Enable','on');
+                else
+                    set(gh.position_slider,...
+                        'Enable','off'...
+                        );
+                end
             case '1D along y'
                 % Plot B0 spectrum at given position in time
-                B0Spectrum = ad.data{ad.control.spectra.active}.data(...
-                    :,ad.data{ad.control.spectra.active}.display.position.x);
+                hold on;
                 plot(gh.axis1,...
-                    [1:1:y],...
-                    B0Spectrum,...
+                    1:1:y,...
+                    ad.data{ad.control.spectra.active}.data(...
+                    :,ad.data{ad.control.spectra.active}.display.position.x),...
                     'k-');
                 set(gh.axis1,'XLim',[1 y]);
                 z = [ min(min(ad.data{ad.control.spectra.active}.data)) ...
                     max(max(ad.data{ad.control.spectra.active}.data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/10) z(2)+((z(2)-z(1))/10)];
                 set(gh.axis1,'YLim',ZLim);
+                if ad.control.axis.position
+                    % Plot red line with position in time
+                    plot(gh.axis1,...
+                        [ad.data{ad.control.spectra.active}.display.position.y ...
+                        ad.data{ad.control.spectra.active}.display.position.y],...
+                        ZLim,...
+                        'r-');
+                end
+                hold off;
                 set(gh.axis1,'YTickLabel',[]);
                 xlabel(gh.axis1,'{\it magnetic field} / points');
                 
@@ -1293,6 +1491,20 @@ function updateAxes()
                     'FaceColor','r',...
                     'FaceAlpha',0.4,...
                     'Parent',gh.axis1);
+                
+                % Enable position slider only if second axis has more than one value
+                if (x>1)
+                    set(gh.position_slider,...
+                        'Min',1,'Max',x,...
+                        'Value',...
+                        ad.data{ad.control.spectra.active}.display.position.x,...
+                        'SliderStep',[1/(x-1) 10/(x-1)],...
+                        'Enable','on');
+                else
+                    set(gh.position_slider,...
+                        'Enable','off'...
+                        );
+                end
         end
                 
         
@@ -1335,85 +1547,108 @@ function updateAxes()
             'Parent',gh.axis2);
 
     catch exception
-        
-        disp('Something happened...');
-        disp(exception);
-        disp(exception.message);
-        rethrow(exception)
-        
-    end
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 function updateSpectra()
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
-    if isempty(ad.data) || isempty(ad.control.spectra.visible)
-        return;
-    end
-    
-    % Get handle for visible spectra listbox
-    gh = guidata(mainWindow);
-    visLbox = gh.visible_panel_listbox;
-    
-    % Get indices of invisible spectra
-    vis = ad.control.spectra.visible;
-    
-    % Get names for display in listbox
-    labels = cell(0);
-    for k=1:length(vis)
-        labels{k} = ad.data{vis(k)}.label;
-    end
-    
-    % Update status display
-    set(visLbox,'String',labels);
-    if (get(visLbox,'Value')>length(vis))
-        set(visLbox,'Value',length(vis));
-    end
-    if ((get(visLbox,'Value')==0) && ~isempty(vis))
-        set(visLbox,'Value',1);
-    end
-    
-    % Highlight currently active
-    if ad.control.spectra.active
-        set(visLbox,'Value',find(vis==ad.control.spectra.active));
-    end
-    
-    % Change enable status of pushbuttons and other elements
-    set(gh.timepoint_panel_maximum_pushbutton,'Enable','on');
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
         
-    [y,x] = size(ad.data{ad.control.spectra.active}.data);
-    % Set timepoint slider
-    set(gh.position_slider,'Min',1,'Max',x,...
-        'Value',ad.data{ad.control.spectra.active}.display.position.x,...
-        'SliderStep',[1/(x-1) 10/(x-1)],...
-        'Enable','on');
-    set(gh.fitarea_panel_back_slider,'Min',1,'Max',x,...
-        'Value',ad.data{ad.control.spectra.active}.blc.fit.area.back,...
-        'SliderStep',[1/(x-1) 10/(x-1)],...
-        'Enable','on');
-    set(gh.fitarea_panel_left_slider,'Min',1,'Max',y,...
-        'Value',ad.data{ad.control.spectra.active}.blc.fit.area.left,...
-        'SliderStep',[1/(y-1) 10/(y-1)],...
-        'Enable','on');
-    set(gh.fitarea_panel_right_slider,'Min',1,'Max',y,...
-        'Value',ad.data{ad.control.spectra.active}.blc.fit.area.right,...
-        'SliderStep',[1/(y-1) 10/(y-1)],...
-        'Enable','on');
-    set(gh.addpoints_panel_pt1_slider,'Min',1,'Max',y,...
-        'Value',ad.data{ad.control.spectra.active}.blc.fit.point(1).position,...
-        'SliderStep',[1/(y-1) 10/(y-1)]...
-        );
-    set(gh.addpoints_panel_pt2_slider,'Min',1,'Max',y,...
-        'Value',ad.data{ad.control.spectra.active}.blc.fit.point(2).position,...
-        'SliderStep',[1/(y-1) 10/(y-1)]...
-        );
+        if isempty(ad.data) || isempty(ad.control.spectra.visible)
+            return;
+        end
+        
+        % Get handle for visible spectra listbox
+        gh = guidata(mainWindow);
+        visLbox = gh.visible_panel_listbox;
+        
+        % Get indices of invisible spectra
+        vis = ad.control.spectra.visible;
+        
+        % Get names for display in listbox
+        labels = cell(0);
+        for k=1:length(vis)
+            labels{k} = ad.data{vis(k)}.label;
+        end
+        
+        % Update status display
+        set(visLbox,'String',labels);
+        if (get(visLbox,'Value')>length(vis))
+            set(visLbox,'Value',length(vis));
+        end
+        if ((get(visLbox,'Value')==0) && ~isempty(vis))
+            set(visLbox,'Value',1);
+        end
+        
+        % Highlight currently active
+        if ad.control.spectra.active
+            set(visLbox,'Value',find(vis==ad.control.spectra.active));
+        end
+        
+        % Change enable status of pushbuttons and other elements
+        set(gh.timepoint_panel_maximum_pushbutton,'Enable','on');
+        
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        % Set timepoint slider
+        set(gh.fitarea_panel_back_slider,'Min',1,'Max',x,...
+            'Value',ad.data{ad.control.spectra.active}.blc.fit.area.back,...
+            'SliderStep',[1/(x-1) 10/(x-1)],...
+            'Enable','on');
+        set(gh.fitarea_panel_left_slider,'Min',1,'Max',y,...
+            'Value',ad.data{ad.control.spectra.active}.blc.fit.area.left,...
+            'SliderStep',[1/(y-1) 10/(y-1)],...
+            'Enable','on');
+        set(gh.fitarea_panel_right_slider,'Min',1,'Max',y,...
+            'Value',ad.data{ad.control.spectra.active}.blc.fit.area.right,...
+            'SliderStep',[1/(y-1) 10/(y-1)],...
+            'Enable','on');
+        set(gh.addpoints_panel_pt1_slider,'Min',1,'Max',y,...
+            'Value',ad.data{ad.control.spectra.active}.blc.fit.point(1).position,...
+            'SliderStep',[1/(y-1) 10/(y-1)]...
+            );
+        set(gh.addpoints_panel_pt2_slider,'Min',1,'Max',y,...
+            'Value',ad.data{ad.control.spectra.active}.blc.fit.point(2).position,...
+            'SliderStep',[1/(y-1) 10/(y-1)]...
+            );
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
     
 end
 
 function update_position_display()
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
+    mainWindow = guiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1425,6 +1660,26 @@ function update_position_display()
     gh = guidata(mainWindow);
 
     try
+        % Set position in time edit boxes
+        set(gh.sliderposition_y_index_edit,...
+            'String',...
+            num2str(ad.data{ad.control.spectra.active}.display.position.y));
+        % Set unit
+        [y,~] = size(ad.data{ad.control.spectra.active}.data);
+        y = linspace(1,y,y);
+        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
+                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
+            y = ad.data{ad.control.spectra.active}.axes.y.values;
+        end
+        set(gh.sliderposition_y_unit_edit,...
+            'String',...
+            num2str(y(ad.data{ad.control.spectra.active}.display.position.y)));
+        % Set slider
+        set(gh.position_slider,'Value',...
+            ad.data{ad.control.spectra.active}.display.position.y);
+        
         % Set position in time edit boxes
         set(gh.sliderposition_x_index_edit,...
             'String',...
@@ -1445,13 +1700,26 @@ function update_position_display()
         set(gh.position_slider,'Value',...
             ad.data{ad.control.spectra.active}.display.position.x);
     catch exception
-        disp('Something went wrong...');
-        disp(exception.message);
-    end
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 function update_fitarea_display()
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
+    mainWindow = guiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1481,13 +1749,26 @@ function update_fitarea_display()
         set(gh.fitarea_panel_back_slider,'Value',...
             ad.data{ad.control.spectra.active}.blc.fit.area.back);
     catch exception
-        disp('Something went wrong...');
-        disp(exception.message);
-    end
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 function update_addpoint_display()
-    mainWindow = findobj('Tag','trepr_gui_BLCwindow');
+    mainWindow = guiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1512,9 +1793,22 @@ function update_addpoint_display()
         set(gh.addpoints_panel_pt2_slider,'Value',...
             ad.data{ad.control.spectra.active}.blc.fit.point(2).position);
     catch exception
-        disp('Something went wrong...');
-        disp(exception.message);
-    end
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 end

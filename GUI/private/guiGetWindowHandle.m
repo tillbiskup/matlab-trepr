@@ -31,6 +31,7 @@ try
     windowTags = struct();
     windowTags.trEPRgui = 'trepr_gui_mainwindow';
     windowTags.trEPRgui_ACC = 'trepr_gui_ACCwindow';
+    windowTags.trEPRgui_BLCwindow = 'trepr_gui_BLCwindow';
     windowTags.trEPRgui_infowindow = 'trepr_gui_infowindow';
     % Add here list of other window tags
     
@@ -39,7 +40,7 @@ try
     
     if identifier
         if isfield(windowTags,identifier)
-            handle = findobj('Tag',getfield(windowTags,identifier));
+            handle = findobj('Tag',windowTags.(identifier));
         else
             handle = cell(0,1);
         end
