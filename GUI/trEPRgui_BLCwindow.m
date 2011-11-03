@@ -1171,7 +1171,9 @@ function pushbutton_Callback(~,~,action)
                     % Return BLC data to main GUI
                     for k=1:length(ad.blc.spectra)
                         status = refreshDatasetInMainGUI(...
-                            ad.data{k},k,'modified',true);
+                            ad.data{ad.blc.spectra(k)},...
+                            ad.blc.spectra(k),...
+                            'modified',true);
                         if status
                             disp('Hmm... some problems with appending accumulated dataset to main GUI.');
                         end

@@ -35,10 +35,9 @@ try
     
     % Refresh dataset in main GUI
     ad.data{id} = dataset;
-    ad.origdata{id} = dataset;
     
     % Handle whether it should go to modified as well
-    if (p.Results.modified) && ~find(ad.control.spectra.modified==id)
+    if (p.Results.modified) && isempty(find(ad.control.spectra.modified==id,1))
         ad.control.spectra.modified(end+1) = id;
     end
     
