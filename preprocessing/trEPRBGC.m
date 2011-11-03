@@ -13,7 +13,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('data', @(x)isnumeric(x) && ~isscalar(x));
 %p.addOptional('parameters','',@isstruct);
-p.addParamValue('numBGprofiles',5,@isscalar);
+p.addParamValue('numBGprofiles',5,@isvector);
 p.parse(data,varargin{:});
 
 % Determine the dimensionality of the data (1D or 2D)
@@ -37,11 +37,26 @@ end
 
 % Compensate the laser background: Subtract mean value of the first n time
 % profiles from each time profile of the complete 2D dataset.
-bg = mean(data(1:p.Results.numBGprofiles,:));
-for k = 1 : rows
-    data(k,:) = data(k,:) - bg;
+if (length(p.Results.numBGprofiles) == 2) && ...
+        (p.Results.numBGprofiles(1) == 0)
+    bg = mean(data(end-p.Results.numBGprofiles(2):end,:));
+elseif (length(p.Results.numBGprofiles) == 1)
+    bg = mean(data(1:p.Results.numBGprofiles,:));
+end
+
+if exist('bg','var');
+    for k = 1 : rows
+        data(k,:) = data(k,:) - bg;
+    end
+else
+    nTrans = size(data,1);
+    low = mean(data(1:p.Results.numBGprofiles(1),:));
+    high = mean(data(nTrans-p.Results.numBGprofiles(2):nTrans,:));
+    slope = (high-low) / nTrans;
+    for i = 1:nTrans
+        data(i,:) = data(i,:) - (low + slope*(i-1));
+    end
 end
     
 % Assign output parameter
 varargout{1} = data;
-    

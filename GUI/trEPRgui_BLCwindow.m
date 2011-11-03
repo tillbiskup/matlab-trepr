@@ -60,7 +60,6 @@ axes(...         % the axes for plotting selected plot
     'FontUnit','Pixel','Fontsize',12,...
     'Units', 'Pixels', ...
     'Position',[20 50 490 140]);
-%    'HandleVisibility','callback', ...
 
 % Slider for position in the dataset
 uicontrol('Tag','position_slider',...
@@ -296,7 +295,7 @@ uicontrol('Tag','timepoint_panel_maximum_pushbutton',...
     'Units','Pixels',...
     'Position',[mainPanelWidth-135 10 105 25],...
     'String','Set to maximum',...
-    'Callback',{@sliderpanel_maximum_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'showMaximum'}...
     );
 
 pp2_p1 = uipanel('Tag','fitarea_panel',...
@@ -602,7 +601,7 @@ uicontrol('Tag','fitfunction_popupmenu',...
     }...
     );
 
-uicontrol('Tag','correction_apply_pushbutton',...
+uicontrol('Tag','correction_preview_pushbutton',...
     'Style','pushbutton',...
     'Parent',pp3,...
     'BackgroundColor',defaultBackground,...
@@ -610,8 +609,9 @@ uicontrol('Tag','correction_apply_pushbutton',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[10 mainPanelHeight-300 (mainPanelWidth-20)/2 30],...
-    'TooltipString','Applies the currently selected fitting to the spectrum and subtracts the baseline',...
-    'String','Apply'...
+    'TooltipString','Previews the currently selected baseline correction settings in the lower axis',...
+    'String','Preview',...
+    'Callback',{@pushbutton_Callback,'PreviewCorrection'}...
     );
 uicontrol('Tag','correction_reset_pushbutton',...
     'Style','pushbutton',...
@@ -622,7 +622,8 @@ uicontrol('Tag','correction_reset_pushbutton',...
     'Units','Pixels',...
     'Position',[(mainPanelWidth-20)/2+10 mainPanelHeight-300 (mainPanelWidth-20)/2 30],...
     'TooltipString','Resets the currently displayed spectrum to its original form (before BLC)',...
-    'String','Reset'...
+    'String','Reset',...
+    'Callback',{@pushbutton_Callback,'ResetCorrection'}...
     );
 
 pp3_p3 = uipanel('Tag','correctionresult_panel',...
@@ -670,7 +671,8 @@ uicontrol('Tag','apply_pushbutton',...
     'String','Apply',...
     'TooltipString','Applies the changes made to the currently visible dataset to the dataset in the main GUI',...
     'pos',[guiSize(1)-mainPanelWidth-20 20 mainPanelWidth/3 40],...
-    'Enable','on'...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'Apply'}...
     );
 uicontrol('Tag','discard_pushbutton',...
     'Style','pushbutton',...
@@ -681,7 +683,8 @@ uicontrol('Tag','discard_pushbutton',...
     'String','Discard',...
     'TooltipString','Discards the changes made to the currently visible dataset',...
     'pos',[guiSize(1)-(mainPanelWidth/3*2)-20 20 mainPanelWidth/3 40],...
-    'Enable','on'...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'Discard'}...
     );
 uicontrol('Tag','close_pushbutton',...
     'Style','pushbutton',...
@@ -692,7 +695,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Closes the BLC GUI',...
     'pos',[guiSize(1)-(mainPanelWidth/3)-20 20 mainPanelWidth/3 40],...
     'Enable','on',...
-    'Callback',{@close_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'Close'}...
     );
 
 
@@ -763,11 +766,21 @@ end
 ad.control.system.platform = platform;
 ad.control.system.matlab = version;
 ad.control.system.trEPR = trEPRtoolboxRevision;
+% blc - struct
+ad.blc = struct();
+ad.blc.corrFun = struct();
+ad.blc.corrFun.values = [];
+ad.blc.corrFun.type = '';
+ad.blc.regions = struct();
+ad.blc.regions.left = [];
+ad.blc.regions.right = [];
+ad.blc.regions.back = [];
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
+setappdata(hMainFigure,'blc',ad.blc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -1051,41 +1064,6 @@ function showposition_checkbox_Callback(source,~)
     end
 end
 
-function sliderpanel_maximum_pushbutton_Callback(~,~)
-    try
-        mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from BLC GUI
-        ad = getappdata(mainWindow);
-        
-        [~,ximax] = max(max(ad.data{ad.control.spectra.active}.data));
-        [~,yimax] = max(ad.data{ad.control.spectra.active}.data(:,ximax));
-        ad.data{ad.control.spectra.active}.display.position.x = ximax;
-        ad.data{ad.control.spectra.active}.display.position.y = yimax;
-        
-        % Set appdata from BLC GUI
-        setappdata(mainWindow,'data',ad.data);
-        
-        updateAxes();
-        update_position_display();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
 function visible_panel_listbox_Callback(source,~)
     try
         mainWindow = guiGetWindowHandle(mfilename);
@@ -1120,10 +1098,6 @@ function visible_panel_listbox_Callback(source,~)
             throw(exception);
         end
     end
-end
-
-function close_pushbutton_Callback(~,~)
-    close(findobj('Tag','trepr_gui_BLCwindow'));    
 end
 
 function displaytype_popupmenu_Callback(source,~)
@@ -1194,6 +1168,35 @@ function pushbutton_Callback(~,~,action)
 %                     delete(hHelpWindow);
 %                 end
                 delete(findobj('Tag','trepr_gui_BLCwindow'));
+                return;
+            case 'showMaximum'
+                mainWindow = guiGetWindowHandle(mfilename);
+                % Get appdata from BLC GUI
+                ad = getappdata(mainWindow);
+                
+                [~,ximax] = max(max(ad.data{ad.control.spectra.active}.data));
+                [~,yimax] = max(ad.data{ad.control.spectra.active}.data(:,ximax));
+                ad.data{ad.control.spectra.active}.display.position.x = ximax;
+                ad.data{ad.control.spectra.active}.display.position.y = yimax;
+                
+                % Set appdata from BLC GUI
+                setappdata(mainWindow,'data',ad.data);
+                
+                updateAxes();
+                update_position_display();
+                return;
+            case 'PreviewCorrection'
+                if_BLC('applyPreview');
+                return;
+            case 'ResetCorrection'
+                if_BLC('resetPreview');
+                return;
+            case 'Apply'
+                if_BLC('apply');
+                return;
+            case 'Discard'
+                if_BLC('reset');
+                return;
             otherwise
                 return;
         end
@@ -1506,19 +1509,28 @@ function updateAxes()
                         );
                 end
         end
-                
         
         % Plot averaged B0 spectra for fitting
         meanData = mean(ad.data{ad.control.spectra.active}.data(...
             :,x-ad.data{ad.control.spectra.active}.blc.fit.area.back:x...
             ),2);
+        y = length(meanData);
         z = [ min(meanData) max(meanData) ];
         ZLim = [z(1)-((z(2)-z(1))/10) z(2)+((z(2)-z(1))/10)];
+        axes(gh.axis2);
+        cla(gh.axis2,'reset');
         hold on;
         plot(gh.axis2,...
-            [1:1:y],...
+            1:1:length(meanData),...
             meanData,...
             'k-');
+        if ~isempty(ad.blc.corrFun.values)
+            plot(gh.axis2,...
+                1:1:y,...
+                ad.blc.corrFun.values,...
+                'r-');
+        else
+        end
         for k=1:length(ad.data{ad.control.spectra.active}.blc.fit.point)
             if (ad.data{ad.control.spectra.active}.blc.fit.point(k).active)
                 line(...
@@ -1530,7 +1542,7 @@ function updateAxes()
             end
         end
         hold off;
-        set(gh.axis2,'XLim',[1 y]);
+        set(gh.axis2,'XLim',[1 length(meanData)]);
         set(gh.axis2,'YLim',ZLim);
         set(gh.axis2,'YTickLabel',[]);
         
@@ -1768,18 +1780,18 @@ function update_fitarea_display()
 end
 
 function update_addpoint_display()
-    mainWindow = guiGetWindowHandle(mfilename);
-    % Get appdata from BLC GUI
-    ad = getappdata(mainWindow);
-
-    if isempty(ad.data) || isempty(ad.control.spectra.visible)
-        return;
-    end
-    
-    % Get handle for visible spectra listbox
-    gh = guidata(mainWindow);
-
     try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from BLC GUI
+        ad = getappdata(mainWindow);
+        
+        if isempty(ad.data) || isempty(ad.control.spectra.visible)
+            return;
+        end
+        
+        % Get handle for visible spectra listbox
+        gh = guidata(mainWindow);
+        
         % Set position in edit boxes
         set(gh.addpoints_panel_pt1_edit,...
             'String',...
@@ -1792,6 +1804,112 @@ function update_addpoint_display()
             ad.data{ad.control.spectra.active}.blc.fit.point(1).position);
         set(gh.addpoints_panel_pt2_slider,'Value',...
             ad.data{ad.control.spectra.active}.blc.fit.point(2).position);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
+end
+
+function if_BLC(action)
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata and gui handles from BLC GUI
+        ad = getappdata(mainWindow);
+        gh = guidata(mainWindow);
+        
+        if isempty(ad.data) || isempty(ad.control.spectra.visible)
+            return;
+        end
+        
+        % Get correction method
+        correctionMethods = cellstr(...
+            get(gh.correctionmethod_popupmenu,'String'));
+        correctionMethod = char(correctionMethods(...
+            get(gh.correctionmethod_popupmenu,'Value')...
+            ));
+        ad.blc.regions.left = ...
+            str2double(get(gh.fitarea_panel_left_edit,'String'));
+        ad.blc.regions.right = ...
+            str2double(get(gh.fitarea_panel_right_edit,'String'));
+        ad.blc.regions.back = ...
+            str2double(get(gh.fitarea_panel_back_edit,'String'));
+        
+        switch action
+            case 'applyPreview'
+                switch correctionMethod
+                    case 'First n time traces'
+                        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+                        ad.blc.corrFun.values = ones(y,1) * mean(mean(...
+                            ad.data{ad.control.spectra.active}.data(...
+                            1:ad.blc.regions.left,...
+                            end-ad.blc.regions.back:end)));
+                        setappdata(mainWindow,'blc',ad.blc);
+                        updateAxes();
+                        return;
+                    case 'Last m time traces'
+                        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+                        ad.blc.corrFun.values = ones(y,1) * mean(mean(...
+                            ad.data{ad.control.spectra.active}.data(...
+                            end-ad.blc.regions.right:end,...
+                            end-ad.blc.regions.back:end)));
+                        setappdata(mainWindow,'blc',ad.blc);
+                        updateAxes();
+                        return;
+                    case 'Weighted average of first/last'
+                        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+                        left = mean(mean(...
+                            ad.data{ad.control.spectra.active}.data(...
+                            1:ad.blc.regions.left,...
+                            end-ad.blc.regions.back:end)));
+                        right = mean(mean(...
+                            ad.data{ad.control.spectra.active}.data(...
+                            end-ad.blc.regions.right:end,...
+                            end-ad.blc.regions.back:end)));
+                        ad.blc.corrFun.values = linspace(left,right,y);
+                        setappdata(mainWindow,'blc',ad.blc);
+                        updateAxes();
+                        return;
+                    otherwise
+                        disp('Unknown correction method');
+                end
+            case 'resetPreview'
+                ad.blc.corrFun.values = [];
+                setappdata(mainWindow,'blc',ad.blc);
+                updateAxes();
+                return;
+            case 'apply'
+                ad.data{ad.control.spectra.active}.data = trEPRBGC(...
+                    ad.data{ad.control.spectra.active}.data, ...
+                    'numBGprofiles',...
+                    [ad.blc.regions.left ad.blc.regions.right] ...
+                    );
+                setappdata(mainWindow,'data',ad.data);
+                ad.blc.corrFun.values = [];
+                setappdata(mainWindow,'blc',ad.blc);
+                updateAxes();
+                return;
+            case 'reset'
+                ad.blc.corrFun.values = [];
+                setappdata(mainWindow,'blc',ad.blc);
+                updateAxes();
+                return;
+            otherwise
+                disp('Unknown action');
+                return;
+        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
