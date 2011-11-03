@@ -109,15 +109,18 @@ try
     end
     switch evt.Key
         case 'f1'
-            trEPRgui_aboutwindow();
+            trEPRgui_helpwindow();
             return;
         case 'f2'
-            trEPRgui_infowindow();
+            trEPRgui_aboutwindow();
             return;
         case 'f3'
-            trEPRgui_BLCwindow();
+            trEPRgui_infowindow();
             return;
         case 'f4'
+            trEPRgui_BLCwindow();
+            return;
+        case 'f5'
             trEPRgui_ACCwindow();
             return;
         case 'f9'
