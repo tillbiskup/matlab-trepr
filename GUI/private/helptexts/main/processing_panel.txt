@@ -36,8 +36,6 @@ For more advanced "corrections", two separate GUI windows are available:
 
 Both GUI windows come with their separate online help.
 
-NOTE: The baseline correction is not yet implemented.
-
 
 -= Smoothing (running average filter) =-
 
