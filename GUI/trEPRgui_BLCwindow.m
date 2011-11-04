@@ -52,7 +52,6 @@ axes(...         % the axes for plotting selected plot
     'FontUnit','Pixel','Fontsize',12,...
     'Units', 'Pixels', ...
     'Position',[70 guiSize(2)-420 400 400]);
-%    'HandleVisibility','callback', ...
 
 axes(...         % the axes for plotting selected plot
     'Tag','axis2',...
@@ -659,7 +658,7 @@ uicontrol('Tag','help_pushbutton',...
     'TooltipString','Display help for how to operate the baseline compensation GUI',...
     'pos',[panel_size*2+5 200 25 25],...
     'Enable','on',...
-    'Callback',@trEPRgui_ACC_helpwindow...
+    'Callback',@trEPRgui_BLC_helpwindow...
     );
 
 uicontrol('Tag','apply_pushbutton',...
@@ -1188,11 +1187,11 @@ function pushbutton_Callback(~,~,action)
                 end
                 % Look for ACC GUI Help window and if its there, close as
                 % well
-%                 hHelpWindow = findobj('Tag','trEPRgui_ACC_helpwindow');
-%                 if ishandle(hHelpWindow)
-%                     delete(hHelpWindow);
-%                 end
-                delete(findobj('Tag','trepr_gui_BLCwindow'));
+                hHelpWindow = guiGetWindowHandle('trEPRgui_BLC_helpwindow');
+                if ishandle(hHelpWindow)
+                    delete(hHelpWindow);
+                end
+                delete(guiGetWindowHandle(mfilename));
                 return;
             case 'showMaximum'
                 mainWindow = guiGetWindowHandle(mfilename);
@@ -1291,7 +1290,7 @@ function keypress_Callback(src,evt)
         end
         switch evt.Key
             case 'f1'
-                trEPRgui_info_helpwindow();
+                trEPRgui_BLC_helpwindow();
                 return;
             otherwise
 %                 disp(evt);
@@ -1570,6 +1569,7 @@ function updateAxes()
         set(gh.axis2,'XLim',[1 length(meanData)]);
         set(gh.axis2,'YLim',ZLim);
         set(gh.axis2,'YTickLabel',[]);
+        xlabel(gh.axis2,'{\it magnetic field} / points');
         
         % Plot patches indicating the fit areas
         patch([1 1 leftarea+1 leftarea+1],[ZLim(1) ZLim(2) ZLim(2) ZLim(1)],[0 0 0 0],...
