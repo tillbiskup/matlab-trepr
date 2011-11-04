@@ -33,6 +33,50 @@ try
     % Get appdata of main window
     ad = getappdata(mainWindow);
     
+    % TODO: Check whether Id exists in main GUI, otherwise append
+    % Get labels from all datasets of the main GUI
+    labels = cell(length(ad.data),1);
+    for k=1:length(ad.data)
+        labels{k} = ad.data{k}.label;
+    end
+    % Check for identity of labels, otherwise try to find dataset with
+    % identical label
+    if id > length(ad.data) || ~strcmp(dataset.label,ad.data{id}.label)
+        matches = find(strcmp(dataset.label,labels));
+        if length(matches) == 1
+            % In this case, the id has changed, but can unequivocally be
+            % assigned
+            id = matches;
+        elseif length(matches) > 1
+            % In this case, there is more than one dataset in the main GUI
+            % with identical label. Additionally, the Ids have changed so
+            % that we cannot any more unequivocally assign the dataset.
+            % Therefore, the first match is used and the user informed.
+            id = matches(1);
+            % Adding status line
+            msgStr = {...
+                'No unequivocal assignment of dataset possible.'...
+                sprintf(...
+                'Therefore, the first matching dataset has been used: %i',...
+                id)...
+                };
+            status = add2status(msgStr);
+            % Get appdata of main window
+            ad = getappdata(mainWindow);
+        else
+            % In this case, the original Id has changed and there is no
+            % longer any dataset with an identical label to that from the
+            % given dataset. Whereas we cannot exclude that the user in
+            % between changed things greatly in the main GUI, such as
+            % moving the Ids and at the same time changing labels, meaning
+            % that the corresponding dataset in the main GUI now has both a
+            % different label and a different id, we savely append it to
+            % the main GUI.
+            appendDatasetToMainGUI(dataset,'modified',p.Results.modified);
+            return;
+        end
+    end
+    
     % Refresh dataset in main GUI
     ad.data{id} = dataset;
     
