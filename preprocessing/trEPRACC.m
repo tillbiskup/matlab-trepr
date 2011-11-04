@@ -387,7 +387,7 @@ try
         % accumulated datasets
         history.parameters.datasets{k}.axes = data{k}.axes;
         history.parameters.datasets{k}.label = data{k}.label;
-        history.parameters.datasets{k}.filename = data{k}.filename;
+        history.parameters.datasets{k}.filename = data{k}.file.name;
         history.parameters.datasets{k}.header = data{k}.header;
         history.parameters.datasets{k}.history = data{k}.history;
     end
