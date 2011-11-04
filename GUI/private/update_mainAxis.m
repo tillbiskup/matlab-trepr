@@ -21,6 +21,11 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
+% Get handle of main axis
+mainAxis = findobj(...
+    'Parent',gh.mainAxes_panel,...
+    '-and','Type','axes');
+
 % Change enable status of pushbuttons and other elements
 mainAxisChildren = findobj(...
     'Parent',gh.mainAxes_panel,...
@@ -60,6 +65,9 @@ if ~(ad.control.spectra.active)
     add2status(msg);
     return;
 end
+
+% IMPORTANT: Set main axis to active axis
+axes(mainAxis);
 
 % Plot depending on display type settings
 % Be as robust as possible: if there is no axes, default is indices
@@ -407,7 +415,6 @@ end
 if (isequal(ad.control.axis.grid.y,'on'))
     set(gca,'YMinorGrid',ad.control.axis.grid.minor);
 end
-
 
 status = 0;
 
