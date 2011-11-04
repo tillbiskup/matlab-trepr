@@ -152,10 +152,10 @@ function helptext_popupmenu_Callback(source,~)
                     trEPRtoolboxdir,'GUI','private','helptexts','BLC','parameters.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Corrections'
+            case 'Correction'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','BLC','corrections.txt');
+                    trEPRtoolboxdir,'GUI','private','helptexts','BLC','correction.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Key bindings'

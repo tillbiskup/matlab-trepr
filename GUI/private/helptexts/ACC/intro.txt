@@ -36,5 +36,5 @@ If happy with the results, simply "Close" the GUI and your data will be written 
 
 BTW: The button with the questionmark shows this help, as you might have figured out already.
 
-(1) Yes, it's not only the ancient Gallia that was divided in three parts, as good old Gaius Julis told us... (apologies to those who don't get the joke)
+(1) Yes, it's not only the ancient Gallia that was divided in three parts, as good old Gaius Julius told us... (apologies to those who don't get the joke)
 
