@@ -6,7 +6,15 @@ Basically, the complete toolbox got reimplemented for version 0.3, and the GUI r
 
 -= New features in v. 0.3.0beta =-
 
-An incomplete list of changes within v. 0.3.0beta as of early September 2011, in decreasing order of their implementation date:
+An incomplete list of changes within v. 0.3.0beta as of early November 2011, in decreasing order of their implementation date:
+
+* BLC GUI (not yet with nonlinear fit functions)
+
+* New keyboard shortcuts: Ctrl-x/y/z for toggling the display modes
+
+* Import of fsc2 metafiles (with calibration values)
+
+* Minor changes in data structure
 
 * ASCII-Export of 1D cross sections of 2D datasets
 
