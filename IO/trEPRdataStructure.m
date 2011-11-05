@@ -35,7 +35,6 @@ function varargout = trEPRdataStructure(varargin)
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
     help trEPRdataStructure
-    return;
 end
 
 % Create empty trEPR toolbox data structure
