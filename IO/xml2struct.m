@@ -1,4 +1,19 @@
 function varargout = xml2struct(docNode)
+% XML2STRUCT Convert XML into struct
+%
+% Usage:
+%   struct = xml2struct(docNode);
+%
+%   docNode - string
+%             XML tree, org.apache.xerces.dom.DocumentImpl
+%   struct  - struct
+%             content of the XML file
+%
+
+% (c) 2010, Martin Hussels
+% (c) 2010-2011, Till Biskup
+% 2011-11-05
+
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
 parser.FunctionName = mfilename; % Function name included in error messages

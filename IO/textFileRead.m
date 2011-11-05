@@ -1,6 +1,18 @@
 function text = textFileRead(filename,varargin)
-% Read text file and save all lines to the output argument (a cell array).
-% The line ends will not be conserved (use of fgetl internally).
+% TEXTFILEREAD Read text file and return all lines as cell array. 
+% The line ends will not be conserved (use of fgetl internally). 
+%
+% Usage:
+%   text = textFileRead(filename);
+%
+%   filename - string
+%              name of a valid (text) file to read
+%   text     - cell array
+%              contains all lines of the textfile
+%
+
+% (c) 2011, Till Biskup
+% 2011-11-05
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.

@@ -1,4 +1,22 @@
 function varargout = xmlZipRead(filename)
+% XMLZIPREAD Read ZIP-compressed XML file and data (if available)
+%
+% Usage:
+%   [data,warning] = xmlZipRead(filename);
+%
+%   filename - string
+%              name of the ZIP archive containing the XML (and data)
+%              file(s)
+%   data     - struct
+%              content of the XML file
+%              data.data holds the data read from the ZIP archive
+%   warning  - cell array
+%              Contains warnings if there are any, otherwise empty
+%
+
+% (c) 2011, Till Biskup
+% 2011-11-05
+
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
 parser.FunctionName = mfilename; % Function name included in error messages
