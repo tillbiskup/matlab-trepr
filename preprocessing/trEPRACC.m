@@ -92,19 +92,10 @@ try
     % values and if not provided, set default values)
     
     % Predefine fields for accData
-    accData = struct();
-    % data - accumulated data
-    accData.data = [];
-    % header - ...
-    accData.header = cell(0);
-    % axes - struct
-    accData.axes = struct();
+    accData = trEPRdataStructure;
     % label - string
     accData.label = parameters.label;
-    % filename - empty string
-    accData.filename = '';
-    % parameters - struct, contains experimental parameters
-    accData.parameters = struct();
+
     % display - struct
     accData.display = struct();
     accData.display.position.x = 1;
