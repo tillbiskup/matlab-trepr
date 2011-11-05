@@ -292,7 +292,7 @@ dataModel.label = 'ischar';
 dataModel.version = 'ischar';
 
 if nargin && ischar(varargin{1})
-    switch varargin{1}
+    switch lower(varargin{1})
         case 'structure'
             if nargout
                 varargout{1} = dataStructure;

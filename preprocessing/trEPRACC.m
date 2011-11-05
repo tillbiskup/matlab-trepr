@@ -87,32 +87,19 @@ try
             };
         return;
     end
-    
-    % TODO: Sanitise parameters structure (look for necessary fields and
-    % values and if not provided, set default values)
-    
+        
     % Predefine fields for accData
     accData = trEPRdataStructure;
     % label - string
     accData.label = parameters.label;
-
-    % display - struct
-    accData.display = struct();
-    accData.display.position.x = 1;
-    accData.display.position.y = 1;
-    accData.display.displacement.x = 0;
-    accData.display.displacement.y = 0;
-    accData.display.displacement.z = 0;
-    accData.display.scaling.x = 1;
-    accData.display.scaling.y = 1;
-    accData.display.scaling.z = 1;
-    accData.display.smoothing.x.value = 1;
-    accData.display.smoothing.y.value = 1;
-    % line - struct
-    accData.line = struct();
-    % history - cell array of structs
-    accData.history = cell(0);
     
+    % Additional fields for dataset in GUI
+    addFields = guiDataStructure('datastructure');
+    addFieldsNames = fieldnames(addFields);
+    for k=1:length(addFieldsNames)
+        accData.(addFieldsNames{k}) = addFields.(addFieldsNames{k});
+    end
+
     % Set fields that can be taken from master dataset
     accData.line = data{masterId}.line;
     accData.parameters = data{masterId}.parameters;
@@ -387,8 +374,7 @@ try
     history.info = accReport;
     
     % Assign history to dataset of accumulated data
-    accData.history = cell(0);
-    accData.history{1} = history;
+    accData.history{end+1} = history;
     
 catch exception
     throw(exception);

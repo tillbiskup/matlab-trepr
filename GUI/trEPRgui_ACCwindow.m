@@ -949,62 +949,7 @@ uicontrol('Tag','close_pushbutton',...
 guidata(hMainFigure,guihandles);
 
 % Create appdata structure
-ad = struct();
-% data - empty cell array
-ad.data = cell(0);
-% origdata - empty cell array
-ad.origdata = cell(0);
-% configuration - struct
-ad.configuration = struct();
-ad.configuration.fit.area.left = 10;
-ad.configuration.fit.area.right = 10;
-ad.configuration.fit.area.back = 10;
-ad.configuration.fit.point(1).active = false;
-ad.configuration.fit.point(1).position = [];
-ad.configuration.fit.point(2).active = false;
-ad.configuration.fit.point(2).position = [];
-% control - struct
-ad.control = struct();
-% control.status - empty struct
-ad.control.status = cell(0);
-% control.spectra - struct
-ad.control.spectra = struct();
-ad.control.spectra.active = 0;
-ad.control.spectra.notaccumulated = [];
-ad.control.spectra.accumulated = [];
-ad.control.spectra.modified = [];
-ad.control.spectra.missing = [];
-% control.axis - struct
-ad.control.axis = struct();
-ad.control.axis.grid = struct();
-ad.control.axis.grid.zero = true;
-ad.control.axis.limits = struct();
-ad.control.axis.limits.auto = true;
-ad.control.axis.limits.x = struct();
-ad.control.axis.limits.x.min = 0;
-ad.control.axis.limits.x.max = 1;
-ad.control.axis.limits.y = struct();
-ad.control.axis.limits.y.min = 0;
-ad.control.axis.limits.y.max = 1;
-ad.control.axis.limits.z = struct();
-ad.control.axis.limits.z.min = 0;
-ad.control.axis.limits.z.max = 1;
-ad.control.axis.normalisation = 'none';
-ad.control.axis.displayType = '2D plot';
-% control.system - struct
-ad.control.system = struct();
-% Get username of current user
-% In worst case, username is an empty string. So nothing should really rely
-% on it.
-% Windows style
-ad.control.system.username = getenv('UserName');
-% Unix style
-if isempty(ad.control.system.username)
-    ad.control.system.username = getenv('USER'); 
-end
-ad.control.system.platform = platform;
-ad.control.system.matlab = version;
-ad.control.system.trEPR = trEPRtoolboxRevision;
+ad = guiDataStructure('guiappdatastructure');
 % acc - struct
 ad.acc = struct();
 ad.acc.datasets = [];
