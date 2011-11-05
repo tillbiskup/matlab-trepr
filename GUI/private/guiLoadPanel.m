@@ -400,8 +400,14 @@ function load_pushbutton_Callback(~,~)
             length(ad.data)+1 : 1 : length(ad.data)+length(data) ];
         
         % Add data to main GUI (appdata)
-        ad.data = [ ad.data data ];
-        ad.origdata = [ ad.origdata data ];
+        [rows,cols] = size(data);
+        if rows == 1
+            ad.data = [ ad.data data ];
+            ad.origdata = [ ad.origdata data ];
+        elseif cols == 1
+            ad.data = [ ad.data data' ];
+            ad.origdata = [ ad.origdata data' ];
+        end
         
         setappdata(mainWindow,'data',ad.data);
         setappdata(mainWindow,'origdata',ad.origdata);
