@@ -35,20 +35,33 @@ catch
     end
     return;
 end
-for k=1:length(filenames)
-    [pathstr, name, ext] = fileparts(filenames{k});
-    switch ext
-        case '.xml'
-            xmlFileSerialize(fullfile(pathstr,[name ext]));
-            DOMnode = xmlread(fullfile(pathstr,[name ext]));
-            struct = xml2struct(DOMnode);
-            delete(fullfile(pathstr,[name ext]));
-        case '.dat'
-            data = load(fullfile(pathstr,[name ext]));
-            delete(fullfile(pathstr,[name ext]));
-        otherwise
-            delete(fullfile(pathstr,[name ext]));
+try
+    for k=1:length(filenames)
+        [pathstr, name, ext] = fileparts(filenames{k});
+        switch ext
+            case '.xml'
+                xmlFileSerialize(fullfile(pathstr,[name ext]));
+                DOMnode = xmlread(fullfile(pathstr,[name ext]));
+                struct = xml2struct(DOMnode);
+                delete(fullfile(pathstr,[name ext]));
+            case '.dat'
+                data = load(fullfile(pathstr,[name ext]));
+                delete(fullfile(pathstr,[name ext]));
+            otherwise
+                delete(fullfile(pathstr,[name ext]));
+        end
     end
+catch errmsg
+    warning = sprintf('%s\n%s\n"%s"\n',...
+        errmsg.identifier,...
+        'Problems with parsing XML in file:',...
+        filename);
+    if nargout
+        varargout{1} = logical(false);
+        varargout{2} = warning;
+    end
+    cd(PWD);
+    return;
 end
 if exist('data','var')
     struct.data = data;

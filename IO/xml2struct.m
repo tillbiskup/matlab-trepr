@@ -50,7 +50,13 @@ function thiselement=traverse(node)
             mclass=char(node.getAttribute('class'));
             msize=eval(node.getAttribute('size'));
             if strcmp(mclass,'char')
-                thiselement=reshape(char(node.getTextContent),msize);
+                % Bug fix for empty elements that appear as size [1 1] in
+                % XML
+                if size(char(node.getTextContent))
+                    thiselement=reshape(char(node.getTextContent),msize);
+                else
+                    thiselement = '';
+                end
             else
                 thiselement=strread(char(node.getTextContent),'%f');
                 eval(['thiselement=' mclass '(thiselement);']);

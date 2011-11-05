@@ -11,15 +11,10 @@ if ~exist(filename,'file')
     fprintf('"%s" seems not to be a valid filename. Abort.',filename);
     return;
 end
-fid = fopen(filename,'rt');
-line = '';
-while 1
-    tline = fgetl(fid);
-    if ~ischar(tline), break, end
-    line = strcat(line,strtrim(tline));
-end
-fclose(fid);
+txt = textFileRead(filename);
 fid2 = fopen(filename,'wt');
-fprintf(fid2,'%s',line);
+for k=1:length(txt)
+    fprintf(fid2,'%s',strtrim(txt{k}));
+end
 fclose(fid2);
 end
