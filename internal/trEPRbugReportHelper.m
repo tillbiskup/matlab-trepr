@@ -49,8 +49,7 @@ try
 catch
     % In case trEPRinfo() is still the old version with no output params
     generalInfo = cell(0);
-	[ tbRevNo, tbRevDate ] = trEPRtoolboxRevision;
-    generalInfo{end+1} = sprintf('Toolbox Release:    %s (%s)',tbRevNo,tbRevDate);
+    generalInfo{end+1} = sprintf('Toolbox Release:    %s',trEPRtoolboxRevision);
     generalInfo{end+1} = sprintf('Platform:           %s',platform);
     generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
 end

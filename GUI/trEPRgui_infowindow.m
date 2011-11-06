@@ -697,12 +697,11 @@ uicontrol('Tag','parameter_panel_npts_text',...
 uicontrol('Tag','parameter_panel_npts_edit',...
     'Style','edit',...
     'Parent',p2p3,...
-    'BackgroundColor',editableWarningBackground,...
+    'BackgroundColor',noneditableBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[110 70 mainPanelWidth-120 25],...
-    'String','0',...
-    'Callback',{@parameter_edit_Callback,'xindex'}...
+    'String','0'...
     );
 uicontrol('Tag','parameter_panel_triggerposition_text',...
     'Style','text',...
@@ -2699,9 +2698,6 @@ setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 
-% Set everything for first panel
-switchPanel('General');
-
 % Load data from Main GUI
 mainGuiWindow = guiGetWindowHandle();
 if (mainGuiWindow)
@@ -2726,7 +2722,8 @@ if (mainGuiWindow)
         for k=1:length(ad.control.spectra.loaded)
             ad.control.spectra.history{k} = 0;
         end
-        if isempty(ad.control.spectra.active)
+        if isempty(ad.control.spectra.active) || ...
+                (ad.control.spectra.active == 0)
             ad.control.spectra.active = 1;
         end
         setappdata(hMainFigure,'control',ad.control);
@@ -2740,6 +2737,9 @@ if (mainGuiWindow)
 %    updateDimensionPanel('Datasets');
 %     update_position_display();
 end
+
+% % Set everything for first panel
+% switchPanel('General');
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -2759,6 +2759,13 @@ for k=1:length(handles)
     set(handles(k),'KeyPressFcn',@keypress_Callback);
 end
 
+% Temporary "fix": Disable all elements of the "Display settings" panel
+displayPanelHandles = findall(...
+    allchild(p3),'style','edit',...
+    '-or','style','popupmenu');
+for k=1:length(displayPanelHandles)
+    set(displayPanelHandles(k),'Enable','inactive');
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
