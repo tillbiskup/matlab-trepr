@@ -103,7 +103,7 @@ try
         varargout{1} = hMainFigure;
     end
     % Read text for welcome message from file and display it
-    helpTextFile = fullfile(trEPRtoolboxdir,'GUI','private','helptexts','ACC','intro.txt');
+    helpTextFile = fullfile(trEPRinfo('dir'),'GUI','private','helptexts','ACC','intro.txt');
     helpText = textFileRead(helpTextFile);
     set(textdisplay,'String',helpText);
 catch exception
@@ -140,37 +140,37 @@ function helptext_popupmenu_Callback(source,~)
             case 'Introduction'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','intro.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','intro.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Datasets'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','datasets.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','datasets.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Settings'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','settings.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','settings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Results'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','results.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','results.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Report'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','report.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','report.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Key bindings'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','ACC','keybindings.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','keybindings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             otherwise

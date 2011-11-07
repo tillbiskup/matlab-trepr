@@ -10,8 +10,10 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    status    - number (0 = OK, -1 = failed)
 %    bugReport - cell array of strings containing the bug report
 
-% Set name of Toolbox (makes it easier to reuse this script later on)
+% Set name and version of Toolbox (makes it easier to reuse this script
+% later on) 
 tbname = 'trEPR toolbox';
+tbversion = trEPRinfo('version');
 
 % If we got no input show message and exit
 if ~nargin
@@ -49,7 +51,7 @@ try
 catch
     % In case trEPRinfo() is still the old version with no output params
     generalInfo = cell(0);
-    generalInfo{end+1} = sprintf('Toolbox Release:    %s',trEPRtoolboxRevision);
+    generalInfo{end+1} = sprintf('Toolbox Release:    %s',tbversion);
     generalInfo{end+1} = sprintf('Platform:           %s',platform);
     generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
 end

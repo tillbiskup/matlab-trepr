@@ -353,7 +353,7 @@ try
     end
     history.system.platform = platform;
     history.system.matlab = version;
-    history.system.trEPR= trEPRtoolboxRevision;
+    history.system.trEPR= trEPRinfo('version');
     
     
     % Fiddle around with parameters structure, as it gets to hold all

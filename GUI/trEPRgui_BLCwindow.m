@@ -778,7 +778,7 @@ if isempty(ad.control.system.username)
 end
 ad.control.system.platform = platform;
 ad.control.system.matlab = version;
-ad.control.system.trEPR = trEPRtoolboxRevision;
+ad.control.system.trEPR = trEPRinfo('version');
 % blc - struct
 ad.blc = struct();
 ad.blc.spectra = [];

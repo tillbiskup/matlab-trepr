@@ -284,7 +284,7 @@ function helptext_selector(helpText)
             case 'Welcome'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','welcome.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','welcome.txt');
                 helpText = textFileRead(helpTextFile);
                 % Workaround: Get rid of the second paragraph saying that one
                 % sees this text only until pressing one of the panel switch
@@ -294,61 +294,61 @@ function helptext_selector(helpText)
             case 'New features'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','newfeatures.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','newfeatures.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Key bindings'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','keybindings.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','keybindings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Load panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','load_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','load_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Datasets panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','datasets_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','datasets_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Slider panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','slider_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','slider_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Measure panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','measure_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','measure_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Display panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','display_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','display_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Processing panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','processing_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','processing_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Analysis panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','analysis_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','analysis_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Help panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRtoolboxdir,'GUI','private','helptexts','main','help_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','help_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             otherwise

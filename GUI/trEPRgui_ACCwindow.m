@@ -1045,7 +1045,7 @@ end
 % Display splash
 try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
-    splash = imread(fullfile(trEPRtoolboxdir,...
+    splash = imread(fullfile(trEPRinfo('dir'),...
         'GUI','private','splashes','ACCGUISplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers
@@ -2064,7 +2064,7 @@ function updateAxes()
         if ~isfield(ad.acc,'data') || isempty(ad.acc.data)
             % Display splash
             set(mainWindow,'CurrentAxes',gh.mainAxis);
-            splash = imread(fullfile(trEPRtoolboxdir,...
+            splash = imread(fullfile(trEPRinfo('dir'),...
                 'GUI','private','splashes','ACCGUISplash.png'),'png');
             image(splash);
             axis off          % Remove axis ticks and numbers

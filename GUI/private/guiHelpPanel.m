@@ -143,7 +143,7 @@ try
     gh = guihandles(mainWindow);
     
     % Read text for welcome message from file and display it
-    helpTextFile = fullfile(trEPRtoolboxdir,...
+    helpTextFile = fullfile(trEPRinfo('dir'),...
         'GUI','private','helptexts','main','welcome.txt');
     helpText = textFileRead(helpTextFile);
     % Workaround: Get rid of the second paragraph saying that one
@@ -187,7 +187,7 @@ function helptext_popupmenu_Callback(source,~)
         switch helpText
             case 'Welcome'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','welcome.txt');
                 helpText = textFileRead(helpTextFile);
                 % Workaround: Get rid of the second paragraph saying that one
@@ -197,43 +197,43 @@ function helptext_popupmenu_Callback(source,~)
                 set(hPanelText,'String',helpText);
             case 'Why this GUI?'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','whygui.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Key concepts'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','keyconcepts.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Key bindings'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','keybindings.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Known bugs'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','knownbugs.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Report a bug'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','bugreport.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Disclaimer'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','disclaimer.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
             case 'Other resources'
                 % Read text for welcome message from file and display it
-                helpTextFile = fullfile(trEPRtoolboxdir,...
+                helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','main','resources.txt');
                 helpText = textFileRead(helpTextFile);
                 set(hPanelText,'String',helpText);
