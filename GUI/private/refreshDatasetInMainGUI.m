@@ -18,6 +18,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('dataset', @(x)isstruct(x) || iscell(x));
 p.addParamValue('modified',false,@islogical);
+p.addParamValue('label','',@ischar);
 p.parse(dataset,varargin{:});
 
 try
@@ -39,10 +40,15 @@ try
     for k=1:length(ad.data)
         labels{k} = ad.data{k}.label;
     end
+    if ~isempty(p.Results.label)
+        label = p.Results.label;
+    else
+        label = dataset.label;
+    end
     % Check for identity of labels, otherwise try to find dataset with
     % identical label
-    if id > length(ad.data) || ~strcmp(dataset.label,ad.data{id}.label)
-        matches = find(strcmp(dataset.label,labels));
+    if id > length(ad.data) || ~strcmp(label,ad.data{id}.label)
+        matches = find(strcmp(label,labels));
         if length(matches) == 1
             % In this case, the id has changed, but can unequivocally be
             % assigned
@@ -73,6 +79,7 @@ try
             % different label and a different id, we savely append it to
             % the main GUI.
             appendDatasetToMainGUI(dataset,'modified',p.Results.modified);
+            status = 0;
             return;
         end
     end

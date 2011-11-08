@@ -46,15 +46,10 @@ dateTime = datestr(clock);
 msgString = getReport(exception, 'extended', 'hyperlinks', 'off');
 
 % Try to get further info about toolbox and system
-try
-    info = trEPRinfo();
-catch
-    % In case trEPRinfo() is still the old version with no output params
-    generalInfo = cell(0);
-    generalInfo{end+1} = sprintf('Toolbox Release:    %s',tbversion);
-    generalInfo{end+1} = sprintf('Platform:           %s',platform);
-    generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
-end
+generalInfo = cell(0);
+generalInfo{end+1} = sprintf('Toolbox Release:    %s',tbversion);
+generalInfo{end+1} = sprintf('Platform:           %s',platform);
+generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
 
 % Try to get status message from toolbox GUI
 mainGuiWindow = findobj('Tag','trepr_gui_mainwindow');
