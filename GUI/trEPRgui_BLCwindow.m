@@ -1,9 +1,13 @@
 function varargout = trEPRgui_BLCwindow(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_BLCWINDOW Provide user with all necessary controls to perform a
+% baseline compensation (BLC) to a given dataset.
+%
+% Normally, this window is called from within the trEPRgui window.
+%
+% See also TREPRGUI
 
-% (Leave a blank line following the help.)
+% (c) 2011, Till Biskup
+% 2011-11-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -798,6 +802,8 @@ setappdata(hMainFigure,'blc',ad.blc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+msgStr = 'BLC GUI window opened';
+add2status(msgStr);
 
 % Load data from Main GUI
 mainGuiWindow = findobj('Tag','trepr_gui_mainwindow');
@@ -1251,7 +1257,7 @@ function pushbutton_Callback(~,~,action)
                             ad.blc.spectra(k),...
                             'modified',true);
                         if status
-                            disp('Hmm... some problems with appending accumulated dataset to main GUI.');
+                            disp('Hmm... some problems with appending baseline-correced dataset to main GUI.');
                         end
                     end
                 else
