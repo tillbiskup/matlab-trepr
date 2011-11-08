@@ -4,9 +4,11 @@ WHAT'S NEW IN THE TREPR TOOLBOX/GUI?
 Basically, the complete toolbox got reimplemented for version 0.3, and the GUI rewritten with a complete new layout (and underlying code).
 
 
--= New features in v. 0.3.0beta =-
+-= New features in v. 0.3.0 =-
 
-An incomplete list of changes within v. 0.3.0beta as of early November 2011, in decreasing order of their implementation date:
+An incomplete list of changes within v. 0.3.0 (currently RC1) as of early November 2011, in decreasing order of their implementation date:
+
+* Info GUI
 
 * BLC GUI (not yet with nonlinear fit functions)
 
