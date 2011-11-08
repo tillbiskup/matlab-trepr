@@ -1,4 +1,4 @@
-function varargout = trEPRgui_infowindow()
+function varargout = trEPRgui_infowindow(varargin)
 % TREPRGUI_INFOWINDOW Display information to a given dataset.
 %
 % Normally, this window is called from within the trEPRgui window.

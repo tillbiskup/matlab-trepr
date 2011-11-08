@@ -123,7 +123,7 @@ try
         case 'f5'
             trEPRgui_ACCwindow();
             return;
-        case 'f9'
+        case 'f10'
             trEPRgui_statuswindow();
             return;
         otherwise

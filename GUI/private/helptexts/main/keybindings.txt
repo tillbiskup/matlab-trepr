@@ -20,17 +20,17 @@ Ctrl-x ... Ctrl-z
 
 FUNCTION KEYS (F1...F12)
 
-F1 - Help
+F1  - Help
 
-F2 - "Help:About" window
+F2  - "Help:About" window
 
-F3 - Informations about currently active dataset
+F3  - Informations about currently active dataset
 
-F4 - Baseline correction
+F4  - Baseline correction
 
-F5 - Accumulation
+F5  - Accumulation
 
-F9 - "Status" window
+F10 - "Status" window
 
 
 
