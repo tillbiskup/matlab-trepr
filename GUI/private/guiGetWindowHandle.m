@@ -34,6 +34,8 @@ try
     windowTags.trEPRgui_ACC_helpwindow = 'trEPRgui_ACC_helpwindow';
     windowTags.trEPRgui_BLCwindow = 'trepr_gui_BLCwindow';
     windowTags.trEPRgui_BLC_helpwindow = 'trEPRgui_BLC_helpwindow';
+    windowTags.trEPRgui_FFTwindow = 'trepr_gui_FFTwindow';
+    windowTags.trEPRgui_FFT_helpwindow = 'trEPRgui_FFT_helpwindow';
     windowTags.trEPRgui_infowindow = 'trepr_gui_infowindow';
     windowTags.trEPRgui_info_helpwindow = 'trEPRgui_info_helpwindow';
     % Add here list of other window tags
