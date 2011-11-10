@@ -1,9 +1,13 @@
 function varargout = trEPRgui_FFTwindow(varargin)
-% TREPRGUI_ACCWINDOW Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_BLCWINDOW Provide user with all necessary controls to perform a
+% FFT on a given dataset.
+%
+% Normally, this window is called from within the trEPRgui window.
+%
+% See also TREPRGUI
 
-% (Leave a blank line following the help.)
+% (c) 2011, Till Biskup
+% 2011-11-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
