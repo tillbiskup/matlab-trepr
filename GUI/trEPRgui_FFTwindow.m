@@ -266,7 +266,7 @@ uicontrol('Tag','slider_panel_show_position_checkbox',...
     'Units','Pixels',...
     'Position',[20 40 mainPanelWidth-30 25],...
     'String','Show position in main display',...
-    'Value',1,...
+    'Value',0,...
     'Callback',{@showposition_checkbox_Callback}...
     );
 uicontrol('Tag','timepoint_panel_maximum_pushbutton',...
@@ -279,6 +279,17 @@ uicontrol('Tag','timepoint_panel_maximum_pushbutton',...
     'Position',[mainPanelWidth-135 10 105 25],...
     'String','Set to maximum',...
     'Callback',{@pushbutton_Callback,'showMaximum'}...
+    );
+uicontrol('Tag','fft_pushbutton',...
+    'Style','pushbutton',...
+	'Parent', pp1, ...
+    'BackgroundColor',defaultBackground,...
+    'FontUnit','Pixel','Fontsize',12,...
+    'String','FFT',...
+    'TooltipString','Apply FFT to currently displayed dataset',...
+    'pos',[(mainPanelWidth-10)/3*2 mainPanelHeight-410 (mainPanelWidth-10)/3 40],...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'FFT'}...
     );
 
 % elements for pp2
@@ -312,7 +323,7 @@ uicontrol('Tag','help_pushbutton',...
     'TooltipString','Display help for how to operate the accumulation GUI',...
     'pos',[panel_size*2+5 200 25 25],...
     'Enable','on',...
-    'Callback',@trEPRgui_ACC_helpwindow...
+    'Callback',@trEPRgui_FFT_helpwindow...
     );
 
 uicontrol('Tag','apply_pushbutton',...
@@ -323,7 +334,7 @@ uicontrol('Tag','apply_pushbutton',...
     'String','Apply',...
     'TooltipString','Apply current settings (perform actual accumulation)',...
     'pos',[guiSize(1)-mainPanelWidth-20 20 (mainPanelWidth)/3 40],...
-    'Enable','on',...
+    'Enable','off',...
     'Callback',{@pushbutton_Callback,'Apply'}...
     );
 uicontrol('Tag','discard_pushbutton',...
@@ -334,7 +345,7 @@ uicontrol('Tag','discard_pushbutton',...
     'String','Discard',...
     'TooltipString','Discard last performed accumulation',...
     'pos',[guiSize(1)-((mainPanelWidth)/3*2)-20 20 (mainPanelWidth)/3 40],...
-    'Enable','on',...
+    'Enable','off',...
     'Callback',{@pushbutton_Callback,'Discard'}...
     );
 uicontrol('Tag','close_pushbutton',...
@@ -359,10 +370,15 @@ guidata(hMainFigure,guihandles);
 % Create appdata structure
 ad = guiDataStructure('guiappdatastructure');
 
+% fft - struct
+ad.fft = struct();
+ad.fft.display = 'time';
+
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
+setappdata(hMainFigure,'fft',ad.fft);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -383,7 +399,7 @@ if (mainGuiWindow)
     end
     if (isfield(admain,'control') ~= 0)
         ad.control = admain.control;
-        ad.control.axis.position = true;
+        ad.control.axis.position = false;
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -437,7 +453,7 @@ end
 function position_slider_Callback(source,~)
     try
         mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from BLC GUI
+        % Get appdata from FFT GUI
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -454,7 +470,7 @@ function position_slider_Callback(source,~)
                 add2status(msg);
         end
         
-        % Set appdata from BLC GUI
+        % Set appdata from FFT GUI
         setappdata(mainWindow,'data',ad.data);
         
         updateAxes();
@@ -581,12 +597,12 @@ end
 function showposition_checkbox_Callback(source,~)
     try
         mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from BLC GUI
+        % Get appdata from FFT GUI
         ad = getappdata(mainWindow);
         
         ad.control.axis.position = get(source,'Value');
         
-        % Set appdata from BLC GUI
+        % Set appdata from FFT GUI
         setappdata(mainWindow,'control',ad.control);
         
         % Update display
@@ -613,14 +629,14 @@ end
 function visible_panel_listbox_Callback(source,~)
     try
         mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from BLC GUI
+        % Get appdata from FFT GUI
         ad = getappdata(mainWindow);
         
         ad.control.spectra.active = ad.control.spectra.visible(...
             get(source,'Value')...
             );
         
-        % Set appdata from BLC GUI
+        % Set appdata from FFT GUI
         setappdata(mainWindow,'control',ad.control);
         
         updateAxes();
@@ -650,16 +666,39 @@ function pushbutton_Callback(~,~,action)
             return;
         end
         
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
         switch action
+            case 'FFT'
+                if strcmp(ad.fft.display,'time')
+                    ad.fft.display = 'frequency';
+                    set(gh.fft_pushbutton,'String','IFFT');
+                else
+                    ad.fft.display = 'time';
+                    set(gh.fft_pushbutton,'String','FFT');
+                end
+                setappdata(mainWindow,'fft',ad.fft);
+                updateAxes();
+                return;
+            case 'showMaximum'
+                [~,ximax] = max(max(ad.data{ad.control.spectra.active}.data));
+                [~,yimax] = max(ad.data{ad.control.spectra.active}.data(:,ximax));
+                ad.data{ad.control.spectra.active}.display.position.x = ximax;
+                ad.data{ad.control.spectra.active}.display.position.y = yimax;
+                
+                % Set appdata from BLC GUI
+                setappdata(mainWindow,'data',ad.data);
+                
+                updateAxes();
+                update_position_display();
+                return;
             case 'Apply'
                 setAccParameters();
-
-                % Get appdata of main window
-                mainWindow = guiGetWindowHandle(mfilename);
-                ad = getappdata(mainWindow);
-        
-                % Get handles of main window
-                gh = guihandles(mainWindow);
                 
                 accDatasets = cell(length(ad.control.spectra.accumulated),1);
                 for k=1:length(ad.control.spectra.accumulated)
@@ -699,13 +738,6 @@ function pushbutton_Callback(~,~,action)
                 
                 return;
             case 'Discard'
-                % Get appdata of main window
-                mainWindow = guiGetWindowHandle(mfilename);
-                ad = getappdata(mainWindow);
-                
-                % Get handles of main window
-                gh = guihandles(mainWindow);
-                
                 ad.acc.data = [];
                 setappdata(mainWindow,'acc',ad.acc);
                 
@@ -723,10 +755,6 @@ function pushbutton_Callback(~,~,action)
 
                 return;
             case 'Close'
-                % Get appdata of main window
-                mainWindow = guiGetWindowHandle(mfilename);
-                ad = getappdata(mainWindow);
-
 %                 % Add accData to main GUI
 %                 if isfield(ad.acc,'data') && ~isempty(ad.acc.data)
 %                     msgStr = {...
@@ -752,7 +780,7 @@ function pushbutton_Callback(~,~,action)
 
                 % Look for ACC GUI Help window and if its there, close as
                 % well
-                hHelpWindow = findobj('Tag','trEPRgui_ACC_helpwindow');
+                hHelpWindow = findobj('Tag','trEPRgui_FFT_helpwindow');
                 if ishandle(hHelpWindow)
                     delete(hHelpWindow);
                 end
@@ -839,6 +867,10 @@ function keypress_Callback(src,evt)
             % was pressed...
             return;
         end
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from FFT GUI
+        ad = getappdata(mainWindow);
+
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...
                     (strcmpi(evt.Modifier{1},'control'))
@@ -847,7 +879,7 @@ function keypress_Callback(src,evt)
                         pushbutton_Callback(src,evt,'Close')
                         return;
                     case '1'
-                        switchPanel('Datasets');
+                        switchPanel('Display');
                         return;
                     case '2'
                         switchPanel('Settings');
@@ -855,12 +887,27 @@ function keypress_Callback(src,evt)
                     case '3'
                         switchPanel('Results');
                         return;
+                    case 'x'
+                        ad.control.axis.displayType = '1D along x';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
+                        return;
+                    case 'y'
+                        ad.control.axis.displayType = '1D along y';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
+                        return;
+                    case 'z'
+                        ad.control.axis.displayType = '2D plot';
+                        setappdata(mainWindow,'control',ad.control);
+                        updateAxes();
+                        return;
                 end
             end
         end
         switch evt.Key
             case 'f1'
-                trEPRgui_ACC_helpwindow();
+                trEPRgui_FFT_helpwindow();
                 return;
             otherwise
 %                 disp(evt);
@@ -1028,7 +1075,7 @@ end
 function updateSpectra()
     try
         mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from BLC GUI
+        % Get appdata from FFT GUI
         ad = getappdata(mainWindow);
         
         if isempty(ad.data) || isempty(ad.control.spectra.visible)
@@ -1087,7 +1134,7 @@ end
 
 function update_position_display()
     mainWindow = guiGetWindowHandle(mfilename);
-    % Get appdata from BLC GUI
+    % Get appdata from FFT GUI
     ad = getappdata(mainWindow);
 
     if isempty(ad.data) || isempty(ad.control.spectra.visible)
@@ -1163,7 +1210,7 @@ end
 
 function updateAxes()
     mainWindow = guiGetWindowHandle(mfilename);
-    % Get appdata from BLC GUI
+    % Get appdata from FFT GUI
     ad = getappdata(mainWindow);
 
     % Get handles from main window
@@ -1185,13 +1232,29 @@ function updateAxes()
     end
     
     try
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
-
         % Set displayType popupmenu
         displayTypes = cellstr(...
             get(gh.displaytype_popupmenu,'String'));
         [~,index] = max(strcmp(ad.control.axis.displayType,displayTypes));
         set(gh.displaytype_popupmenu,'Value',index);
+        
+        % Check whether we are in time or frequency domain
+        if strcmp(ad.fft.display,'frequency')
+            [data,xvalues] = doFFT(ad.control.spectra.active);
+            %xvalues = 1:size(data,2);
+            xmeasure = 'frequency';
+            xunit = 'MHz';
+        else
+            data = ad.data{ad.control.spectra.active}.data;
+            xvalues = ad.data{ad.control.spectra.active}.axes.x.values;
+            xmeasure = ad.data{ad.control.spectra.active}.axes.x.measure;
+            xunit = ad.data{ad.control.spectra.active}.axes.x.unit;
+        end
+        yvalues = ad.data{ad.control.spectra.active}.axes.y.values;
+        ymeasure = ad.data{ad.control.spectra.active}.axes.y.measure;
+        yunit = ad.data{ad.control.spectra.active}.axes.y.unit;
+
+        [y,x] = size(data);
         
         cla(gh.axis,'reset');
         axes(gh.axis);
@@ -1203,37 +1266,33 @@ function updateAxes()
                 hold on;
                 % Plot 2D data
                 imagesc(...
-                    ad.data{ad.control.spectra.active}.axes.x.values,...
-                    ad.data{ad.control.spectra.active}.axes.y.values,...                  
-                    ad.data{ad.control.spectra.active}.data,'Parent',gh.axis);
-%                 if ad.control.axis.position
-%                     % Plot red line with position in time
-%                     plot(gh.axis,...
-%                         [ad.data{ad.control.spectra.active}.display.position.x ...
-%                         ad.data{ad.control.spectra.active}.display.position.x],...
-%                         [1,y],...
-%                         'r-');
-%                     % Plot red line with position in field
-%                     plot(gh.axis,...
-%                         [1,x],...
-%                         [ad.data{ad.control.spectra.active}.display.position.y ...
-%                         ad.data{ad.control.spectra.active}.display.position.y],...
-%                         'r-');
-%                 end
+                    xvalues,...
+                    yvalues,...                  
+                    data,'Parent',gh.axis);
+                if ad.control.axis.position
+                    % Plot red line with position in time
+                    plot(gh.axis,...
+                        [xvalues(ad.data{ad.control.spectra.active}.display.position.x) ...
+                        xvalues(ad.data{ad.control.spectra.active}.display.position.x)],...
+                        [yvalues(1) yvalues(end)],...
+                        'r-');
+                    % Plot red line with position in field
+                    plot(gh.axis,...
+                        [xvalues(1) xvalues(end)],...
+                        [yvalues(ad.data{ad.control.spectra.active}.display.position.y) ...
+                        yvalues(ad.data{ad.control.spectra.active}.display.position.y)],...
+                        'r-');
+                end
                 hold off;
                 set(gh.axis,'XLim',[...
-                    ad.data{ad.control.spectra.active}.axes.x.values(1) ...
-                    ad.data{ad.control.spectra.active}.axes.x.values(end)]);
+                    xvalues(1) ...
+                    xvalues(end)]);
                 set(gh.axis,'YLim',[...
-                    ad.data{ad.control.spectra.active}.axes.y.values(1) ...
-                    ad.data{ad.control.spectra.active}.axes.y.values(end)]);
+                    yvalues(1) ...
+                    yvalues(end)]);
                 set(gh.axis,'YDir','normal');
-                xlabel(gh.axis,sprintf('{\\it %s} / %s',...
-                    ad.data{ad.control.spectra.active}.axes.x.measure,...
-                    ad.data{ad.control.spectra.active}.axes.x.unit));
-                ylabel(gh.axis,sprintf('{\\it %s} / %s',...
-                    ad.data{ad.control.spectra.active}.axes.y.measure,...
-                    ad.data{ad.control.spectra.active}.axes.y.unit));
+                xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
+                ylabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
 
             case '1D along x'
                 % Enable position slider only if second axis has more than one value
@@ -1252,26 +1311,29 @@ function updateAxes()
                 % Plot time trace at given position in spectrum
                 hold on;
                 plot(gh.axis,...
-                    1:1:x,...
-                    ad.data{ad.control.spectra.active}.data(...
+                    xvalues,...
+                    data(...
                     ad.data{ad.control.spectra.active}.display.position.y,:),...
                     'k-');
-                set(gh.axis,'XLim',[1 x]);
-                z = [ min(min(ad.data{ad.control.spectra.active}.data)) ...
-                    max(max(ad.data{ad.control.spectra.active}.data)) ];
+                set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+                if strcmp(ad.fft.display,'frequency')
+                    z = [ min(min(data(:,10:end))) max(max(data(:,10:end))) ];
+                else
+                    z = [ min(min(data)) max(max(data)) ];
+                end
                 ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
                 set(gh.axis,'YLim',ZLim);
                 if ad.control.axis.position
                     % Plot red line with position in time
                     plot(gh.axis,...
-                        [ad.data{ad.control.spectra.active}.display.position.x ...
-                        ad.data{ad.control.spectra.active}.display.position.x],...
+                        [xvalues(ad.data{ad.control.spectra.active}.display.position.x) ...
+                        xvalues(ad.data{ad.control.spectra.active}.display.position.x)],...
                         ZLim,...
                         'r-');
                 end
                 hold off;
                 set(gh.axis,'YTickLabel',[]);
-                xlabel(gh.axis,'{\it time} / points');
+                xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
                 
             case '1D along y'
                 % Enable position slider only if second axis has more than one value
@@ -1293,28 +1355,26 @@ function updateAxes()
                 % Matlab from crashing due to stupid errors (plot: vectors
                 % must be of same length) when being too fast with the
                 % sliders.
-                [y,x] = size(ad.data{ad.control.spectra.active}.data);
                 plot(gh.axis,...
-                    1:1:y,...
-                    ad.data{ad.control.spectra.active}.data(...
+                    yvalues,...
+                    data(...
                     :,ad.data{ad.control.spectra.active}.display.position.x),...
                     'k-');
-                set(gh.axis,'XLim',[1 y]);
-                z = [ min(min(ad.data{ad.control.spectra.active}.data)) ...
-                    max(max(ad.data{ad.control.spectra.active}.data)) ];
+                set(gh.axis,'XLim',[yvalues(1) yvalues(end)]);
+                z = [ min(min(data)) max(max(data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
                 set(gh.axis,'YLim',ZLim);
                 if ad.control.axis.position
                     % Plot red line with position in time
                     plot(gh.axis,...
-                        [ad.data{ad.control.spectra.active}.display.position.y ...
-                        ad.data{ad.control.spectra.active}.display.position.y],...
+                        [yvalues(ad.data{ad.control.spectra.active}.display.position.y) ...
+                        yvalues(ad.data{ad.control.spectra.active}.display.position.y)],...
                         ZLim,...
                         'r-');
                 end
                 hold off;
                 set(gh.axis,'YTickLabel',[]);
-                xlabel(gh.axis,'{\it magnetic field} / points');
+                xlabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
         end
     catch exception
         try
@@ -1333,6 +1393,30 @@ function updateAxes()
             throw(exception);
         end
     end 
+end
+
+function [fftdata,frequency] = doFFT(datasetId)
+    mainWindow = guiGetWindowHandle(mfilename);
+    % Get appdata from FFT GUI
+    ad = getappdata(mainWindow);
+
+    % Perform FFT
+    L = size(ad.data{datasetId}.data,2);
+    NFFT = 2^nextpow2(L); % Next power of 2 from length of y
+    
+    % Very important: fft performs the FFT on every COLUMN of the matrix
+    Y = fft(ad.data{datasetId}.data',NFFT)/L;
+    ad.data{datasetId}.fft.data = Y;
+    
+    % Sampling frequency
+    Fs = 1/(ad.data{datasetId}.axes.x.values(2)-...
+        ad.data{datasetId}.axes.x.values(1));
+    frequency = Fs/2*linspace(0,1,NFFT/2+1);
+    
+    fftdata = 2*abs(Y(1:NFFT/2+1,:))';
+
+    % Set appdata of FFT GUI
+    setappdata(mainWindow,'fft',ad.fft);
 end
 
 end

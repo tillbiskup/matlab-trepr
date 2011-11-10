@@ -1,0 +1,34 @@
+
+INTRODUCTION
+
+A rather short introduction to the FFT GUI
+
+
+-=IF IN A HURRY=-
+
+To perform FFT on your data, select the dataset in the "Display" panel on the right and simply hit the big "FFT" button. You can analyse the results in the usual manner in all three representations (2D, 1D along x and y) with the main axes.
+
+
+-=TO THE GENTLE READER=-
+
+Why perform FFT on trEPR data? Mostly, this will be a diagnostic tool that helps figuring out if there are some oscillations in the data and if so, what frequency they have.
+
+In rare cases, there are unwanted oscillations on the data due to problems with the experimental setup. Generally it is highly recommended to fix those technical details with the experimental setup and NOT to rely on the possibility to remove those oscillations via FFT, cutting out the unwanted frequency contribution, followed by IFFT. Nevertheless, sometimes one is still interested in the "real" data without the oscillations, especially in those cases where the oscillations show a stable frequency and are rather strong. In such cases, FFT might help. 
+
+
+GUI layout
+
+Basically, the FFT GUI window is divided into three panels (1) that are all located to the right. You can switch between them with the buttons on the top or via shortcuts Ctrl-1 to Ctrl-3. A fourth panel is located below the main axes and used for displaying more detailed reports of the actions performed on the data.
+
+More details to all the different panels and the meaning of their control elements can be found in the respective help topic.
+
+
+Normal operation
+
+...
+
+
+BTW: The button with the questionmark shows this help, as you might have figured out already.
+
+(1) Yes, it's not only the ancient Gallia that was divided in three parts, as good old Gaius Julius told us... (apologies to those who don't get the joke)
+
