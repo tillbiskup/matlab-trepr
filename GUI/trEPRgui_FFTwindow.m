@@ -7,7 +7,7 @@ function varargout = trEPRgui_FFTwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011, Till Biskup
-% 2011-11-10
+% 2011-11-12
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -196,7 +196,7 @@ uicontrol('Tag','clipping_text',...
     'TooltipString',sprintf('%s\n%s',...
     'First n points to ignore when setting the y maximum ',...
     'when plotting frequency in FFT mode.'),...
-    'String','npts to ignore for max'...
+    'String','npts to ignore for max '...
     );
 uicontrol('Tag','clipping_npts_edit',...
     'Style','edit',...
@@ -361,8 +361,8 @@ uicontrol('Tag','pickfrequency_unit_text',...
     'Position',[10+(mainPanelWidth-40)/3*2 30 (mainPanelWidth-40)/3 25],...
     'String','unit'...
     );
-uicontrol('Tag','pickfrequency_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','pickfrequency_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp2_p1,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -370,7 +370,7 @@ uicontrol('Tag','pickfrequency_pushbutton',...
     'Units','Pixels',...
     'Position',[10 10 (mainPanelWidth-40)/3 25],...
     'String','Pick',...
-    'Callback',{@pushbutton_Callback,'pickFrequency'}...
+    'Callback',{@togglebutton_Callback,'pickFrequency'}...
     );
 uicontrol('Tag','pickfrequency_x_index_edit',...
     'Style','edit',...
@@ -399,8 +399,8 @@ pp2_p2 = uipanel('Tag','zoom_panel',...
     'Position',[10 mainPanelHeight-170 mainPanelWidth-20 60],...
     'Title','Zoom'...
     );
-uicontrol('Tag','zoom_x_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','zoom_x_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp2_p2,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -408,10 +408,10 @@ uicontrol('Tag','zoom_x_pushbutton',...
     'Units','Pixels',...
     'Position',[10 10 (mainPanelWidth-40)/3 25],...
     'String','x',...
-    'Callback',{@pushbutton_Callback,'zoomX'}...
+    'Callback',{@togglebutton_Callback,'zoomX'}...
     );
-uicontrol('Tag','zoom_xy_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','zoom_xy_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp2_p2,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -419,7 +419,7 @@ uicontrol('Tag','zoom_xy_pushbutton',...
     'Units','Pixels',...
     'Position',[10+(mainPanelWidth-40)/3 10 (mainPanelWidth-40)/3 25],...
     'String','x & y',...
-    'Callback',{@pushbutton_Callback,'zoomXY'}...
+    'Callback',{@togglebutton_Callback,'zoomXY'}...
     );
 uicontrol('Tag','zoom_reset_pushbutton',...
     'Style','pushbutton',...
@@ -459,7 +459,7 @@ uicontrol('Tag','backgroundfit_popupmenu',...
     'Units','Pixels',...
     'Position',[60 72 mainPanelWidth-90 20],...
     'String','exponential|biexponential',...
-    'Callback', {@displaytype_popupmenu_Callback}...
+    'Callback', {@popupmenu_Callback,'bgfitfunction'}...
     );
 uicontrol('Tag','backgroundfit_ignorepoints_text',...
     'Style','text',...
@@ -479,10 +479,10 @@ uicontrol('Tag','backgroundfit_ignorepoints_edit',...
     'Units','Pixels',...
     'Position',[10+(mainPanelWidth-40)/3*2 40 (mainPanelWidth-40)/3 25],...
     'String','0',...
-    'Callback',{@position_edit_Callback,'backgroundfit_ignorepoints'}...
+    'Callback',{@edit_Callback,'bgfit_ignorepoints'}...
     );
-uicontrol('Tag','backgroundfit_fit_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','backgroundfit_fit_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp2_p3,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -490,10 +490,10 @@ uicontrol('Tag','backgroundfit_fit_pushbutton',...
     'Units','Pixels',...
     'Position',[10 10 (mainPanelWidth-40)/2 25],...
     'String','Fit & Display',...
-    'Callback',{@pushbutton_Callback,'backgroundfit'}...
+    'Callback',{@togglebutton_Callback,'backgroundfit'}...
     );
-uicontrol('Tag','backgroundfit_subtract_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','backgroundfit_subtract_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp2_p3,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -501,7 +501,7 @@ uicontrol('Tag','backgroundfit_subtract_pushbutton',...
     'Units','Pixels',...
     'Position',[10+(mainPanelWidth-40)/2 10 (mainPanelWidth-40)/2 25],...
     'String','Subtract',...
-    'Callback',{@pushbutton_Callback,'backgroundsubtract'}...
+    'Callback',{@togglebutton_Callback,'backgroundsubtract'}...
     );
 pp2_p4 = uipanel('Tag','peakdetection_panel',...
     'Parent',pp2,...
@@ -793,11 +793,15 @@ guidata(hMainFigure,guihandles);
 ad = guiDataStructure('guiappdatastructure');
 
 % Configuration values
-ad.configuration.ignorefirstn = 10;
+ad.configuration.display.ignorefirstn = 10;
+ad.configuration.bgfit.ignorefirstn = 0;
 
 % fft - struct
 ad.fft = struct();
 ad.fft.display = 'time';
+ad.fft.bgfit.mode = '';
+ad.fft.bgfit.ignorefirstn = ad.configuration.bgfit.ignorefirstn;
+ad.fft.bgfit.function = '';
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
@@ -834,7 +838,7 @@ end
 
 % Set FFT GUI specific fields in control structure
 ad.control.axis.position = false;
-ad.control.axis.ignorefirstn = ad.configuration.ignorefirstn;
+ad.control.axis.ignorefirstn = ad.configuration.display.ignorefirstn;
 setappdata(hMainFigure,'control',ad.control);
 
 updateAxes();
@@ -850,8 +854,8 @@ handles = findall(...
     '-or','style','edit',...
     '-or','style','listbox',...
     '-or','style','popupmenu');
-for k=1:length(handles)
-    set(handles(k),'KeyPressFcn',@keypress_Callback);
+for m=1:length(handles)
+    set(handles(m),'KeyPressFcn',@keypress_Callback);
 end
 
 % Set all uicontrols of analysis and correction panel to inactive
@@ -1104,16 +1108,13 @@ function edit_Callback(source,~,field)
         mainWindow = guiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
         value = get(source,'String');
         
         switch field
             case 'npts_clipping'
                 value = str2double(value);
                 xdim = size(ad.data{ad.control.spectra.active}.data,2);
-                if isnan(value) || (value > xdim) || (value < 1)
+                if isnan(value) || (value > xdim) || (value < 0)
                     set(source,'string',...
                         num2str(ad.control.axis.ignorefirstn));
                 else
@@ -1122,6 +1123,17 @@ function edit_Callback(source,~,field)
                 end
                 updateAxes();
                 return;
+            case 'bgfit_ignorepoints'
+                value = str2double(value);
+                xdim = size(ad.data{ad.control.spectra.active}.data,2);
+                if isnan(value) || (value > xdim) || (value < 0)
+                    set(source,'string',...
+                        num2str(ad.control.axis.ignorefirstn));
+                else
+                    ad.fft.bgfit.ignorefirstn = value;
+                    setappdata(mainWindow,'fft',ad.fft)
+                end
+                updateAxes();
             otherwise
                 return;
         end
@@ -1144,6 +1156,170 @@ function edit_Callback(source,~,field)
     end
 end
 
+function popupmenu_Callback(source,~,action)
+    try
+        if isempty(action)
+            return;
+        end
+        
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
+        switch action
+            case 'bgfitfunction'
+                functions = cellstr(get(source,'String'));
+                ad.fft.bgfit.function = functions{get(source,'Value')};
+                setappdata(mainWindow,'fft',ad.fft);
+                updateAxes();
+            otherwise
+                disp('Unknown popupmenu')
+                disp(action);
+        end
+
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end  
+end
+
+function togglebutton_Callback(source,~,action)
+    try
+        if isempty(action)
+            return;
+        end
+        
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+
+        % Get state of toggle button
+        value = get(source,'Value');
+        
+        % Toggle button
+        if value % If toggle switched ON
+            switch action
+                case 'pickFrequency'
+                    % Switch off zoom
+                    zoom(mainWindow,'off');                  
+                    % Set pointer callback functions
+                    set(gh.zoom_x_togglebutton,'Value',0);
+                    set(gh.zoom_xy_togglebutton,'Value',0);
+                    set(mainWindow,...
+                        'WindowButtonMotionFcn',@trackPointer);
+                    set(mainWindow,...
+                        'WindowButtonDownFcn',@switchMeasurePointer);
+                    return;
+                case 'zoomX'
+                    % Reset pointer callback functions
+                    set(mainWindow,'WindowButtonMotionFcn','');
+                    set(mainWindow,'WindowButtonDownFcn','');
+                    set(gh.pickfrequency_togglebutton,'Value',0);
+                    % Reset other zoom toggle button
+                    set(gh.zoom_xy_togglebutton,'Value',0);
+                    zoom(mainWindow,'xon');
+                    return;
+                case 'zoomXY'
+                    % Reset pointer callback functions
+                    set(mainWindow,'WindowButtonMotionFcn','');
+                    set(mainWindow,'WindowButtonDownFcn','');
+                    set(gh.pickfrequency_togglebutton,'Value',0);
+                    % Reset other zoom toggle button
+                    set(gh.zoom_x_togglebutton,'Value',0);
+                    zoom(mainWindow,'on');
+                    return;
+                case 'backgroundfit'
+                    % Reset other bgfit toggle button
+                    set(gh.backgroundfit_subtract_togglebutton,'Value',0);
+                    ad.fft.bgfit.mode = 'bgfit';
+                    % Set fit function
+                    functions = ...
+                        cellstr(get(gh.backgroundfit_popupmenu,'String'));
+                    ad.fft.bgfit.function = functions{...
+                        get(gh.backgroundfit_popupmenu,'Value')};
+                    setappdata(mainWindow,'fft',ad.fft);
+                    updateAxes();
+                    return;
+                case 'backgroundsubtract'
+                    set(gh.backgroundfit_fit_togglebutton,'Value',0);
+                    ad.fft.bgfit.mode = 'bgsubtract';
+                    % Set fit function
+                    functions = ...
+                        cellstr(get(gh.backgroundfit_popupmenu,'String'));
+                    ad.fft.bgfit.function = functions{...
+                        get(gh.backgroundfit_popupmenu,'Value')};
+                    setappdata(mainWindow,'fft',ad.fft);
+                    updateAxes();
+                    return;
+                otherwise
+                    return;
+            end
+        else % If toggle button switched OFF
+            switch action
+                case 'pickFrequency'
+                    % Reset pointer callback functions
+                    set(mainWindow,'WindowButtonMotionFcn','');
+                    set(mainWindow,'WindowButtonDownFcn','');
+                    return;
+                case 'zoomX'
+                    zoom(mainWindow,'off');
+                    return;
+                case 'zoomXY'
+                    zoom(mainWindow,'off');
+                    return;
+                case 'backgroundfit'
+                    ad.fft.bgfit.mode = '';
+                    setappdata(mainWindow,'fft',ad.fft);
+                    updateAxes();
+                    return;
+                case 'backgroundsubtract'
+                    ad.fft.bgfit.mode = '';
+                    setappdata(mainWindow,'fft',ad.fft);
+                    updateAxes();
+                    return;
+                otherwise
+                    return;
+            end
+        end
+        
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+        
 function pushbutton_Callback(~,~,action)
     try
         if isempty(action)
@@ -1192,6 +1368,12 @@ function pushbutton_Callback(~,~,action)
                 
                 updateAxes();
                 update_position_display();
+                return;
+            case 'zoomReset'
+                zoom(mainWindow,'off');
+                set(gh.zoom_x_togglebutton,'Value',0);
+                set(gh.zoom_xy_togglebutton,'Value',0);
+                updateAxes();
                 return;
             case 'Apply'
                 setAccParameters();
@@ -1841,12 +2023,19 @@ function updateAxes()
             case '2D plot'
                 % Disable position slider
                 set(gh.position_slider,'Enable','off');
-                
+
+                if strcmp(ad.fft.display,'frequency')
+                    z = [ ...
+                        min(min(data(:,ad.control.axis.ignorefirstn+1:end))) ...
+                        max(max(data(:,ad.control.axis.ignorefirstn+1:end))) ];
+                else
+                    z = [ min(min(data)) max(max(data)) ];
+                end
                 hold on;
                 % Plot 2D data
                 imagesc(...
                     xvalues,...
-                    yvalues,...                  
+                    yvalues,...
                     data,'Parent',gh.axis);
                 if ad.control.axis.position
                     % Plot red line with position in time
@@ -1870,6 +2059,7 @@ function updateAxes()
                     yvalues(1) ...
                     yvalues(end)]);
                 set(gh.axis,'YDir','normal');
+                set(gh.axis,'CLim',z);
                 xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
                 ylabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
 
@@ -1889,11 +2079,24 @@ function updateAxes()
                 end
                 % Plot time trace at given position in spectrum
                 hold on;
-                plot(gh.axis,...
-                    xvalues,...
-                    data(...
-                    ad.data{ad.control.spectra.active}.display.position.y,:),...
-                    'k-');
+                if strcmp(ad.fft.bgfit.mode,'bgsubtract')
+                    fit = doFit(...
+                        data(...
+                        ad.data{ad.control.spectra.active}.display.position.y,:),...
+                        ad.fft.bgfit.function,...
+                        ad.fft.bgfit.ignorefirstn);
+                    plot(gh.axis,...
+                        xvalues,...
+                        data(...
+                        ad.data{ad.control.spectra.active}.display.position.y,:)-fit,...
+                        'k-');
+                else
+                    plot(gh.axis,...
+                        xvalues,...
+                        data(...
+                        ad.data{ad.control.spectra.active}.display.position.y,:),...
+                        'k-');
+                end
                 set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
                 if strcmp(ad.fft.display,'frequency')
                     z = [ ...
@@ -1911,6 +2114,15 @@ function updateAxes()
                         xvalues(ad.data{ad.control.spectra.active}.display.position.x)],...
                         ZLim,...
                         'r-');
+                end
+                % Plot fitted background
+                if strcmp(ad.fft.bgfit.mode,'bgfit')
+                    fit = doFit(...
+                        data(...
+                        ad.data{ad.control.spectra.active}.display.position.y,:),...
+                        ad.fft.bgfit.function,...
+                        ad.fft.bgfit.ignorefirstn);
+                    plot(gh.axis,xvalues,fit,'r-');
                 end
                 hold off;
                 set(gh.axis,'YTickLabel',[]);
@@ -1976,28 +2188,380 @@ function updateAxes()
     end 
 end
 
+function switchMeasurePointer(~,~)
+    try
+        % Get appdata of main window
+        mainWindow = guiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+
+        % Get handles from main window
+        gh = guidata(mainWindow);
+        
+        % Reset pointer callback functions
+        set(mainWindow,'WindowButtonMotionFcn','');
+        set(mainWindow,'WindowButtonDownFcn','');
+        
+        % Reset pointer
+        set(mainWindow,'Pointer','arrow');
+        
+        % Switch off togglebuttons
+        set(gh.pickfrequency_togglebutton,'Value',0);
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'control',ad.control);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function trackPointer(varargin)
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        
+        % Get handles of mainwindow
+        gh = guihandles(mainWindow);
+        
+        % Get appdata of main window
+        ad = getappdata(mainWindow);
+        
+        % Get position of mainAxis (axis coordinates)
+        axisPosition = get(hPlotAxes,'Position');
+        % Coordinates are "real" x,y pairs relative to the mainWindow
+        axisCoordinates = [ ...
+            axisPosition(1)-1 ...
+            axisPosition(2)-1 ...
+            axisPosition(1)+axisPosition(3) ...
+            axisPosition(2)+axisPosition(4) ...
+            ];
+        
+        % Get current position of pointer
+        pointerPosition = get(mainWindow,'CurrentPoint');
+        
+        % Create CData for custom pointer
+        pointerShapeCData = ones(16)*nan;
+        pointerShapeCData([1 8 15],[1:6 10:15]) = 1;
+        pointerShapeCData([1:6 10:15],[1 8 15]) = 1;
+        
+        % As long as we are inside the mainAxis
+        if pointerPosition(1) > axisCoordinates(1) && ...
+                pointerPosition(1) < axisCoordinates(3) && ...
+                pointerPosition(2) > axisCoordinates(2) && ...
+                pointerPosition(2) < axisCoordinates(4)
+            
+            % Get pointer position coordinates relative to axis
+            pointerPositionInAxis = ...
+                pointerPosition - [axisCoordinates(1) axisCoordinates(2)];
+            
+            % Set pointer shape
+            %set(mainWindow,'Pointer','crosshair');
+            set(mainWindow,'Pointer','custom',...
+                'PointerShapeCData',pointerShapeCData,...
+                'PointerShapeHotSpot',[9 9]);
+            
+            % Get id of current spectrum (to shorten lines afterwards)
+            active = ad.control.spectra.active;
+            
+            % Get xdata and ydata of currently active dataset
+            if (strcmp(ad.control.axis.displayType,'2D plot'))
+                xdata = get(...
+                    findobj('Parent',hPlotAxes,'-and','Type','image'),...
+                    'xdata');
+                ydata = get(...
+                    findobj('Parent',hPlotAxes,'-and','Type','image'),...
+                    'ydata');
+            else
+                xdata = get(...
+                    findobj('Parent',hPlotAxes,'-and','Type','line'),...
+                    'xdata');
+                ydata = get(...
+                    findobj('Parent',hPlotAxes,'-and','Type','line'),...
+                    'ydata');
+            end
+            
+            % If we are in 1D display mode and there are more than one spectrum
+            % and/or a zero line displayed
+            if ( (strcmp(ad.control.axis.displayType,'1D along x') || ...
+                    strcmp(ad.control.axis.displayType,'1D along y')) ) && ...
+                    (iscell(xdata) && iscell(ydata))
+                xdata = xdata{length(xdata)-find(ad.control.spectra.visible==active)+1};
+                ydata = ydata{length(ydata)-find(ad.control.spectra.visible==active)+1};
+            end
+            
+            % Create vectors with indices for xdata and ydata
+            % Those are used in case of axis limits <> dataset limits
+            xindex = [ 1 : length(xdata) ];
+            yindex = [ 1 : length(ydata) ];
+            
+            % Handle situation that axis limits and dataset limits don't coincide.
+            % Therefore, in case of the dataset being smaller than axis limits, pad
+            % it with the first/last value to fill xdata/ydata, respectively.
+            % Alternatively, the dataset being larger than axis limits, cut out
+            % part from the dataset that's currently displayed.
+            % To find out how many points to pad, use interp1 to get ending points
+            % of dataset in current axis.
+            
+            % IMPORTANT: DON'T MESS UP THE CODE BELOW, IF YOU'RE NOT ABSOLUTELY
+            % SURE WHAT YOU'RE DOING. I SPEND A WHOLE DAY FIGHTING WITH IT UNTIL IT
+            % WORKED SOMEWHAT FINE.
+            
+            % Get x and y limits of axes
+            axisXLim = get(hPlotAxes,'XLim');
+            axisYLim = get(hPlotAxes,'YLim');
+            % Get x and y limits of currently active dataset
+            datasetXLim = [ xdata(1) xdata(end) ];
+            datasetYLim = [ ydata(1) ydata(end) ];
+            
+            % Get dataset limits in axis coordinates
+            if (axisXLim(1) > datasetXLim(1))
+                % In case dataset is larger than current axis limits
+                
+                % Need to come up with a good variable name for that, but it looks
+                % like we get here the position of the axis limit in the data
+                % vector, what would be very useful
+                newDatasetXmin=interp1(...
+                    linspace(datasetXLim(1),datasetXLim(2),length(xdata)),...
+                    linspace(1,length(xdata),length(xdata)),...
+                    axisXLim(1),'nearest');
+                newXdata = xdata(newDatasetXmin:end);
+                newXindex = xindex(newDatasetXmin:end);
+            else
+                newDatasetXmin=interp1(...
+                    linspace(axisXLim(1),axisXLim(2),length(xdata)),...
+                    linspace(1,length(xdata),length(xdata)),...
+                    xdata(1),'nearest');
+                newXdata = [ones(1,newDatasetXmin)*xdata(1) xdata];
+                newXindex = [ones(1,newDatasetXmin)*xindex(1) xindex];
+            end
+            if (axisXLim(2) < datasetXLim(2))
+                % In case dataset is larger than current axis limits
+                
+                % Need to come up with a good variable name for that, but it looks
+                % like we get here the position of the axis limit in the data
+                % vector, what would be very useful
+                newDatasetXmax=interp1(...
+                    linspace(datasetXLim(1),datasetXLim(end),length(xdata)),...
+                    linspace(1,length(xdata),length(xdata)),...
+                    axisXLim(2),'nearest');
+                newXdata = newXdata(1:end-(length(xdata)-newDatasetXmax));
+                newXindex = newXindex(1:end-(length(xindex)-newDatasetXmax));
+            else
+                newDatasetXmax=interp1(...
+                    linspace(axisXLim(1),axisXLim(2),length(xdata)),...
+                    linspace(1,length(xdata),length(xdata)),...
+                    xdata(end),'nearest');
+                newXdata = [newXdata ones(1,length(xdata)-newDatasetXmax)*xdata(end)];
+                newXindex = [newXindex ones(1,length(xindex)-newDatasetXmax)*xindex(end)];
+            end
+            
+            if (strcmp(ad.control.axis.displayType,'2D plot'))
+                if (axisYLim(1) > datasetYLim(1))
+                    % In case dataset is larger than current axis limits
+                    
+                    % Need to come up with a good variable name for that, but it looks
+                    % like we get here the position of the axis limit in the data
+                    % vector, what would be very useful
+                    newDatasetYmin=interp1(...
+                        linspace(datasetYLim(1),datasetYLim(2),length(ydata)),...
+                        linspace(1,length(ydata),length(ydata)),...
+                        axisYLim(1),'nearest');
+                    newYdata = ydata(newDatasetYmin:end);
+                    newYindex = yindex(newDatasetYmin:end);
+                else
+                    newDatasetYmin=interp1(...
+                        linspace(axisYLim(1),axisYLim(2),length(ydata)),...
+                        linspace(1,length(ydata),length(ydata)),...
+                        ydata(1),'nearest');
+                    newYdata = [ones(1,newDatasetYmin)*ydata(1) ydata];
+                    newYindex = [ones(1,newDatasetYmin)*yindex(1) yindex];
+                end
+                if (axisYLim(2) < datasetYLim(2))
+                    % In case dataset is larger than current axis limits
+                    
+                    % Need to come up with a good variable name for that, but it looks
+                    % like we get here the position of the axis limit in the data
+                    % vector, what would be very useful
+                    newDatasetYmax=interp1(...
+                        linspace(datasetYLim(1),datasetYLim(end),length(ydata)),...
+                        linspace(1,length(ydata),length(ydata)),...
+                        axisYLim(2),'nearest');
+                    newYdata = newYdata(1:end-(length(ydata)-newDatasetYmax));
+                    newYindex = newYindex(1:end-(length(yindex)-newDatasetYmax));
+                else
+                    newDatasetYmax=interp1(...
+                        linspace(axisYLim(1),axisYLim(2),length(ydata)),...
+                        linspace(1,length(ydata),length(ydata)),...
+                        ydata(end),'nearest');
+                    newYdata = [newYdata ones(1,length(ydata)-newDatasetYmax)*ydata(end)];
+                    newYindex = [newYindex ones(1,length(yindex)-newDatasetYmax)*yindex(end)];
+                end
+            end
+            
+            switch ad.control.axis.displayType
+                case '2D plot'
+                    % Get index of current point in dataset
+                    indx=interp1(...
+                        linspace(1,axisPosition(3),length(newXdata)),...
+                        newXindex,...
+                        pointerPositionInAxis(1),'nearest');
+                    indy=interp1(...
+                        linspace(1,axisPosition(4),length(newYdata)),...
+                        newYindex,...
+                        pointerPositionInAxis(2),'nearest');
+                case '1D along x'
+                    % Get index of current point in dataset
+                    indx=interp1(...
+                        linspace(1,axisPosition(3),length(newXdata)),...
+                        newXindex,...
+                        pointerPositionInAxis(1),'nearest');
+                    indy=indx;
+                case '1D along y'
+                    % Get index of current point in dataset
+                    indx=interp1(...
+                        linspace(1,axisPosition(3),length(newXdata)),...
+                        newXindex,...
+                        pointerPositionInAxis(1),'nearest');
+                    indy=indx;
+                otherwise
+                    % That shall never happen!
+                    disp('trackPointer(): Unrecognised displayType');
+                    disp(ad.control.axis.displayType);
+                    set(mainWindow,'Pointer','arrow');
+                    return;
+            end
+            
+            % Get value (in units) of current point in dataset
+            valx = xdata(indx);
+            valy = ydata(indy);
+            
+            % Set display
+            % Update display of first point
+            set(gh.pickfrequency_x_index_edit,'String',num2str(indx));
+            set(gh.pickfrequency_x_unit_edit,'String',num2str(valx));
+        else
+            set(mainWindow,'Pointer','arrow');
+        end
+        
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
 function [fftdata,frequency] = doFFT(datasetId)
-    mainWindow = guiGetWindowHandle(mfilename);
-    % Get appdata from FFT GUI
-    ad = getappdata(mainWindow);
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from FFT GUI
+        ad = getappdata(mainWindow);
+        
+        % Perform FFT
+        L = size(ad.data{datasetId}.data,2);
+        NFFT = 2^nextpow2(L); % Next power of 2 from length of y
+        
+        % Very important: fft performs the FFT on every COLUMN of the matrix
+        Y = fft(ad.data{datasetId}.data',NFFT)/L;
+        ad.data{datasetId}.fft.data = Y;
+        
+        % Sampling frequency
+        Fs = 1/(ad.data{datasetId}.axes.x.values(2)-...
+            ad.data{datasetId}.axes.x.values(1));
+        frequency = Fs/2*linspace(0,1,NFFT/2+1);
+        
+        fftdata = 2*abs(Y(1:NFFT/2+1,:))';
+        
+        % Set appdata of FFT GUI
+        setappdata(mainWindow,'fft',ad.fft);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
 
-    % Perform FFT
-    L = size(ad.data{datasetId}.data,2);
-    NFFT = 2^nextpow2(L); % Next power of 2 from length of y
-    
-    % Very important: fft performs the FFT on every COLUMN of the matrix
-    Y = fft(ad.data{datasetId}.data',NFFT)/L;
-    ad.data{datasetId}.fft.data = Y;
-    
-    % Sampling frequency
-    Fs = 1/(ad.data{datasetId}.axes.x.values(2)-...
-        ad.data{datasetId}.axes.x.values(1));
-    frequency = Fs/2*linspace(0,1,NFFT/2+1);
-    
-    fftdata = 2*abs(Y(1:NFFT/2+1,:))';
-
-    % Set appdata of FFT GUI
-    setappdata(mainWindow,'fft',ad.fft);
+function fit = doFit(data,fitFunType,ignorefirstn)
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from FFT GUI
+        ad = getappdata(mainWindow);
+        
+        x1 = ignorefirstn+1:length(data);
+        x2 = 1:length(data);
+        
+        switch fitFunType
+            case 'exponential'
+                % A1*exp(k1*x)
+                fun1 = @(z)z(1)*exp(z(2)*x1+z(3));
+                fun2 = @(z)z(1)*exp(z(2)*x2+z(3));
+                fitfun = @(z)sum((fun1(z)-data(ignorefirstn+1:end)).^2);
+                % Fit function
+                [Y,fval] = fminsearch(fitfun,[1 1 1]);
+                fit = fun2(Y);
+                return;
+            case 'biexponential'
+                % A1*exp(k1*x) + A2*exp(k2*x)
+                fun1 = @(z)z(1)*exp(z(2)*x1+z(3))+z(4)*exp(z(5)*x1+z(6));
+                fun2 = @(z)z(1)*exp(z(2)*x2+z(3))+z(4)*exp(z(5)*x2+z(6));
+                fitfun = @(z)sum((fun1(z)-data(ignorefirstn+1:end)).^2);
+                % Fit function
+                [Y,fval] = fminsearch(fitfun,[1 1 1 1 1 1]);
+                fit = fun2(Y);
+                return;
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
 end
 
 end
