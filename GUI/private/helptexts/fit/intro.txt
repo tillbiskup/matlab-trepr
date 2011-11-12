@@ -1,0 +1,38 @@
+
+INTRODUCTION
+
+A rather short introduction to the Fit GUI
+
+
+-=IF IN A HURRY=-
+
+...
+
+
+-=TO THE GENTLE READER=-
+
+The Fit GUI is ...
+
+
+GUI layout
+
+Basically, the BLC GUI window is divided into three panels (1) that are all located to the right. You can switch between them with the buttons on the top or via shortcuts Ctrl-1 to Ctrl-3.
+
+More details to all the different panels and the meaning of their control elements can be found in the respective help topic.
+
+
+Normal operation
+
+Normally, you simply go through the panels, first deciding about which dataset to correct, then checking the parameters, the correction method, and then, after you have setup all things, you hit first "Preview" to preview your settings and if satisfied, "Apply" to apply those parameters to the selected dataset and perform the actual BLC.
+
+After you did that, you will see the result in the main axis, where you can inspect it in the ususal way, as 2D or 1D plots, and for the latter at any position of the other axis, respectively. Of course, the latter only applies to the case where you have 2D data. All controls for this can be found in the "Display" panel on the right. 
+
+Additionally, you will find a summary of the performed action in the "Results" panel within the "Correction" panel.
+
+If happy with the results, simply "Close" the GUI and your data will be written to the main GUI. If unhappy, hit "Discard" and either start a new round with different parameters or "Close" the GUI without writing back anything to the main GUI.
+
+
+BTW: The button with the questionmark shows this help, as you might have figured out already.
+
+(1) Yes, it's not only the ancient Gallia that was divided in three parts, as good old Gaius Julius told us... (apologies to those who don't get the joke)
+

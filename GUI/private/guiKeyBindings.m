@@ -123,6 +123,9 @@ try
         case 'f5'
             trEPRgui_ACCwindow();
             return;
+        case 'f7'
+            trEPRgui_fitwindow();
+            return;
         case 'f10'
             trEPRgui_statuswindow();
             return;
