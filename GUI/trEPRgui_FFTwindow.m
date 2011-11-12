@@ -2080,11 +2080,13 @@ function updateAxes()
                 % Plot time trace at given position in spectrum
                 hold on;
                 if strcmp(ad.fft.bgfit.mode,'bgsubtract')
-                    fit = doFit(...
+                    [fit,~,message] = doFit(...
+                        [xvalues;...
                         data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:),...
+                        ad.data{ad.control.spectra.active}.display.position.y,:)],...
                         ad.fft.bgfit.function,...
                         ad.fft.bgfit.ignorefirstn);
+                    set(gh.summary_panel_edit,'String',message);
                     plot(gh.axis,...
                         xvalues,...
                         data(...
@@ -2117,11 +2119,13 @@ function updateAxes()
                 end
                 % Plot fitted background
                 if strcmp(ad.fft.bgfit.mode,'bgfit')
-                    fit = doFit(...
+                    [fit,~,message] = doFit(...
+                        [xvalues;...
                         data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:),...
+                        ad.data{ad.control.spectra.active}.display.position.y,:)],...
                         ad.fft.bgfit.function,...
                         ad.fft.bgfit.ignorefirstn);
+                    set(gh.summary_panel_edit,'String',message);
                     plot(gh.axis,xvalues,fit,'r-');
                 end
                 hold off;
@@ -2297,8 +2301,8 @@ function trackPointer(varargin)
             if ( (strcmp(ad.control.axis.displayType,'1D along x') || ...
                     strcmp(ad.control.axis.displayType,'1D along y')) ) && ...
                     (iscell(xdata) && iscell(ydata))
-                xdata = xdata{length(xdata)-find(ad.control.spectra.visible==active)+1};
-                ydata = ydata{length(ydata)-find(ad.control.spectra.visible==active)+1};
+                xdata = xdata{1};
+                ydata = ydata{1};
             end
             
             % Create vectors with indices for xdata and ydata
@@ -2516,34 +2520,59 @@ function [fftdata,frequency] = doFFT(datasetId)
     end
 end
 
-function fit = doFit(data,fitFunType,ignorefirstn)
+function [fit,fval,message] = doFit(data,fitFunType,ignorefirstn)
+    function stop = outfun(x, optimValues, state)
+        stop = false;
+        message{end+1} = sprintf('  %6.0f     %6.0f    %10f  %s',...
+            optimValues.iteration,optimValues.funccount,...
+            optimValues.fval,optimValues.procedure);
+    end
+    
     try
         mainWindow = guiGetWindowHandle(mfilename);
         % Get appdata from FFT GUI
         ad = getappdata(mainWindow);
         
-        x1 = ignorefirstn+1:length(data);
-        x2 = 1:length(data);
+        x1 = data(1,ignorefirstn+1:size(data,2));
+        x2 = data(1,1:size(data,2));
         
+        message = cell(0);
+        message{end+1} = ...
+            sprintf('Iteration  FuncCount    min f(x)   Procedure');
+        
+        % Set options for fminsearch
+        fitopt = optimset(...
+            'Display','Off',...
+            'OutputFcn', @outfun ... 
+            );
+
         switch fitFunType
             case 'exponential'
                 % A1*exp(k1*x)
                 fun1 = @(z)z(1)*exp(z(2)*x1+z(3));
                 fun2 = @(z)z(1)*exp(z(2)*x2+z(3));
-                fitfun = @(z)sum((fun1(z)-data(ignorefirstn+1:end)).^2);
+                fitfun = @(z)sum((fun1(z)-data(2,ignorefirstn+1:end)).^2);
                 % Fit function
-                [Y,fval] = fminsearch(fitfun,[1 1 1]);
+                [Y,fval,exitflag,output] = fminsearch(fitfun,[1 -1 0],fitopt);
                 fit = fun2(Y);
-                return;
             case 'biexponential'
                 % A1*exp(k1*x) + A2*exp(k2*x)
                 fun1 = @(z)z(1)*exp(z(2)*x1+z(3))+z(4)*exp(z(5)*x1+z(6));
                 fun2 = @(z)z(1)*exp(z(2)*x2+z(3))+z(4)*exp(z(5)*x2+z(6));
-                fitfun = @(z)sum((fun1(z)-data(ignorefirstn+1:end)).^2);
+                fitfun = @(z)sum((fun1(z)-data(2,ignorefirstn+1:end)).^2);
                 % Fit function
-                [Y,fval] = fminsearch(fitfun,[1 1 1 1 1 1]);
+                [Y,fval,exitflag,output] = fminsearch(fitfun,[1 -1 0 1 -1 0],fitopt);
                 fit = fun2(Y);
-                return;
+        end
+        
+        % Create message
+        message{end+1} = ''; % Empty line
+        message{end+1} = 'SUMMARY';
+        message{end+1} = sprintf('Algorithm: %s',output.algorithm);
+        message{end+1} = sprintf('Number of iterations: %i',output.iterations);
+        message{end+1} = sprintf('Number of function evaluations: %i',output.funcCount);
+        if (exitflag ~= 1)
+            message{end+1} = output.message;
         end
     catch exception
         try
