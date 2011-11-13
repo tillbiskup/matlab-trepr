@@ -940,13 +940,13 @@ guidata(hMainFigure,guihandles);
 ad = guiDataStructure('guiappdatastructure');
 
 % AVG - struct
-ad.fft = struct();
+ad.avg = struct();
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
-setappdata(hMainFigure,'fft',ad.fft);
+setappdata(hMainFigure,'avg',ad.avg);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -967,6 +967,7 @@ if (mainGuiWindow)
     end
     if (isfield(admain,'control') ~= 0)
         ad.control = admain.control;
+        ad.control.axis.position = true;
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -2054,18 +2055,10 @@ function updateAxes()
         [~,index] = max(strcmp(ad.control.axis.displayType,displayTypes));
         set(gh.displaytype_popupmenu,'Value',index);
         
-        % Check whether we are in time or frequency domain
-        if strcmp(ad.fft.display,'frequency')
-            [data,xvalues] = dofit(ad.control.spectra.active);
-            %xvalues = 1:size(data,2);
-            xmeasure = 'frequency';
-            xunit = 'MHz';
-        else
-            data = ad.data{ad.control.spectra.active}.data;
-            xvalues = ad.data{ad.control.spectra.active}.axes.x.values;
-            xmeasure = ad.data{ad.control.spectra.active}.axes.x.measure;
-            xunit = ad.data{ad.control.spectra.active}.axes.x.unit;
-        end
+        data = ad.data{ad.control.spectra.active}.data;
+        xvalues = ad.data{ad.control.spectra.active}.axes.x.values;
+        xmeasure = ad.data{ad.control.spectra.active}.axes.x.measure;
+        xunit = ad.data{ad.control.spectra.active}.axes.x.unit;
         yvalues = ad.data{ad.control.spectra.active}.axes.y.values;
         ymeasure = ad.data{ad.control.spectra.active}.axes.y.measure;
         yunit = ad.data{ad.control.spectra.active}.axes.y.unit;
@@ -2079,13 +2072,7 @@ function updateAxes()
                 % Disable position slider
                 set(gh.position_slider,'Enable','off');
 
-                if strcmp(ad.fft.display,'frequency')
-                    z = [ ...
-                        min(min(data(:,ad.control.axis.ignorefirstn+1:end))) ...
-                        max(max(data(:,ad.control.axis.ignorefirstn+1:end))) ];
-                else
-                    z = [ min(min(data)) max(max(data)) ];
-                end
+                z = [ min(min(data)) max(max(data)) ];
                 hold on;
                 % Plot 2D data
                 imagesc(...
@@ -2134,34 +2121,13 @@ function updateAxes()
                 end
                 % Plot time trace at given position in spectrum
                 hold on;
-                if strcmp(ad.fft.bgfit.mode,'bgsubtract')
-                    [fit,~,message] = doFit(...
-                        [xvalues;...
-                        data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:)],...
-                        ad.fft.bgfit.function,...
-                        ad.fft.bgfit.ignorefirstn);
-                    set(gh.summary_panel_edit,'String',message);
-                    plot(gh.axis,...
-                        xvalues,...
-                        data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:)-fit,...
-                        'k-');
-                else
-                    plot(gh.axis,...
-                        xvalues,...
-                        data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:),...
-                        'k-');
-                end
+                plot(gh.axis,...
+                    xvalues,...
+                    data(...
+                    ad.data{ad.control.spectra.active}.display.position.y,:),...
+                    'k-');
                 set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
-                if strcmp(ad.fft.display,'frequency')
-                    z = [ ...
-                        min(min(data(:,ad.control.axis.ignorefirstn+1:end))) ...
-                        max(max(data(:,ad.control.axis.ignorefirstn+1:end))) ];
-                else
-                    z = [ min(min(data)) max(max(data)) ];
-                end
+                z = [ min(min(data)) max(max(data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
                 set(gh.axis,'YLim',ZLim);
                 if ad.control.axis.position
@@ -2171,17 +2137,6 @@ function updateAxes()
                         xvalues(ad.data{ad.control.spectra.active}.display.position.x)],...
                         ZLim,...
                         'r-');
-                end
-                % Plot fitted background
-                if strcmp(ad.fft.bgfit.mode,'bgfit')
-                    [fit,~,message] = doFit(...
-                        [xvalues;...
-                        data(...
-                        ad.data{ad.control.spectra.active}.display.position.y,:)],...
-                        ad.fft.bgfit.function,...
-                        ad.fft.bgfit.ignorefirstn);
-                    set(gh.summary_panel_edit,'String',message);
-                    plot(gh.axis,xvalues,fit,'r-');
                 end
                 hold off;
                 set(gh.axis,'YTickLabel',[]);
