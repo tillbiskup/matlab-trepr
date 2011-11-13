@@ -1,0 +1,9 @@
+
+REPORT
+
+The report panel displays a summary report of the fit performed, with all important and interesting parameters necessary to make a sound decision about the quality of the fit.
+
+Details of what will be included in the report will be added later on, as soon as that has been decided about.
+
+The report can be saved to a text file via the "Save" button in the "Fit" panel.
+
