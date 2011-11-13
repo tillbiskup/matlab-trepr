@@ -1,0 +1,28 @@
+
+INTRODUCTION
+
+A rather short introduction to the AVG GUI
+
+
+-=IF IN A HURRY=-
+
+...
+
+
+-=TO THE GENTLE READER=-
+
+The Average (AVG) GUI is dedicated to the task of ...
+
+
+GUI layout
+
+...
+
+
+Normal operation
+
+...
+
+
+BTW: The button with the questionmark shows this help, as you might have figured out already.
+
