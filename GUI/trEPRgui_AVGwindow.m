@@ -828,9 +828,27 @@ guidata(hMainFigure,guihandles);
 % Create appdata structure
 ad = guiDataStructure('guiappdatastructure');
 
+% Assign configuration parameters
+% TODO: Later on, read this from a file
+% AVG-specific settings
+ad.configuration.avg.dimension = 'x';
+ad.configuration.avg.area.patch.color = [0.5 0.5 1];
+ad.configuration.avg.area.patch.alpha = 0.4;
+ad.configuration.avg.area.patch.edge = 'none';
+% Axis-specific settings
+ad.configuration.axis.position = false;
+ad.configuration.axis.grid.zero = true;
+ad.configuration.axis.grid.x = 'off';
+ad.configuration.axis.grid.y = 'off';
+ad.configuration.axis.grid.minor = 'off';
+
 % AVG - struct
 ad.avg = struct();
-ad.avg.dimension = 'x';
+ad.avg.dimension = ad.configuration.avg.dimension;
+ad.avg.area.patch.color = ad.configuration.avg.area.patch.color;
+ad.avg.area.patch.alpha = ad.configuration.avg.area.patch.alpha;
+ad.avg.area.patch.edge = ad.configuration.avg.area.patch.edge;
+
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
@@ -857,7 +875,11 @@ if (mainGuiWindow)
     end
     if (isfield(admain,'control') ~= 0)
         ad.control = admain.control;
-        ad.control.axis.position = false;
+        ad.control.axis.position = ad.configuration.axis.position;
+        ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
+        ad.control.axis.grid.x = ad.configuration.axis.grid.x;
+        ad.control.axis.grid.y = ad.configuration.axis.grid.y;
+        ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -1237,6 +1259,7 @@ function togglebutton_Callback(source,~,action)
         % Get state of toggle button
         value = get(source,'Value');
         
+        % For those togglebuttons who do more complicated stuff
         % Toggle button
         if value % If toggle switched ON
             switch lower(action)
@@ -1258,6 +1281,26 @@ function togglebutton_Callback(source,~,action)
                     % Reset other zoom toggle button
                     zoom(mainWindow,'on');
                     return;
+                case 'gridx'
+                    ad.control.axis.grid.x = 'on';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridy'
+                    ad.control.axis.grid.y = 'on';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridminor'
+                    ad.control.axis.grid.minor = 'on';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridzero'
+                    ad.control.axis.grid.zero = value;
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
                 otherwise
                     disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
                     disp(action);
@@ -1272,6 +1315,26 @@ function togglebutton_Callback(source,~,action)
                     return;
                 case 'zoom'
                     zoom(mainWindow,'off');
+                    return;
+                case 'gridx'
+                    ad.control.axis.grid.x = 'off';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridy'
+                    ad.control.axis.grid.y = 'off';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridminor'
+                    ad.control.axis.grid.minor = 'off';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'gridzero'
+                    ad.control.axis.grid.zero = value;
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
                     return;
                 otherwise
                     disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
@@ -1313,29 +1376,6 @@ function pushbutton_Callback(~,~,action)
         gh = guihandles(mainWindow);
 
         switch action
-            case 'fit'
-                if strcmp(ad.fft.display,'time')
-                    ad.fft.display = 'frequency';
-                    set(gh.fft_pushbutton,'String','F -> t');
-                    set(gh.fft_pushbutton,'TooltipString',...
-                        'Switch from frequency to time domain (Ifit)');
-                    set(findall(allchild(pp2),'-not','Type','uipanel'),...
-                        'Enable','On');
-                    set(findall(allchild(pp3),'-not','Type','uipanel'),...
-                        'Enable','On');
-                else
-                    ad.fft.display = 'time';
-                    set(gh.fft_pushbutton,'String','t -> F');
-                    set(gh.fft_pushbutton,'TooltipString',...
-                        'Switch from time to frequency domain (fit)');
-                    set(findall(allchild(pp2),'-not','Type','uipanel'),...
-                        'Enable','Inactive');
-                    set(findall(allchild(pp3),'-not','Type','uipanel'),...
-                        'Enable','Inactive');
-                end
-                setappdata(mainWindow,'fft',ad.fft);
-                updateAxes();
-                return;
             case 'showMaximum'
                 % If no datasets are loaded, return
                 if isempty(ad.data)
@@ -1346,7 +1386,7 @@ function pushbutton_Callback(~,~,action)
                 ad.data{ad.control.spectra.active}.display.position.x = ximax;
                 ad.data{ad.control.spectra.active}.display.position.y = yimax;
                 
-                % Set appdata from BLC GUI
+                % Set appdata from AVG GUI
                 setappdata(mainWindow,'data',ad.data);
                 
                 updateAxes();
@@ -1356,6 +1396,26 @@ function pushbutton_Callback(~,~,action)
                 zoom(mainWindow,'off');
                 set(gh.zoom_x_togglebutton,'Value',0);
                 set(gh.zoom_xy_togglebutton,'Value',0);
+                updateAxes();
+                return;
+            case 'Average'
+                if strcmp('x',ad.avg.dimension)
+                    ad.control.axis.displayType = '1D along y';
+                else
+                    ad.control.axis.displayType = '1D along x';
+                end
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'averageareaColourPalette'
+                ad.avg.area.patch.color = uisetcolor(...
+                    ad.avg.area.patch.color,'Set average area color');
+                setappdata(mainWindow,'avg',ad.avg);
+                updateSettingsPanel();
+                updateAxes();
+                return;
+            case 'SettingsDefault'
+                updateSettingsPanel('defaults');
                 updateAxes();
                 return;
             case 'Close'
@@ -1412,6 +1472,8 @@ function slider_Callback(source,~,action)
         switch lower(action)
             case 'averageareaalpha'
                 set(gh.averageareasettings_alpha_edit,'String',num2str(value));
+                ad.avg.area.patch.alpha = value;
+                setappdata(mainWindow,'avg',ad.avg);
             otherwise
                 disp('trEPRgui_fitwindow: slider_Callback(): Unknown action');
                 disp(action);
@@ -1585,6 +1647,7 @@ function switchPanel(panelName)
                 set(buttons,'Value',0);
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
+                updateSettingsPanel();
             otherwise
         end
     catch exception
@@ -1780,6 +1843,70 @@ function updateDimensionPanel(panel)
     end 
 end
 
+function updateSettingsPanel(varargin)
+    try
+        mainWindow = guiGetWindowHandle(mfilename);
+        % Get appdata from AVG GUI
+        ad = getappdata(mainWindow);
+
+        % Get handles from main window
+        gh = guidata(mainWindow);
+               
+        if nargin && strcmpi('defaults',varargin{1})
+            % Reset display settings
+            ad.control.axis.grid.x = ad.configuration.axis.grid.x;
+            ad.control.axis.grid.y = ad.configuration.axis.grid.y;
+            ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
+            ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
+            % Reset avg settings
+            ad.avg.area.patch.color = ad.configuration.avg.area.patch.color;
+            ad.avg.area.patch.alpha = ad.configuration.avg.area.patch.alpha;
+            setappdata(mainWindow,'avg',ad.avg);
+            setappdata(mainWindow,'control',ad.control);
+        end
+        
+        if strcmpi('on',ad.control.axis.grid.x)
+            set(gh.grid_x_togglebutton,'Value',1);
+        else
+            set(gh.grid_x_togglebutton,'Value',0);
+        end
+        if strcmpi('on',ad.control.axis.grid.y)
+            set(gh.grid_y_togglebutton,'Value',1);
+        else
+            set(gh.grid_y_togglebutton,'Value',0);
+        end
+        if strcmpi('on',ad.control.axis.grid.minor)
+            set(gh.grid_minor_togglebutton,'Value',1);
+        else
+            set(gh.grid_minor_togglebutton,'Value',0);
+        end
+        set(gh.grid_zero_togglebutton,'Value',ad.control.axis.grid.zero);
+        
+        set(gh.averageareasettings_coloursample_text,'Background',...
+            ad.avg.area.patch.color);
+        set(gh.averageareasettings_alpha_edit,'String',...
+            num2str(ad.avg.area.patch.alpha));
+        set(gh.averageareasettings_alpha_slider,'Value',...
+            ad.avg.area.patch.alpha);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
+end
+        
 function updateSpectra()
     try
         mainWindow = guiGetWindowHandle(mfilename);
@@ -2134,6 +2261,25 @@ function updateAxes()
                 disp('trEPRgui_AVGwindow : updateAxis(): Unknown AVG dimension');
                 disp(ad.avg.dimension);
         end
+        
+        % Set grid for main axis
+        set(gh.axis,'XGrid',ad.control.axis.grid.x);
+        set(gh.axis,'YGrid',ad.control.axis.grid.y);
+        if (isequal(ad.control.axis.grid.x,'on'))
+            set(gh.axis,'XMinorGrid',ad.control.axis.grid.minor);
+        end
+        if (isequal(ad.control.axis.grid.y,'on'))
+            set(gh.axis,'YMinorGrid',ad.control.axis.grid.minor);
+        end
+        % Set grid for auxilliary axis
+        set(gh.axis2,'XGrid',ad.control.axis.grid.x);
+        set(gh.axis2,'YGrid',ad.control.axis.grid.y);
+        if (isequal(ad.control.axis.grid.x,'on'))
+            set(gh.axis2,'XMinorGrid',ad.control.axis.grid.minor);
+        end
+        if (isequal(ad.control.axis.grid.y,'on'))
+            set(gh.axis2,'YMinorGrid',ad.control.axis.grid.minor);
+        end        
 
     catch exception
         try
