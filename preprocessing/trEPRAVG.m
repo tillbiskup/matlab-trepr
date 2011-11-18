@@ -13,6 +13,8 @@ function [avgData] = trEPRAVG(data,parameters)
 %                          position in axis to start the averaging at
 %              stop      - scalar
 %                          position in axis to end the averaging at
+%              label     - string, optional
+%                          label for the averaged dataset
 %
 % avgData    - structure
 %              contains both the averaged data (in avgData.data)
@@ -42,9 +44,15 @@ try
         case 'x'
             avgData.data = ...
                 mean(avgData.data(:,parameters.start:parameters.stop),2);
+            avgData.axes.x.values = mean(...
+                [avgData.axes.x.values(parameters.start) ...
+                avgData.axes.x.values(parameters.stop)]);
         case 'y'
             avgData.data = ...
                 mean(avgData.data(parameters.start:parameters.stop,:),1);
+            avgData.axes.y.values = mean(...
+                [avgData.axes.y.values(parameters.start) ...
+                avgData.axes.y.values(parameters.stop)]);
         otherwise
             fprintf('\nUnknown dimension to average over: %s\n',...
                 parameters.dimension);
@@ -53,7 +61,10 @@ try
             return;
     end
     
-    % TODO: Handle axes properly
+    % Set label if applicable
+    if isfield(parameters,'label')
+        avgData.label = parameters.label;
+    end
     
     % Write history
     history = struct();

@@ -934,11 +934,15 @@ ad.avg.line.style = ad.configuration.avg.line.style;
 ad.avg.line.color = ad.configuration.avg.line.color;
 ad.avg.line.width = ad.configuration.avg.line.width;
 
+% avgdata - cell array
+ad.avgdata = cell(0);
+
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 setappdata(hMainFigure,'avg',ad.avg);
+setappdata(hMainFigure,'avgdata',ad.avgdata);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -958,6 +962,8 @@ if (mainGuiWindow)
             ad.data{l}.avg.start = 1;
             ad.data{l}.avg.stop = 1;
             ad.data{l}.avg.delta = 0;
+            ad.data{l}.avg.label = '';
+            ad.data{l}.avg.dimension = ad.configuration.avg.dimension;
         end
         setappdata(hMainFigure,'data',ad.data);
         ad.origdata = admain.data;
@@ -1220,6 +1226,9 @@ function area_edit_Callback(source,~,position)
         mainWindow = guiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
+        % Get handles of main window
+        gh = guihandles(mainWindow);
+        
         % Make code lines shorter and code easier to read
         active = ad.control.spectra.active;
         
@@ -1380,11 +1389,15 @@ function area_edit_Callback(source,~,position)
                 return;
         end
         
+        % Set dimension and label for current averaging
+        ad.data{active}.avg.dimension = ad.avg.dimension;
+        ad.data{active}.avg.label = get(gh.label_edit,'String');
+        
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
         
         % Update average panel display
-        updateAveragePanel()
+        updateAveragePanel();
 
         %Update main axis
         updateAxes();
@@ -1508,9 +1521,6 @@ function popupmenu_Callback(source,~,action)
         % Get appdata of main window
         mainWindow = guiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
 
         values = cellstr(get(source,'String'));
         value = values{get(source,'Value')};
@@ -1746,6 +1756,22 @@ function pushbutton_Callback(~,~,action)
                 updateSettingsPanel('defaults');
                 updateAxes();
                 return;
+            case 'Apply'
+                % Check for every dataset whether an average has been
+                % performed (avg.delta ~= 0) and if so, do proper AVG
+                for k=1:length(ad.data)
+                    if ad.data{k}.avg.delta
+                        avgparams = struct(...
+                            'dimension',ad.data{k}.avg.dimension,...
+                            'start',ad.data{k}.avg.start,...
+                            'stop',ad.data{k}.avg.stop,...
+                            'label',ad.data{k}.avg.label...
+                            );
+                        ad.avgdata{end+1} = trEPRAVG(ad.data{k},avgparams);
+                    end
+                end
+                setappdata(mainWindow,'avgdata',ad.avgdata);
+                return;
             case 'Discard'
                 answer = questdlg(...
                     {'Discard averaging for all datasets or'...
@@ -1761,6 +1787,9 @@ function pushbutton_Callback(~,~,action)
                             ad.data{k}.avg.delta = 0;
                         end
                         setappdata(mainWindow,'data',ad.data);
+                        % Remove all datasets from ad.avgdata
+                        ad.avgdata = cell(0);
+                        setappdata(mainWindow,'avgdata',ad.avgdata);
                         updateAveragePanel();
                         updateAxes();
                     case 'Current'
@@ -1770,6 +1799,14 @@ function pushbutton_Callback(~,~,action)
                         setappdata(mainWindow,'data',ad.data);
                         updateAveragePanel();
                         updateAxes();
+                        deleteAvgData = [];
+                        for k=length(ad.avgdata):-1:1
+                            if strcmp(ad.avgdata{k}.label,...
+                                    get(gh.label_edit,'String'))
+                                ad.avgdata(k) = [];
+                            end
+                        setappdata(mainWindow,'avgdata',ad.avgdata);
+                        end
                     case 'Cancel'
                         return;
                     otherwise
@@ -2539,7 +2576,8 @@ function updateAxes()
                     % Plot average spectrum
                     plot(gh.axis,...
                         xvalues,...
-                        mean(data(ad.data{ad.control.spectra.active}.avg.start:ad.data{ad.control.spectra.active}.avg.stop,:),1),...
+                        mean(data(ad.data{ad.control.spectra.active}.avg.start:...
+                        ad.data{ad.control.spectra.active}.avg.stop,:),1),...
                         'LineStyle',ad.avg.line.style,...
                         'Color',ad.avg.line.color,...
                         'LineWidth',ad.avg.line.width);
