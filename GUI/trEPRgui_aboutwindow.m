@@ -131,6 +131,17 @@ set(hMainFigure,'Visible','on');
 % Set focus to "Close" button
 uicontrol(closeBtn);
 
+% Add keypress function to every element that can have one...
+handles = findall(...
+    allchild(hMainFigure),'style','pushbutton',...
+    '-or','style','togglebutton',...
+    '-or','style','edit',...
+    '-or','style','listbox',...
+    '-or','style','popupmenu');
+for m=1:length(handles)
+    set(handles(m),'KeyPressFcn',@keypress_Callback);
+end
+
 % Define timer for all the fun stuff
 t1 = timer( ...
     'StartDelay', 8, ...
@@ -202,6 +213,41 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function keypress_Callback(~,evt)
+    try
+        if isempty(evt.Character) && isempty(evt.Key)
+            % In case "Character" is the empty string, i.e. only modifier key
+            % was pressed...
+            return;
+        end
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                switch evt.Key
+                    case 'w'
+                        closeWindow();
+                end
+            end
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
 
     function startTimer2(~,~)
         set(closeBtn,'Position',[position(3)/2-30 20 60 30]);
