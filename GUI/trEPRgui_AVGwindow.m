@@ -2567,12 +2567,16 @@ function updateAxes()
                         'r-');
                 end
                 hold off;
-                set(gh.axis,'XLim',[...
-                    xvalues(1) ...
-                    xvalues(end)]);
-                set(gh.axis,'YLim',[...
-                    yvalues(1) ...
-                    yvalues(end)]);
+                if isscalar(xvalues)
+                    set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+                else
+                    set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+                end
+                if isscalar(yvalues)
+                    set(gh.axis,'YLim',[yvalues(1)-1 yvalues(1)+1]);
+                else
+                    set(gh.axis,'YLim',[yvalues(1) yvalues(end)]);
+                end
                 set(gh.axis,'YDir','normal');
                 set(gh.axis,'CLim',z);
                 xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
@@ -2737,7 +2741,11 @@ function updateAxes()
                 end
                 hold off;
                 set(gh.axis2,'YTickLabel',[]);
-                set(gh.axis2,'XLim',[xvalues(1) xvalues(end)]);
+                if isscalar(xvalues)
+                    set(gh.axis2,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+                else
+                    set(gh.axis2,'XLim',[xvalues(1) xvalues(end)]);
+                end
                 set(gh.axis2,'YTickLabel',[]);
                 xlabel(gh.axis2,sprintf('{\\it %s} / %s',xmeasure,xunit));
                 if ad.data{ad.control.spectra.active}.avg.delta
@@ -2772,7 +2780,11 @@ function updateAxes()
                 end
                 hold off;
                 set(gh.axis2,'YTickLabel',[]);
-                set(gh.axis2,'XLim',[yvalues(1) yvalues(end)]);
+                if isscalar(yvalues)
+                    set(gh.axis2,'YLim',[yvalues(1)-1 yvalues(1)+1]);
+                else
+                    set(gh.axis2,'YLim',[yvalues(1) yvalues(end)]);
+                end
                 set(gh.axis2,'YTickLabel',[]);
                 xlabel(gh.axis2,sprintf('{\\it %s} / %s',ymeasure,yunit));
                 if ad.data{ad.control.spectra.active}.avg.delta
