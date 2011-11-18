@@ -1467,29 +1467,12 @@ function edit_Callback(source,~,field)
         value = get(source,'String');
         
         switch field
-            case 'npts_clipping'
-                value = str2double(value);
-                xdim = size(ad.data{ad.control.spectra.active}.data,2);
-                if isnan(value) || (value > xdim) || (value < 0)
-                    set(source,'string',...
-                        num2str(ad.control.axis.ignorefirstn));
-                else
-                    ad.control.axis.ignorefirstn = value;
-                    setappdata(mainWindow,'control',ad.control)
+            case 'label'
+                if ~isempty(value) && ad.data{ad.control.spectra.active}.avg.delta
+                    ad.data{ad.control.spectra.active}.avg.label = value;
+                    setappdata(mainWindow,'data',ad.data);
                 end
-                updateAxes();
-                return;
-            case 'bgfit_ignorepoints'
-                value = str2double(value);
-                xdim = size(ad.data{ad.control.spectra.active}.data,2);
-                if isnan(value) || (value > xdim) || (value < 0)
-                    set(source,'string',...
-                        num2str(ad.control.axis.ignorefirstn));
-                else
-                    ad.fft.bgfit.ignorefirstn = value;
-                    setappdata(mainWindow,'fft',ad.fft)
-                end
-                updateAxes();
+                updateAveragePanel();
             otherwise
                 return;
         end
