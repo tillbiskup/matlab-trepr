@@ -2603,7 +2603,11 @@ function updateAxes()
                     data(...
                     ad.data{ad.control.spectra.active}.display.position.y,:),...
                     'k-');
-                set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+                if isscalar(xvalues)
+                    set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+                else
+                    set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+                end
                 z = [ min(min(data)) max(max(data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
                 set(gh.axis,'YLim',ZLim);
@@ -2675,7 +2679,11 @@ function updateAxes()
                     data(...
                     :,ad.data{ad.control.spectra.active}.display.position.x),...
                     'k-');
-                set(gh.axis,'XLim',[yvalues(1) yvalues(end)]);
+                if isscalar(yvalues)
+                    set(gh.axis,'XLim',[yvalues(1)-1 yvalues(1)+1]);
+                else
+                    set(gh.axis,'XLim',[yvalues(1) yvalues(end)]);
+                end
                 z = [ min(min(data)) max(max(data)) ];
                 ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
                 set(gh.axis,'YLim',ZLim);
@@ -2781,9 +2789,9 @@ function updateAxes()
                 hold off;
                 set(gh.axis2,'YTickLabel',[]);
                 if isscalar(yvalues)
-                    set(gh.axis2,'YLim',[yvalues(1)-1 yvalues(1)+1]);
+                    set(gh.axis2,'XLim',[yvalues(1)-1 yvalues(1)+1]);
                 else
-                    set(gh.axis2,'YLim',[yvalues(1) yvalues(end)]);
+                    set(gh.axis2,'XLim',[yvalues(1) yvalues(end)]);
                 end
                 set(gh.axis2,'YTickLabel',[]);
                 xlabel(gh.axis2,sprintf('{\\it %s} / %s',ymeasure,yunit));
