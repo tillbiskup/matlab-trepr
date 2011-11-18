@@ -339,6 +339,7 @@ uicontrol('Tag','measure_x_index_edit',...
     'Units','Pixels',...
     'Position',[60 70 (mainPanelWidth-90)/2 25],...
     'String','0',...
+    'Enable','Inactive',...
     'Callback',{@position_edit_Callback,'xindex'}...
     );
 uicontrol('Tag','measure_x_unit_edit',...
@@ -349,6 +350,7 @@ uicontrol('Tag','measure_x_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(mainPanelWidth-90)/2 70 (mainPanelWidth-90)/2 25],...
     'String','0',...
+    'Enable','Inactive',...
     'Callback',{@position_edit_Callback,'xunit'}...
     );
 uicontrol('Tag','measure_y_text',...
@@ -368,6 +370,7 @@ uicontrol('Tag','measure_y_index_edit',...
     'Units','Pixels',...
     'Position',[60 40 (mainPanelWidth-90)/2 25],...
     'String','0',...
+    'Enable','Inactive',...
     'Callback',{@position_edit_Callback,'yindex'}...
     );
 uicontrol('Tag','measure_y_unit_edit',...
@@ -378,10 +381,11 @@ uicontrol('Tag','measure_y_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(mainPanelWidth-90)/2 40 (mainPanelWidth-90)/2 25],...
     'String','0',...
+    'Enable','Inactive',...
     'Callback',{@position_edit_Callback,'yunit'}...
     );
-uicontrol('Tag','measure_pick_pushbutton',...
-    'Style','pushbutton',...
+uicontrol('Tag','measure_pick_togglebutton',...
+    'Style','togglebutton',...
     'Parent',pp1_p4,...
     'BackgroundColor',defaultBackground,...
     'Enable','on',...
@@ -390,7 +394,7 @@ uicontrol('Tag','measure_pick_pushbutton',...
     'Position',[60 10 (mainPanelWidth-90)/2 25],...
     'String','Pick',...
     'TooltipString','Pick point to measure',...
-    'Callback',{@pushbutton_Callback,'measurePick'}...
+    'Callback',{@togglebutton_Callback,'measurePick'}...
     );
 uicontrol('Tag','measure_clear_pushbutton',...
     'Style','pushbutton',...
@@ -1123,11 +1127,7 @@ function position_edit_Callback(source,~,position)
                 if (value < x(1)) value = x(1); end
                 if (value > x(end)) value = x(end); end
                 ad.data{ad.control.spectra.active}.display.position.x = ...
-                    interp1(...
-                    x,[1:length(x)],...
-                    value,...
-                    'nearest'...
-                    );
+                    interp1(x,[1:length(x)],value,'nearest');
             case 'yindex'
                 value = round(str2double(get(source,'String')));
                 if (value > length(y)) value = length(y); end
@@ -1139,11 +1139,7 @@ function position_edit_Callback(source,~,position)
                 if (value < y(1)) value = y(1); end
                 if (value > y(end)) value = y(end); end
                 ad.data{ad.control.spectra.active}.display.position.y = ...
-                    interp1(...
-                    y,[1:length(y)],...
-                    value,...
-                    'nearest'...
-                    );
+                    interp1(y,1:length(y),value,'nearest');
             otherwise
                 return;
         end
@@ -1575,9 +1571,6 @@ function togglebutton_Callback(source,~,action)
         % Get appdata of main window
         mainWindow = guiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
 
         % Get state of toggle button
         value = get(source,'Value');
@@ -1586,12 +1579,10 @@ function togglebutton_Callback(source,~,action)
         % Toggle button
         if value % If toggle switched ON
             switch lower(action)
-                case 'pickfrequency'
+                case 'measurepick'
                     % Switch off zoom
-                    zoom(mainWindow,'off');                  
+                    zoom(mainWindow,'off');
                     % Set pointer callback functions
-                    set(gh.zoom_x_togglebutton,'Value',0);
-                    set(gh.zoom_xy_togglebutton,'Value',0);
                     set(mainWindow,...
                         'WindowButtonMotionFcn',@trackPointer);
                     set(mainWindow,...
@@ -1631,7 +1622,7 @@ function togglebutton_Callback(source,~,action)
             end
         else % If toggle button switched OFF
             switch lower(action)
-                case 'pickfrequency'
+                case 'measurepick'
                     % Reset pointer callback functions
                     set(mainWindow,'WindowButtonMotionFcn','');
                     set(mainWindow,'WindowButtonDownFcn','');
@@ -1721,6 +1712,13 @@ function pushbutton_Callback(~,~,action)
                 set(gh.zoom_xy_togglebutton,'Value',0);
                 updateAxes();
                 return;
+            case'measureClear'
+                set(gh.measure_pick_togglebutton,'Value',0);
+                set(gh.measure_x_index_edit,'String','0');
+                set(gh.measure_x_unit_edit,'String','0');
+                set(gh.measure_y_index_edit,'String','0');
+                set(gh.measure_y_unit_edit,'String','0');
+                return;
             case 'averageClear'
                 ad.data{ad.control.spectra.active}.avg.start = 1;
                 ad.data{ad.control.spectra.active}.avg.stop = 1;
@@ -1759,6 +1757,7 @@ function pushbutton_Callback(~,~,action)
             case 'Apply'
                 % Check for every dataset whether an average has been
                 % performed (avg.delta ~= 0) and if so, do proper AVG
+                ad.avgdata = cell(0);
                 for k=1:length(ad.data)
                     if ad.data{k}.avg.delta
                         avgparams = struct(...
@@ -1773,6 +1772,9 @@ function pushbutton_Callback(~,~,action)
                 setappdata(mainWindow,'avgdata',ad.avgdata);
                 return;
             case 'Discard'
+                if isempty(ad.avgdata)
+                    return;
+                end
                 answer = questdlg(...
                     {'Discard averaging for all datasets or'...
                     'only for the datasetcurrently selected? '},...
@@ -1799,7 +1801,6 @@ function pushbutton_Callback(~,~,action)
                         setappdata(mainWindow,'data',ad.data);
                         updateAveragePanel();
                         updateAxes();
-                        deleteAvgData = [];
                         for k=length(ad.avgdata):-1:1
                             if strcmp(ad.avgdata{k}.label,...
                                     get(gh.label_edit,'String'))
@@ -1814,6 +1815,30 @@ function pushbutton_Callback(~,~,action)
                 end
                 return;
             case 'Close'
+                if ~isempty(ad.avgdata)
+                    msgStr = {...
+                        ['Trying to append averaged data as new '...
+                        'datasets to main GUI.']...
+                        };
+                    add2status(msgStr);
+                    % Return BLC data to main GUI
+                    for k=1:length(ad.avgdata)
+                        % Remove avg field in data structure
+                        if isfield(ad.avgdata{k},'avg')
+                            ad.avgdata{k} = rmfield(ad.avgdata{k},'avg');
+                        end
+                        % Remove display field in data structure
+                        if isfield(ad.avgdata{k},'display')
+                            ad.avgdata{k} = rmfield(ad.avgdata{k},'display');
+                        end
+                        status = appendDatasetToMainGUI(...
+                            ad.avgdata{k},...
+                            'modified',true);
+                        if status
+                            disp('Hmm... some problems with appending baseline-correced dataset to main GUI.');
+                        end
+                    end
+                end
                 msgStr = 'AVG GUI window closed.';
                 add2status(msgStr);
 
@@ -2162,21 +2187,31 @@ function updateAveragePanel()
             return;
         end
 
+        % Make codelines shorter and easier to read
+        active = ad.control.spectra.active;
+        
+        % Set label field
+        if isempty(ad.data{active}.avg.label)
+            ad.data{active}.avg.label = sprintf('%s (AVG, %s)',...
+                ad.data{active}.label,ad.avg.dimension);
+        end
+        set(gh.label_edit,'String',ad.data{active}.avg.label);
+        
         % Get dimensions and axes of current dataset
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        [y,x] = size(ad.data{active}.data);
         x = linspace(1,x,x);
         y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
-            x = ad.data{ad.control.spectra.active}.axes.x.values;
+        if (isfield(ad.data{active},'axes') ...
+                && isfield(ad.data{active}.axes,'x') ...
+                && isfield(ad.data{active}.axes.x,'values') ...
+                && not (isempty(ad.data{active}.axes.x.values)))
+            x = ad.data{active}.axes.x.values;
         end
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
-            y = ad.data{ad.control.spectra.active}.axes.y.values;
+        if (isfield(ad.data{active},'axes') ...
+                && isfield(ad.data{active}.axes,'y') ...
+                && isfield(ad.data{active}.axes.y,'values') ...
+                && not (isempty(ad.data{active}.axes.y.values)))
+            y = ad.data{active}.axes.y.values;
         end
         % In case that we loaded 1D data...
         if isscalar(x)
@@ -2190,38 +2225,38 @@ function updateAveragePanel()
         set(...
             gh.average_start_index_edit,...
             'string',...
-            ad.data{ad.control.spectra.active}.avg.start...
+            ad.data{active}.avg.start...
             );
         set(...
             gh.average_stop_index_edit,...
             'string',...
-            ad.data{ad.control.spectra.active}.avg.stop...
+            ad.data{active}.avg.stop...
             );
         set(...
             gh.average_delta_index_edit,...
             'string',...
-            ad.data{ad.control.spectra.active}.avg.delta...
+            ad.data{active}.avg.delta...
             );
 
         if strcmpi(ad.avg.dimension,'x')
             set(gh.average_start_unit_edit,...
-                'string',num2str(x(ad.data{ad.control.spectra.active}.avg.start))...
+                'string',num2str(x(ad.data{active}.avg.start))...
                 );
             set(gh.average_stop_unit_edit,...
-                'string',num2str(x(ad.data{ad.control.spectra.active}.avg.stop))...
+                'string',num2str(x(ad.data{active}.avg.stop))...
                 );
             set(gh.average_delta_unit_edit,...
-                'string',num2str(abs(x(2)-x(1))*ad.data{ad.control.spectra.active}.avg.delta)...
+                'string',num2str(abs(x(2)-x(1))*ad.data{active}.avg.delta)...
                 );
         else
             set(gh.average_start_unit_edit,...
-                'string',num2str(y(ad.data{ad.control.spectra.active}.avg.start))...
+                'string',num2str(y(ad.data{active}.avg.start))...
                 );
             set(gh.average_stop_unit_edit,...
-                'string',num2str(y(ad.data{ad.control.spectra.active}.avg.stop))...
+                'string',num2str(y(ad.data{active}.avg.stop))...
                 );
             set(gh.average_delta_unit_edit,...
-                'string',num2str(abs(y(2)-y(1))*ad.data{ad.control.spectra.active}.avg.delta)...
+                'string',num2str(abs(y(2)-y(1))*ad.data{active}.avg.delta)...
                 );
         end
     catch exception
@@ -2811,7 +2846,7 @@ function switchMeasurePointer(~,~)
         set(mainWindow,'Pointer','arrow');
         
         % Switch off togglebuttons
-        set(gh.pickfrequency_togglebutton,'Value',0);
+        set(gh.measure_pick_togglebutton,'Value',0);
         
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
@@ -2878,9 +2913,6 @@ function trackPointer(varargin)
                 'PointerShapeCData',pointerShapeCData,...
                 'PointerShapeHotSpot',[9 9]);
             
-            % Get id of current spectrum (to shorten lines afterwards)
-            active = ad.control.spectra.active;
-            
             % Get xdata and ydata of currently active dataset
             if (strcmp(ad.control.axis.displayType,'2D plot'))
                 xdata = get(...
@@ -2897,20 +2929,28 @@ function trackPointer(varargin)
                     findobj('Parent',hPlotAxes,'-and','Type','line'),...
                     'ydata');
             end
+    
+            % Get id of current spectrum (to shorten lines afterwards)
+            active = ad.control.spectra.active;
             
             % If we are in 1D display mode and there are more than one spectrum
             % and/or a zero line displayed
             if ( (strcmp(ad.control.axis.displayType,'1D along x') || ...
                     strcmp(ad.control.axis.displayType,'1D along y')) ) && ...
                     (iscell(xdata) && iscell(ydata))
-                xdata = xdata{1};
-                ydata = ydata{1};
+                if ad.control.axis.grid.zero 
+                    xdata = xdata{2};
+                    ydata = ydata{2};
+                else
+                    xdata = xdata{1};
+                    ydata = ydata{1};
+                end
             end
             
             % Create vectors with indices for xdata and ydata
             % Those are used in case of axis limits <> dataset limits
-            xindex = [ 1 : length(xdata) ];
-            yindex = [ 1 : length(ydata) ];
+            xindex = 1 : length(xdata);
+            yindex = 1 : length(ydata);
             
             % Handle situation that axis limits and dataset limits don't coincide.
             % Therefore, in case of the dataset being smaller than axis limits, pad
@@ -3055,127 +3095,14 @@ function trackPointer(varargin)
             
             % Set display
             % Update display of first point
-            set(gh.pickfrequency_x_index_edit,'String',num2str(indx));
-            set(gh.pickfrequency_x_unit_edit,'String',num2str(valx));
+            set(gh.measure_x_index_edit,'String',num2str(indx));
+            set(gh.measure_x_unit_edit,'String',num2str(valx));
+            set(gh.measure_y_index_edit,'String',num2str(indy));
+            set(gh.measure_y_unit_edit,'String',num2str(valy));
         else
             set(mainWindow,'Pointer','arrow');
         end
         
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function [fftdata,frequency] = dofit(datasetId)
-    try
-        mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        % Perform fit
-        L = size(ad.data{datasetId}.data,2);
-        Nfit = 2^nextpow2(L); % Next power of 2 from length of y
-        
-        % Very important: fft performs the fit on every COLUMN of the matrix
-        Y = fft(ad.data{datasetId}.data',Nfit)/L;
-        ad.data{datasetId}.fft.data = Y;
-        
-        % Sampling frequency
-        Fs = 1/(ad.data{datasetId}.axes.x.values(2)-...
-            ad.data{datasetId}.axes.x.values(1));
-        frequency = Fs/2*linspace(0,1,Nfit/2+1);
-        
-        fftdata = 2*abs(Y(1:Nfit/2+1,:))';
-        
-        % Set appdata of AVG GUI
-        setappdata(mainWindow,'fft',ad.fft);
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function [fit,fval,message] = doFit(data,fitFunType,ignorefirstn)
-    function stop = outfun(x, optimValues, state)
-        stop = false;
-        message{end+1} = sprintf('  %6.0f     %6.0f    %10f  %s',...
-            optimValues.iteration,optimValues.funccount,...
-            optimValues.fval,optimValues.procedure);
-    end
-    
-    try
-        mainWindow = guiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        x1 = data(1,ignorefirstn+1:size(data,2));
-        x2 = data(1,1:size(data,2));
-        
-        message = cell(0);
-        message{end+1} = ...
-            sprintf('Iteration  FuncCount    min f(x)   Procedure');
-        
-        % Set options for fminsearch
-        fitopt = optimset(...
-            'Display','Off',...
-            'OutputFcn', @outfun ... 
-            );
-
-        switch fitFunType
-            case 'exponential'
-                % A1*exp(k1*x)
-                fun1 = @(z)z(1)*exp(z(2)*x1+z(3));
-                fun2 = @(z)z(1)*exp(z(2)*x2+z(3));
-                fitfun = @(z)sum((fun1(z)-data(2,ignorefirstn+1:end)).^2);
-                % Fit function
-                [Y,fval,exitflag,output] = fminsearch(fitfun,[1 -1 0],fitopt);
-                fit = fun2(Y);
-            case 'biexponential'
-                % A1*exp(k1*x) + A2*exp(k2*x)
-                fun1 = @(z)z(1)*exp(z(2)*x1+z(3))+z(4)*exp(z(5)*x1+z(6));
-                fun2 = @(z)z(1)*exp(z(2)*x2+z(3))+z(4)*exp(z(5)*x2+z(6));
-                fitfun = @(z)sum((fun1(z)-data(2,ignorefirstn+1:end)).^2);
-                % Fit function
-                [Y,fval,exitflag,output] = fminsearch(fitfun,[1 -1 0 1 -1 0],fitopt);
-                fit = fun2(Y);
-        end
-        
-        % Create message
-        message{end+1} = ''; % Empty line
-        message{end+1} = 'SUMMARY';
-        message{end+1} = sprintf('Algorithm: %s',output.algorithm);
-        message{end+1} = sprintf('Number of iterations: %i',output.iterations);
-        message{end+1} = sprintf('Number of function evaluations: %i',output.funcCount);
-        if (exitflag ~= 1)
-            message{end+1} = output.message;
-        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
