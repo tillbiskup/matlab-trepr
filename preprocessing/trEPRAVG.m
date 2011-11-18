@@ -82,10 +82,8 @@ try
     history.system.platform = platform;
     history.system.matlab = version;
     history.system.trEPR = trEPRinfo('version');
-    
-    % Fiddle around with parameters structure, as it gets to hold all
-    % information about the accumulated datasets as well
     history.parameters = parameters;
+    history.info = '';
     
     avgData.history{end+1} = history;
     
