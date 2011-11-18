@@ -2651,7 +2651,7 @@ function parameter_edit_Callback(source,~,value)
             'lasermodel','parameters.laser.model','',''; ...
             'opodye','','parameters.laser.opodye',''; ...
             'laserwavelength','parameters.laser.wavelength.value','str2double',''; ...
-            'laserrepetitionrate','parameters.laser.repetitionRate','str2double',''; ...
+            'laserrepetitionrate','parameters.laser.repetitionRate.value','str2double',''; ...
             'laserpower','parameters.laser.power.value','str2double',''; ...
             'laserpowerunit','parameters.laser.power.unit','',''; ...
             };
@@ -3689,16 +3689,36 @@ end
 
 % --- Get field of cascaded struct
 function value = getCascadedField (struct, fieldName)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    if isempty(nDots)
-        value = struct.(fieldName);
-    else
-        struct = struct.(fieldName(1:nDots(1)-1));
-        value = getCascadedField(...
-            struct,...
-            fieldName(nDots(1)+1:end));
-    end    
+    try
+        % Get number of "." in fieldName
+        nDots = strfind(fieldName,'.');
+        if isempty(nDots)
+            value = struct.(fieldName);
+        else
+            struct = struct.(fieldName(1:nDots(1)-1));
+            value = getCascadedField(...
+                struct,...
+                fieldName(nDots(1)+1:end));
+        end
+    catch exception
+        try
+            disp(fieldName);
+            disp(struct);
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 % --- Set field of cascaded struct
