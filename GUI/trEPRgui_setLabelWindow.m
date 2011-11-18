@@ -135,12 +135,7 @@ function setLabel_Callback(~,~,action)
 end
 
 function info_pushbutton_Callback(~,~)
-    % Add function here that opens the Info window
-    disp('Sorry, info does not work yet. Please, come back later.');
-    msgbox(...
-        'Sorry, info does not work yet. Please, come back later.',...
-        'Not implemented yet',...
-        'help')
+    trEPRgui_infowindow();
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
