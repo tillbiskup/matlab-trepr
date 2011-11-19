@@ -7,7 +7,7 @@ function status = update_datasetPanel()
 %            0: successfully updated main axis
 
 % Is there currently a trEPRgui object?
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
@@ -26,6 +26,9 @@ ad = getappdata(mainWindow);
 %         set(gh.data_panel_displaytype_popupmenu,'Value',k)
 %     end
 % end
+
+update_visibleSpectra();
+update_invisibleSpectra();
 
 status = 0;
 

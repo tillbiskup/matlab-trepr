@@ -234,13 +234,6 @@ uicontrol('Tag','data_panel_duplicate_pushbutton',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-% Get handles of main window
-mainWindow = guiGetWindowHandle;
-gh = guihandles(mainWindow);
-set(gh.data_panel_show_pushbutton,'Enable','off');
-set(gh.data_panel_hide_pushbutton,'Enable','off');
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -282,7 +275,6 @@ function pushbutton_Callback(~,~,action)
                 ad.control.spectra.invisible = [];
                 
                 % Set active if not done
-                ad.control.spectra.active
                 if isempty(ad.control.spectra.active) || (ad.control.spectra.active < 1)
                     ad.control.spectra.active = 1;
                 end

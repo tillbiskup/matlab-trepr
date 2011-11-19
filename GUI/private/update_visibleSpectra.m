@@ -52,12 +52,22 @@ if ad.control.spectra.active
 end
 
 % Change enable status of pushbuttons and other elements
+multiplePanelChildren = findobj(...
+    'Parent',gh.data_panel_multiple_panel,'-not','Style','Listbox');
+if isempty(ad.data)
+    set(multiplePanelChildren,'Enable','off');
+else
+    if (length(ad.data) > 1)
+        set(multiplePanelChildren,'Enable','on');
+    else
+        set(multiplePanelChildren,'Enable','off');
+    end
+end
+
 currActiveButtons = findobj('Parent',gh.data_panel_currentlyactive_panel);
-visPanelChildren = findobj('Parent',gh.data_panel_visible_panel,'-not','Style','Listbox');
 if isempty(ad.control.spectra.visible)
     set(gh.data_panel_hide_pushbutton,'Enable','off');
     set(currActiveButtons,'Enable','off');
-    set(visPanelChildren,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
     set(gh.display_panel_datasets_listbox,'Enable','off');
     set(gh.data_panel_visible_listbox,'Enable','off');
@@ -74,14 +84,6 @@ else
     set(gh.displaytype_popupmenu,'Enable','on');
     set(gh.previous_pushbutton,'Enable','on');
     set(gh.next_pushbutton,'Enable','on');
-
-    % Show additional controls in visible_listbox only if there are more
-    % than two datasets currently visible
-    if (length(ad.control.spectra.visible) > 1)
-        set(visPanelChildren,'Enable','on');
-    else
-        set(visPanelChildren,'Enable','off');
-    end
 
     % Make "Save" button active only if currently active spectrum is
     % modified
