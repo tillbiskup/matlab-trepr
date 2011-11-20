@@ -27,6 +27,12 @@ ad = getappdata(mainWindow);
 % Get indices of visible spectra
 vis = ad.control.spectra.visible;
 
+if ~isempty(vis) && (isempty(ad.control.spectra.active) ...
+        || ~ad.control.spectra.active)
+    ad.control.spectra.active = vis(1);
+    setappdata(mainWindow,'control',ad.control)
+end
+
 % Get names for display in listbox
 labels = cell(0);
 for k=1:length(vis)

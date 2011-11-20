@@ -257,7 +257,7 @@ function pushbutton_Callback(~,~,action)
                 if isempty(ad.data)
                     return;
                 end
-                
+                trEPRgui_combinewindow();
                 return;
             case 'ShowAll'
                 % If there are no invisible datasets, return immediately
