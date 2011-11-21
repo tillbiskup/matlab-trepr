@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011, Till Biskup
-% 2011-11-20
+% 2011-11-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -340,7 +340,9 @@ end
 
 % If there are no combinable datasets, close GUI and return
 if ~checkForCombinableDatasets
-    pushbutton_Callback('','','Close');
+    msgStr = 'combine GUI window not opened: missing combinable datasets';
+    add2status(msgStr);
+    delete(hMainFigure);
     return;
 end
 
@@ -691,7 +693,8 @@ function status = checkForCombinableDatasets()
 
         % If one of the formats is combinable, set output to true
         for k=1:length(uniqueFormats)
-            if max(strcmp(uniqueFormats{k},combinableFormats))
+            if max(strcmpi(uniqueFormats{k},combinableFormats)) ...
+                    && length(find(strcmpi(uniqueFormats{k},formats)))>1
                 status = true;
             end
         end
@@ -732,7 +735,8 @@ function updateFileformats()
         % the main GUI
         displayFormats = cell(0);
         for k=1:length(uniqueFormats)
-            if max(strcmp(uniqueFormats{k},combinableFormats))
+            if max(strcmp(uniqueFormats{k},combinableFormats)) ...
+                    && length(find(strcmpi(uniqueFormats{k},formats)))>1
                 displayFormats{end+1} = uniqueFormats{k};
             end
         end
@@ -772,6 +776,11 @@ function updateBasenames()
         
         % Get selected format from filetypes listbox
         selectedFormats = get(gh.filetypes_listbox,'String');
+        if isempty(selectedFormats)
+            set(gh.filebasename_listbox,'String','');
+            set(gh.filebasename_listbox,'Value',1);
+            return;
+        end
         selectedFormat = selectedFormats{get(gh.filetypes_listbox,'Value')};
         
         % Get file formats

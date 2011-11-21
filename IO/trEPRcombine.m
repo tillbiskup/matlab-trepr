@@ -2,6 +2,10 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % TREPRCOMBINE Combine datasets contained in the input parameter to a
 % single dataset.
 %
+% Usage
+%   [combinedDatset,status] = trEPRcombine(datasets)
+%   [combinedDatset,status] = trEPRcombine(datasets,'label','sometext')
+%
 % datasets        - cell array
 %                   Cell array of datasets in trEPR toolbox format
 %
@@ -16,9 +20,13 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 %                   If something went wrong, status contains a message
 %                   describing the problem in more detail.
 %              
+% As you can see in the example above, you can specify a label as
+% parameter/value pair. This label is used for the combined dataset,
+% otherwise the label of the first dataset that is combined gets used.
+%
 
 % (c) 2011, Till Biskup
-% 2011-11-20
+% 2011-11-21
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -69,30 +77,27 @@ try
         end
         combinedDataset.axes.y.values = linspace(...
             datasets{1}.parameters.field.start,...
-            datasets{end}.parameters.field.start,...
+            datasets{end}.parameters.field.stop,...
             length(datasets));
         combinedDataset.parameters.field.start = ...
             datasets{1}.parameters.field.start;
         combinedDataset.parameters.field.stop = ...
-            datasets{end}.parameters.field.start;
+            datasets{end}.parameters.field.stop;
         combinedDataset.parameters.field.step = ...
             combinedDataset.axes.y.values(2)-combinedDataset.axes.y.values(1);
         combinedDataset.parameters.field.unit = ...
             combinedDataset.axes.y.unit;
     end
     
-%     if (length(unique(dimensions(:,1)))==1) ...
-%             && (length(unique(dimensions(:,2)))==1) ...
-%             && (unique(dimensions(:,1)==1))
-%         for k=2:length(datasets)
-%             combinedDataset.data = ...
-%                 [ combinedDataset.data; datasets{k}.data ];
-%         end
-%         combinedDataset.axes.x.values = linspace(...
-%             datasets{1}.axes.x.values(1),...
-%             datasets{end}.axes.x.values(1),...
-%             length(datasets));
-%     end
+    % In case that we have identical dimensions along x (cols, therefore
+    % dimension 2), and dimension along x is larger than max along y, add
+    % datasets together (assuming that always the longer dimension is the
+    % one that stays fixed)
+    if (length(unique(dimensions(:,2)))==1) ...
+            && unique(dimensions(:,2)) > max(unique(dimensions(:,1))) ...
+            && max(unique(dimensions(:,1))) > 1
+    end
+    
 catch exception
     throw(exception);
 end
