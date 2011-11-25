@@ -2392,7 +2392,7 @@ function axesexport_pushbutton_Callback(~,~)
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
             [p,f,e] = ...
-                fileparts(ad.data{ad.control.spectra.visible(1)}.filename);
+                fileparts(ad.data{ad.control.spectra.visible(1)}.file.name);
             fileNameSuggested = f;
             clear p f e;
         else
