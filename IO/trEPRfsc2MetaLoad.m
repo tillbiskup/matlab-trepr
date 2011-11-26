@@ -279,8 +279,6 @@ try
         if ~isempty(warning) 
             warnings{end+1} = warning;
         end
-        data{k}.filename = ...
-            fullfile(metaFilePath,[dataFileName dataFileExtension]);
         data{k}.file.name = ...
             fullfile(metaFilePath,[dataFileName dataFileExtension]);
         data{k}.file.format = 'fsc2';

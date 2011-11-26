@@ -291,7 +291,7 @@ function load_pushbutton_Callback(~,~)
         if iscell(data)
             for k=1:length(data)
                 if not(isnumeric(data{k}.data))
-                    fnNoData{k} = data{k}.filename;
+                    fnNoData{k} = data{k}.file.name;
                     nNoData = [ nNoData k ];
                 end
             end
@@ -299,7 +299,7 @@ function load_pushbutton_Callback(~,~)
             data(nNoData) = [];
         else
             if not(isnumeric(data.data))
-                fnNoData = data.filename;
+                fnNoData = data.file.name;
                 data = [];
             end
         end

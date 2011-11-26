@@ -786,7 +786,7 @@ function duplicate_pushbutton_Callback(~,~)
         % Set label of duplicate
         duplicate.label = duplicateLabel;
         % IMPORTANT: Set the filename of the duplicate to empty string
-        duplicate.filename = '';
+        duplicate.file.name = '';
         
         nSpectra = length(ad.data);
         
@@ -1147,7 +1147,7 @@ function status = datasetSaveAs(id)
             else
                 number = 1;
             end
-            ad.data{id}.filename = fullfile(...
+            ad.data{id}.file.name = fullfile(...
                 fpath,...
                 sprintf('%s_%i.zip',fname,number));
         end
