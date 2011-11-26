@@ -105,8 +105,7 @@ try
     accData.parameters = data{masterId}.parameters;
     accData.display.position = data{masterId}.display.position;
     
-    % Check for axes steppings and handle interpolation accordingly, or,
-    % for the time being, complain that interpolation is not supported yet.
+    % Check for axes steppings and handle interpolation accordingly.
     if ((min(xStep) ~= max(xStep)) || (min(yStep) ~= max(yStep))) || ...
             interpolate
         % If no interpolation method is set, default is linear
@@ -265,6 +264,13 @@ try
     switch parameters.method
         case 'cumulative'
             accData.data = sum(accData.data,3)/length(data);
+            % Handle number of averages
+            accData.parameters.recorder.averages = 0;
+            for k=1:length(data)
+                accData.parameters.recorder.averages = ...
+                    accData.parameters.recorder.averages + ...
+                    data{k}.parameters.recorder.averages;
+            end
         case 'weighted'
             accData = [];
             accReport = {...
