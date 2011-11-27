@@ -8,7 +8,7 @@ function status = update_invisibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % Is there currently a trEPRgui object?
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
@@ -39,7 +39,7 @@ set(invLbox,'String',labels);
 if (get(invLbox,'Value')>length(inv))
     set(invLbox,'Value',length(inv));
 end
-if ((get(invLbox,'Value')==0) && (length(inv)>0))
+if ((get(invLbox,'Value')==0) && (~isempty(inv)))
     set(invLbox,'Value',1);
 end
 

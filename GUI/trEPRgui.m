@@ -1,9 +1,10 @@
 function varargout = trEPRgui(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI A GUI to display and process transient EPR data in Matlab.
+%
+% Main GUI window of the trEPR toolbox.
 
-% (Leave a blank line following the help.)
+% (c) 2011, Till Biskup
+% 2011-11-27
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','trepr_gui_mainwindow');

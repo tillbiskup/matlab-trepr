@@ -1,13 +1,13 @@
 function handle = guiProcessingPanel(parentHandle,position)
-% GUIWELCOMEPANEL Add a panel for <function> to a gui
+% GUIPROCESSINGPANEL Add a panel for general preprocessing to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
-%       TODO: Add guidata and appdata to list of arguments
 %
 %       Returns the handle of the added panel.
 
-% (Leave a blank line following the help.)
+% (c) 11, Till Biskup
+% 2011-11-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -183,7 +183,7 @@ uicontrol('Tag','processing_panel_average_x_points_edit',...
     'Units','Pixels',...
     'Position',[60 40 (handle_size(3)-90)/2 25],...
     'String','1',...
-    'Callback',{@average_x_points_Callback}...
+    'Callback',{@average_edit_Callback,'xindex'}...
     );
 uicontrol('Tag','processing_panel_average_x_unit_edit',...
     'Style','edit',...
@@ -193,7 +193,7 @@ uicontrol('Tag','processing_panel_average_x_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 40 (handle_size(3)-90)/2 25],...
     'String','0',...
-    'Callback',{@average_x_unit_Callback}...
+    'Callback',{@average_edit_Callback,'xunit'}...
     );
 uicontrol('Tag','processing_panel_average_y_text',...
     'Style','text',...
@@ -212,7 +212,7 @@ uicontrol('Tag','processing_panel_average_y_points_edit',...
     'Units','Pixels',...
     'Position',[60 10 (handle_size(3)-90)/2 25],...
     'String','1',...
-    'Callback',{@average_y_points_Callback}...
+    'Callback',{@average_edit_Callback,'yindex'}...
     );
 uicontrol('Tag','processing_panel_average_y_unit_edit',...
     'Style','edit',...
@@ -222,7 +222,7 @@ uicontrol('Tag','processing_panel_average_y_unit_edit',...
     'Units','Pixels',...
     'Position',[60+(handle_size(3)-90)/2 10 (handle_size(3)-90)/2 25],...
     'String','0',...
-    'Callback',{@average_y_unit_Callback}...
+    'Callback',{@average_edit_Callback,'yunit'}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -340,7 +340,7 @@ function datasets_listbox_Callback(~,~)
     end
 end
 
-function average_x_points_Callback(source,~)
+function average_edit_Callback(source,~,value)
     try
         % Get appdata of main window
         mainWindow = guiGetWindowHandle;
@@ -353,258 +353,112 @@ function average_x_points_Callback(source,~)
             return;
         end
         
-        % Fix values: only integers >= 1
-        [~,x] = size(ad.data{ad.control.spectra.active}.data);
-        if (str2double(get(source,'String')) < 1) || ...
-                isnan(str2double(get(source,'String')))
-            set(source,'String','1');
-        elseif (str2double(get(source,'String')) > x)
-            set(source,'String',num2str(x));
-        else
-            set(source,...
-                'String',...
-                num2str(round(str2double(get(source,'String')))));
+        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+
+        switch value
+            case 'xindex'
+                % Fix values: only integers >= 1
+                if (str2double(get(source,'String')) < 1) || ...
+                        isnan(str2double(get(source,'String')))
+                    set(source,'String','1');
+                elseif (str2double(get(source,'String')) > x)
+                    set(source,'String',num2str(x));
+                else
+                    set(source,...
+                        'String',...
+                        num2str(round(str2double(get(source,'String')))));
+                end
+                
+                ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
+                    str2num(get(source,'String'));
+            case 'xunit'
+                x = linspace(1,x,x);
+                y = linspace(1,y,y);
+                if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                        && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
+                        && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
+                        && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
+                    x = ad.data{ad.control.spectra.active}.axes.x.values;
+                end
+                
+                % Get "atomic" value
+                atomic = x(2)-x(1);
+                
+                % Fix values: only those in range of the axis are allowed
+                if (str2double(get(source,'String')) < atomic) || ...
+                        isnan(str2double(get(source,'String')))
+                    set(source,'String',num2str(atomic));
+                elseif (str2double(get(source,'String')) > (atomic*length(x)))
+                    set(source,'String',num2str(atomic*length(x)));
+                else
+                    set(source,...
+                        'String',...
+                        num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
+                        );
+                end
+                
+                set(gh.processing_panel_average_x_points_edit,...
+                    'String',...
+                    num2str(round(str2double(get(source,'String'))/atomic))...
+                    );
+                
+                ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
+                    round(str2double(get(source,'String'))/atomic);
+            case 'yindex'
+                if (str2double(get(source,'String')) < 1) || ...
+                        isnan(str2double(get(source,'String')))
+                    set(source,'String','1');
+                elseif (str2double(get(source,'String')) > y)
+                    set(source,'String',num2str(x));
+                else
+                    set(source,...
+                        'String',...
+                        num2str(round(str2double(get(source,'String')))));
+                end
+                
+                ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
+                    str2num(get(source,'String'));
+            case 'yunit'
+                x = linspace(1,x,x);
+                y = linspace(1,y,y);
+                if (isfield(ad.data{ad.control.spectra.active},'axes') ...
+                        && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
+                        && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
+                        && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
+                    y = ad.data{ad.control.spectra.active}.axes.y.values;
+                end
+                
+                % Get "atomic" value
+                atomic = y(2)-y(1);
+                
+                % Fix values: only those in range of the axis are allowed
+                if (str2double(get(source,'String')) < atomic) || ...
+                        isnan(str2double(get(source,'String')))
+                    set(source,'String',num2str(atomic));
+                elseif (str2double(get(source,'String')) > (atomic*length(y)))
+                    set(source,'String',num2str(atomic*length(y)));
+                else
+                    set(source,...
+                        'String',...
+                        num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
+                        );
+                end
+                
+                set(gh.processing_panel_average_y_points_edit,...
+                    'String',...
+                    num2str(round(str2double(get(source,'String'))/atomic))...
+                    );
+                
+                ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
+                    round(str2double(get(source,'String'))/atomic);
+            otherwise
+                disp('guiProcessingPanel : average_edit_Callback : unknown value');
+                disp(value);
         end
         
-        ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
-            str2num(get(source,'String'));
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-            sprintf('trEPRfilter_%s',filterType);
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function average_x_unit_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        if not (ad.control.spectra.active)
-            return;
-        end
-        
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
-        x = linspace(1,x,x);
-        y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
-            x = ad.data{ad.control.spectra.active}.axes.x.values;
-        end
-        
-        % Get "atomic" value
-        atomic = x(2)-x(1);
-        
-        % Fix values: only those in range of the axis are allowed
-        if (str2double(get(source,'String')) < atomic) || ...
-                isnan(str2double(get(source,'String')))
-            set(source,'String',num2str(atomic));
-        elseif (str2double(get(source,'String')) > (atomic*length(x)))
-            set(source,'String',num2str(atomic*length(x)));
-        else
-            set(source,...
-                'String',...
-                num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
-                );
-        end
-        
-        set(gh.processing_panel_average_x_points_edit,...
-            'String',...
-            num2str(round(str2double(get(source,'String'))/atomic))...
-            );
-        
-        ad.data{ad.control.spectra.active}.display.smoothing.x.value = ...
-            round(str2double(get(source,'String'))/atomic);
-        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-        ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-            sprintf('trEPRfilter_%s',filterType);
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function average_y_points_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        if not (ad.control.spectra.active)
-            return;
-        end
-        
-        % Fix values: only integers >= 1
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
-        if (str2double(get(source,'String')) < 1) || ...
-                isnan(str2double(get(source,'String')))
-            set(source,'String','1');
-        elseif (str2double(get(source,'String')) > y)
-            set(source,'String',num2str(x));
-        else
-            set(source,...
-                'String',...
-                num2str(round(str2double(get(source,'String')))));
-        end
-        
-        ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
-            str2num(get(source,'String'));
-        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-        ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
-            sprintf('trEPRfilter_%s',filterType);
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function average_y_unit_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        if not (ad.control.spectra.active)
-            return;
-        end
-        
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
-        x = linspace(1,x,x);
-        y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
-            y = ad.data{ad.control.spectra.active}.axes.y.values;
-        end
-        
-        % Get "atomic" value
-        atomic = y(2)-y(1);
-        
-        % Fix values: only those in range of the axis are allowed
-        if (str2double(get(source,'String')) < atomic) || ...
-                isnan(str2double(get(source,'String')))
-            set(source,'String',num2str(atomic));
-        elseif (str2double(get(source,'String')) > (atomic*length(y)))
-            set(source,'String',num2str(atomic*length(y)));
-        else
-            set(source,...
-                'String',...
-                num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
-                );
-        end
-        
-        set(gh.processing_panel_average_y_points_edit,...
-            'String',...
-            num2str(round(str2double(get(source,'String'))/atomic))...
-            );
-        
-        ad.data{ad.control.spectra.active}.display.smoothing.y.value = ...
-            round(str2double(get(source,'String'))/atomic);
-        filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
-        filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
-        ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
             sprintf('trEPRfilter_%s',filterType);
         
         % Update appdata of main window
