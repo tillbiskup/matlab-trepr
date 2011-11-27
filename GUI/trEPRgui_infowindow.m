@@ -3664,6 +3664,10 @@ function updateHistoryPanel()
         set(gh.history_panel_toolboxversion_text,'String',...
             ad.data{selectedId}.history{historyId}.system.trEPR);
         
+        % Set parameters panel
+        set(gh.history_panel_parameter_edit,'String',...
+            trEPRhistoryDisplay(ad.data{selectedId}.history{historyId}));
+        
         % Set report panel
         set(gh.history_panel_report_edit,'String',...
             ad.data{selectedId}.history{historyId}.info);

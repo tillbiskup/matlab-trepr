@@ -18,7 +18,7 @@ try
         struct = rmfield(struct,'data');
         save(fullfile(tempdir,[name '.dat']),'data','-ascii');
         [structpathstr, structname] = fileparts(struct.file.name);
-        struct.filename = fullfile(structpathstr,[structname '.zip']);
+        struct.file.name = fullfile(structpathstr,[structname '.zip']);
         docNode = struct2xml(struct);
         xmlwrite(fullfile(tempdir,[name '.xml']),docNode);
         zip(fullfile(pathstr,[name '.zip']),...
@@ -28,7 +28,7 @@ try
         delete(fullfile(tempdir,[name '.dat']));
     else
         [structpathstr, structname] = fileparts(struct.file.name);
-        struct.filename = fullfile(structpathstr,[structname '.zip']);
+        struct.file.name = fullfile(structpathstr,[structname '.zip']);
         docNode = struct2xml(struct);
         xmlwrite(fullfile(tempdir,[name '.xml']),docNode);
         zip(fullfile(pathstr,[name '.zip']),fullfile(tempdir,[name '.xml']));

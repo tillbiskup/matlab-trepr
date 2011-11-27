@@ -13,6 +13,11 @@ try
         return;
     end
     
+    % Get appdata and handles of main window
+    mainWindow = guiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = guihandles(mainWindow);
+    
     % Use "src" to distinguish between callers - may be helpful later on
     
     if ~isempty(evt.Modifier)
@@ -132,6 +137,25 @@ try
         case 'f10'
             trEPRgui_statuswindow();
             return;
+        case 'delete'
+            if ~ad.control.spectra.active
+                return;
+            end
+            if src == gh.data_panel_visible_listbox
+                if (strcmpi(evt.Modifier{1},'shift'))
+                    [status,message] = removeDatasetFromMainGUI(...
+                        ad.control.spectra.active,'force',true);
+                    if status
+                        disp(message);
+                    end
+                else
+                    [status,message] = removeDatasetFromMainGUI(...
+                        ad.control.spectra.active);
+                    if status
+                        disp(message);
+                    end
+                end
+            end
         otherwise
 %             disp(evt);
 %             fprintf('       Caller: %i\n\n',src);
