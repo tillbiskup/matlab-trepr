@@ -1,5 +1,5 @@
 function status = refreshDatasetInMainGUI(dataset,id,varargin)
-% REFRESHDATASETINMAINGUI Append dataset to main GUI.
+% REFRESHDATASETINMAINGUI Refresh dataset in main GUI.
 %
 % Usage:
 %   status = refreshDatasetInMainGUI(dataset,id);
