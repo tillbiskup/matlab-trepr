@@ -27,7 +27,7 @@ p.parse(dataset,varargin{:});
 
 try
     % First, find main GUI window
-    mainWindow = guiGetWindowHandle('trEPRgui');
+    mainWindow = guiGetWindowHandle();
     
     % Preset message
     message = '';
@@ -42,10 +42,14 @@ try
     % Get appdata of main window
     ad = getappdata(mainWindow);
 
+    % Cell array for labels of removed datasets
+    removedDatasetsLabels = cell(0);
+    
     % Remove dataset(s) from main GUI
     for k=length(dataset):-1:1
         if ~p.Results.force
             if ~any(ad.control.spectra.modified==dataset)
+                removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
                 ad.data(dataset(k)) = [];
                 ad.origdata(dataset(k)) = [];
                 ad.control.spectra.visible(...
@@ -94,6 +98,7 @@ try
                     case 'Cancel'
                 end
                 if remove
+                    removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
                     ad.data(dataset(k)) = [];
                     ad.origdata(dataset(k)) = [];
                     ad.control.spectra.visible(...
@@ -120,6 +125,7 @@ try
                 end
             end
         else
+            removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
             ad.data(dataset(k)) = [];
             ad.origdata(dataset(k)) = [];
             ad.control.spectra.visible(...
@@ -152,12 +158,22 @@ try
     setappdata(mainWindow,'control',ad.control);
     
     % Adding status line
-    msg = {...
-        sprintf('Datasets successfully removed from main GUI')...
-        };
+    msg = cell(0);
+    msg{end+1} = sprintf('Datasets successfully removed from main GUI');
+    for k=1:length(removedDatasetsLabels)
+        msg{end+1} = sprintf('  Label: %s',removedDatasetsLabels{k});
+    end
     status = add2status(msg);
+    invStr = sprintf('%i ',ad.control.spectra.invisible);
+    visStr = sprintf('%i ',ad.control.spectra.visible);
+    msgStr = sprintf(...
+        'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+        invStr,visStr,length(ad.data));
+    add2status(msgStr);
+    clear msgStr;
     
     % Update main GUI's axes and panels
+    update_invisibleSpectra();
     update_visibleSpectra();
     update_datasetPanel();
     update_processingPanel();

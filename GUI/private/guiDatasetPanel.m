@@ -3,11 +3,11 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
-%       TODO: Add guidata and appdata to list of arguments
 %
 %       Returns the handle of the added panel.
 
-% (Leave a blank line following the help.)
+% (c) 11, Till Biskup
+% 2011-11-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -85,7 +85,7 @@ uicontrol('Tag','data_panel_show_pushbutton',...
     'Position',[10 panel_size(4)-205 60 25],...
     'String','Show',...
     'TooltipString','Show currently highlighted spectrum',...
-    'Callback', {@show_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'Show'}...
     );
 uicontrol('Tag','data_panel_hide_pushbutton',...
     'Style','pushbutton',...
@@ -96,7 +96,7 @@ uicontrol('Tag','data_panel_hide_pushbutton',...
     'Position',[panel_size(3)-70 panel_size(4)-205 60 25],...
     'String','Hide',...
     'TooltipString','Hide currently highlighted spectrum',...
-    'Callback', {@hide_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'Hide'}...
     );
 uicontrol('Tag','show_hide_button_explanation',...
     'Style','text',...
@@ -171,7 +171,7 @@ uicontrol('Tag','data_panel_save_pushbutton',...
     'Position',[10 35 floor((panel_size(3)-40)/3) 25],...
     'String','Save',...
     'TooltipString','Save currently active spectrum',...
-    'Callback', {@save_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'Save'}...
     );
 uicontrol('Tag','data_panel_saveas_pushbutton',...
     'Style','pushbutton',...
@@ -182,7 +182,7 @@ uicontrol('Tag','data_panel_saveas_pushbutton',...
     'Position',[floor((panel_size(3)-40)/3)+10 35 floor((panel_size(3)-40)/3) 25],...
     'String','Save as',...
     'TooltipString','Save currently active spectrum under different filename',...
-    'Callback', {@saveas_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'SaveAs'}...
     );
 uicontrol('Tag','data_panel_remove_pushbutton',...
     'Style','pushbutton',...
@@ -195,7 +195,7 @@ uicontrol('Tag','data_panel_remove_pushbutton',...
     'TooltipString',sprintf('%s\n%s',...
     'Remove currently active spectrum from GUI',...
     '(does not delete the file)'),...
-    'Callback', {@remove_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'Remove'}...
     );
 uicontrol('Tag','data_panel_undo_pushbutton',...
     'Style','pushbutton',...
@@ -226,7 +226,7 @@ uicontrol('Tag','data_panel_duplicate_pushbutton',...
     'Position',[(floor((panel_size(3)-40)/3)*2)+10 10 floor((panel_size(3)-40)/3) 25],...
     'TooltipString','Duplicate currently active dataset',...
     'String','Duplicate',...
-    'Callback', {@duplicate_pushbutton_Callback}...
+    'Callback', {@pushbutton_Callback,'Duplicate'}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -252,6 +252,96 @@ function pushbutton_Callback(~,~,action)
         gh = guihandles(mainWindow);
 
         switch action
+            case 'Show'
+                % Get selected item of listbox
+                selected = get(gh.data_panel_invisible_listbox,'Value');
+                
+                % Be on the save side if user is faster than Matlab
+                if selected == 0
+                    return;
+                end
+                
+                % Move to visible
+                ad.control.spectra.visible = [...
+                    ad.control.spectra.visible ...
+                    ad.control.spectra.invisible(selected) ...
+                    ];
+                
+                % Make moved entry active one
+                ad.control.spectra.active = ad.control.spectra.invisible(selected);
+                
+                % Delete in invisible
+                ad.control.spectra.invisible(selected) = [];
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = sprintf(...
+                    'Moved dataset %i (%s) to visible',...
+                    ad.control.spectra.active,...
+                    ad.data{ad.control.spectra.active}.label);
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                add2status(msgStr);
+                
+                % Update both list boxes
+                update_invisibleSpectra();
+                update_visibleSpectra();
+                
+                %Update main axis
+                update_mainAxis();
+            case 'Hide'                
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                selectedId = ad.control.spectra.visible(selected);
+                
+                % Be on the save side if user is faster than Matlab
+                if selected == 0
+                    return;
+                end
+                
+                % Move to invisible
+                ad.control.spectra.invisible = [...
+                    ad.control.spectra.invisible ...
+                    ad.control.spectra.visible(selected) ...
+                    ];
+                
+                % Delete in visible
+                ad.control.spectra.visible(selected) = [];
+                
+                % Toggle active entry
+                if (selected > length(ad.control.spectra.visible))
+                    if (selected == 1)
+                        ad.control.spectra.active = 0;
+                    else
+                        ad.control.spectra.active = ad.control.spectra.visible(end);
+                    end
+                else
+                    ad.control.spectra.active = ad.control.spectra.visible(selected);
+                end
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = sprintf(...
+                    'Moved dataset %i (%s) to invisible',...
+                    selectedId,...
+                    ad.data{selectedId}.label);
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                add2status(msgStr);
             case 'Combine'
                 % If no datasets are loaded, return
                 if isempty(ad.data)
@@ -338,491 +428,110 @@ function pushbutton_Callback(~,~,action)
                 %Update main axis
                 update_mainAxis();
                 return;
+            case 'Save'
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                
+                % Get id of selected spectrum
+                selectedId = ad.control.spectra.visible(selected);
+                
+                saveDatasetInMainGUI(selectedId);
+            case 'SaveAs'
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                
+                % Get id of selected spectrum
+                selectedId = ad.control.spectra.visible(selected);
+                
+                saveAsDatasetInMainGUI(selectedId);
+            case 'Remove'
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                
+                % Get id of selected spectrum
+                selectedId = ad.control.spectra.visible(selected);
+                
+                removeDatasetFromMainGUI(selectedId);
+            case 'Duplicate'
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                
+                % Create label for duplicate
+                % That is, add number in brackets at the end: (n)
+                % But check whether there is already such a number in brackets in
+                % any of the visible spectra with the same label.
+                expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
+                l = 0;
+                token = [];
+                for k=1:length(ad.control.spectra.visible)
+                    tokens = regexp(...
+                        ad.data{ad.control.spectra.visible(k)}.label,...
+                        expression,'tokens');
+                    if ~isempty(tokens)
+                        l=l+1;
+                        token(l) = str2double(char(tokens{1}));
+                    end
+                end
+                if ~isempty(token)
+                    if (regexp(ad.data{selected}.label,' \((\d+)\)$'))
+                        duplicateLabel = regexprep(...
+                            ad.data{selected}.label,...
+                            ' \((\d+)\)$',sprintf(' (%i)',max(token)+1));
+                    else
+                        duplicateLabel = sprintf('%s (%i)',...
+                            ad.data{selected}.label,max(token)+1);
+                    end
+                else
+                    duplicateLabel = sprintf('%s (1)',ad.data{selected}.label);
+                end
+                
+                % Actually duplicate the dataset
+                duplicate = ad.data{selected};
+                % Set label of duplicate
+                duplicate.label = duplicateLabel;
+                % IMPORTANT: Set the filename of the duplicate to empty string
+                duplicate.file.name = '';
+                
+                nSpectra = length(ad.data);
+                
+                ad.data{end+1} = duplicate;
+                ad.origdata{end+1} = duplicate;
+                
+                ad.control.spectra.visible(end+1) = nSpectra+1;
+                ad.control.spectra.modified(end+1) = nSpectra+1;
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                setappdata(mainWindow,'data',ad.data);
+                setappdata(mainWindow,'origdata',ad.origdata);
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = ...
+                    sprintf(...
+                    'Data set "%s" duplicated as %s',...
+                    ad.data{selected}.label,...
+                    duplicateLabel);
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                add2status(msgStr);
+                clear msgStr;
+                
+                % Update both list boxes
+                update_invisibleSpectra();
+                update_visibleSpectra();
+                
+                %Update main axis
+                update_mainAxis();
             otherwise
                 disp('trEPRgui : guiDatasetPanel() : pushbutton_Callback(): Unknown action');
                 disp(action);
                 return;
         end
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function show_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_invisible_listbox,'Value');
-        
-        % Be on the save side if user is faster than Matlab
-        if selected == 0
-            return;
-        end
-        
-        % Move to visible
-        ad.control.spectra.visible = [...
-            ad.control.spectra.visible ...
-            ad.control.spectra.invisible(selected) ...
-            ];
-        
-        % Make moved entry active one
-        ad.control.spectra.active = ad.control.spectra.invisible(selected);
-        
-        % Delete in invisible
-        ad.control.spectra.invisible(selected) = [];
-       
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Moved dataset %i (%s) to visible',...
-            ad.control.spectra.active,...
-            ad.data{ad.control.spectra.active}.label);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        add2status(msgStr);
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-
-function hide_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_visible_listbox,'Value');
-        selectedId = ad.control.spectra.visible(selected);
-        
-        % Be on the save side if user is faster than Matlab
-        if selected == 0
-            return;
-        end
-        
-        % Move to invisible
-        ad.control.spectra.invisible = [...
-            ad.control.spectra.invisible ...
-            ad.control.spectra.visible(selected) ...
-            ];
-        
-        % Delete in visible
-        ad.control.spectra.visible(selected) = [];
-        
-        % Toggle active entry
-        if (selected > length(ad.control.spectra.visible))
-            if (selected == 1)
-                ad.control.spectra.active = 0;
-            else
-                ad.control.spectra.active = ad.control.spectra.visible(end);
-            end
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(selected);
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Moved dataset %i (%s) to invisible',...
-            selectedId,...
-            ad.data{selectedId}.label);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        add2status(msgStr);
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function save_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_visible_listbox,'Value');
-        
-        % Get id of selected spectrum
-        selectedId = ad.control.spectra.visible(selected);
-        
-        saveDatasetInMainGUI(selectedId);
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function saveas_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_visible_listbox,'Value');
-        
-        % Get id of selected spectrum
-        selectedId = ad.control.spectra.visible(selected);
-        
-        saveAsDatasetInMainGUI(selectedId);
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function remove_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_visible_listbox,'Value');
-        
-        % Fix for too slow MATLAB(r)
-        if ~isempty(ad.control.spectra.visible)
-            % If for whatever reason, selectedId is larger than the visible
-            % spectra array, simply return
-            if selected > length(ad.control.spectra.visible)
-                return;
-            end
-            % Get id of selected spectrum
-            selectedId = ad.control.spectra.visible(selected);
-        else
-            return;
-        end
-        
-        % Check whether currently selected spectrum is modified, and if so,
-        % ask the user whether to remove it anyway
-        if find(ad.control.spectra.modified==selectedId)
-            answer = questdlg(...
-                {'Dataset was modified. Remove anyway?'...
-                ' '...
-                'Note that "Remove" means that you loose the changes you made,'...
-                'but the (original) file will not be deleted from the file system.'...
-                ' '...
-                'Other options include "Save & Remove" or "Cancel".'},...
-                'Warning: Dataset Modified...',...
-                'Save & Remove','Remove','Cancel',...
-                'Save & Remove');
-            switch answer
-                case 'Save & Remove'
-                    status = saveDatasetInMainGUI(selectedId);
-                    if status
-                        % That means that something went wrong with the saveAs
-                        return;
-                    end
-                case 'Remove'
-                case 'Cancel'
-                    return;
-                otherwise
-                    return;
-            end
-        end
-        
-        removedDatasetLabel = ...
-            ad.data{selectedId}.label;
-        
-        % Remove from data and origdata
-        ad.data(selectedId) = [];
-        ad.origdata(selectedId) = [];
-        
-        % Remove from modified if it's there
-        ad.control.spectra.modified(...
-            ad.control.spectra.modified == selectedId) = [];
-        % Remove from missing if it's there
-        ad.control.spectra.missing(...
-            ad.control.spectra.missing == selectedId) = [];
-        
-        
-        % Delete in visible
-        ad.control.spectra.visible(selected) = [];
-        
-        % Shift numbering in spectra.visible and spectra.invisible
-        if (~isempty(ad.control.spectra.visible))
-            indices = find(ad.control.spectra.visible>selectedId);
-            ad.control.spectra.visible(indices) = ...
-                ad.control.spectra.visible(indices)-1;
-        end
-        if (~isempty(ad.control.spectra.invisible))
-            indices = find(ad.control.spectra.invisible>selectedId);
-            ad.control.spectra.invisible(indices) = ...
-                ad.control.spectra.invisible(indices)-1;
-        end
-        
-        % Shift numbering in spectra.modified
-        if (~isempty(ad.control.spectra.modified))
-            indices = find(ad.control.spectra.modified>selectedId);
-            ad.control.spectra.modified(indices) = ...
-                ad.control.spectra.modified(indices)-1;
-        end
-        
-        % Toggle active entry
-        if (selected > length(ad.control.spectra.visible))
-            if (selected == 1)
-                ad.control.spectra.active = [];
-            else
-                ad.control.spectra.active = ad.control.spectra.visible(end);
-            end
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(selected);
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        setappdata(mainWindow,'data',ad.data);
-        setappdata(mainWindow,'origdata',ad.origdata);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = ...
-            sprintf('Data set "%s" removed from GUI',removedDatasetLabel);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        add2status(msgStr);
-        clear msgStr;
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function duplicate_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Get selected item of listbox
-        selected = get(gh.data_panel_visible_listbox,'Value');
-        
-        % Create label for duplicate
-        % That is, add number in brackets at the end: (n)
-        % But check whether there is already such a number in brackets in
-        % any of the visible spectra with the same label.
-        expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
-        l = 0;
-        token = [];
-        for k=1:length(ad.control.spectra.visible)
-            tokens = regexp(ad.data{ad.control.spectra.visible(k)}.label,expression,'tokens');
-            if ~isempty(tokens)
-                l=l+1;
-                token(l) = str2double(char(tokens{1}));
-            end
-        end
-        if ~isempty(token)
-            ad.data{selected}.label
-            if (regexp(ad.data{selected}.label,' \((\d+)\)$'))
-                duplicateLabel = regexprep(...
-                    ad.data{selected}.label,...
-                    ' \((\d+)\)$',sprintf(' (%i)',max(token)+1));
-            else
-                duplicateLabel = sprintf('%s (%i)',ad.data{selected}.label,max(token)+1);
-            end
-        else
-            duplicateLabel = sprintf('%s (1)',ad.data{selected}.label);
-        end
-        
-        % Actually duplicate the dataset
-        duplicate = ad.data{selected};
-        % Set label of duplicate
-        duplicate.label = duplicateLabel;
-        % IMPORTANT: Set the filename of the duplicate to empty string
-        duplicate.file.name = '';
-        
-        nSpectra = length(ad.data);
-        
-        ad.data{end+1} = duplicate;
-        ad.origdata{end+1} = duplicate;
-        
-        ad.control.spectra.visible(end+1) = nSpectra+1;
-        ad.control.spectra.modified(end+1) = nSpectra+1;
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        setappdata(mainWindow,'data',ad.data);
-        setappdata(mainWindow,'origdata',ad.origdata);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = ...
-            sprintf(...
-            'Data set "%s" duplicated as %s',...
-            ad.data{selected}.label,...
-            duplicateLabel);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        add2status(msgStr);
-        clear msgStr;
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
     catch exception
         try
             msgStr = ['An exception occurred. '...
