@@ -41,6 +41,8 @@ try
     windowTags.trEPRgui_infowindow = 'trepr_gui_infowindow';
     windowTags.trEPRgui_info_helpwindow = 'trEPRgui_info_helpwindow';
     % Add here list of other window tags
+    windowTags.trEPRgui_combinewindow = 'trepr_gui_combinewindow';
+    windowTags.trEPRgui_combine_helpwindow = 'trEPRgui_combine_helpwindow';
     
     % Define default tag
     defaultTag = windowTags.trEPRgui;

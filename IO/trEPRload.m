@@ -88,7 +88,7 @@ function varargout = trEPRload(filename, varargin)
             else
                 for k=1:length(content)
                     [~, name, ext] = fileparts(...
-                        content{k}.filename);
+                        content{k}.file.name);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content{k});
                     assignin('base','warnings',warnings);
@@ -153,7 +153,7 @@ function varargout = trEPRload(filename, varargin)
             else
                 for k=1:length(content)
                     [~, name, ext] = fileparts(...
-                        content{k}.filename);
+                        content{k}.file.name);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content{k});
                     assignin('base','warnings',warnings);
@@ -222,7 +222,7 @@ function varargout = trEPRload(filename, varargin)
                     if iscell(content)
                         for k=1:length(content)
                             [~, name, ext] = fileparts(...
-                                content{k}.filename);
+                                content{k}.file.name);
                             name = cleanFileName([name ext]);
                             assignin('base',name,content{k});
                         end

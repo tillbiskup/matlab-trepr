@@ -192,7 +192,7 @@ function [content,warnings] = loadFile(filename,varargin)
         end
 
         files{1} = importdata(filename,' ',3);
-        content.data = files{1}.data(:,2);
+        content.data = files{1}.data(:,2)';
         B0 = regexp(files{1}.textdata{2},'B0 = ([0-9.]*)','tokens');
         content.parameters.field.start = str2double(B0{1});
         content.parameters.field.stop = str2double(B0{1});
