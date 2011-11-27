@@ -35,175 +35,155 @@ function varargout = trEPRload(filename, varargin)
 % (c) 2009-2011, Till Biskup
 % 2011-11-01
 
-    % Parse input arguments using the inputParser functionality
-    p = inputParser;   % Create an instance of the inputParser class.
-    p.FunctionName = mfilename; % Function name to be included in error messages
-    p.KeepUnmatched = true; % Enable errors on unmatched arguments
-    p.StructExpand = true; % Enable passing arguments in a structure
+% Parse input arguments using the inputParser functionality
+p = inputParser;   % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Function name to be included in error messages
+p.KeepUnmatched = true; % Enable errors on unmatched arguments
+p.StructExpand = true; % Enable passing arguments in a structure
 
-    p.addRequired('filename', @(x)ischar(x) || iscell(x) || isstruct(x));
-%    p.addOptional('parameters','',@isstruct);
-    p.addParamValue('combine',logical(false),@islogical);
-    p.parse(filename,varargin{:});
+p.addRequired('filename', @(x)ischar(x) || iscell(x) || isstruct(x));
+p.addParamValue('combine',logical(false),@islogical);
+p.parse(filename,varargin{:});
 
-    if iscell(filename)
-        sort(filename);
+if iscell(filename)
+    sort(filename);
+    if p.Results.combine
+        [content,warnings] = combineFile(filename);
+    else
+        for k=1:length(filename)
+            switch exist(filename{k})
+                case 0
+                    % If name does not exist.
+                    fprintf('%s does not exist...\n',filename{k});
+                case 2
+                    % If name is an M-file on your MATLAB search path.
+                    % It also returns 2 when name is the full pathname
+                    % to a file or the name of an ordinary file on your
+                    % MATLAB search path.
+                    [content{k},warnings{k}] = loadFile(filename{k});
+                otherwise
+                    % If none of the above possibilities match
+                    fprintf('%s could not be loaded...\n',filename{k});
+            end
+        end
+        % Concatenate all the warnings messages
+        warningsArray = cell(0);
+        for k=1:length(warnings)
+            if ~isempty(warnings{k})
+                warningsArray = [ warningsArray warnings{k} ];
+            end
+        end
+        warnings = warningsArray;
+    end
+    if ~nargout && exist('content','var')
+        % If no output argument is given, assign content to a
+        % variable in the workspace with the same name as the
+        % file
         if p.Results.combine
-            [content,warnings] = combineFile(filename);
+            [~, name, ext] = fileparts(filename{1});
+            name = cleanFileName([name ext]);
+            assignin('base',name,content);
+            assignin('base','warnings',warnings);
         else
-            for k=1:length(filename)
-                switch exist(filename{k})
-                    case 0
-                        % If name does not exist.
-                        fprintf('%s does not exist...\n',filename{k});
-                    case 2
-                        % If name is an M-file on your MATLAB search path.
-                        % It also returns 2 when name is the full pathname
-                        % to a file or the name of an ordinary file on your
-                        % MATLAB search path. 
-                        [content{k},warnings{k}] = loadFile(filename{k});
-                    otherwise
-                        % If none of the above possibilities match
-                        fprintf('%s could not be loaded...\n',filename{k});
-                end
-            end
-            % Concatenate all the warnings messages
-            warningsArray = cell(0);
-            for k=1:length(warnings)
-                if ~isempty(warnings{k})
-                    warningsArray = [ warningsArray warnings{k} ];
-                end
-            end
-            warnings = warningsArray;
-        end
-        if ~nargout && exist('content','var')
-            % If no output argument is given, assign content to a
-            % variable in the workspace with the same name as the
-            % file
-            if p.Results.combine
-                [~, name, ext] = fileparts(filename{1});
+            for k=1:length(content)
+                [~, name, ext] = fileparts(...
+                    content{k}.file.name);
                 name = cleanFileName([name ext]);
-                assignin('base',name,content);
+                assignin('base',name,content{k});
                 assignin('base','warnings',warnings);
-            else
-                for k=1:length(content)
-                    [~, name, ext] = fileparts(...
-                        content{k}.file.name);
-                    name = cleanFileName([name ext]);
-                    assignin('base',name,content{k});
-                    assignin('base','warnings',warnings);
-                end
-            end
-        elseif exist('content','var')
-            varargout{1} = content;
-            varargout{2} = warnings;
-        else
-            varargout{1} = 0;
-            varargout{2} = [];
-        end
-    elseif isstruct(filename) && isfield(filename,'name')
-        % That might be the case if the user uses "dir" as input for the
-        % filenames, as this returns a structure with fields as "name"
-        % Convert struct to cell
-        filenames = cell(length(filename),1);
-        l = 1;
-        for k = 1:length(filename)
-            if ~strcmp(filename(k).name,'.') && ~strcmp(filename(k).name,'..')
-                filenames{l} = filename(k).name;
-                l=l+1;
             end
         end
+    elseif exist('content','var')
+        varargout{1} = content;
+        varargout{2} = warnings;
+    else
+        varargout{1} = 0;
+        varargout{2} = [];
+    end
+elseif isstruct(filename) && isfield(filename,'name')
+    % That might be the case if the user uses "dir" as input for the
+    % filenames, as this returns a structure with fields as "name"
+    % Convert struct to cell
+    filenames = cell(length(filename),1);
+    l = 1;
+    for k = 1:length(filename)
+        if ~strcmp(filename(k).name,'.') && ~strcmp(filename(k).name,'..')
+            filenames{l} = filename(k).name;
+            l=l+1;
+        end
+    end
+    if p.Results.combine
+        [content,warnings] = combineFile(filenames);
+    else
+        for k=1:length(filenames)
+            switch exist(filenames{k})
+                case 0
+                    % If name does not exist.
+                    fprintf('%s does not exist...\n',filenames{k});
+                case 2
+                    % If name is an M-file on your MATLAB search path.
+                    % It also returns 2 when name is the full pathname
+                    % to a file or the name of an ordinary file on your
+                    % MATLAB search path.
+                    [content{k},warnings{k}] = loadFile(filenames{k});
+                otherwise
+                    % If none of the above possibilities match
+                    fprintf('%s could not be loaded...\n',filenames{k});
+            end
+        end
+        % Concatenate all the warnings messages
+        warningsArray = cell(0);
+        for k=1:length(warnings)
+            if ~isempty(warnings{k})
+                warningsArray = [ warningsArray warnings{k} ];
+            end
+        end
+        warnings = warningsArray;
+    end
+    if ~nargout && exist('content','var')
+        % If no output argument is given, assign content to a
+        % variable in the workspace with the same name as the
+        % file
         if p.Results.combine
-            [content,warnings] = combineFile(filenames);
+            [~, name, ext] = fileparts(filenames{1});
+            name = cleanFileName([name ext]);
+            assignin('base',name,content);
+            assignin('base','warnings',warnings);
         else
-            for k=1:length(filenames)
-                switch exist(filenames{k})
-                    case 0
-                        % If name does not exist.
-                        fprintf('%s does not exist...\n',filenames{k});
-                    case 2
-                        % If name is an M-file on your MATLAB search path.
-                        % It also returns 2 when name is the full pathname
-                        % to a file or the name of an ordinary file on your
-                        % MATLAB search path. 
-                        [content{k},warnings{k}] = loadFile(filenames{k});
-                    otherwise
-                        % If none of the above possibilities match
-                        fprintf('%s could not be loaded...\n',filenames{k});
-                end
-            end
-            % Concatenate all the warnings messages
-            warningsArray = cell(0);
-            for k=1:length(warnings)
-                if ~isempty(warnings{k})
-                    warningsArray = [ warningsArray warnings{k} ];
-                end
-            end
-            warnings = warningsArray;
-        end
-        if ~nargout && exist('content','var')
-            % If no output argument is given, assign content to a
-            % variable in the workspace with the same name as the
-            % file
-            if p.Results.combine
-                [~, name, ext] = fileparts(filenames{1});
+            for k=1:length(content)
+                [~, name, ext] = fileparts(...
+                    content{k}.file.name);
                 name = cleanFileName([name ext]);
-                assignin('base',name,content);
+                assignin('base',name,content{k});
                 assignin('base','warnings',warnings);
-            else
-                for k=1:length(content)
-                    [~, name, ext] = fileparts(...
-                        content{k}.file.name);
-                    name = cleanFileName([name ext]);
-                    assignin('base',name,content{k});
-                    assignin('base','warnings',warnings);
-                end
             end
-        elseif exist('content','var')
-            varargout{1} = content;
-            varargout{2} = warnings;
-        else
-            varargout{1} = 0;
-            varargout{2} = [];
         end
-    else    % -> if iscell(filename)
-        switch exist(filename)
-            case 0
-                % Check whether it is only a file basename
-                if isempty(dir(sprintf('%s.*',filename)))
-                    fprintf('%s does not exist...\n',filename);
-                else
-                    % Read all files and combine them
-                    files = dir(sprintf('%s.*',filename));
-                    filenames = cell(1);
-                    for k = 1 : length(files)
-                        filenames{k} = files(k).name;
-                    end
-                    [content,warnings] = combineFile(filenames);
-                    % assign output argument
-                    if ~nargout
-                        % of no output argument is given, assign content to
-                        % a variable in the workspace with the same name as
-                        % the file
-                        [~, name, ext] = fileparts(filename);
-                        name = cleanFileName([name ext]);
-                        assignin('base',name,content);
-                        assignin('base','warnings',warnings);
-                    else
-                        varargout{1} = content;
-                        varargout{2} = warnings;
-                    end
+    elseif exist('content','var')
+        varargout{1} = content;
+        varargout{2} = warnings;
+    else
+        varargout{1} = 0;
+        varargout{2} = [];
+    end
+else    % -> if iscell(filename)
+    switch exist(filename)
+        case 0
+            % Check whether it is only a file basename
+            if isempty(dir(sprintf('%s.*',filename)))
+                fprintf('%s does not exist...\n',filename);
+            else
+                % Read all files and combine them
+                files = dir(sprintf('%s.*',filename));
+                filenames = cell(1);
+                for k = 1 : length(files)
+                    filenames{k} = files(k).name;
                 end
-            case 2
-                % If name is an M-file on your MATLAB search path. It also
-                % returns 2 when name is the full pathname to a file or the
-                % name of an ordinary file on your MATLAB search path.
-                [content,warnings] = loadFile(filename);
+                [content,warnings] = combineFile(filenames);
                 % assign output argument
                 if ~nargout
-                    % of no output argument is given, assign content to a
-                    % variable in the workspace with the same name as the
-                    % file
+                    % of no output argument is given, assign content to
+                    % a variable in the workspace with the same name as
+                    % the file
                     [~, name, ext] = fileparts(filename);
                     name = cleanFileName([name ext]);
                     assignin('base',name,content);
@@ -212,41 +192,60 @@ function varargout = trEPRload(filename, varargin)
                     varargout{1} = content;
                     varargout{2} = warnings;
                 end
-            case 7
-                % If name is a directory.
-                [content,warnings] = loadDir(filename,'combine',p.Results.combine);
-                if ~nargout
-                    % of no output argument is given, assign content to a
-                    % variable in the workspace with the same name as the
-                    % file
-                    if iscell(content)
-                        for k=1:length(content)
-                            [~, name, ext] = fileparts(...
-                                content{k}.file.name);
-                            name = cleanFileName([name ext]);
-                            assignin('base',name,content{k});
-                        end
-                    else
-                        [~, name, ext] = fileparts(filename);
+            end
+        case 2
+            % If name is an M-file on your MATLAB search path. It also
+            % returns 2 when name is the full pathname to a file or the
+            % name of an ordinary file on your MATLAB search path.
+            [content,warnings] = loadFile(filename);
+            % assign output argument
+            if ~nargout
+                % of no output argument is given, assign content to a
+                % variable in the workspace with the same name as the
+                % file
+                [~, name, ext] = fileparts(filename);
+                name = cleanFileName([name ext]);
+                assignin('base',name,content);
+                assignin('base','warnings',warnings);
+            else
+                varargout{1} = content;
+                varargout{2} = warnings;
+            end
+        case 7
+            % If name is a directory.
+            [content,warnings] = loadDir(filename,'combine',p.Results.combine);
+            if ~nargout
+                % of no output argument is given, assign content to a
+                % variable in the workspace with the same name as the
+                % file
+                if iscell(content)
+                    for k=1:length(content)
+                        [~, name, ext] = fileparts(...
+                            content{k}.file.name);
                         name = cleanFileName([name ext]);
-                        assignin('base',name,content);
-                        assignin('base','warnings',warnings);
+                        assignin('base',name,content{k});
                     end
                 else
-                    varargout{1} = content;
-                    varargout{2} = warnings;
+                    [~, name, ext] = fileparts(filename);
+                    name = cleanFileName([name ext]);
+                    assignin('base',name,content);
+                    assignin('base','warnings',warnings);
                 end
-            otherwise
-                % If none of the above possibilities match
-                fprintf('%s could not be loaded...\n',filename);
-        end
+            else
+                varargout{1} = content;
+                varargout{2} = warnings;
+            end
+        otherwise
+            % If none of the above possibilities match
+            fprintf('%s could not be loaded...\n',filename);
     end
-    
-    if ~exist('content','var') && nargout
-        varargout{1} = 0;
-        varargout{2} = [];
-    end
-    
+end
+
+if ~exist('content','var') && nargout
+    varargout{1} = 0;
+    varargout{2} = [];
+end
+
 end
 
 % --- load file and return struct with the content of the file together
