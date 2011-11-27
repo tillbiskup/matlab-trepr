@@ -145,7 +145,7 @@ uicontrol('Tag','processing_panel_average_type_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[55 95 handle_size(3)-80 20],...
-    'String','simple_filter',...
+    'String','boxcar',...
     'TooltipString','Choose filter type for smoothing'...
     );
 uicontrol('Tag','processing_panel_average_points_text',...
@@ -371,7 +371,7 @@ function average_x_points_Callback(source,~)
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-            filterType;
+            sprintf('trEPRfilter_%s',filterType);
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -455,7 +455,7 @@ function average_x_unit_Callback(source,~)
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.x.filterfun = ...
-            filterType;
+            sprintf('trEPRfilter_%s',filterType);
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -521,7 +521,7 @@ function average_y_points_Callback(source,~)
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
-            filterType;
+            sprintf('trEPRfilter_%s',filterType);
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -605,7 +605,7 @@ function average_y_unit_Callback(source,~)
         filterTypes = cellstr(get(gh.processing_panel_average_type_popupmenu,'String'));
         filterType = filterTypes{get(gh.processing_panel_average_type_popupmenu,'Value')};
         ad.data{ad.control.spectra.active}.display.smoothing.y.filterfun = ...
-            filterType;
+            sprintf('trEPRfilter_%s',filterType);
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
