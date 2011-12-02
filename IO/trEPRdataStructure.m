@@ -5,7 +5,7 @@ function varargout = trEPRdataStructure(varargin)
 % Usage
 %   structure = trEPRdataStructure;
 %   structure = trEPRdataStructure(<command>)
-%   [missingFields,wrongType] = trEPRfsc2MetaLoad(<command>,structure)
+%   [missingFields,wrongType] = trEPRdataStructure(<command>,structure)
 %
 %   <command> - string 
 %               one of 'structure', 'model' or 'check'
