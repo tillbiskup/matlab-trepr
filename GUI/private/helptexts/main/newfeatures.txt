@@ -8,6 +8,8 @@ Basically, the complete toolbox got reimplemented for version 0.3, and the GUI r
 
 An incomplete list of changes within v. 0.3.0 (currently RC1) as of early November 2011, in decreasing order of their implementation date:
 
+* Help in MATLAB(r) Help Browser
+
 * Combine GUI (for combining datasets consisting of multiple files)
 
 * AVG GUI
