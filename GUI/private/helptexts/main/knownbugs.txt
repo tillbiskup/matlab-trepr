@@ -4,18 +4,11 @@ A LIST OF KNOWN BUGS
 There is a list of bugs and flaws the author of the GUI is aware of but has for some reason or other not fixed yet.
 
 
-GENERAL
-
-Close without save
-
-You can simply close the GUI window, even if there are modified spectra. So currently it is completely within your responsibility to make sure you have saved everything before closing the GUI.
-
-
 DATASETS PANEL
 
-"Undo" & "Get info"
+"Undo"
 
-These two functions are not implemented yet.
+This functions is not implemented yet.
 
 
 MEASURE
@@ -25,28 +18,14 @@ Not quite sure whether it works absolutely correct in case of zooming or other "
 
 DISPLAY
 
--= pages 4-6 =-
+-= page 6 =-
 
-Most functions are not implemented yet, with the notable exception of "Export figure" function that exports (saves) the current display to figure files (Matlab FIG, EPS, PDF, or PNG format).
-
-
-PROCESSING
-
-"Baseline"
-
-The baseline correction (BLC) is not implemented yet. A preview of a very preliminary version of its GUI window can bee seen using the shortcut "F3". 
+g-axis functions have not been implemented yet.
 
 
 ANALYSIS
 
 No functions yet. Sorry...
-
-
-HELP
-
-"Manual"
-
-The "Manual" button most probably shows either something completely unrelated or hopelessly outdated. In worst case it crashes.
 
 
 

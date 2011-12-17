@@ -30,7 +30,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRLOAD.
 
 % (c) 2011, Till Biskup
-% 2011-11-01
+% 2011-12-09
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -164,8 +164,10 @@ dataStructure.file = struct(...
     'format','' ...
     );
 dataStructure.label = '';
-dataStructure.version = '1.1';
-
+dataStructure.format = struct(...
+    'name','trEPR toolbox', ...
+    'version','1.1' ...
+    );
 
 % Create trEPR toolbox data model (structure with field types as values)
 dataModel = struct();
@@ -294,7 +296,10 @@ dataModel.file = struct(...
     'format','ischar' ...
     );
 dataModel.label = 'ischar';
-dataModel.version = 'ischar';
+dataModel.format = struct(...
+    'name','ischar', ...
+    'version','ischar' ...
+    );
 
 if nargin && ischar(varargin{1})
     switch lower(varargin{1})

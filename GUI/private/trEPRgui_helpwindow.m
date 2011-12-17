@@ -1,10 +1,12 @@
 function varargout = trEPRgui_helpwindow(varargin)
-% TREPRGUI_HELPWINDOW Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_HELPWINDOW Help window for the trEPR GUI.
+%
+% This window provides the user with "online" help included into the GUI.
+% Besides that, it gives access to all the other sources of additional
+% help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011, Till Biskup
-% 2011-09-02
+% 2011-12-09
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -62,11 +64,15 @@ hpm = uicontrol('Tag','helptopic_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'pos',[120 guiSize(2)-70 guiSize(1)-130 20],...
-    'String',sprintf('%s%s',...
-    'Welcome|New features|Key bindings|',...
+    'String',[...
+    '--- General Topics ---|',...
+    'Welcome|Why this GUI?|Key concepts|New features|'...
+    'Key bindings|Known bugs|Report a bug|Other resources|Disclaimer|',...
+    '--- Help for Panels ---|',...
     'Load panel|Datasets panel|Slider panel|',...
     'Measure panel|Display panel|Processing panel|',...
-    'Analysis panel|Help panel'),...
+    'Analysis panel|Help panel'],...
+    'Value',2,...
     'KeyPressFcn',@keypress_Callback,...
     'Callback',@helptext_popupmenu_Callback...
     );
@@ -154,7 +160,7 @@ try
     mainWindow = guiGetWindowHandle;
     mgh = guihandles(mainWindow);
     if get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')
-        helpTopicOffset = 3;
+        helpTopicOffset = 11;
         switch get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')
             case 'tbLoad'
                 helpText = 'Load panel';
@@ -212,13 +218,12 @@ end
 
 function helptext_popupmenu_Callback(source,~)
     try
-        % Get handles of main window
-        gh = guihandles(hMainFigure);
-        
         helpTexts = cellstr(get(source,'String'));
         helpText = helpTexts{get(source,'Value')};
-        
-        helptext_selector(helpText);
+
+        if ~strncmp(helpText,'---',3)
+            helptext_selector(helpText);
+        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -238,7 +243,7 @@ function helptext_popupmenu_Callback(source,~)
     end
 end
 
-function keypress_Callback(src,evt)
+function keypress_Callback(~,evt)
     try
         if isempty(evt.Character) && isempty(evt.Key)
             % In case "Character" is the empty string, i.e. only modifier key
@@ -301,6 +306,42 @@ function helptext_selector(helpText)
                 % Read text from file and display it
                 helpTextFile = fullfile(...
                     trEPRinfo('dir'),'GUI','private','helptexts','main','keybindings.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Why this GUI?'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','whygui.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Key concepts'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','keyconcepts.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Known bugs'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','knownbugs.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Report a bug' 
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','bugreport.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Other resources'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','resources.txt');
+                helpText = textFileRead(helpTextFile);
+                set(textdisplay,'String',helpText);
+            case 'Disclaimer'
+                % Read text from file and display it
+                helpTextFile = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','disclaimer.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             case 'Load panel'
