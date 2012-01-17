@@ -2931,6 +2931,10 @@ function pushbutton_Callback(~,~,action)
                 % Update dataset display
                 updateDatasets();
             case 'Revert'
+                % If there is no active spectrum, silently return
+                if ~ad.control.spectra.active
+                    return;
+                end
                 % If there are no changes made to the currently active
                 % dataset, silently return
                 if ~find(ad.control.spectra.modified==ad.control.spectra.active)
