@@ -1266,7 +1266,7 @@ uicontrol('Tag','display_panel_gaxis_description',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Read configuration for export formats (geometries) from ini file
-exportFormatsConfigFile = fullfile(TAinfo('dir'),'figure','fig2file.ini');
+exportFormatsConfigFile = fullfile(trEPRinfo('dir'),'figure','fig2file.ini');
 exportFormats = iniFileRead(exportFormatsConfigFile);
 % Set export formats (geometries)
 set(hAxesExportFormat,'String',fieldnames(exportFormats));
