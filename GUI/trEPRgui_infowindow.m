@@ -3063,10 +3063,10 @@ function keypress_Callback(src,evt)
                         switchPanel('Parameters');
                         return;
                     case '3'
-                        switchPanel('Display');
+                        switchPanel('History');
                         return;
                     case '4'
-                        switchPanel('History');
+                        switchPanel('Tools');
                         return;
                 end
             end
