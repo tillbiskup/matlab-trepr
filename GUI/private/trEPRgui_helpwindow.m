@@ -5,8 +5,8 @@ function varargout = trEPRgui_helpwindow(varargin)
 % Besides that, it gives access to all the other sources of additional
 % help, such as the Matlab Help Browser and the toolbox website.
 
-% (c) 2011, Till Biskup
-% 2011-12-09
+% (c) 2011-12, Till Biskup
+% 2012-01-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -183,8 +183,8 @@ try
             case 'tbAnalysis'
                 helpText = 'Analysis panel';
                 set(hpm,'Value',helpTopicOffset+7);
-            case 'tbHelp'
-                helpText = 'Help panel';
+            case 'tbConfigure'
+                helpText = 'Configure panel';
                 set(hpm,'Value',helpTopicOffset+8);
             otherwise
                 % That shall never happen
@@ -386,10 +386,10 @@ function helptext_selector(helpText)
                     trEPRinfo('dir'),'GUI','private','helptexts','main','analysis_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
-            case 'Help panel'
+            case 'Configure panel'
                 % Read text from file and display it
                 helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','help_panel.txt');
+                    trEPRinfo('dir'),'GUI','private','helptexts','main','configure_panel.txt');
                 helpText = textFileRead(helpTextFile);
                 set(textdisplay,'String',helpText);
             otherwise
