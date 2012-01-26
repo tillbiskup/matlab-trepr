@@ -1,11 +1,11 @@
-function [ data, warnings ] = iniFileRead ( fileName, varargin )
-% INIFILEREAD Read a Windows-style ini file and return them as MATLAB(r)
-% struct structure. 
+function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
+% TREPRINIFILEREAD Read a Windows-style ini file and return them as
+% MATLAB(r) struct structure. 
 %
 % Usage
-%   data = iniFileRead(filename)
-%   [data,warnings] = iniFileRead(filename)
-%   data = iniFileRead(filename,'<parameter>','<option>')
+%   data = trEPRiniFileRead(filename)
+%   [data,warnings] = trEPRiniFileRead(filename)
+%   data = trEPRiniFileRead(filename,'<parameter>','<option>')
 %
 %   filename - string
 %              Name of the ini file to read
@@ -33,10 +33,10 @@ function [ data, warnings ] = iniFileRead ( fileName, varargin )
 %                    Character used for starting a block
 %                    Default: [
 %
-% See also: iniFileWrite
+% See also: trEPRiniFileWrite
 
-% (c) 2008-11, Till Biskup
-% 2011-12-08
+% (c) 2008-12, Till Biskup
+% 2012-01-26
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -119,10 +119,33 @@ for k=1:length(iniFileContents)
                         blockname,key,oldFieldValue,val);
                 end
             end
-            data.(blockname).(strtrim(names.key)) = strtrim(names.val);
+            %data.(blockname).(strtrim(names.key)) = strtrim(names.val);
+            if ~isfield(data,blockname)
+                data.(blockname) = '';
+            end
+            data.(blockname) = setCascadedField(data.(blockname),...
+                strtrim(names.key),strtrim(names.val));
         end
     end
 end
 
 end % end of main function
 
+% --- Set field of cascaded struct
+function struct = setCascadedField (struct, fieldName, value)
+    % Get number of "." in fieldName
+    nDots = strfind(fieldName,'.');
+    if isempty(nDots)
+        struct.(fieldName) = value;
+    else
+        if ~isfield(struct,fieldName(1:nDots(1)-1))
+            struct.(fieldName(1:nDots(1)-1)) = [];
+        end
+        innerstruct = struct.(fieldName(1:nDots(1)-1));
+        innerstruct = setCascadedField(...
+            innerstruct,...
+            fieldName(nDots(1)+1:end),...
+            value);
+        struct.(fieldName(1:nDots(1)-1)) = innerstruct;
+    end
+end

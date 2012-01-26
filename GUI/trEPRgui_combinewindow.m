@@ -7,8 +7,8 @@ function varargout = trEPRgui_combinewindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011, Till Biskup
-% 2011-11-21
+% (c) 2011-12, Till Biskup
+% 2012-01-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -26,7 +26,7 @@ end
 % In this INI file, all formats that allow to combine datasets have the
 % field 'combineMultiple' set to 'true'
 combinableFormats = cell(0);
-fileFormats = iniFileRead(fullfile(trEPRinfo('dir'),'IO','trEPRload.ini'));
+fileFormats = trEPRiniFileRead(fullfile(trEPRinfo('dir'),'IO','trEPRload.ini'));
 formatNames = fieldnames(fileFormats);
 for k=1:length(formatNames)
     if isfield(fileFormats.(formatNames{k}),'combineMultiple') && ...

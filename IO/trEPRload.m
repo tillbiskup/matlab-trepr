@@ -32,8 +32,8 @@ function varargout = trEPRload(filename, varargin)
 %
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
-% (c) 2009-2011, Till Biskup
-% 2011-11-01
+% (c) 2009-2012, Till Biskup
+% 2012-01-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -254,7 +254,7 @@ function [content,warnings] = loadFile(filename)
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
-    fileFormats = iniFileRead([mfilename('fullpath') '.ini']);
+    fileFormats = trEPRiniFileRead([mfilename('fullpath') '.ini']);
     
     % read file formats into cell array
     fileFormatNames = fieldnames(fileFormats);
@@ -445,7 +445,7 @@ function [content,warnings] = combineFile(filename)
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
-    fileFormats = iniFileRead([mfilename('fullpath') '.ini']);
+    fileFormats = trEPRiniFileRead([mfilename('fullpath') '.ini']);
       
     % read file formats into cell array
     asciiFileFormats = fieldnames(fileFormats);

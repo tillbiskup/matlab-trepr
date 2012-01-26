@@ -55,7 +55,7 @@ exportFormat = p.Results.exportFormat;
 try
     % Read configuration for export formats (geometries) from ini file
     exportFormatsConfigFile = [mfilename('full') '.ini'];
-    exportFormats = iniFileRead(exportFormatsConfigFile);
+    exportFormats = trEPRiniFileRead(exportFormatsConfigFile);
 
     % Set export format only in case of not having "fig" as fileType
     if ~strcmpi(fileType,'fig')

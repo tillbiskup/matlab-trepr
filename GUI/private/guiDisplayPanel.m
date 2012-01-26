@@ -7,7 +7,8 @@ function handle = guiDisplayPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-01-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1267,7 +1268,7 @@ uicontrol('Tag','display_panel_gaxis_description',...
 
 % Read configuration for export formats (geometries) from ini file
 exportFormatsConfigFile = fullfile(trEPRinfo('dir'),'figure','fig2file.ini');
-exportFormats = iniFileRead(exportFormatsConfigFile);
+exportFormats = trEPRiniFileRead(exportFormatsConfigFile);
 % Set export formats (geometries)
 set(hAxesExportFormat,'String',fieldnames(exportFormats));
 set(h3DExportFormat,'String',fieldnames(exportFormats));
