@@ -1,7 +1,7 @@
 
 Welcome to the new GUI of the trEPR toolbox.
 
-NOTE: This message will disappear once you press one of the above buttons. You can find it again in the help panel via the "Help" button above.
+NOTE: This message will disappear once you press one of the above buttons. You can find it again in the help: Press "F1" or either the "Help" button in the bottom left of this GUI window or the button with the blue "?" in the bottom right below the axes.
 
 
 HOW TO USE THE GUI?

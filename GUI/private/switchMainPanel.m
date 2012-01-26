@@ -7,6 +7,9 @@ function status = switchMainPanel(panelName)
 %
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
+% (c) 2011-12, Till Biskup
+% 2012-01-26
+
 try
     % Get handles of main window
     mainWindow = guiGetWindowHandle;
@@ -22,7 +25,7 @@ try
         gh.processing_panel ...
         gh.analysis_panel ...
         gh.reserve_panel ...
-        gh.help_panel ...
+        gh.configure_panel ...
         ];
     buttons = [...
         gh.tbLoad ...
@@ -33,7 +36,7 @@ try
         gh.tbProcessing ...
         gh.tbAnalysis ...
         gh.tbReserve1 ...
-        gh.tbHelp ...
+        gh.tbConfigure ...
         ];
     
     switch panelName
@@ -84,11 +87,11 @@ try
             set(buttons,'Value',0);
             set(gh.analysis_panel,'Visible','on');
             set(gh.tbAnalysis,'Value',1);
-        case 'Help'
+        case 'Configure'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
-            set(gh.help_panel,'Visible','on');
-            set(gh.tbHelp,'Value',1);
+            set(gh.configure_panel,'Visible','on');
+            set(gh.tbConfigure,'Value',1);
     end
     
     status = 0;
