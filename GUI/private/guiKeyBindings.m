@@ -123,13 +123,13 @@ try
             trEPRgui_infowindow();
             return;
         case 'f4'
-            trEPRgui_BLCwindow();
-            return;
-        case 'f5'
             trEPRgui_ACCwindow();
             return;
-        case 'f6'
+        case 'f5'
             trEPRgui_AVGwindow();
+            return;
+        case 'f6'
+            trEPRgui_BLCwindow();
             return;
         case 'f10'
             trEPRgui_statuswindow();

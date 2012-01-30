@@ -26,9 +26,11 @@ F2  - "Help:About" window
 
 F3  - Informations about currently active dataset
 
-F4  - Baseline correction
+F4  - Accumulation (ACC)
 
-F5  - Accumulation
+F5  - Average (AVG)
+
+F6  - Baseline correction (BLC)
 
 F10 - "Status" window
 
