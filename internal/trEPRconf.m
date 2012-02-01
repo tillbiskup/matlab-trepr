@@ -36,7 +36,7 @@ function varargout = trEPRconf(action,varargin)
 %               "<basename>.ini.dist").
 
 % (c) 2011-12, Till Biskup
-% 2012-01-26
+% 2012-02-01
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -80,7 +80,8 @@ try
                     % create it by copying from the "ini.dist" file.
                     if ~exist(confDistFiles(k).name(1:end-5),'file') ...
                             || p.Results.overwrite
-                        conf = trEPRiniFileRead(confDistFiles(k).name);
+                        conf = trEPRiniFileRead(confDistFiles(k).name,...
+                            'typeConversion',true);
                         header = 'Configuration file for trEPR toolbox';
                         trEPRiniFileWrite(confDistFiles(k).name(1:end-5),...
                             conf,'header',header,'overwrite',true);

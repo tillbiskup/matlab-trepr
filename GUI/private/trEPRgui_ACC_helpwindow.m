@@ -1,7 +1,12 @@
 function varargout = trEPRgui_ACC_helpwindow(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% trEPRGUI_ACC_HELPWINDOW Help window for the ACC GUI.
+%
+% Normally, this window is called from within the trEPRgui_ACCwindow window.
+%
+% See also trEPRGUI_ACCWINDOW
+
+% (c) 2011-12, Till Biskup
+% 2012-02-01
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -57,23 +62,42 @@ uicontrol('Tag','helptopic_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'pos',[120 guiSize(2)-70 guiSize(1)-130 20],...
-    'String','Introduction|Datasets|Settings|Results|Report|Key bindings',...
+    'String','Introduction|Datasets|Accumulate|Settings|Report|Key bindings',...
     'KeyPressFcn',@keypress_Callback,...
     'Callback',@helptext_popupmenu_Callback...
     );
 
 % Create the message window
-textdisplay = uicontrol('Tag','status_text',...
-    'Style','edit',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',[1 1 1],...
-    'FontUnit','Pixel','Fontsize',12,...
+% NEW: Use a Java Browser object to display HTML
+jObject = com.mathworks.mlwidgets.html.HTMLBrowserPanel;
+[browser,container] = javacomponent(jObject, [], hMainFigure);
+set(container,...
     'Units','Pixels',...
-    'HorizontalAlignment','Left',...
-    'Position',[10 50 guiSize(1)-20 guiSize(2)-135],...
-    'Enable','inactive',...
-    'Max',2,'Min',0,...
-    'String','');
+    'Position',[10 50 guiSize(1)-20 guiSize(2)-135]...
+    );
+
+uicontrol('Tag','back_pushbutton',...
+    'Style','pushbutton',...
+	'Parent', hMainFigure, ...
+    'BackgroundColor',defaultBackground,...
+    'FontUnit','Pixel','Fontsize',12,...
+    'String','<html>&larr;</html>',...
+    'TooltipString','Go to previous page in browser history',...
+    'pos',[10 10 40 30],...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'browserback'} ...
+    );
+uicontrol('Tag','back_pushbutton',...
+    'Style','pushbutton',...
+	'Parent', hMainFigure, ...
+    'BackgroundColor',defaultBackground,...
+    'FontUnit','Pixel','Fontsize',12,...
+    'String','<html>&rarr;</html>',...
+    'TooltipString','Go to next page in browser history',...
+    'pos',[50 10 40 30],...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'browserforward'} ...
+    );
 
 uicontrol('Tag','close_pushbutton',...
     'Style','pushbutton',...
@@ -84,7 +108,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Close ACC GUI Help window',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
-    'Callback',{@delete,hMainFigure}...
+    'Callback',{@closeGUI}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -103,9 +127,9 @@ try
         varargout{1} = hMainFigure;
     end
     % Read text for welcome message from file and display it
-    helpTextFile = fullfile(trEPRinfo('dir'),'GUI','private','helptexts','ACC','intro.txt');
-    helpText = textFileRead(helpTextFile);
-    set(textdisplay,'String',helpText);
+    helpTextFile = fullfile(...
+        trEPRinfo('dir'),'GUI','private','helptexts','ACC','intro.html');
+    browser.setCurrentLocation(helpTextFile);
 catch exception
     try
         msgStr = ['An exception occurred. '...
@@ -139,40 +163,34 @@ function helptext_popupmenu_Callback(source,~)
         switch helpText
             case 'Introduction'
                 % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','intro.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','intro.html');
+                browser.setCurrentLocation(helpTextFile);
             case 'Datasets'
                 % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','datasets.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','datasets.html');
+                browser.setCurrentLocation(helpTextFile);
+            case 'Accumulate'
+                % Read text from file and display it
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','accumulate.html');
+                browser.setCurrentLocation(helpTextFile);
             case 'Settings'
                 % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','settings.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Results'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','results.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','settings.html');
+                browser.setCurrentLocation(helpTextFile);
             case 'Report'
                 % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','report.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','report.html');
+                browser.setCurrentLocation(helpTextFile);
             case 'Key bindings'
                 % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','ACC','keybindings.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
+                helpTextFile = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','helptexts','ACC','keybindings.html');
+                browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
                 add2status('guiHelpPanel(): Unknown helptext');
@@ -197,11 +215,41 @@ function helptext_popupmenu_Callback(source,~)
     end
 end
 
+function pushbutton_Callback(~,~,action)
+    try
+        if isempty(action)
+            return;
+        end
+        switch action
+            case 'browserback'
+                browser.executeScript('javascript:history.back()');
+            case 'browserforward'
+                browser.executeScript('javascript:history.forward()');
+        end
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
 function keypress_Callback(src,evt)
     try
         if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier key
-            % was pressed...
+            % In case "Character" is the empty string, i.e. only modifier
+            % key was pressed...
             return;
         end
         if ~isempty(evt.Modifier)
@@ -209,7 +257,7 @@ function keypress_Callback(src,evt)
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
-                        delete(hMainFigure);
+                        closeGUI();
                         return;
                 end
             end
@@ -236,5 +284,28 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function closeGUI(~,~)
+    try
+        clear('jObject');
+        delete(hMainFigure);
+    catch exception
+        try
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
 
 end

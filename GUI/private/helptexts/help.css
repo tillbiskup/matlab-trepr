@@ -1,0 +1,50 @@
+/* Define general styles */
+html {
+	line-height:1.4em;
+}
+/* Define single elements */
+h1 {
+	font-size:160%;
+	background:#eee;
+	padding:5px 10px;
+	border-bottom:1px solid #ccc;
+	}
+h2 {
+	font-size:140%;
+	border-bottom:1px solid #ccc;
+	margin-top:1.5em;
+	}
+h3 {
+	font-size:120%;
+	border-bottom:1px solid #ccc;
+	margin-top:1.5em;
+	}
+h4 {
+	font-size:100%;
+	border-bottom:1px solid #ccc;
+	margin-top:1.5em;
+	}
+dt {font-weight:bold}
+key {
+	border:1px solid #ccc;
+	border-style:outset;
+	padding:2px 2px 0px 2px;
+	background:#eee;
+	}
+/* Define classes */
+.intro {
+	font-style:italic;
+	}
+a.fnmark {
+	font-size:small;
+	vertical-align:top;
+	text-decoration:none;
+	}
+.footnotes {
+	margin-top:2em;
+	padding-top:1em;
+	border-top:1px solid #ccc;
+	}
+.hurry {
+	background:#ffd;
+	}

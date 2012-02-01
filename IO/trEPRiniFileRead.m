@@ -33,10 +33,13 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %                    Character used for starting a block
 %                    Default: [
 %
+%   typeConversion - boolean
+%                    Whether or not to perform a type conversion str2num
+%
 % See also: trEPRiniFileWrite
 
 % (c) 2008-12, Till Biskup
-% 2012-01-26
+% 2012-02-01
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -53,6 +56,7 @@ p.addRequired('fileName', @(x)ischar(x));
 p.addParamValue('commentChar','%',@ischar);
 p.addParamValue('assignmentChar','=',@ischar);
 p.addParamValue('blockStartChar','[',@ischar);
+p.addParamValue('typeConversion',false,@islogical);
 % Parse input arguments
 p.parse(fileName,varargin{:});
 
@@ -60,6 +64,7 @@ p.parse(fileName,varargin{:});
 commentChar = p.Results.commentChar;
 assignmentChar = p.Results.assignmentChar;
 blockStartChar = p.Results.blockStartChar;
+typeConversion = p.Results.typeConversion;
 
 if isempty(fileName)
     warnings = 'No filename';
@@ -124,7 +129,7 @@ for k=1:length(iniFileContents)
                 data.(blockname) = '';
             end
             data.(blockname) = setCascadedField(data.(blockname),...
-                strtrim(names.key),strtrim(names.val));
+                strtrim(names.key),strtrim(names.val),typeConversion);
         end
     end
 end
@@ -132,11 +137,15 @@ end
 end % end of main function
 
 % --- Set field of cascaded struct
-function struct = setCascadedField (struct, fieldName, value)
+function struct = setCascadedField(struct,fieldName,value,typeConversion)
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
     if isempty(nDots)
-        struct.(fieldName) = value;
+        if isempty(str2num(value)) || ~typeConversion
+            struct.(fieldName) = value;
+        else
+            struct.(fieldName) = str2num(value);
+        end
     else
         if ~isfield(struct,fieldName(1:nDots(1)-1))
             struct.(fieldName(1:nDots(1)-1)) = [];
@@ -145,7 +154,7 @@ function struct = setCascadedField (struct, fieldName, value)
         innerstruct = setCascadedField(...
             innerstruct,...
             fieldName(nDots(1)+1:end),...
-            value);
+            value,typeConversion);
         struct.(fieldName(1:nDots(1)-1)) = innerstruct;
     end
 end

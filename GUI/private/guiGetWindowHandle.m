@@ -20,6 +20,9 @@ function handle = guiGetWindowHandle(varargin)
 %
 % If no handle could be found, an empty cell array will be returned.
 
+% (c) 2011-12, Till Biskup
+% 2012-02-01
+
 try
     % Check whether we are called with input argument
     if nargin && ischar(varargin{1})
@@ -30,7 +33,7 @@ try
     
     windowTags = struct();
     windowTags.trEPRgui = 'trepr_gui_mainwindow';
-    windowTags.trEPRgui_ACC = 'trepr_gui_ACCwindow';
+    windowTags.trEPRgui_ACCwindow = 'trEPRgui_ACCwindow';
     windowTags.trEPRgui_ACC_helpwindow = 'trEPRgui_ACC_helpwindow';
     windowTags.trEPRgui_BLCwindow = 'trepr_gui_BLCwindow';
     windowTags.trEPRgui_BLC_helpwindow = 'trEPRgui_BLC_helpwindow';
