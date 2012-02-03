@@ -11,8 +11,8 @@ function [status,message] = saveAsDatasetInMainGUI(id,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011, Till Biskup
-% 2011-11-27
+% (c) 2011-12, Till Biskup
+% 2012-02-03
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -128,7 +128,9 @@ try
             sprintf('Problems when trying to save "%s" to file',...
             ad.data{id}.label);
         msgStr{length(msgStr)+1} = ad.data{id}.file.name;
+        msgStr = [ msgStr saveStatus ];
         status = add2status(msgStr);
+        warndlg(msgStr,'Problems saving file','modal');
         clear msgStr;
         return;
     else
@@ -159,6 +161,7 @@ try
     update_processingPanel();
     update_mainAxis();
     
+    msgbox(msg,'Successful saving of file','help'); 
     status = 0;
     
 catch exception

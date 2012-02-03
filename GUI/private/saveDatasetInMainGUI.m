@@ -113,6 +113,7 @@ try
             ad.data{id}.label);
         msgStr{length(msgStr)+1} = ad.data{id}.file.name;
         status = add2status(msgStr);
+        warndlg(msgStr,'Problems saving file','modal');
         clear msgStr;
         status = -1;
         return;
@@ -143,6 +144,7 @@ try
     update_processingPanel();
     update_mainAxis();
     
+    msgbox(msg,'Successful saving of file','help'); 
     status = 0;
     
 catch exception
