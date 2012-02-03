@@ -11,8 +11,8 @@ function [status,message] = saveDatasetInMainGUI(id,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011, Till Biskup
-% 2011-11-27
+% (c) 2011-12, Till Biskup
+% 2012-02-03
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -43,7 +43,7 @@ try
     % Check whether selected dataset has a (valid) filename
     if ~isfield(ad.data{id}.file,'name') || ...
             (strcmp(ad.data{id}.file.name,''))
-        status = datasetSaveAs(id);
+        status = saveAsDatasetInMainGUI(id);
         return;
     else
         [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
@@ -90,7 +90,7 @@ try
                 'Cancel');
             switch answer
                 case 'Save as'
-                    status = datasetSaveAs(id);
+                    status = saveAsDatasetInMainGUI(id);
                     return;
                 case 'Cancel'
                     return;
