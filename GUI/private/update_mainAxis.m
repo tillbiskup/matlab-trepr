@@ -8,6 +8,9 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
+% (c) 2011-12, Till Biskup
+% 2012-02-06
+
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
@@ -435,7 +438,8 @@ end
 
 legendLabels = cell(1,length(ad.control.spectra.visible));
 for k = 1 : length(ad.control.spectra.visible)
-    legendLabels{k} = strrep(ad.data{k}.label,'_','\_');
+    legendLabels{k} = strrep(...
+        ad.data{ad.control.spectra.visible(k)}.label,'_','\_');
 end
 
 legend(mainAxes,legendLabels,'Location',ad.control.axis.legend.location);
