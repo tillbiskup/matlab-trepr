@@ -21,8 +21,8 @@
 %              Otherwise it contains an error description
 %
 
-% (c) 2011, Till Biskup
-% 2011-09-03
+% (c) 2011-12, Till Biskup
+% 2012-02-13
 
 function status = trEPRexport1D(data,fileName,parameters)
 
@@ -109,7 +109,7 @@ try
             end
         case 'y'
             % Check whether position parameter is within dataset dimensions
-            if parameters.crosssection.position > dimy
+            if parameters.crosssection.position > dimx
                 status = sprintf('%s %s',...
                     'Cross section position parameter exceeds ',...
                     'dimensions of dataset');
