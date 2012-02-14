@@ -33,12 +33,6 @@ try
         return;
     end
     
-    % Check whether data are 2D
-    if min(size(data.data)) < 2
-        status = 'Data are (most probably) not 2D';
-        return;
-    end
-    
     % Check whether we have a file name
     if isempty(fileName) || ~ischar(fileName)
         status = 'No valid file name';
