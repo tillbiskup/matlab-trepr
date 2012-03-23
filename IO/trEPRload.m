@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2012, Till Biskup
-% 2012-01-26
+% 2012-03-23
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -50,8 +50,10 @@ if iscell(filename)
     if p.Results.combine
         [content,warnings] = combineFile(filename);
     else
+        content = cell(length(filename),1);
+        warnings = cell(length(filename),1);
         for k=1:length(filename)
-            switch exist(filename{k})
+            switch exist(filename{k}) %#ok<*EXIST>
                 case 0
                     % If name does not exist.
                     fprintf('%s does not exist...\n',filename{k});
@@ -70,7 +72,7 @@ if iscell(filename)
         warningsArray = cell(0);
         for k=1:length(warnings)
             if ~isempty(warnings{k})
-                warningsArray = [ warningsArray warnings{k} ];
+                warningsArray{end+1} = warnings{k}; %#ok<AGROW>
             end
         end
         warnings = warningsArray;
@@ -115,6 +117,8 @@ elseif isstruct(filename) && isfield(filename,'name')
     if p.Results.combine
         [content,warnings] = combineFile(filenames);
     else
+        content = cell(length(filename),1);
+        warnings = cell(length(filename),1);
         for k=1:length(filenames)
             switch exist(filenames{k})
                 case 0
@@ -135,7 +139,7 @@ elseif isstruct(filename) && isfield(filename,'name')
         warningsArray = cell(0);
         for k=1:length(warnings)
             if ~isempty(warnings{k})
-                warningsArray = [ warningsArray warnings{k} ];
+                warningsArray{end+1} = warnings{k}; %#ok<AGROW>
             end
         end
         warnings = warningsArray;
@@ -261,11 +265,11 @@ function [content,warnings] = loadFile(filename)
     asciiFileFormats = cell(0);
     binaryFileFormats = cell(0);
     for k=1:length(fileFormatNames)
-        switch getfield(getfield(fileFormats,fileFormatNames{k}),'type')
+        switch fileFormats.(fileFormatNames{k}).type
             case 'ascii'
-                asciiFileFormats{end+1} = fileFormatNames{k};
+                asciiFileFormats{end+1} = fileFormatNames{k}; %#ok<AGROW>
             case 'binary'
-                binaryFileFormats{end+1} = fileFormatNames{k};
+                binaryFileFormats{end+1} = fileFormatNames{k}; %#ok<AGROW>
         end
     end
 
@@ -311,15 +315,11 @@ function [content,warnings] = loadFile(filename)
     
     if isBinary
        for k = 1 : length(binaryFileFormats)
-           [pathstr, name, ext] = fileparts(filename);
-           if findstr(...,
-                    getfield(...
-                    getfield(fileFormats,binaryFileFormats{k}),...
-                    'identifierString'),...
-                    ext);
-                functionHandle = str2func(getfield(...
-                    getfield(fileFormats,binaryFileFormats{k}),...
-                    'function'));
+           [~,~,ext] = fileparts(filename);
+           if any(strfind(ext,...
+                   fileFormats.(binaryFileFormats{k}).identifierString))
+                functionHandle = ...
+                    str2func(fileFormats.(binaryFileFormats{k}).function);
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
                     content.data = data;
@@ -335,15 +335,11 @@ function [content,warnings] = loadFile(filename)
        end
     else
         % else try to find a matching function from the ini file
-        for k = 1 : length(asciiFileFormats)           
-            if findstr(...,
-                    getfield(...
-                    getfield(fileFormats,asciiFileFormats{k}),...
-                    'identifierString'),...
-                    firstLine);
-                functionHandle = str2func(getfield(...
-                    getfield(fileFormats,asciiFileFormats{k}),...
-                    'function'));
+        for k = 1 : length(asciiFileFormats)   
+            if any(strfind(firstLine,...
+                    fileFormats.(asciiFileFormats{k}).identifierString))
+                functionHandle = ...
+                    str2func(fileFormats.(asciiFileFormats{k}).function);
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
                     content.data = data;
@@ -407,13 +403,13 @@ function [content,warnings] = loadDir(dirname,varargin)
     % starts with a "." and all directories. The names are stored as a cell
     % array in 'filesInDir'.
     allFilesInDir = dir(dirname);
+    filesInDir = ...
+        cell(length(allFilesInDir)-length(find([allFilesInDir.isdir])),1);
     l = 1;
     for k=1:length(allFilesInDir)
-        if (findstr(allFilesInDir(k).name,'.') ~= 1)
-            if ~allFilesInDir(k).isdir
-                filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
-                l=l+1;
-            end
+        if ~allFilesInDir(k).isdir
+            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
+            l=l+1;
         end
     end
     
@@ -424,6 +420,7 @@ function [content,warnings] = loadDir(dirname,varargin)
             [content,warnings] = combineFile(filesInDir);
         else
             l = 1;
+            content = cell(length(filesInDir),1);
             for k=1:length(filesInDir)
                 [fileContent,warnings] = loadFile(char(filesInDir(k)));
                 if ~isempty(fileContent)
@@ -481,19 +478,13 @@ function [content,warnings] = combineFile(filename)
     else
         % else try to find a matching function from the ini file
         for k = 1 : length(asciiFileFormats) 
-            if ~isempty(findstr(...,
-                    getfield(...
-                    getfield(fileFormats,asciiFileFormats{k}),...
-                    'identifierString'),...
-                    firstLine)) ... 
-                    && ...
-                    strcmp(getfield(...
-                    getfield(fileFormats,asciiFileFormats{k}),...
-                    'combineMultiple'),...
+            if any(strfind(firstLine,...
+                    fileFormats.(asciiFileFormats{k}).identifierString)) ... 
+                    && strcmp(...
+                    fileFormats.(asciiFileFormats{k}).combineMultiple,...
                     'true')
-                functionHandle = str2func(getfield(...
-                    getfield(fileFormats,asciiFileFormats{k}),...
-                    'function'));
+                functionHandle = ...
+                    str2func(fileFormats.(asciiFileFormats{k}).function);
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data)
                     content.data = data;

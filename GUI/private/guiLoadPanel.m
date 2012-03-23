@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-02-19
+% 2012-03-23
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -219,7 +219,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % In case of files, not a directory, add path to filename
-        if exist('PathName')
+        if exist('PathName','file')
             % In case of multiple files
             if iscell(FileName)
                 for k = 1 : length(FileName)
@@ -231,7 +231,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % Set lastLoadDir in appdata
-        if exist('PathName')
+        if exist('PathName','file')
             ad.control.lastLoadDir = PathName;
         else
             ad.control.lastLoadDir = FileName;
@@ -253,7 +253,7 @@ function load_pushbutton_Callback(~,~)
         messageText = get(hMessageText,'String');
         
         [data,warnings] = trEPRload(FileName,'combine',state.comb);
-        
+
         if isequal(data,0) || isempty(data)
             msg = 'Data could not be loaded.';
             add2status(msg);
@@ -396,8 +396,7 @@ function load_pushbutton_Callback(~,~)
         % Get indices of new datasets
         % Necessary in case of further corrections applied to datasets
         % after loading
-        newDataIdx = [ ...
-            length(ad.data)+1 : 1 : length(ad.data)+length(data) ];
+        newDataIdx = length(ad.data)+1 : 1 : length(ad.data)+length(data);
         
         % Add data to main GUI (appdata)
         [rows,cols] = size(data);
@@ -417,7 +416,7 @@ function load_pushbutton_Callback(~,~)
         msgStr{length(msgStr)+1} = ...
             sprintf('%i data set(s) successfully loaded:',length(data));
         msg = [msgStr fileNames];
-        status = add2status(msg);
+        add2status(msg);
         clear msgStr msg;
         
         if ishandle(hMsgBox)
