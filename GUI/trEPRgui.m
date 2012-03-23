@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-01-26
+% 2012-03-23
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','trepr_gui_mainwindow');
@@ -585,7 +585,7 @@ set(hPlotAxes,'XLim',[-.0001,0.0002]);
 try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
     [path,~,~] = fileparts(mfilename('fullpath'));
-    splash = imread(fullfile(path,'private','splashes','TREPRtoolboxSplash.png'),'png');
+    splash = imread(fullfile(path,'private','splashes','trEPRtoolboxSplash.png'),'png');
     %splash = imread(fullfile(path,'private','TAtoolboxSplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers

@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-02-06
+% 2012-03-23
 
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
@@ -32,7 +32,7 @@ mainAxisChildren = findobj(...
 if isempty(ad.control.spectra.visible)
     set(mainAxisChildren,'Enable','off');
     [path,~,~] = fileparts(mfilename('fullpath'));
-    splash = imread(fullfile(path,'splashes','TREPRtoolboxSplash.png'),'png');
+    splash = imread(fullfile(path,'splashes','trEPRtoolboxSplash.png'),'png');
     %splash = imread(fullfile(path,'TAtoolboxSplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers
