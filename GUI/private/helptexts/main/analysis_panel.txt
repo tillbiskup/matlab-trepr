@@ -1,8 +1,0 @@
-
-DATA ANALYSIS
-
-This panel will give access to different means of data analysis.
-
-NOTE: Currently, no such analysis tools are implemented.
-
-
