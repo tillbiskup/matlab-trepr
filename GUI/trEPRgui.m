@@ -586,7 +586,6 @@ try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
     [path,~,~] = fileparts(mfilename('fullpath'));
     splash = imread(fullfile(path,'private','splashes','trEPRtoolboxSplash.png'),'png');
-    %splash = imread(fullfile(path,'private','TAtoolboxSplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers
 catch exception

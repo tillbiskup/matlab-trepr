@@ -6,6 +6,9 @@ function status = update_datasetPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
+% (c) 2011-12, Till Biskup
+% 2012-03-23
+
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))

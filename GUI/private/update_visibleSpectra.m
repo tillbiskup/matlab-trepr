@@ -10,6 +10,9 @@ function status = update_visibleSpectra()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated panels listing the spectra
 
+% (c) 2011-12, Till Biskup
+% 2012-03-23
+
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
@@ -73,6 +76,7 @@ end
 currActiveButtons = findobj('Parent',gh.data_panel_currentlyactive_panel);
 if isempty(ad.control.spectra.visible)
     set(gh.data_panel_hide_pushbutton,'Enable','off');
+    set(gh.data_panel_hideall_pushbutton,'Enable','off');
     set(currActiveButtons,'Enable','off');
     set(gh.processing_panel_datasets_listbox,'Enable','off');
     set(gh.display_panel_datasets_listbox,'Enable','off');
@@ -82,6 +86,7 @@ if isempty(ad.control.spectra.visible)
     set(gh.next_pushbutton,'Enable','off');
 else
     set(gh.data_panel_hide_pushbutton,'Enable','on');
+    set(gh.data_panel_hideall_pushbutton,'Enable','on');
     set(currActiveButtons,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
     set(gh.processing_panel_datasets_listbox,'Enable','on');

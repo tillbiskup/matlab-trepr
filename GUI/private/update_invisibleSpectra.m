@@ -7,6 +7,9 @@ function status = update_invisibleSpectra()
 %           -1: no tEPRgui_statuswindow found
 %            0: successfully updated panels listing the spectra
 
+% (c) 2011-12, Till Biskup
+% 2012-03-23
+
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
@@ -47,9 +50,11 @@ end
 invPanelChildren = findobj('Parent',gh.data_panel_invisible_panel);
 if isempty(ad.control.spectra.invisible)
     set(gh.data_panel_show_pushbutton,'Enable','off');
+    set(gh.data_panel_showall_pushbutton,'Enable','off');
     set(invPanelChildren,'Enable','off');
 else
     set(gh.data_panel_show_pushbutton,'Enable','on');
+    set(gh.data_panel_showall_pushbutton,'Enable','on');
     set(invPanelChildren,'Enable','on');
 end
 
