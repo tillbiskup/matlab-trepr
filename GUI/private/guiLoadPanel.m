@@ -219,7 +219,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % In case of files, not a directory, add path to filename
-        if exist('PathName','file')
+        if exist(PathName,'file')
             % In case of multiple files
             if iscell(FileName)
                 for k = 1 : length(FileName)
@@ -231,7 +231,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % Set lastLoadDir in appdata
-        if exist('PathName','file')
+        if exist(PathName,'file')
             ad.control.lastLoadDir = PathName;
         else
             ad.control.lastLoadDir = FileName;
@@ -279,7 +279,10 @@ function load_pushbutton_Callback(~,~)
             msgStr{end+1} = 'Some warnings occurred when trying to load ';
             msg = [ msgStr FileName ];
             for k=1:length(warnings)
-                msg = [ msg warnings{k}.identifier warnings{k}.message ];
+                if isfield(warnings{k},'identifier') ...
+                        && isfield(warnings{k},'message')
+                    msg = [ msg warnings{k}.identifier warnings{k}.message ];
+                end
             end
             add2status(msg);
             clear msgStr msg;
