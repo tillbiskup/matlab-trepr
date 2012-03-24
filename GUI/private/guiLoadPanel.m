@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-03-23
+% 2012-03-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -219,7 +219,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % In case of files, not a directory, add path to filename
-        if exist(PathName,'file')
+        if exist('PathName','var') && exist(PathName,'file')
             % In case of multiple files
             if iscell(FileName)
                 for k = 1 : length(FileName)
@@ -231,7 +231,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         % Set lastLoadDir in appdata
-        if exist(PathName,'file')
+        if exist('PathName','var') && exist(PathName,'file')
             ad.control.lastLoadDir = PathName;
         else
             ad.control.lastLoadDir = FileName;
@@ -245,31 +245,14 @@ function load_pushbutton_Callback(~,~)
         add2status(msg);
         clear msgStr msg;
         
-        hMsgBox = msgWindow(...
-            'Loading spectra... please wait.',...
-            'Loading spectra',...
-            'Help','modal',0);
-        hMessageText = findobj(hMsgBox,'Tag','msgwindow_text');
-        messageText = get(hMessageText,'String');
-        
+        busyWindow('start','Trying to load spectra...<br />please wait.');
+       
         [data,warnings] = trEPRload(FileName,'combine',state.comb);
 
         if isequal(data,0) || isempty(data)
             msg = 'Data could not be loaded.';
             add2status(msg);
-            if ishandle(hMsgBox)
-                set(hMessageText,'String',...
-                    strrep(messageText,'please wait.','FAILED!'));
-                % Show "OK" button
-                set(...
-                    findobj(hMsgBox,'Tag','msgwindow_button'),...
-                    'visible','on');
-            else
-                hMsgBox = msgWindow(...
-                    'Loading spectra... FAILED!',...
-                    'Loading spectra',...
-                    'Help','modal');
-            end
+            busyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
         
@@ -277,15 +260,20 @@ function load_pushbutton_Callback(~,~)
             % Add warnings to status messages
             msgStr = cell(0);
             msgStr{end+1} = 'Some warnings occurred when trying to load ';
-            msg = [ msgStr FileName ];
+            msgStr = [msgStr FileName];
             for k=1:length(warnings)
-                if isfield(warnings{k},'identifier') ...
-                        && isfield(warnings{k},'message')
-                    msg = [ msg warnings{k}.identifier warnings{k}.message ];
+                if length(warnings{k})>1
+                    for m=1:length(warnings{k})
+                        msgStr{end+1} = warnings{k}{m}.identifier; %#ok<AGROW>
+                        msgStr{end+1} = warnings{k}{m}.message; %#ok<AGROW>
+                    end
+                else
+                    msgStr{end+1} = warnings{k}.identifier; %#ok<AGROW>
+                    msgStr{end+1} = warnings{k}.message; %#ok<AGROW>
                 end
             end
-            add2status(msg);
-            clear msgStr msg;
+            add2status(msgStr);
+            clear msgStr;
         end
         
         % Check whether data{n}.data is numeric (very basic test for format)
@@ -293,9 +281,11 @@ function load_pushbutton_Callback(~,~)
         nNoData = [];
         if iscell(data)
             for k=1:length(data)
-                if not(isnumeric(data{k}.data))
+                if (isfield(data{k},'data') && ~isnumeric(data{k}.data))
                     fnNoData{k} = data{k}.file.name;
-                    nNoData = [ nNoData k ];
+                    nNoData = [ nNoData k ]; %#ok<AGROW>
+                elseif ~isfield(data{k},'data')
+                    nNoData = [ nNoData k ]; %#ok<AGROW>
                 end
             end
             % Remove datasets from data cell array
@@ -318,19 +308,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         if isempty(data)
-            if ishandle(hMsgBox)
-                set(hMessageText,'String',...
-                    strrep(messageText,'please wait.','FAILED!'));
-                % Show "OK" button
-                set(...
-                    findobj(hMsgBox,'Tag','msgwindow_button'),...
-                    'visible','on');
-            else
-                hMsgBox = msgWindow(...
-                    'Loading spectra... FAILED!',...
-                    'Loading spectra',...
-                    'Help','modal');
-            end
+            busyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
         
@@ -421,20 +399,8 @@ function load_pushbutton_Callback(~,~)
         msg = [msgStr fileNames];
         add2status(msg);
         clear msgStr msg;
-        
-        if ishandle(hMsgBox)
-            % Show "OK" button
-            set(...
-                findobj(hMsgBox,'Tag','msgwindow_button'),...
-                'visible','on');
-            set(hMessageText,'String',...
-                strrep(messageText,'please wait.','DONE.'));
-        else
-            hMsgBox = msgWindow(...
-                'Loading spectra... DONE  ',...
-                'Loading spectra',...
-                'Help','modal');
-        end
+
+        busyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
         
         % Get appdata again after making changes to it before
         ad = getappdata(mainWindow);
