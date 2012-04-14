@@ -50,8 +50,8 @@ function varargout = trEPRinfo(varargin)
 %
 % See also VER
 
-% (c) 2007-11, Till Biskup
-% 2011-11-07
+% (c) 2007-12, Till Biskup
+% 2011-12-30
 
 % The place to centrally manage the revision number and date is the file
 % "Contents.m" in the root directory of the trEPR toolbox.
@@ -74,7 +74,7 @@ info.maintainer = struct(...
     'name','Till Biskup',...
     'email','till@till-biskup.de'...
     );
-info.url = 'http://till-biskup.de/de/software/matlab/trepr/';
+info.url = 'http://till-biskup.de/en/software/matlab/trepr/';
 info.bugtracker = struct(...
     'type','BugZilla',...
     'url','https://r3c.de/bugs/till/'...

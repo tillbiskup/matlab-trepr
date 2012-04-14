@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-03-23
+% 2012-03-30
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','trepr_gui_mainwindow');
