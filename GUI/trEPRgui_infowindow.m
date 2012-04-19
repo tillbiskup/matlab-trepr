@@ -2334,6 +2334,15 @@ guidata(hMainFigure,guihandles);
 % Create appdata structure
 ad = guiDataStructure('guiappdatastructure');
 
+% Set modified to empty array - as at the beginning, no dataset has
+% been modified in terms of its information
+ad.control.spectra.modified = [];
+% Add additional field "unsaved" for datasets that have been
+% changed but not saved (hit "Apply") yet - "saved" means here only
+% within the info GUI window. The final transfer to the main GUI
+% window is done when the info GUI is closed.
+ad.control.spectra.unsaved = [];
+
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
@@ -2367,9 +2376,6 @@ if (mainGuiWindow)
                 (ad.control.spectra.active == 0)
             ad.control.spectra.active = 1;
         end
-        % Set modified to empty array - as at the beginning, no dataset has
-        % been modified in terms of its information
-        ad.control.spectra.modified = [];
         % Add additional field "unsaved" for datasets that have been
         % changed but not saved (hit "Apply") yet - "saved" means here only
         % within the info GUI window. The final transfer to the main GUI
@@ -2377,6 +2383,44 @@ if (mainGuiWindow)
         ad.control.spectra.unsaved = [];
         setappdata(hMainFigure,'control',ad.control);
     end
+    
+    updateDatasets();
+    updateGeneralPanel();
+    updateParameterPanel();
+    updateToolsPanel();
+    updateHistoryPanel();
+elseif nargin && (isstruct(varargin{1}) || iscell(varargin{1}))
+    if isstruct(varargin{1})
+        ad.data{1} = varargin{1};
+    else
+        ad.data = varargin{1};
+    end
+    ad.origdata = ad.data;
+    inputParameterName = inputname(1);
+    if isempty(inputParameterName)
+        inputParameterName = 'trEPRgui_infowindow_dataset';
+    end
+    
+    ad.control.spectra.loaded = 1:length(ad.data);
+    for m=1:length(ad.control.spectra.loaded)
+        % If there is no history field, add one
+        if ~isfield(ad.data{m},'history')
+            ad.data{m}.history = cell(0);
+        end
+        % If there is no label, use filename as label
+        if isempty(ad.data{m}.label)
+            [~,label,~] = fileparts(ad.data{m}.file.name);
+            ad.data{m}.label = label;
+        end
+        ad.control.spectra.history{m} = 0;
+    end
+    if isempty(ad.control.spectra.active) || ...
+            (ad.control.spectra.active == 0)
+        ad.control.spectra.active = 1;
+    end
+    setappdata(hMainFigure,'data',ad.data);
+    setappdata(hMainFigure,'origdata',ad.origdata);
+    setappdata(hMainFigure,'control',ad.control);
     
     updateDatasets();
     updateGeneralPanel();
@@ -2916,13 +2960,17 @@ function pushbutton_Callback(~,~,action)
                 % main GUI
                 if ~isempty(ad.control.spectra.modified)
                     for k=1:length(ad.control.spectra.modified)
-                        status = refreshDatasetInMainGUI(...
-                            ad.data{ad.control.spectra.modified(k)},...
-                            ad.control.spectra.modified(k),...
-                            'modified',true,...
-                            'label',ad.origdata{ad.control.spectra.modified(k)}.label);
-                        if status
-                            disp('Hmm... some problems with appending modified dataset to main GUI.');
+                        if isempty(guiGetWindowHandle())
+                            assignin('base',inputParameterName,ad.data);
+                        else
+                            status = refreshDatasetInMainGUI(...
+                                ad.data{ad.control.spectra.modified(k)},...
+                                ad.control.spectra.modified(k),...
+                                'modified',true,...
+                                'label',ad.origdata{ad.control.spectra.modified(k)}.label);
+                            if status
+                                disp('Hmm... some problems with appending modified dataset to main GUI.');
+                            end
                         end
                     end
                 end
