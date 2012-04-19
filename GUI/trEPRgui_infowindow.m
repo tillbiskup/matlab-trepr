@@ -5,8 +5,8 @@ function varargout = trEPRgui_infowindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011, Till Biskup
-% 2011-11-08
+% (c) 2011-12, Till Biskup
+% 2012-04-19
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2360,8 +2360,8 @@ if (mainGuiWindow)
         ad.control.spectra = rmfield(ad.control.spectra,'visible');
         ad.control.spectra = rmfield(ad.control.spectra,'invisible');
         % Set history record cell array to default value
-        for k=1:length(ad.control.spectra.loaded)
-            ad.control.spectra.history{k} = 0;
+        for m=1:length(ad.control.spectra.loaded)
+            ad.control.spectra.history{m} = 0;
         end
         if isempty(ad.control.spectra.active) || ...
                 (ad.control.spectra.active == 0)
@@ -2403,8 +2403,8 @@ handles = findall(...
     '-or','style','edit',...
     '-or','style','listbox',...
     '-or','style','popupmenu');
-for k=1:length(handles)
-    set(handles(k),'KeyPressFcn',@keypress_Callback);
+for m=1:length(handles)
+    set(handles(m),'KeyPressFcn',@keypress_Callback);
 end
 
 % Temporary "fix": Disable all elements of the "Display settings" panel
@@ -2412,8 +2412,8 @@ displayPanelHandles = findall(...
     allchild(p4),'style','edit',...
     '-or','style','pushbutton',...
     '-or','style','popupmenu');
-for k=1:length(displayPanelHandles)
-    set(displayPanelHandles(k),'Enable','inactive');
+for m=1:length(displayPanelHandles)
+    set(displayPanelHandles(m),'Enable','inactive');
 end
 
 % Get all edit fields that are marked as "Handle carefully"
@@ -2623,7 +2623,7 @@ function parameter_edit_Callback(source,~,value)
             'triggerposition','parameters.transient.triggerPosition','str2double',''; ...
             'transientlength','parameters.transient.length','str2double',''; ...
             'transientlengthunit','parameters.transient.unit','',''; ...
-            'probehead','parameters.bridge.probehead','',''; ...
+            'probehead','parameters.probehead.model','',''; ...
             'bridgemodel','parameters.bridge.model','',''; ...
             'mwfrequency','parameters.bridge.MWfrequency.value','str2double',''; ...
             'bridgeattenuation','parameters.bridge.attenuation.value','str2double',''; ...
@@ -2649,7 +2649,7 @@ function parameter_edit_Callback(source,~,value)
             'recordersensitivity','parameters.recorder.sensitivity.value','str2double',''; ...
             'recordersensitivityunit','parameters.recorder.sensitivity.unit','',''; ...
             'lasermodel','parameters.laser.model','',''; ...
-            'opodye','','parameters.laser.opodye',''; ...
+            'opodye','parameters.laser.tunable.model','',''; ...
             'laserwavelength','parameters.laser.wavelength.value','str2double',''; ...
             'laserrepetitionrate','parameters.laser.repetitionRate.value','str2double',''; ...
             'laserpower','parameters.laser.power.value','str2double',''; ...
@@ -2762,99 +2762,6 @@ function parameter_edit_Callback(source,~,value)
         
         % Update dataset display
         updateDatasets();
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end     
-
-function colour_type_popupmenu_Callback(source,~)
-    try
-        % Get handles of main window
-        gh = guihandles(hMainFigure);
-        
-        colourTypes = cellstr(get(source,'String'));
-        colourType = colourTypes{get(source,'Value')};
-        
-        switch colourType
-            case 'name'
-                set(gh.display_panel_colour_type2_popupmenu,'String',...
-                    'b|g|r|c|m|y|k'...
-                    );
-                set(gh.display_panel_colour_r_edit,'Enable','Off');
-                set(gh.display_panel_colour_g_edit,'Enable','Off');
-                set(gh.display_panel_colour_b_edit,'Enable','Off');
-            case 'RGB'
-                set(gh.display_panel_colour_type2_popupmenu,'String',...
-                    '0-1|0-255|0-FF'...
-                    );
-                set(gh.display_panel_colour_r_edit,'Enable','On');
-                set(gh.display_panel_colour_g_edit,'Enable','On');
-                set(gh.display_panel_colour_b_edit,'Enable','On');
-            otherwise
-                % That shall never happen
-                add2status('trEPRgui_infowindow(): Unknown colour type');
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            add2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function colour_type2_popupmenu_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        colourTypes = ...
-            cellstr(get(gh.display_panel_colour_type_popupmenu,'String'));
-        colourType = ...
-            colourTypes{get(gh.display_panel_colour_type_popupmenu,'Value')};
-                
-        switch colourType
-            case 'name'
-                colourNames = cellstr(get(source,'String'));
-                if ad.control.spectra.active
-                    ad.data{ad.control.spectra.active}.line.color = ...
-                        colourNames{get(source,'Value')};
-                    % Update appdata of main window
-                    setappdata(mainWindow,'data',ad.data);
-                end
-            case 'RGB'
-            otherwise
-                % That shall never happen
-                add2status('trEPRgui_infowindow(): Unknown colour type');
-        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -3459,16 +3366,17 @@ function updateParameterPanel()
             'parameter_panel_attenuation_edit','0','bridge.attenuation.value',''; ...
             'parameter_panel_mwpower_edit','0','bridge.power.value',''; ...
             'parameter_panel_mwpowerunit_edit','mW','bridge.power.unit',''; ...
-            'parameter_panel_mwcalibratedstart_edit','N/A','bridge.calibration.values','1'; ...
-            'parameter_panel_mwcalibratedend_edit','N/A','bridge.calibration.values','2'; ...
+            'parameter_panel_mwcalibratedstart_edit','N/A','bridge.calibration.values',1; ...
+            'parameter_panel_mwcalibratedend_edit','N/A','bridge.calibration.values',2; ...
             'parameter_panel_mwcounter_edit','N/A','bridge.calibration.model',''; ...
             'parameter_panel_bridgemodel_edit','N/A','bridge.model',''; ...
+            'parameter_panel_probehead_edit','N/A','probehead.model','';...
             'parameter_panel_wavelength_edit','0','laser.wavelength.value',''; ...
             'parameter_panel_repetitionrate_edit','0','laser.repetitionRate.value',''; ...
             'parameter_panel_laserpower_edit','0','laser.power.value',''; ...
             'parameter_panel_laserpowerunit_edit','mJ','laser.power.unit',''; ...
             'parameter_panel_lasermodel_edit','N/A','laser.model',''; ...
-            'parameter_panel_opodye_edit','N/A','laser.opoDye',''; ...
+            'parameter_panel_opodye_edit','N/A','laser.tunable.model',''; ...
             };
         
         if isempty(ad.data)
@@ -3484,26 +3392,27 @@ function updateParameterPanel()
             end
             return;
         else
-            for k=1:length(matchingParameter)
-                if ~isempty(matchingParameter{k,3}) && ~isempty(...
+            for idx=1:length(matchingParameter)
+                if ~isempty(matchingParameter{idx,3}) && ~isempty(...
                         getCascadedField(...
                         ad.data{ad.control.spectra.active}.parameters,...
-                        matchingParameter{k,3}))
-                    if ~isempty(matchingParameter{k,4})
+                        matchingParameter{idx,3}))
+                    if ~isempty(matchingParameter{idx,4})
                         value = getCascadedField(...
                             ad.data{ad.control.spectra.active}.parameters,...
-                            matchingParameter{k,3});
-                        set(gh.(matchingParameter{k,1}),'String',...
-                            num2str(value(matchingParameter{k,4})));
+                            matchingParameter{idx,3});
+                        set(gh.(matchingParameter{idx,1}),'String',...
+                            num2str(value(matchingParameter{idx,4})));
                     else
-                        set(gh.(matchingParameter{k,1}),'String',...
+                        set(gh.(matchingParameter{idx,1}),'String',...
                             getCascadedField(...
                             ad.data{ad.control.spectra.active}.parameters,...
-                            matchingParameter{k,3})...
+                            matchingParameter{idx,3})...
                             );
                     end
                 else
-                    set(gh.(matchingParameter{k,1}),'String',matchingParameter{k,2});
+                    set(gh.(matchingParameter{idx,1}),...
+                        'String',matchingParameter{idx,2});
                 end
             end
             for k=1:size(matchingSample,1)
@@ -3585,7 +3494,7 @@ function updateToolsPanel()
         end
 
         % Get handles from info GUI
-        gh = guidata(mainWindow);
+%         gh = guidata(mainWindow);
 
     catch exception
         try

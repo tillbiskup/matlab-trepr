@@ -33,15 +33,15 @@ if ~nargin
     return;
 end
 
-    % Parse input arguments using the inputParser functionality
-    parser = inputParser;   % Create an instance of the inputParser class.
-    parser.FunctionName = mfilename; % Function name included in error messages
-    parser.KeepUnmatched = true; % Enable errors on unmatched arguments
-    parser.StructExpand = true; % Enable passing arguments in a structure
+% Parse input arguments using the inputParser functionality
+parser = inputParser;   % Create an instance of the inputParser class.
+parser.FunctionName = mfilename; % Function name included in error messages
+parser.KeepUnmatched = true; % Enable errors on unmatched arguments
+parser.StructExpand = true; % Enable passing arguments in a structure
 
-    parser.addRequired('filename', @(x)ischar(x) || iscell(x));
+parser.addRequired('filename', @(x)ischar(x) || iscell(x));
 %    parser.addOptional('parameters','',@isstruct);
-    parser.parse(filename,varargin{:});
+parser.parse(filename,varargin{:});
     
     switch exist(filename)
         case 0
@@ -86,6 +86,29 @@ end
 function [content,warnings] = loadFile(filename)
     warnings = cell(0);
 
+    % Try to read ini file and get the matching for parameters and data
+    % structure
+    try
+        iniFileName = 'trEPRfsc2MetaLoad.ini';
+        matching = cell(0);
+        fh = fopen(iniFileName,'r');
+        k=1;
+        while 1
+            tline = fgetl(fh);
+            if ~ischar(tline)
+                break
+            end
+            if ~strncmp(tline,'%',1)
+                matching(k,:) = regexp(tline,',','split');
+                k=k+1;
+            end
+        end
+        fclose(fh);
+    catch exception
+        disp('Problems reading INI file.');
+        throw(exception);
+    end
+
     % Preassign values to the content struct
     content = trEPRdataStructure;
 
@@ -127,48 +150,6 @@ function [content,warnings] = loadFile(filename)
         content = struct();
         return;
     end
-        
-    % Cell array correlating struct fieldnames and strings in the header.
-    % The first entry contains the string to be searched for in the header
-    % of the fsc2 file, the second entry contains the corresponding field
-    % name of the "content.parameters" struct. The third parameter,
-    % finally, tells the program how to parse the corresponding entry.
-    % Here, "numeric" means that the numbers of the field should be treated
-    % as numbers, "string" means to treat the whole field as string, and
-    % "valueunit" splits the field in a numeric value and a string
-    % containing the unit.
-    matching = {...
-        'Measurement start','date','string'
-        'Number of runs','runs','numeric';...
-        'Start field','field.start','numeric';...
-        'End field','field.stop','numeric';...
-        'Field step width','field.step','numeric';...
-        'Field start','field.start','numeric';...
-        'Field end','field.stop','numeric';...
-        'Field step','field.step','numeric';...
-        'Number of averages','recorder.averages','numeric';...
-        'Number of points','transient.points','numeric';...
-        'Slice length','transient.length','numeric';...
-        'Trigger position','transient.triggerPosition','numeric';...
-        'Oscilloscope coupling','recorder.coupling','string';...
-        'MW Bridge','bridge.model','string';...
-        'Probehead','bridge.probehead','string';...
-        'Digitizer model','recorder.model','string';...
-        'Field controller model','field.model','string';...
-        'Gaussmeter model','field.calibration.model','string';...
-        'Frequency counter model','bridge.calibration.model','string';...
-        'Laser model','laser.model','string';...
-        'OPO model','laser.opoDye','string';...
-        'Sensitivity','recorder.sensitivity','valueunit';...
-        'Time base','recorder.timeBase','valueunit';...
-        'MW frequency','bridge.MWfrequency','valueunit';...
-        'Attenuation','bridge.attenuation','valueunit';...
-        'Temperature','temperature','valueunit';...
-        'Laser wavelength','laser.wavelength','valueunit';...
-        'Oscilloscope impedance','recorder.impedance','valueunit';...
-        'Oscilloscope bandwidth','recorder.bandwidth','valueunit';...
-        'Laser repetition rate','laser.repetitionRate','valueunit';
-        };
     
     % Extract information from header. As we know that the parameters can
     % be found at the very end of the file header, and that in new versions
