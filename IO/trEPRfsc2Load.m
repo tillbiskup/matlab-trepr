@@ -24,8 +24,8 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
-% (c) 2009-2011, Till Biskup
-% 2011-11-01
+% (c) 2009-2012, Till Biskup
+% 2012-04-19
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -361,10 +361,10 @@ function [content,warnings] = loadFile(filename)
     content.axes.y.unit = content.parameters.field.unit;
     
     % Fix date string
-    if ~isempty(content.parameters.date)
-        content.parameters.date = ...
+    if ~isempty(content.parameters.date.start)
+        content.parameters.date.start = ...
             datestr(datenum(...
-            content.parameters.date,'ddd mmm dd, yyyy; HH:MM:SS'),31);
+            content.parameters.date.start,'ddd mmm dd, yyyy; HH:MM:SS'),31);
     end
     
     % Set Version string of content structure
