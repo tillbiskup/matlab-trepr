@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-03-30
+% 2012-04-20
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','trepr_gui_mainwindow');
@@ -17,6 +17,24 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Display "Splash"
+initDialogue = dialog(...
+    'WindowStyle','modal',...
+    'Name','Initialising...',...
+    'Position',[200 400 300 80]);
+uicontrol('Tag','InitialisingText',...
+    'Style','text',...
+    'parent',initDialogue,...
+    'FontUnit','Pixel','Fontsize',14,...
+    'HorizontalAlignment','Center',...
+    'BackgroundColor',get(initDialogue,'Color'),...
+    'Visible','on',...
+    'Units','pixels',...
+    'String',{...
+    'Initialising trEPR toolbox...','','This may take a few seconds.'},...
+    'Position',[10 10 280 55]...
+    );
 
 hMainFigure = figure('Tag','trepr_gui_mainwindow',...
     'Visible','off',...
@@ -561,10 +579,8 @@ uicontrol('Tag','next_pushbutton',...
 
 % Apply configuration
 guiConfigApply(mfilename);
-
-% Make the GUI visible.
-set(hMainFigure,'Visible','on');
-set(hp0,'Visible','on');
+% Get appdata for immediate use
+ad = getappdata(hMainFigure);
 
 % Initialize some button group properties. 
 set(hbg,'SelectionChangeFcn',{@tbg_Callback});
@@ -573,6 +589,19 @@ set(hbg,'Visible','on');
     
 set(hbg_fb,'Visible','on');
     
+% Be very careful, such as not to break old installations without updated
+% config files
+if isfield(ad.configuration,'start') && ...
+        isfield(ad.configuration.start,'welcome')
+    if ad.configuration.start.welcome
+        set(hp0,'Visible','on');
+    else
+        switchMainPanel('Load');
+    end
+else
+    set(hp0,'Visible','on');
+end
+
 xlabel(hPlotAxes,'time / s');
 ylabel(hPlotAxes,'intensity / a.u.');
 
@@ -593,6 +622,8 @@ catch exception
     throw(exception);
 end
 
+handles = guihandles;
+handles.mainAxis = hPlotAxes;
 guidata(hMainFigure,guihandles);
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -614,6 +645,29 @@ for k=1:length(handles)
     set(handles(k),'KeyPressFcn',@guiKeyBindings);
 end
 
+% Make the GUI visible.
+set(hMainFigure,'Visible','on');
+if ishandle(initDialogue)
+    delete(initDialogue);
+end
+
+% Be very careful, such as not to break old installations without updated
+% config files
+if isfield(ad.configuration,'start') && ...
+        isfield(ad.configuration.start,'tip')
+    if ad.configuration.start.tip
+        showTips = showTip('File',fullfile(...
+            trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'));
+        if ~showTips
+            conf = guiConfigLoad(mfilename);
+            conf.start.tip = showTips;
+            warnings = guiConfigWrite(mfilename,conf);
+            if warnings
+                add2status(warnings);
+            end
+        end
+    end
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
