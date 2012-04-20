@@ -12,7 +12,7 @@ function [status,message] = saveDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-12, Till Biskup
-% 2012-02-03
+% 2012-04-20
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -105,7 +105,7 @@ try
         trEPRsave(ad.data{id}.file.name,ad.data{id});
     
     % In case something went wrong
-    if saveStatus
+    if ~isempty(saveStatus)
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...

@@ -1,8 +1,8 @@
-function varargout = xmlZipRead(filename)
-% XMLZIPREAD Read ZIP-compressed XML file and data (if available)
+function varargout = trEPRxmlZipRead(filename,varargin)
+% TREPRXMLZIPREAD Read ZIP-compressed XML file and data (if available)
 %
 % Usage:
-%   [data,warning] = xmlZipRead(filename);
+%   [data,warning] = trEPRxmlZipRead(filename);
 %
 %   filename - string
 %              name of the ZIP archive containing the XML (and data)
@@ -13,9 +13,10 @@ function varargout = xmlZipRead(filename)
 %   warning  - cell array
 %              Contains warnings if there are any, otherwise empty
 %
+% SEE ALSO TREPRXMLZIPWRITE
 
-% (c) 2011, Till Biskup
-% 2011-11-05
+% (c) 2011-12, Till Biskup
+% 2012-04-20
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -23,8 +24,22 @@ parser.FunctionName = mfilename; % Function name included in error messages
 parser.KeepUnmatched = true; % Enable errors on unmatched arguments
 parser.StructExpand = true; % Enable passing arguments in a structure
 parser.addRequired('filename', @(x)ischar(x) || iscell(x));
+% Note, this is to be compatible with TAload - currently without function!
+parser.addParamValue('checkFormat',logical(true),@islogical);
 parser.parse(filename);
+
 % Do the real stuff
+if iscell(filename)
+    data = cell(length(filename),1);
+    warning = cell(length(filename),1);
+    for k=1:length(filename)
+        [data{k},warning{k}] = trEPRxmlZipRead(filename{k},varargin{:});
+    end
+    varargout{1} = data;
+    varargout{2} = warning;
+    return;
+end
+
 if ~exist(filename,'file')
     fprintf('"%s" seems not to be a valid filename. Abort.',filename);
     if nargout, varargout{1} = logical(false); end;
@@ -38,12 +53,14 @@ if ~status
 end
 PWD = pwd;
 cd(tempdir);
+% Unzip and delete ZIP archive afterwards
 try
     filenames = unzip(filename);
-catch
-    err = lasterror;
+    [~, name, ext] = fileparts(filename);
+    delete(fullfile(tempdir,[name ext]));
+catch exception
     warning = sprintf('%s\n%s\n"%s"\n%s\n',...
-        err.identifier,...
+        exception.identifier,...
         'Problems with unzipping:',...
         filename,...
         'seems not to be a valid zip file. Aborted.');
@@ -53,6 +70,7 @@ catch
     end
     return;
 end
+% Read different files of the archive
 try
     for k=1:length(filenames)
         [pathstr, name, ext] = fileparts(filenames{k});
@@ -63,7 +81,16 @@ try
                 struct = xml2struct(DOMnode);
                 delete(fullfile(pathstr,[name ext]));
             case '.dat'
-                data = load(fullfile(pathstr,[name ext]));
+                try
+                    data = load(fullfile(pathstr,[name ext]));
+                catch exception
+                    try
+                        data = readBinary(fullfile(pathstr,[name ext]));
+                    catch exception2
+                        exception = addCause(exception2, exception);
+                        throw(exception);
+                    end
+                end
                 delete(fullfile(pathstr,[name ext]));
             otherwise
                 delete(fullfile(pathstr,[name ext]));
@@ -82,7 +109,16 @@ catch errmsg
     return;
 end
 if exist('data','var')
+    % Check whether data have the right dimensions - in case that we read
+    % from binary, most probably they have not - in this case, reshape
+    xdim = length(struct.axes.x.values);
+    ydim = length(struct.axes.y.values);
+    [y,x] = size(data);
+    if ((x ~= xdim) || (y ~= ydim))  && ~isempty(data)
+        data = reshape(data,ydim,xdim);
+    end
     struct.data = data;
+    clear data
 end
 if nargout
     varargout{1} = struct;
@@ -92,4 +128,12 @@ else
     assignin('caller',varname,struct);
 end
 cd(PWD);
+end
+
+function data = readBinary(filename)
+
+fh = fopen(filename);
+data = fread(fh,inf,'real*4');
+fclose(fh);
+
 end

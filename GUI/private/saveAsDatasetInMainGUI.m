@@ -121,7 +121,7 @@ try
         trEPRsave(ad.data{id}.file.name,ad.data{id});
     
     % In case something went wrong
-    if saveStatus
+    if ~isempty(saveStatus)
         % Adding status line
         msgStr = cell(0);
         msgStr{length(msgStr)+1} = ...
