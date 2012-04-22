@@ -6,8 +6,8 @@ function varargout = trEPRgui_AVGwindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011, Till Biskup
-% 2011-11-13
+% (c) 2011-12, Till Biskup
+% 2012-04-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -909,7 +909,7 @@ uicontrol('Tag','close_pushbutton',...
 guidata(hMainFigure,guihandles);
 
 % Create appdata structure
-ad = guiDataStructure('guiappdatastructure');
+ad = trEPRguiDataStructure('guiappdatastructure');
 
 % Assign configuration parameters
 % TODO: Later on, read this from a file

@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../help.css" />
+        <title>trEPR GUI : Info window : Parameters</title>
+    </head>
+    <body>
+		<h1>Parameters of the measurement</h1>
+		<p class="intro">
+			This panel displays all the parameters of the dataset that are stored in the parameters structure of the current dataset.
+		</p>
+		<p>
+Not every dataset has originally values for all the fields, and not every field is editable (especially, a few of the units for different fields are fixed).
+		</p>
+		<p>
+			Be especially careful with the fields marked accordingly, as changing their values might corrupt your dataset.
+		</p>
+		<p>
+			If you change some of the parameters in a way that would obviously corrupt your dataset, the respective fields get marked in red, and those parameters are not applied to the dataset.
+		</p>
+		<p>
+			Due to the wealth of parameters, the panel has been divided into several subpanels, called "pages" here. To switch between the pages, use the buttons on top.
+		</p>
+		<h2>Sample</h2>
+		<p>
+			Information about the sample. With most raw data read in to the GUI, these fields will be empty. Nevertheless, the fields provide you with means to at least add the most important bits of information regarding the sample measured directly to the dataset.
+		</p>
+		<dl>
+			<dt>Name</dt>
+			<dd>A rather short name of the sample that helps you recognising it. May well be "lab slang"</dd>
+			<dt>Tube</dt>
+			<dd>Type of the tube used</dd>
+			<dt>Description</dt>
+			<dd>More comprehensive description of the sample. Multiline without fixed limit, but be aware of that this information gets stored along with the data, so please, no short stories...</dd>
+			<dt>Preparation</dt>
+			<dd>Details of the sample preparation. Multiline without fixed limit, but same limits as for the description apply.</dd>
+		</dl>
+		<h2>General</h2>
+		<p>
+			General information about the current dataset.
+		</p>
+		<dl>
+			<dt>Date (start)</dt>
+			<dd>Starting date the data were recorded at. Use "yyyy-mm-dd" as format. If you really want to add time as well, the format of choice would "yyyy-mm-dd HH:MM:SS".</dd>
+			<dt>Date (end)</dt>
+			<dd>End date the data were recorded at. Use "yyyy-mm-dd" as format. If you really want to add time as well, the format of choice would "yyyy-mm-dd HH:MM:SS".</dd>
+			<dt>Operator</dt>
+			<dd>The username/real name of the person recording the data.</dd>
+			<dt>No. of runs</dt>
+			<dd>Number of runs, that is not the number of averages, but the number of complete runs.</dd>
+			<dt>Shot rep. rate</dt>
+			<dd>Shot repetition rate of the experiment. Depending on the setup this may well be different (lower) than the laser repetition rate.</dd>
+		</dl>
+		<h2>Axis labels</h2>
+		<p>
+			Axis labels for all three axes. Normally, x is the time axis, y the field axis, and z the intensity.
+		</p>
+		<p>
+			For correct typesetting, all fields are split in "measure" and "unit" and get divided by a slash ("/") on display.
+		</p>
+		<p>
+			<strong>Please note:</strong> If no unit is given, the slash ("/") will <em>not</em> be displayed.
+		</p>
+		<h2>Temperature</h2>
+		<p>
+			Information about the temperature the sample was measured at and how it was achieved.
+		</p>
+		<dl>
+			<dt>Temperature</dt>
+			<dd>The actual temperature the sample was measured at.</dd>
+			<dt>Controller</dt>
+			<dd>Controlling unit used to keep the temperature, if any.</dd>
+			<dt>Cryostat</dt>
+			<dd>Model name of the cryostat used.</dd>
+			<dt>Cryogen</dt>
+			<dd>Cryogen used for setting the temperature, e.g. "LN2", "LHe", "H2O"</dd>
+		</dl>
+		<h2>Spectrometer</h2>
+		<p>
+			Information about the spectrometer used to measure the data.
+		</p>
+		<dl>
+			<dt>Name</dt>
+			<dd>Either the model name (in case of commercial setups) or a short unique identifier.</dd>
+			<dt>Software</dt>
+			<dd>Software and version used to record the data.</dd>
+		</dl>
+		<h2>Field</h2>
+		<p>
+			Information about the magnetic field range over which the data were recorded.
+		</p>
+		<dl>
+			<dt>Dimension</dt>
+			<dd>Dimension of the field axis in points. Read-only field to help when changing the next three fields.</dd>
+			<dt>Start</dt>
+			<dd>Position on the field axis where the field sweep started.</dd>
+			<dt>End</dt>
+			<dd>Position on the field axis where the field sweep ended.</dd>
+			<dt>Step</dt>
+			<dd>Stepping of the magnetic field axis.</dd>
+			<dt>Controller</dt>
+			<dd>Model of the field controller used, e.g. "Bruker BH-15".</dd>
+			<dt>Power supply</dt>
+			<dd>Model of the power supply used.</dd>
+		</dl>
+		<p>
+			In case that a field calibration (normally with either an NMR Gaussmeter or a g-standard or both) was performed, additional parameters are as follows:
+		</p>
+		<dl>
+			<dt>Calibration start</dt>
+			<dd>Position of the field axis where the field sweep started, measured with an NMR gaussmeter.</dd>
+			<dt>Calibration end</dt>
+			<dd>Position of the field axis where the field sweep ended, measured with an NMR gaussmeter.</dd>
+			<dt>Gaussmeter</dt>
+			<dd>Model of the gaussmeter used to record the field for the calibration, e.g. "Bruker ER035".</dd>
+		</dl>
+		<h2>Transient</h2>
+		<p>
+			Information about the time traces (transients) the dataset consists of.
+		</p>
+		<dl>
+			<dt>Dimension</dt>
+			<dd>Length of the time trace in points, read-only field.</dd>
+			<dt>Trigger pos.</dt>
+			<dd>Position of the trigger pulse within the time trace; in points.</dd>
+			<dt>Length</dt>
+			<dd>Length of the time trace in actual units; you can specify the unit as well.</dd>
+		</dl>
+		<h2>Bridge</h2>
+		<p>
+			Information about the microwave bridge used to record the data and its settings.
+		</p>
+		<dl>
+			<dt>Model</dt>
+			<dd>Model of the microwave bridge used.<br />E.g. "Bruker ER 046 XK-T".</dd>
+			<dt>MW frequency</dt>
+			<dd>Microwave frequency the experiment was performed at.</dd>
+			<dt>Attenuation</dt>
+			<dd>Attenuation (in dB)</dd>
+			<dt>Power</dt>
+			<dd>Actual microwave power (as different MW bridges have different maximum power and therefore, the "attenuation" field is not sufficient).</dd>
+			<dt>Detection</dt>
+			<dd>Type of detection used.<br />Normally either "diode" or "mixer".</dd>
+		</dl>
+		<p>
+			In case a video amplifier with control over bandwidth and amplification is used, the following parameters are important:
+		</p>
+		<dl>
+			<dt>Bandwidth</dt>
+			<dd>Bandwidth of the video amplifier in the MW bridge.</dd>
+			<dt>Amplification</dt>
+			<dd>Amplification of the video amplifier of the MW bridge.</dd>
+		</dl>
+		<p>
+			In case the MW frequency is monitored by an accurate frequency counter (such as to perform a field/frequency calibration), the following fields are important:
+		</p>
+		<dl>
+			<dt>Freq. @ start</dt>
+			<dd>Microwave frequency at the start of the experiment, read from a frequency counter.</dd>
+			<dt>Freq. @ end</dt>
+			<dd>Microwave frequency at the end of the experiment/current run, read from a frequency counter.</dd>
+			<dt>Freq. counter</dt>
+			<dd>Model of the MW frequency counter used.</dd>
+		</dl>
+		<h2>Probehead</h2>
+		<p>
+			Information about the EPR probehead (normally a resonator) used for performing the experiment.
+		</p>
+		<dl>
+			<dt>Type</dt>
+			<dd>Type of the probehead used.<br />In case of a resonator, something as "dielectric ring", "split ring", or "rectangular" (or even the mode pattern).</dd>
+			<dt>Model</dt>
+			<dd>Model of the resonator used.<br />E.g. "Bruker ER 4118X-MD5".</dd>
+			<dt>Coupling</dt>
+			<dd>Type of coupling used.<br />Normally either "critical" or "overcoupled".</dd>
+		</dl>
+		<h2>Recorder</h2>
+		<p>
+			Information about the transient recorder used to record the time traces.
+		</p>
+		<dl>
+			<dt>Model</dt>
+			<dd>A string identifying the model of the transient recorder, e.g. "Tektronix TDS520A".</dd>
+			<dt>Averages</dt>
+			<dd>Number of averages as set at the recorder. Normally, that means that this averaging is already done within the recorder. To be distinguished from measurements where you get data for each single measurement.</dd>
+			<dt>Coupling</dt>
+			<dd>Type of coupling of the transient recorder, usually one out of "AC"/"DC"/"GND".</dd>
+			<dt>Impedance</dt>
+			<dd>Impedance of the transient recorder (oscilloscope) used to acquire the 			data.</dd>
+			<dt>Time base</dt>
+			<dd>Time base of the transient recorder (oscilloscope) used to acquire the data. Normally, this is given as "per division".</dd>
+			<dt>Bandwidth</dt>
+			<dd>Bandwidth of the transient recorder (oscilloscope).</dd>
+			<dt>Sensitivity</dt>
+			<dd>The sensitivity setting of the transient recorder (oscilloscope) used to acquire the data. Normally, this is given as "per division". </dd>
+		</dl>
+		<h2>Laser</h2>
+		<p>
+			Information about the laser used to irradiate the sample and to generate the transient paramagnetic species observed by trEPR.
+		</p>
+		<dl>
+			<dt>Model</dt>
+			<dd>Model name of the laser used.</dd>
+			<dt>Wavelength</dt>
+			<dd>Wavelength of the laserused.</dd>
+			<dt>Rep. rate</dt>
+			<dd>Repetition rate of the laser used.<br /><strong>Please note:</strong> This is <em>not</em> identical with the "shot repetition rate" (srr) of the experiment as such. For the srr, see the first page of the "parameters" panel.</dd>
+			<dt>Power</dt>
+			<dd>Power of laser beam used to irradiate the sample.</dd>
+		</dl>
+		<p>
+			Additional information about the kind of <strong>tunable</strong> used to achieve the wavelength. The two standard types of tunables are either a dye laser or an optical parametric oscillator (OPO).
+		</p>
+		<dl>
+			<dt>Type</dt>
+			<dd>Type of tunable light source used (OPO or dye laser).</dd>
+			<dt>Model</dt>
+			<dd>Model name of tunable light source used.</dd>
+			<dt>Dye</dt>
+			<dd>In case of dye laser: Name of the laser dye.</dd>
+		</dl>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2011-12, Till Biskup
+		</p>
+		<p class="lastchange">
+			2012-04-22
+		</p>
+		</div>
+	</body>
+</html>

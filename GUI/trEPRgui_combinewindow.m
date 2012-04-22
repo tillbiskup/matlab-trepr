@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-01-26
+% 2012-04-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -310,7 +310,7 @@ uicontrol('Tag','close_pushbutton',...
 guidata(hMainFigure,guihandles);
 
 % Create appdata structure
-ad = guiDataStructure('guiappdatastructure');
+ad = trEPRguiDataStructure('guiappdatastructure');
 
 % Combine - struct
 ad.combine = struct();

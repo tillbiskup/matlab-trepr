@@ -1,11 +1,12 @@
-function varargout = guiDataStructure(varargin)
-% GUIDATASTRUCTURE Return data structure for trEPR toolbox data, or test
-% compliance of given structure with the data structure of the toolbox.
+function varargout = trEPRguiDataStructure(varargin)
+% TREPRGUIDATASTRUCTURE Return data structure for trEPR toolbox data, or
+% test compliance of given structure with the data structure of the
+% toolbox.
 %
 % Usage
-%   structure = guiDataStructure;
-%   structure = guiDataStructure(<command>)
-%   [missingFields,wrongType] = guiDataStructure(<command>,structure)
+%   structure = trEPRguiDataStructure;
+%   structure = trEPRguiDataStructure(<command>)
+%   [missingFields,wrongType] = trEPRguiDataStructure(<command>,structure)
 %
 %   <command> - string 
 %               one of 'structure', 'model' or 'check'
@@ -30,7 +31,7 @@ function varargout = guiDataStructure(varargin)
 % See also TREPRDATASTRUCTURE.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-21
+% 2012-04-22
 
 % Create empty trEPR toolbox data structure
 %-%guiDataStructure = trEPRdataStructure('structure');

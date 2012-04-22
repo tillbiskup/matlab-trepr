@@ -94,7 +94,7 @@ try
     accData.label = parameters.label;
     
     % Additional fields for dataset in GUI
-    addFields = guiDataStructure('datastructure');
+    addFields = trEPRguiDataStructure('datastructure');
     addFieldsNames = fieldnames(addFields);
     for k=1:length(addFieldsNames)
         accData.(addFieldsNames{k}) = addFields.(addFieldsNames{k});

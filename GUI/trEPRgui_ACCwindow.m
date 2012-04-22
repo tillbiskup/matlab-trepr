@@ -7,7 +7,7 @@ function varargout = trEPRgui_ACCwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-02-01
+% 2012-04-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1193,7 +1193,7 @@ uicontrol('Tag','close_pushbutton',...
 guidata(hMainFigure,guihandles);
 
 % Create appdata structure
-ad = guiDataStructure('guiappdatastructure');
+ad = trEPRguiDataStructure('guiappdatastructure');
 
 % Apply configuration
 guiConfigApply(mfilename);
