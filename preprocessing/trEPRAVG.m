@@ -21,8 +21,8 @@ function [avgData] = trEPRAVG(data,parameters)
 %              and all usual parameters of a dataset and the parameters
 %              from the averaging in the history.parameters field
 
-% (c) 2011, Till Biskup
-% 2011-11-18
+% (c) 2011-12, Till Biskup
+% 2012-04-22
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -44,12 +44,18 @@ try
         case 'x'
             avgData.data = ...
                 mean(avgData.data(:,parameters.start:parameters.stop),2);
+            % Calculate standard deviation
+            avgData.avg.stdev = ...
+                std(data.data(:,parameters.start:parameters.stop),0,2);
             avgData.axes.x.values = mean(...
                 [avgData.axes.x.values(parameters.start) ...
                 avgData.axes.x.values(parameters.stop)]);
         case 'y'
             avgData.data = ...
                 mean(avgData.data(parameters.start:parameters.stop,:),1);
+            % Calculate standard deviation
+            avgData.avg.stdev = ...
+                std(data.data(parameters.start:parameters.stop,:),0,2);
             avgData.axes.y.values = mean(...
                 [avgData.axes.y.values(parameters.start) ...
                 avgData.axes.y.values(parameters.stop)]);

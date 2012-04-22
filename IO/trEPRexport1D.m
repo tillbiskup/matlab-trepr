@@ -22,7 +22,7 @@
 %
 
 % (c) 2011-12, Till Biskup
-% 2012-02-13
+% 2012-04-22
 
 function status = trEPRexport1D(data,fileName,parameters)
 
@@ -62,6 +62,10 @@ try
     if ~isfield(parameters,'axis') ...
             || ~isfield(parameters.axis,'include')
         parameters.axis.include = 1;
+    end
+    if ~isfield(parameters,'stdev') ...
+            || ~isfield(parameters.stdev,'include')
+        parameters.stdev.include = 0;
     end
     if ~isfield(parameters,'file') || ~isfield(parameters.file,'type')
         parameters.file.type = 'ASCII';
@@ -200,9 +204,21 @@ try
             for k=1:length(header)
                 fprintf(fid,'%s\n',header{k});
             end
-            if parameters.axis.include
+            if parameters.axis.include && parameters.stdev.include && ...
+                    isfield(data,'avg') && isfield(data.avg,'stdev')
+                for l=1:length(crosssection)
+                    fprintf(fid,'%20.12f %20.12f %20.12f\n',axis(l),...
+                        crosssection(l),data.avg.stdev(l));
+                end
+            elseif parameters.axis.include
                 for l=1:length(crosssection)
                     fprintf(fid,'%20.12f %20.12f\n',axis(l),crosssection(l));
+                end
+            elseif parameters.stdev.include && ...
+                    isfield(data,'avg') && isfield(data.avg,'stdev')
+                for l=1:length(crosssection)
+                    fprintf(fid,'%20.12f %20.12f\n',...
+                        crosssection(l),data.avg.stdev(l));
                 end
             else
                 for l=1:length(crosssection)

@@ -1812,7 +1812,7 @@ function pushbutton_Callback(~,~,action)
                     for k=1:length(ad.avgdata)
                         % Remove avg field in data structure
                         if isfield(ad.avgdata{k},'avg')
-                            ad.avgdata{k} = rmfield(ad.avgdata{k},'avg');
+                            ad.avgdata{k}.avg = rmfield(ad.avgdata{k}.avg,'label');
                         end
                         % Remove display field in data structure
                         if isfield(ad.avgdata{k},'display')
