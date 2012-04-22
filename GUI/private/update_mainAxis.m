@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-04-21
+% 2012-04-22
 
 % Is there currently a trEPRgui object?
 mainWindow = guiGetWindowHandle();
@@ -382,7 +382,7 @@ switch ad.control.axis.displayType
                 ad.control.axis.labels.z.unit));
         end
         % Display legend - internal function
-        display_legend();
+        display_legend(mainAxes);
     case '1D along y' % B0 spectrum
         % Enable sliders
         sliderHandles = findobj(...
@@ -642,7 +642,7 @@ switch ad.control.axis.displayType
                 ad.control.axis.labels.z.unit));
         end
         % Display legend - internal function
-        display_legend();
+        display_legend(mainAxes);
     otherwise
         msg = sprintf('Display type %s currently unsupported',displayType);
         add2status(msg);    

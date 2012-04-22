@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-21
+% 2012-04-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2189,6 +2189,12 @@ function highlight_checkbox_Callback(source,~)
             ad.control.axis.highlight.method = '';
         end
         
+        % Set both highlight checkboxes
+        set(gh.display_panel_highlight_checkbox,'Value',...
+            get(source,'Value'));
+        set(gh.display_panel_highlight2_checkbox,'Value',...
+            get(source,'Value'));
+        
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
         
@@ -2470,7 +2476,7 @@ function grid_zero_togglebutton_Callback(source,~)
         mainWindow = guiGetWindowHandle;
         ad = getappdata(mainWindow);
         
-        ad.control.axis.grid.zero = get(source,'Value');
+        ad.control.axis.grid.zero.visible = get(source,'Value');
         
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
@@ -2942,40 +2948,42 @@ function linemarker_popupmenu_Callback(~,~)
             cellstr(get(gh.display_panel_linemarker_popupmenu,'String'));
         lineMarker = ...
             lineMarkers{get(gh.display_panel_linemarker_popupmenu,'Value')};
-                
+
+        active = ad.control.spectra.active;
+                        
         if ad.control.spectra.active
             switch lineMarker
                 case 'none'
-                    ad.data{ad.control.spectra.active}.line.marker = 'none';
+                    ad.data{active}.line.marker.type = 'none';
                 case 'plus'
-                    ad.data{ad.control.spectra.active}.line.marker = '+';
+                    ad.data{active}.line.marker.type = '+';
                 case 'circle'
-                    ad.data{ad.control.spectra.active}.line.marker = 'o';
+                    ad.data{active}.line.marker.type = 'o';
                 case 'asterisk'
-                    ad.data{ad.control.spectra.active}.line.marker = '*';
+                    ad.data{active}.line.marker.type = '*';
                 case 'point'
-                    ad.data{ad.control.spectra.active}.line.marker = '.';
+                    ad.data{active}.line.marker.type = '.';
                 case 'cross'
-                    ad.data{ad.control.spectra.active}.line.marker = 'x';
+                    ad.data{active}.line.marker.type = 'x';
                 case 'square'
-                    ad.data{ad.control.spectra.active}.line.marker = 's';
+                    ad.data{active}.line.marker.type = 's';
                 case 'diamond'
-                    ad.data{ad.control.spectra.active}.line.marker = 'd';
+                    ad.data{active}.line.marker.type = 'd';
                 case 'triangle up'
-                    ad.data{ad.control.spectra.active}.line.marker = '^';
+                    ad.data{active}.line.marker.type = '^';
                 case 'triangle down'
-                    ad.data{ad.control.spectra.active}.line.marker = 'v';
+                    ad.data{active}.line.marker.type = 'v';
                 case 'triangle right'
-                    ad.data{ad.control.spectra.active}.line.marker = '<';
+                    ad.data{active}.line.marker.type = '<';
                 case 'triangle left'
-                    ad.data{ad.control.spectra.active}.line.marker = '>';
+                    ad.data{active}.line.marker.type = '>';
                 case 'pentagram'
-                    ad.data{ad.control.spectra.active}.line.marker = 'p';
+                    ad.data{active}.line.marker.type = 'p';
                 case 'hexagram'
-                    ad.data{ad.control.spectra.active}.line.marker = 'h';
+                    ad.data{active}.line.marker.type = 'h';
                 otherwise
                     % That shall never happen
-                    add2status('trEPRgui : guiDisplayPanel: Unknown line marker');
+                    add2status('TAgui : guiDisplayPanel: Unknown line marker');
             end
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
