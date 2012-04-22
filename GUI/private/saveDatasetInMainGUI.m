@@ -12,7 +12,7 @@ function [status,message] = saveDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-20
+% 2012-04-21
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -29,6 +29,9 @@ try
         
     % Preset message
     message = '';
+    
+    % Set file extension
+    zipext = '.tez';
 
     % If there is no main GUI window, silently return
     if isempty(mainWindow)
@@ -47,8 +50,8 @@ try
         return;
     else
         [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
-        if ~strcmp(fext,'.zip')
-            ad.data{id}.file.name = fullfile(fpath,[fname '.zip']);
+        if ~strcmp(fext,zipext)
+            ad.data{id}.file.name = fullfile(fpath,[fname zipext]);
             % Need to test for existing file and in case, ask user...
             if (exist(ad.data{id}.file.name,'file'))
                 answer = questdlg(...
@@ -100,6 +103,8 @@ try
         end
     end
     
+    busyWindow('start','Trying to save spectra...<br />please wait.');
+    
     % Do the actual saving
     [ saveStatus, exception ] = ...
         trEPRsave(ad.data{id}.file.name,ad.data{id});
@@ -108,12 +113,13 @@ try
     if ~isempty(saveStatus)
         % Adding status line
         msgStr = cell(0);
-        msgStr{length(msgStr)+1} = ...
+        msgStr{end+1} = ...
             sprintf('Problems when trying to save "%s" to file',...
             ad.data{id}.label);
-        msgStr{length(msgStr)+1} = ad.data{id}.file.name;
+        msgStr{end+1} = ad.data{id}.file.name;
+        msgStr = [ msgStr saveStatus ];
         status = add2status(msgStr);
-        warndlg(msgStr,'Problems saving file','modal');
+        busyWindow('stop','Trying to save spectra...<br /><b>failed</b>.');
         clear msgStr;
         status = -1;
         return;
@@ -126,6 +132,9 @@ try
     % Remove from modified
     ad.control.spectra.modified(ad.control.spectra.modified == id) = [];
     
+    % Set last save dir
+    ad.control.dirs.lastSave = fpath;
+    
     % Write appdata
     setappdata(mainWindow,'data',ad.data);
     setappdata(mainWindow,'origdata',ad.data);
@@ -135,6 +144,7 @@ try
     msg = {...
         sprintf('Dataset %i successfully saved',id)...
         sprintf('Label: %s',ad.data{id}.label)...
+        sprintf('File: %s',filename)...
         };
     status = add2status(msg);
     
@@ -144,7 +154,7 @@ try
     update_processingPanel();
     update_mainAxis();
     
-    msgbox(msg,'Successful saving of file','help'); 
+    busyWindow('stop','Trying to save spectra...<br /><b>done</b>.');
     status = 0;
     
 catch exception

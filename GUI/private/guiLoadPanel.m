@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-03-30
+% 2012-04-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -179,8 +179,10 @@ function load_pushbutton_Callback(~,~)
         ad = getappdata(mainWindow);
         
         % Set directory where to load files from
-        if isfield(ad,'control') && isfield(ad.control,'lastLoadDir')
-            startDir = ad.control.lastLoadDir;
+        if isfield(ad,'control') && isfield(ad.control,'dirs') && ...
+                isfield(ad.control.dirs,'lastLoad')  && ...
+                ~isempty(ad.control.dirs.lastLoad)
+            startDir = ad.control.dirs.lastLoad;
         else
             startDir = pwd;
         end
@@ -201,6 +203,7 @@ function load_pushbutton_Callback(~,~)
                 startDir,...
                 'Select directory to load'...
                 );
+            PathName = '';
         else
             [FileName,PathName,~] = uigetfile(...
                 FilterSpec,...
@@ -231,10 +234,14 @@ function load_pushbutton_Callback(~,~)
         end
         
         % Set lastLoadDir in appdata
-        if exist('PathName','var') && exist(PathName,'file')
-            ad.control.lastLoadDir = PathName;
+        if exist(PathName,'dir')
+            ad.control.dirs.lastLoad = PathName;
         else
-            ad.control.lastLoadDir = FileName;
+            if iscell(FileName)
+                ad.control.dirs.lastLoad = FileName{1};
+            else
+                ad.control.dirs.lastLoad = FileName;
+            end
         end
         setappdata(mainWindow,'control',ad.control);
         
@@ -315,22 +322,10 @@ function load_pushbutton_Callback(~,~)
         % Get names of successfully loaded files
         % In parallel, add additional fields to each dataset
         % Define default display structure to add to datasets
-        display = struct();
-        display.position.x = 1;
-        display.position.y = 1;
-        display.displacement.x = 0;
-        display.displacement.y = 0;
-        display.displacement.z = 0;
-        display.scaling.x = 1;
-        display.scaling.y = 1;
-        display.scaling.z = 1;
-        display.smoothing.x.value = 1;
-        display.smoothing.y.value = 1;
-        line = struct();
-        line.color = 'k';
-        line.style = '-';
-        line.marker = 'none';
-        line.width = 1;
+        guiDataStruct = guiDataStructure('datastructure');
+        % Important: Delete "history" field not to overwrite history
+        guiDataStruct = rmfield(guiDataStruct,'history');
+        guiDataStructFields = fieldnames(guiDataStruct);
         if iscell(data)
             fileNames = cell(0);
             for k = 1 : length(data)
@@ -339,9 +334,13 @@ function load_pushbutton_Callback(~,~)
                 if ~isfield(data{k},'label') || isempty(data{k}.label)
                     data{k}.label = [fn ext];
                 end
-                data{k}.display = display;
-                data{k}.history = cell(0);
-                data{k}.line = line;
+                for l=1:length(guiDataStructFields)
+                    data{k}.(guiDataStructFields{l}) = ...
+                        guiDataStruct.(guiDataStructFields{l});
+                end
+                if ~isfield(data{k},'history')
+                    data{k}.history = cell(0);
+                end
                 % For compatibility with old versions of trEPRread and for
                 % consistency with the naming of all other structures
                 if (isfield(data{k},'axes') && isfield(data{k}.axes,'xaxis'))
@@ -356,12 +355,16 @@ function load_pushbutton_Callback(~,~)
         else
             fileNames = data.file.name;
             [~,fn,ext] = fileparts(data.file.name);
-            if ~isfield(data,'label') || isempty(data.label)
+            if ~isfield(data,'label') || isempty(data{k}.label)
                 data.label = [fn ext];
             end
-            data.display = display;
-            data.history = cell(0);
-            data.line = line;
+            for l=1:length(guiDataStructFields)
+                data.(guiDataStructFields{l}) = ...
+                    guiDataStruct.(guiDataStructFields{l});
+            end
+            if ~isfield(data,'history')
+                data.history = cell(0);
+            end
             % For compatibility with old versions of trEPRread and for
             % consistency with the naming of all other structures
             if (isfield(data,'axes') && isfield(data.axes,'xaxis'))

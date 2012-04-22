@@ -624,7 +624,7 @@ end
 
 handles = guihandles;
 handles.mainAxis = hPlotAxes;
-guidata(hMainFigure,guihandles);
+guidata(hMainFigure,handles);
 if (nargout == 1)
     varargout{1} = hMainFigure;
 end

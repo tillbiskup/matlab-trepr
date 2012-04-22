@@ -39,7 +39,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 % See also: trEPRiniFileWrite
 
 % (c) 2008-12, Till Biskup
-% 2012-03-23
+% 2012-04-22
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -142,13 +142,15 @@ function struct = setCascadedField(struct,fieldName,value,typeConversion)
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
     if isempty(nDots)
-        % Bug fix to prevent eval (str2num) doing stupid things: Check for
-        % first character of "value" to alphabetic
-        if any(strfind(char([65:90,97:122]),value(1))) ...
-                || isempty(str2num(value)) || ~typeConversion %#ok<*ST2NM>
-            struct.(fieldName) = value;
-        else
+        if typeConversion && regexp('[','[\[0-9.]?') && ...
+                ~isempty(str2num(value))
             struct.(fieldName) = str2num(value);
+        else
+            struct.(fieldName) = value;
+        end
+        % Handle special case of empty vector - convert into numeric
+        if strcmpi(value,'[]') && typeConversion
+            struct.(fieldName) = [];
         end
     else
         if ~isfield(struct,fieldName(1:nDots(1)-1))

@@ -44,7 +44,7 @@ function [ warnings ] = trEPRiniFileWrite ( fileName, data, varargin )
 % See also: trEPRiniFileRead
 
 % (c) 2008-12, Till Biskup
-% 2012-01-26
+% 2012-04-21
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -70,6 +70,8 @@ assignmentChar = p.Results.assignmentChar;
 
 % headerFirstLine
 % headerCreationDate
+
+warnings = '';
 
 if isempty(fileName)
     warnings = 'No filename';

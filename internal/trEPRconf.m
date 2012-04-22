@@ -36,7 +36,7 @@ function varargout = trEPRconf(action,varargin)
 %               "<basename>.ini.dist").
 
 % (c) 2011-12, Till Biskup
-% 2012-02-01
+% 2012-04-22
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -92,7 +92,9 @@ try
                 % overwrite is true - and only then write file.
                 if exist([p.Results.file '.dist'],'file') ...
                         && p.Results.overwrite
-                    conf = trEPRiniFileRead([p.Results.file '.dist']);
+                    [~,fname,fext] = fileparts(p.Results.file);
+                    conf = trEPRiniFileRead([fname fext '.dist'],...
+                        'typeConversion',true);
                     header = 'Configuration file for trEPR toolbox';
                     trEPRiniFileWrite(p.Results.file,conf,'header',header,...
                         'overwrite',true);
@@ -103,6 +105,19 @@ try
         case 'files'
             confFiles = dir(...
                 fullfile(trEPRinfo('dir'),'GUI','private','conf','*.ini'));
+            if isempty(confFiles)
+                varargout{1} = cell(0);
+                return;
+            end
+            confFileNames = cell(length(confFiles),1);
+            for k=1:length(confFiles)
+                confFileNames{k} = fullfile(...
+                    trEPRinfo('dir'),'GUI','private','conf',confFiles(k).name);
+            end
+            varargout{1} = confFileNames;
+        case 'distfiles'
+            confFiles = dir(...
+                fullfile(trEPRinfo('dir'),'GUI','private','conf','*.ini.dist'));
             if isempty(confFiles)
                 varargout{1} = cell(0);
                 return;
