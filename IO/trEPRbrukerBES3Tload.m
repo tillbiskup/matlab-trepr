@@ -16,8 +16,8 @@ function [data,warnings] = trEPRbrukerBES3Tload(filename)
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 
-% (c) 2011, Till Biskup
-% 2011-07-07
+% (c) 2011-12, Till Biskup
+% 2012-04-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -42,7 +42,7 @@ try
     end
     % If filename does not exist, try to add extension
     if  ~exist(filename,'file')
-        [fpath,fname,fext] = fileparts(filename);
+        [fpath,fname,fext] = fileparts(filename); %#ok<NASGU>
         if exist(fullfile(fpath,[fname '.DTA']),'file')
             filename = fullfile(fpath,[fname '.DTA']);
         else
@@ -100,6 +100,7 @@ try
             'YWID','numeric'; ...
             'YNAM','qstring'; ...
             'YUNI','qstring'; ...
+            'IKKF','string';...
             'TITL','qstring';...
             'OPER','string';...
             'DATE','string';...
@@ -110,11 +111,14 @@ try
             'HighFieldVal','valueunit';...
             'LowFieldVal','valueunit';...
             'AveragesPerScan','numeric'; ...
+            'RampCenter','valueunit'; ...
+            'RampWidth','valueunit'; ...
+            'TransPerScan','numeric'; ....
             };
         % Read whole DSC file in one pass into cell array
         k=1;
         while ischar(tline)
-            DSC{k,1} = tline;
+            DSC{k,1} = tline; %#ok<AGROW>
             % Do some very basic assignment of necessary parameters already
             % while reading file (saves doing another looping through the
             % cell array later on
@@ -182,7 +186,7 @@ try
     % If fopen was successful, fid > 2, otherwise fid == -1
     if fid > 2
         % Data are binary, big endian, double precision
-        data.data = fread(fid,inf,'double',0,'b');
+        data.data = fread(fid,inf,'double=>double',0,'b');
         fclose(fid);
     else
         data = struct();
@@ -194,7 +198,27 @@ try
     end
     
     % Reshape data according to what we read from DSC file
-    data.data = reshape(data.data,parameters.XPTS,[])';
+    if strcmp(parameters.IKKF,'CPLX') % If we have quadrature detection
+        % Deal with aborted measurements where we have less data points
+        % than expected from DSC file
+        if length(data.data) < parameters.XPTS*parameters.YPTS*2
+            tmp = data.data;
+            data.data = zeros(parameters.XPTS*parameters.YPTS*2,1);
+            data.data(1:length(tmp)) = tmp;
+            clear tmp;
+        end
+        data.data = reshape(data.data(2:2:end),parameters.XPTS,[])';
+    else
+        % Deal with aborted measurements where we have less data points
+        % than expected from DSC file
+        if length(data.data) < parameters.XPTS*parameters.YPTS
+            tmp = data.data;
+            data.data = zeros(parameters.XPTS*parameters.YPTS,1);
+            data.data(1:length(tmp)) = tmp;
+            clear tmp;
+        end
+        data.data = reshape(data.data,parameters.XPTS,[])';
+    end
     
     % Do a very rough checking of dimensions, using XPTS and YPTS from the
     % DSC file
@@ -213,6 +237,22 @@ try
 
     % Append complete DSC file to data structure
     data.header = DSC;
+    
+    % Handle situation if field 'LowFieldVal' doesn't exist
+    if ~isfield(parameters,'LowFieldVal') && ...
+            isfield(parameters,'RampCenter') && ...
+            isfield(parameters,'RampWidth')
+        parameters.LowFieldVal.value = ...
+            parameters.RampCenter.value - parameters.RampWidth.value/2;
+        parameters.LowFieldVal.unit = parameters.RampWidth.unit;
+        parameters.HighFieldVal.value = ...
+            parameters.RampCenter.value + parameters.RampWidth.value/2;
+        parameters.HighFieldVal.unit = parameters.RampWidth.unit;
+    end
+    
+    if ~isfield(parameters,'AveragesPerScan')
+        parameters.AveragesPerScan = parameters.TransPerScan;
+    end
     
     % Cell array correlating struct fieldnames read from the DSC file and
     % from the toolbox data structure.
@@ -252,8 +292,6 @@ try
         datenum([parameters.DATE ' ' parameters.TIME],...
         'dd/mm/yy HH:MM:SS'),...
         31);
-    % Set Version string of content structure
-    data.version = '1.1';
 catch exception
     throw(exception);
 end
@@ -269,9 +307,7 @@ function value = getCascadedField (struct, fieldName)
         case 0
             value = struct.(fieldName);
         case 1
-            value = getfield(getfield(...
-                struct,...
-                fieldName(1:nDots(1)-1)),...
+            value = struct.(fieldName(1:nDots(1)-1)).(...
                 fieldName(nDots(1)+1:length(fieldName)));
         otherwise
             value = '';

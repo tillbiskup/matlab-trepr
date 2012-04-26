@@ -1,9 +1,13 @@
 function varargout = trEPRgui_statuswindow(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_STATUSWINDOW A GUI window displaying status messages of the
+% toolbox and GUI.
+%
+% Normally, this window is called from within the TAgui window.
+%
+% See also TAGUI
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-04-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -42,7 +46,8 @@ textdisplay = uicontrol('Tag','status_text',...
     'Position',[10 10 guiSize(1)-20 guiSize(2)-20],...
     'Enable','inactive',...
     'Max',2,'Min',0,...
-    'FontName','FixedWidth',...
+    'FontSize',12,...
+    'FontName','Monospaced',...
     'String','');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -87,7 +92,7 @@ function closeGUI(~,~)
             disp(msgStr);
         end
         try
-            TAgui_bugreportwindow(exception);
+            trEPRgui_bugreportwindow(exception);
         catch exception3
             % If even displaying the bug report window fails...
             exception = addCause(exception3, exception);
@@ -96,28 +101,28 @@ function closeGUI(~,~)
     end
 end
 
-function keyBindings(src,evt)
+function keyBindings(~,evt)
     try
-    if ~isempty(evt.Modifier)
-        if (strcmpi(evt.Modifier{1},'command')) || ...
-                (strcmpi(evt.Modifier{1},'control'))
-            switch evt.Key
-                case 'w'
-                    closeGUI();
-                    return;
-                otherwise
-                    return;
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                switch evt.Key
+                    case 'w'
+                        closeGUI();
+                        return;
+                    otherwise
+                        return;
+                end
             end
         end
-    end
-    switch evt.Key
-        case 'f1'
-            return;
-        otherwise
-%             disp(evt);
-%             fprintf('       Caller: %i\n\n',src);
-            return;
-    end
+        switch evt.Key
+            case 'f1'
+                return;
+            otherwise
+                %             disp(evt);
+                %             fprintf('       Caller: %i\n\n',src);
+                return;
+        end
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -128,7 +133,7 @@ function keyBindings(src,evt)
             disp(msgStr);
         end
         try
-            TAgui_bugreportwindow(exception);
+            trEPRgui_bugreportwindow(exception);
         catch exception3
             % If even displaying the bug report window fails...
             exception = addCause(exception3, exception);
