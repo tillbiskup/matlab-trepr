@@ -4091,21 +4091,41 @@ end
 
 % --- Set field of cascaded struct
 function struct = setCascadedField (struct, fieldName, value)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    if isempty(nDots)
-        struct.(fieldName) = value;
-    else
-        if ~isfield(struct,fieldName(1:nDots(1)-1))
-            struct.(fieldName(1:nDots(1)-1)) = [];
+    try
+        % Get number of "." in fieldName
+        nDots = strfind(fieldName,'.');
+        if isempty(nDots)
+            struct.(fieldName) = value;
+        else
+            if ~isfield(struct,fieldName(1:nDots(1)-1))
+                struct.(fieldName(1:nDots(1)-1)) = [];
+            end
+            innerstruct = struct.(fieldName(1:nDots(1)-1));
+            innerstruct = setCascadedField(...
+                innerstruct,...
+                fieldName(nDots(1)+1:end),...
+                value);
+            struct.(fieldName(1:nDots(1)-1)) = innerstruct;
         end
-        innerstruct = struct.(fieldName(1:nDots(1)-1));
-        innerstruct = setCascadedField(...
-            innerstruct,...
-            fieldName(nDots(1)+1:end),...
-            value);
-        struct.(fieldName(1:nDots(1)-1)) = innerstruct;
-    end
+    catch exception
+        try
+            disp(fieldName);
+            disp(struct);
+            msgStr = ['An exception occurred. '...
+                'The bug reporter should have been opened'];
+            add2status(msgStr);
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end 
 end
 
 end
