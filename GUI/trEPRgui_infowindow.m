@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-04-25
+% 2012-05-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3832,7 +3832,7 @@ function updateParameterPanel()
         
         if isempty(ad.data)
             % Set all edit fields to default values
-            for k=1:length(matchingParameter)
+            for k=1:size(matchingParameter,1)
                 set(gh.(matchingParameter{k,1}),'String',matchingParameter{k,2});
             end
             for k=1:size(matchingSample,1)
