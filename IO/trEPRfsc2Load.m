@@ -25,7 +25,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
 % (c) 2009-2012, Till Biskup
-% 2012-04-19
+% 2012-05-09
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -34,16 +34,17 @@ if ~nargin
 end
 
 % Parse input arguments using the inputParser functionality
-parser = inputParser;   % Create an instance of the inputParser class.
-parser.FunctionName = mfilename; % Function name included in error messages
-parser.KeepUnmatched = true; % Enable errors on unmatched arguments
-parser.StructExpand = true; % Enable passing arguments in a structure
+p = inputParser;   % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Function name included in error messages
+p.KeepUnmatched = true; % Enable errors on unmatched arguments
+p.StructExpand = true; % Enable passing arguments in a structure
 
-parser.addRequired('filename', @(x)ischar(x) || iscell(x));
+p.addRequired('filename', @(x)ischar(x) || iscell(x));
+p.addParamValue('zerofill',logical(true),@islogical);
 %    parser.addOptional('parameters','',@isstruct);
-parser.parse(filename,varargin{:});
+p.parse(filename,varargin{:});
     
-    switch exist(filename)
+    switch exist(filename) %#ok<EXIST>
         case 0
             % If name does not exist.
             fprintf('%s does not exist...\n',filename);
@@ -51,7 +52,7 @@ parser.parse(filename,varargin{:});
             % If name is an M-file on your MATLAB search path. It also
             % returns 2 when name is the full pathname to a file or the
             % name of an ordinary file on your MATLAB search path.
-            [content,warnings] = loadFile(filename);
+            [content,warnings] = loadFile(filename,p.Results);
             % assign output argument
             if ~nargout
                 % of no output argument is given, assign content to a
@@ -83,7 +84,7 @@ end
     
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
-function [content,warnings] = loadFile(filename)
+function [content,warnings] = loadFile(filename,parameters)
     warnings = cell(0);
 
     % Try to read ini file and get the matching for parameters and data
@@ -274,6 +275,12 @@ function [content,warnings] = loadFile(filename)
                 '(This might be a bug of the fsc2 program used.)'...
                 ],...
                 content.parameters.runs,content.parameters.runs+1)...
+                );
+        elseif parameters.zerofill
+            data(end:rows*cols) = 0;
+            warnings{end+1} = struct(...
+                'identifier','trEPRfsc2Load:dimensionMismatch',...
+                'message','...data filled with zeros' ...
                 );
         else
             rows = length(data)/cols;

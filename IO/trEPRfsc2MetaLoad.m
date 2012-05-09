@@ -23,7 +23,7 @@ function [data,warnings] = trEPRfsc2MetaLoad(filename)
 % See also TREPRLOAD, TREPRFSC2LOAD.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-18
+% 2012-05-09
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -146,10 +146,12 @@ try
     blocks = struct();
     lineNumbers = zeros(1,length(blockNames));
     for k = 1:length(blockNames)
-        [~,lineNumber] = max(cellfun(@(x) ~isempty(x),...
+        lineNumber = find(cellfun(@(x) ~isempty(x),...
             strfind(metaFile,blockNames{k})));
-        lineNumbers(k) = lineNumber;
         blocks.(str2fieldName(blockNames{k})) = lineNumber;
+        if lineNumber
+            lineNumbers(k) = lineNumber;
+        end
     end
     
     % How to access the line number of the next block starting with a given
@@ -204,16 +206,27 @@ try
                     lineNumbers > blocks.(blocknames{k}),1))-2 ...
                     -blocks.(blocknames{k}))...
                     /nLinesCalibDataSubblock;
+                % If we have no "TERMINATION" block (i.e., something went
+                % wrong with the measurement
+                if isempty(noScans)
+                    noScans = (length(metaFile)-blocks.(blocknames{k}))...
+                    /nLinesCalibDataSubblock;
+                end
                 % Check whether we have the correct number of blocks (needs
                 % to be a natural number), therefore divide by 1 and look
                 % for the remainder
                 if rem(noScans,1)
-                    data = struct();
+                    % Get number of lines from last (unfinished)
+                    % calibration block
+                    linesInLastBlock = ...
+                        int8(rem(noScans,1)*nLinesCalibDataSubblock);
+                    noScans = floor(noScans);
                     warnings{end+1} = struct(...
                         'identifier','trEPRfsc2MetaLoad:calibrationBlock',...
-                        'message','Problems parsing calibration block.'...
+                        'message',[...
+                        'Problems parsing calibration block. ' ...
+                        'No. of calibrated scans reduced to ' num2str(noScans) ]...
                         ); %#ok<AGROW>
-                    return;
                 end
                 % For each scan, read key-value pairs into structure
                 for l = 1:noScans
@@ -225,11 +238,42 @@ try
                         nLinesCalibDataSubblock-2 ...
                         ));
                 end
+                if exist('linesInLastBlock','var') && linesInLastBlock > 1
+                    noCalibrationBlocks = length(block.calibrationData);
+                    % Prepare empty structure with fieldnames
+                    calibrationBlockFieldNames = ...
+                        fieldnames(block.calibrationData(1));
+                    for l=1:length(calibrationBlockFieldNames)
+                        block.calibrationData(noCalibrationBlocks+1).(...
+                            calibrationBlockFieldNames{l}) = '';
+                    end
+                    % Get fields of last (unfinished) calibration block
+                    lastCalibrationBlock = parseBlocks(metaFile(...
+                        blocks.(blocknames{k})...
+                        +2+(noCalibrationBlocks*nLinesCalibDataSubblock) : ...
+                        blocks.(blocknames{k})...
+                        +2+(noCalibrationBlocks*nLinesCalibDataSubblock) + ...
+                        linesInLastBlock-2 ...
+                        ));
+                    % Assign fields to block.calibrationData
+                    lastCalibrationBlockFieldNames = ...
+                        fieldnames(lastCalibrationBlock);
+                    for l=1:length(lastCalibrationBlockFieldNames)
+                        block.calibrationData(noCalibrationBlocks+1).(...
+                            lastCalibrationBlockFieldNames{l}) = ...
+                            lastCalibrationBlock.(lastCalibrationBlockFieldNames{l});
+                    end
+                end
             case 'termination'
-                % Read key-value pairs into structure
-                block.termination = parseBlocks(metaFile(...
-                    blocks.(blocknames{k})+1 : end)...
-                    );
+                % Check that line number for termination block is > 0
+                % (Otherwise, that would mean that there is no termination
+                % block)
+                if blocks.(blocknames{k})
+                    % Read key-value pairs into structure
+                    block.termination = parseBlocks(metaFile(...
+                        blocks.(blocknames{k})+1 : end)...
+                        );
+                end
             otherwise
                 % That shall not happen!
                 warnings{end+1} = struct(...
@@ -241,7 +285,11 @@ try
                 return;
         end
     end
-    
+catch exception
+    throw(exception);
+end
+
+try
     % Assing cell array of right size to data
     data = cell(length(block.calibrationData),1);
     
@@ -269,7 +317,10 @@ try
         data{k}.file.format = 'fsc2';
         % Assign parameters from metafile to datasets
         % Calibrated y axis
-        if strfind(block.parameters.calibration,'field');
+        if strfind(block.parameters.calibration,'field') ...
+                && ~isempty(block.calibrationData(k).fieldStart) ...
+                && ~isempty(block.calibrationData(k).fieldStep) ...
+                && ~isempty(block.calibrationData(k).fieldEnd)
             fieldStart = textscan(block.calibrationData(k).fieldStart,'%f');
             fieldStep = textscan(block.calibrationData(k).fieldStep,'%f');
             fieldEnd = textscan(block.calibrationData(k).fieldEnd,'%f');
@@ -280,7 +331,9 @@ try
                 ];
         end
         % Calibrated frequency
-        if strfind(block.parameters.calibration,'frequency');
+        if strfind(block.parameters.calibration,'frequency') ...
+                && ~isempty(block.calibrationData(k).frequencyStart) ...
+                && ~isempty(block.calibrationData(k).frequencyEnd)
             frequencyStart = ...
                 textscan(block.calibrationData(k).frequencyStart,'%f');
             frequencyEnd = ...
@@ -302,9 +355,9 @@ try
             infoFieldNames = fieldnames(block.comment.info);
             % Copy field names from one struct into other to get them
             % properly parsed as well
-            for k=1:length(infoFieldNames)
-                block.comment.parameters.(infoFieldNames{k}) = ...
-                    block.comment.info.(infoFieldNames{k});
+            for m=1:length(infoFieldNames)
+                block.comment.parameters.(infoFieldNames{m}) = ...
+                    block.comment.info.(infoFieldNames{m});
             end
         end
         
