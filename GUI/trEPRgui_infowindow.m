@@ -4067,12 +4067,20 @@ function value = getCascadedField (struct, fieldName)
         % Get number of "." in fieldName
         nDots = strfind(fieldName,'.');
         if isempty(nDots)
-            value = struct.(fieldName);
+            if isfield(struct,fieldName)
+                value = struct.(fieldName);
+            else
+                value = '';
+            end
         else
-            struct = struct.(fieldName(1:nDots(1)-1));
-            value = getCascadedField(...
-                struct,...
-                fieldName(nDots(1)+1:end));
+            if isfield(struct,fieldName(1:nDots(1)-1))
+                struct = struct.(fieldName(1:nDots(1)-1));
+                value = getCascadedField(...
+                    struct,...
+                    fieldName(nDots(1)+1:end));
+            else
+                value = '';
+            end
         end
     catch exception
         try
