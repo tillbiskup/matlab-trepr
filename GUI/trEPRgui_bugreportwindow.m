@@ -3,7 +3,8 @@ function varargout = trEPRgui_bugreportwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-05-29
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

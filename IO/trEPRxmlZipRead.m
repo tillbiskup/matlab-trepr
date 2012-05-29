@@ -16,7 +16,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % SEE ALSO TREPRXMLZIPWRITE
 
 % (c) 2011-12, Till Biskup
-% 2012-04-20
+% 2012-05-29
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -83,6 +83,23 @@ try
             case '.dat'
                 try
                     data = load(fullfile(pathstr,[name ext]));
+                    % Try to check whether we have read correct data - as
+                    % we cannot rely to already have read the xml file, we
+                    % need to check whether "length(data) == 1" and in this
+                    % case try to read via binary and see what happens.
+                    %
+                    % This is to cope with the fact that some binary files
+                    % might start with something load interprets as proper
+                    % number - and therefore doesn't crash. There is no
+                    % easy way to distinguish whether a file has binary
+                    % content in Matlab. At least not that I know of...
+                    if length(data) == 1
+                        tmpData = readBinary(fullfile(pathstr,[name ext]));
+                        if length(tmpData) > length(data)
+                            data = tmpData;
+                        end
+                        clear tmpData;
+                    end
                 catch exception
                     try
                         data = readBinary(fullfile(pathstr,[name ext]));
@@ -115,7 +132,15 @@ if exist('data','var')
     ydim = length(struct.axes.y.values);
     [y,x] = size(data);
     if ((x ~= xdim) || (y ~= ydim))  && ~isempty(data)
-        data = reshape(data,ydim,xdim);
+        try
+            data = reshape(data,ydim,xdim);
+        catch exception
+            fprintf('%s\n%s',...
+                'Something caused trouble trying to reshape...',...
+                'Therefore, data might be corrupted. BE CAREFUL!\n\n');
+            fprintf('Error was: %s',...
+                getReport(exception, 'extended', 'hyperlinks', 'off'))
+        end
     end
     struct.data = data;
     clear data

@@ -10,6 +10,9 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    status    - number (0 = OK, -1 = failed)
 %    bugReport - cell array of strings containing the bug report
 
+% (c) 2011-12, Till Biskup
+% 2012-05-29
+
 % Set name and version of Toolbox (makes it easier to reuse this script
 % later on) 
 tbname = 'trEPR toolbox';
