@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-08
+% 2012-05-29
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3135,7 +3135,7 @@ function parameter_edit_Callback(source,~,value)
                 set(source,'BackgroundColor',editableBackground);
             end
         end
-        
+
         % Check for consistency of the values for the magnetic field
         fieldEditFields = [...
             gh.parameter_panel_fieldstart_edit ...
@@ -3161,6 +3161,12 @@ function parameter_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.parameters.field.start:...
                 ad.data{ad.control.spectra.active}.parameters.field.step:...
                 ad.data{ad.control.spectra.active}.parameters.field.stop ;
+        end
+        
+        % Set field value consistently for axes as well
+        if any(strcmpi(value,{'fieldstartunit','fieldstepunit','fieldendunit'}))
+            ad.data{ad.control.spectra.active}.axes.y.unit = ...
+                ad.data{ad.control.spectra.active}.parameters.field.unit;
         end
         
         % Set time axis parameters according to new values

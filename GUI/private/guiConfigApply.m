@@ -66,6 +66,19 @@ try
             % .ini.dist files get distributed, but not the actual config
             % files.
             
+            % Set position of the main GUI window
+            if isfield(ad.configuration,'general')
+                guiPosition = get(handle,'Position');
+                if isfield(ad.configuration.general,'dx')
+                    guiPosition(1) = ad.configuration.general.dx;
+                    set(handle,'Position',guiPosition);
+                end
+                if isfield(ad.configuration.general,'dy')
+                    guiPosition(2) = ad.configuration.general.dy;
+                    set(handle,'Position',guiPosition);
+                end
+            end
+            
             % Set load panel's settings
             if isfield(ad.configuration.load,'combine')
                 set(gh.load_panel_files_combine_checkbox,...
