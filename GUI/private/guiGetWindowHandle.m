@@ -48,8 +48,6 @@ try
         windowTags.(guiFileNames{k}(1:end-2)) = guiFileNames{k}(1:end-2);
     end
     
-    windowTags
-    
     % Define default tag
     defaultTag = windowTags.trEPRgui;
     
