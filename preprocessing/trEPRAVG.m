@@ -9,10 +9,16 @@ function [avgData] = trEPRAVG(data,parameters)
 %
 %              dimension - string
 %                          'x' or 'y'
-%              start     - scalar
+%              start     - struct
 %                          position in axis to start the averaging at
-%              stop      - scalar
+%                          fields: index, value, unit
+%                          (Only "index" is necessary to perform the
+%                          averaging.) 
+%              stop      - struct
 %                          position in axis to end the averaging at
+%                          fields: index, value, unit
+%                          (Only "index" is necessary to perform the
+%                          averaging.) 
 %              label     - string, optional
 %                          label for the averaged dataset
 %
@@ -43,27 +49,45 @@ try
     switch parameters.dimension
         case 'x'
             avgData.data = ...
-                mean(avgData.data(:,parameters.start:parameters.stop),2);
+                mean(avgData.data(:,...
+                parameters.start.index:parameters.stop.index),2);
+            % Adjust parameters
+            parameters.start.value = ...
+                avgData.axes.x.values(parameters.start.index);
+            parameters.stop.value = ...
+                avgData.axes.x.values(parameters.stop.index);
+            parameters.start.unit = avgData.axes.x.unit;
+            parameters.stop.unit = avgData.axes.x.unit;
             % Calculate standard deviation
             avgData.avg.stdev = ...
-                std(data.data(:,parameters.start:parameters.stop),0,2);
+                std(data.data(:,...
+                parameters.start.index:parameters.stop.index),0,2);
             % Adjust axis
             avgData.axes.x.values = mean(...
-                [avgData.axes.x.values(parameters.start) ...
-                avgData.axes.x.values(parameters.stop)]);
+                [avgData.axes.x.values(parameters.start.index) ...
+                avgData.axes.x.values(parameters.stop.index)]);
             % Fix problem with time axis in parameters
             avgData.parameters.transient.points = ...
                 length(avgData.axes.x.values);
         case 'y'
             avgData.data = ...
-                mean(avgData.data(parameters.start:parameters.stop,:),1);
+                mean(avgData.data(...
+                parameters.start.index:parameters.stop.index,:),1);
+            % Adjust parameters
+            parameters.start.value = ...
+                avgData.axes.y.values(parameters.start.index);
+            parameters.stop.value = ...
+                avgData.axes.y.values(parameters.stop.index);
+            parameters.start.unit = avgData.axes.y.unit;
+            parameters.stop.unit = avgData.axes.y.unit;
             % Calculate standard deviation
             avgData.avg.stdev = ...
-                std(data.data(parameters.start:parameters.stop,:),0,2);
+                std(data.data(...
+                parameters.start.index:parameters.stop.index,:),0,2);
             % Adjust axis
             avgData.axes.y.values = mean(...
-                [avgData.axes.y.values(parameters.start) ...
-                avgData.axes.y.values(parameters.stop)]);
+                [avgData.axes.y.values(parameters.start.index) ...
+                avgData.axes.y.values(parameters.stop.index)]);
         otherwise
             fprintf('\nUnknown dimension to average over: %s\n',...
                 parameters.dimension);
