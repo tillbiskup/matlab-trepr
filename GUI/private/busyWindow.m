@@ -6,7 +6,7 @@ function varargout = busyWindow(varargin)
 %       Returns the handle of the window.
 
 % (c) 2012, Till Biskup
-% 2012-03-30
+% 2012-05-30
 
 title = 'Processing...';
 position = [220,350,270,120];
@@ -41,8 +41,8 @@ description = ['<html>' description '</html>'];
 % Make GUI effectively a singleton
 singleton = findobj('Tag','busyWindow');
 if ~isempty(singleton)
+    varargout{1} = figure(singleton);
     if ~nargin
-        varargout{1} = figure(singleton);
         return;
     else
         hMainFigure = figure(singleton);
@@ -130,9 +130,13 @@ switch action
             set(hMainFigure,'Name','Completed.');
         end
         clear('jObj');
+    case 'delete'
+        jObj.stop;
+        delete(hMainFigure);
     otherwise
 end
 
+varargout{1} = hMainFigure;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
