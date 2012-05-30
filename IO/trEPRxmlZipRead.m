@@ -16,7 +16,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % SEE ALSO TREPRXMLZIPWRITE
 
 % (c) 2011-12, Till Biskup
-% 2012-05-29
+% 2012-05-30
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -27,6 +27,8 @@ parser.addRequired('filename', @(x)ischar(x) || iscell(x));
 % Note, this is to be compatible with TAload - currently without function!
 parser.addParamValue('checkFormat',logical(true),@islogical);
 parser.parse(filename);
+
+warning = cell(0);
 
 % Do the real stuff
 if iscell(filename)
@@ -114,10 +116,12 @@ try
         end
     end
 catch errmsg
-    warning = sprintf('%s\n%s\n"%s"\n',...
+    warning{end+1} = struct(...
+        'identifier','trEPRxmlZipRead:xmlParser',...
+        'message',sprintf('%s\n%s\n"%s"\n',...
         errmsg.identifier,...
         'Problems with parsing XML in file:',...
-        filename);
+        filename));
     if nargout
         varargout{1} = logical(false);
         varargout{2} = warning;
@@ -135,11 +139,12 @@ if exist('data','var')
         try
             data = reshape(data,ydim,xdim);
         catch exception
-            fprintf('%s\n%s',...
+            errmsg = sprintf('%s\n%s\n\nError was: %s',...
                 'Something caused trouble trying to reshape...',...
-                'Therefore, data might be corrupted. BE CAREFUL!\n\n');
-            fprintf('Error was: %s',...
-                getReport(exception, 'extended', 'hyperlinks', 'off'))
+                'Therefore, data might be corrupted. BE CAREFUL!',...
+                getReport(exception, 'extended', 'hyperlinks', 'off'));
+            warning{end+1}.identifier = 'trEPRxmlZipRead:reshape';
+            warning{end}.message = errmsg;
         end
     end
     struct.data = data;
@@ -147,7 +152,7 @@ if exist('data','var')
 end
 if nargout
     varargout{1} = struct;
-    varargout{2} = cell(0);
+    varargout{2} = warning;
 else
     varname=char(DOMnode.getDocumentElement.getNodeName);
     assignin('caller',varname,struct);

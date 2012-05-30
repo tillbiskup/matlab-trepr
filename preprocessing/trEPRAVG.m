@@ -22,7 +22,7 @@ function [avgData] = trEPRAVG(data,parameters)
 %              from the averaging in the history.parameters field
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -47,15 +47,20 @@ try
             % Calculate standard deviation
             avgData.avg.stdev = ...
                 std(data.data(:,parameters.start:parameters.stop),0,2);
+            % Adjust axis
             avgData.axes.x.values = mean(...
                 [avgData.axes.x.values(parameters.start) ...
                 avgData.axes.x.values(parameters.stop)]);
+            % Fix problem with time axis in parameters
+            avgData.parameters.transient.points = ...
+                length(avgData.axes.x.values);
         case 'y'
             avgData.data = ...
                 mean(avgData.data(parameters.start:parameters.stop,:),1);
             % Calculate standard deviation
             avgData.avg.stdev = ...
                 std(data.data(parameters.start:parameters.stop,:),0,2);
+            % Adjust axis
             avgData.axes.y.values = mean(...
                 [avgData.axes.y.values(parameters.start) ...
                 avgData.axes.y.values(parameters.stop)]);
