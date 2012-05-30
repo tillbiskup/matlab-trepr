@@ -8,14 +8,14 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_combinewindow');
+singleton = guiGetWindowHandle('trEPRgui_combinewindow');
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -36,7 +36,7 @@ for k=1:length(formatNames)
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_combinewindow',...
+hMainFigure = figure('Tag','trEPRgui_combinewindow',...
     'Visible','off',...
     'Name','trEPR GUI : Combine Window',...
     'Units','Pixels',...

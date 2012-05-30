@@ -4,7 +4,7 @@ function varargout = trEPRgui_bugreportwindow(varargin)
 %          to the help command. 
 
 % (c) 2011-12, Till Biskup
-% 2012-05-29
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -21,7 +21,7 @@ else
 end
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_bugreportwindow');
+singleton = guiGetWindowHandle('trEPRgui_bugreportwindow');
 if (singleton)
     figure(singleton);
     return;
@@ -33,7 +33,7 @@ bugZillaBugReportUrl = ...
     'https://r3c.de/bugs/till/enter_bug.cgi?product=trEPR%20toolbox';
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_bugreportwindow',...
+hMainFigure = figure('Tag','trEPRgui_bugreportwindow',...
     'Visible','off',...
     'Name','trEPR GUI : Bug Report Window',...
     'Units','Pixels',...

@@ -11,8 +11,11 @@ function status = update_statuswindow(statusmessages)
 %   Using the findjobj function from Y. Altman, it ensures that always
 %   the last (i.e., most current) line of the status window is visible.
 
+% (c) 2011-12, Till Biskup
+% 2012-05-30
+
 % Is there currently a trEPRgui_statuswindow object?
-statuswindow = findobj('Tag','trepr_gui_statuswindow');
+statuswindow = guiGetWindowHandle('trEPRgui_statuswindow');
 if (isempty(statuswindow))
     status = -1;
     return;

@@ -6,25 +6,34 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-03-23
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_helpwindow');
+singleton = findobj('Tag','trEPRgui_helpwindow');
 if (singleton)
     figure(singleton);
     return;
 end
 
-%  Construct the components
-hMainFigure = figure('Tag','trepr_gui_helpwindow',...
+% Get position of main window to position help window relative to it
+hMainGUI = guiGetWindowHandle();
+if ishandle(hMainGUI)
+    mainGUIPosition = get(hMainGUI,'Position');
+    position = [mainGUIPosition(1)+95,mainGUIPosition(2)+175,450,430];
+else
+    position = [115,235,450,430];
+end
+
+% Construct the components
+hMainFigure = figure('Tag','trEPRgui_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : Help Window',...
     'Units','Pixels',...
-    'Position',[115,235,450,430],...
+    'Position',position,...
     'Resize','off',...
     'KeyPressFcn',@keypress_Callback,...
     'NumberTitle','off', ...

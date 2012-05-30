@@ -1,11 +1,15 @@
 function guiProcessingBGC(datasetnum)
+
+% (c) 2011-12, Till Biskup
+% 2012-05-30
+
     method = 'trEPRBGC';
     fun = str2func(method);
     
     numBGprofiles = 5;
     
     % Get appdata of main window
-    mainWindow = findobj('Tag','trepr_gui_mainwindow');
+    mainWindow = guiGetWindowHandle();
     ad = getappdata(mainWindow);
     
     % Check whether operation has been applied to that dataset before

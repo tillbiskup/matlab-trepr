@@ -4,10 +4,10 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-30
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_mainwindow');
+singleton = findobj('Tag','trEPRgui');
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -36,7 +36,7 @@ uicontrol('Tag','InitialisingText',...
     'Position',[10 10 280 55]...
     );
 
-hMainFigure = figure('Tag','trepr_gui_mainwindow',...
+hMainFigure = figure('Tag','trEPRgui',...
     'Visible','off',...
     'Name','trEPR GUI : Main Window',...
     'Units','Pixels',...
@@ -675,7 +675,7 @@ end
 function slider_v1_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -721,7 +721,7 @@ end
 function slider_v2_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Convert slider value to scaling factor
@@ -777,7 +777,7 @@ end
 function slider_v3_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -826,7 +826,7 @@ end
 function slider_h1_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Convert slider value to scaling factor
@@ -882,7 +882,7 @@ end
 function slider_h2_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -931,7 +931,7 @@ end
 function zoom_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         if (get(source,'Value'))
@@ -967,7 +967,7 @@ end
 function fullscale_pushbutton_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -1005,7 +1005,7 @@ function reset_pushbutton_Callback(source,~)
         end
         
         % Get appdata of main window
-        mainWindow = findobj('Tag','trepr_gui_mainwindow');
+        mainWindow = guiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Reset displacement and scaling for current spectrum

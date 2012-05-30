@@ -712,7 +712,7 @@ end
 function setMinMax()
 
 % Get appdata from main GUI
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 ad = getappdata(mainWindow);
 
 if (isempty(ad.control.spectra.visible))

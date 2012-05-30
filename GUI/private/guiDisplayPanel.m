@@ -3290,7 +3290,7 @@ end
 function show3d_pushbutton_Callback(~,~)
     try
         % Make 3D representation window effectively a singleton
-        singleton = findobj('Tag','trepr_gui_3Drepresentation');
+        singleton = findobj('Tag','trEPRgui_3Drepresentation');
         if (singleton)
             figure(singleton);
             return;
@@ -3340,7 +3340,7 @@ function show3d_pushbutton_Callback(~,~)
             threeDrepresentationParameters);
         
         % Set tag for figure window containing 3D representation
-        set(figHandle,'Tag','trepr_gui_3Drepresentation');
+        set(figHandle,'Tag','trEPRgui_3Drepresentation');
 
     catch exception
         try
@@ -3364,7 +3364,7 @@ end
 function export3d_pushbutton_Callback(~,~)
     try
         % Look for 3D representation window
-        figHandle = findobj('Tag','trepr_gui_3Drepresentation');
+        figHandle = findobj('Tag','trEPRgui_3Drepresentation');
         if isempty(figHandle)
             return;
         end

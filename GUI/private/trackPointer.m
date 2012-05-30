@@ -15,8 +15,11 @@ function status = trackPointer(varargin)
 %           -4: no datasets displayed
 %            0: successful
 
+% (c) 2011-12, Till Biskup
+% 2012-05-30
+
 % Is there currently a trEPRgui object?
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
@@ -26,7 +29,7 @@ end
 gh = guihandles(mainWindow);
 
 % Get appdata of main window
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 ad = getappdata(mainWindow);
 
 % Check for availability of necessary GUI elements

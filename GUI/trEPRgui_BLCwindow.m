@@ -6,8 +6,8 @@ function varargout = trEPRgui_BLCwindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011, Till Biskup
-% 2011-11-08
+% (c) 2011-12, Till Biskup
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -22,7 +22,7 @@ if (singleton)
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_BLCwindow',...
+hMainFigure = figure('Tag','trEPRgui_BLCwindow',...
     'Visible','off',...
     'Name','trEPR GUI : Baseline Compensation (BLC) Window',...
     'Units','Pixels',...
@@ -806,7 +806,7 @@ msgStr = 'BLC GUI window opened';
 add2status(msgStr);
 
 % Load data from Main GUI
-mainGuiWindow = findobj('Tag','trepr_gui_mainwindow');
+mainGuiWindow = guiGetWindowHandle();
 if (mainGuiWindow)
     admain = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata

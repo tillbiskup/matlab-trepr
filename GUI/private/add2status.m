@@ -9,11 +9,11 @@ function status = add2status(statusmessage)
 %           -2: trEPRgui window appdata don't contain necessary fields
 %            0: successfully updated status
 
-% (c) 2011, Till Biskup
-% 2011-11-05
+% (c) 2011-12, Till Biskup
+% 2012-05-30
 
 % Is there currently a trEPRgui object?
-mainwindow = findobj('Tag','trepr_gui_mainwindow');
+mainwindow = guiGetWindowHandle();
 if (isempty(mainwindow))
     status = -1;
     return;

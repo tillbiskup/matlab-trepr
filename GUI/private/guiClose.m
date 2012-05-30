@@ -3,7 +3,7 @@ function guiClose()
 % subwindows that might still be open.
 
 % (c) 11, Till Biskup
-% 2011-11-27
+% 2012-05-30
 
 try
     % Get appdata of main window
@@ -34,7 +34,7 @@ try
     end
     
     % Close all GUI windows currently open
-    delete(findobj('-regexp','Tag','trepr_gui_*'));
+    delete(findobj('-regexp','Tag','trEPRgui_*'));
     
 catch exception
     % Hm... that should really not happen.

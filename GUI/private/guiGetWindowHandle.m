@@ -21,7 +21,7 @@ function handle = guiGetWindowHandle(varargin)
 % If no handle could be found, an empty cell array will be returned.
 
 % (c) 2011-12, Till Biskup
-% 2012-02-01
+% 2012-05-30
 
 try
     % Check whether we are called with input argument
@@ -32,18 +32,23 @@ try
     end
     
     windowTags = struct();
-    windowTags.trEPRgui = 'trepr_gui_mainwindow';
-    windowTags.trEPRgui_ACCwindow = 'trEPRgui_ACCwindow';
-    windowTags.trEPRgui_ACC_helpwindow = 'trEPRgui_ACC_helpwindow';
-    windowTags.trEPRgui_BLCwindow = 'trepr_gui_BLCwindow';
-    windowTags.trEPRgui_BLC_helpwindow = 'trEPRgui_BLC_helpwindow';
-    windowTags.trEPRgui_AVGwindow = 'trepr_gui_AVGwindow';
-    windowTags.trEPRgui_AVG_helpwindow = 'trEPRgui_AVG_helpwindow';
-    windowTags.trEPRgui_infowindow = 'trepr_gui_infowindow';
-    windowTags.trEPRgui_info_helpwindow = 'trEPRgui_info_helpwindow';
-    % Add here list of other window tags
-    windowTags.trEPRgui_combinewindow = 'trepr_gui_combinewindow';
-    windowTags.trEPRgui_combine_helpwindow = 'trEPRgui_combine_helpwindow';
+    windowTags.trEPRgui = 'trEPRgui';
+    
+    % Fill struct with generic names - assuming everybody followed the
+    % conventions of naming GUI windows
+    
+    % Get GUI window filenames
+    guiFileNames = struct2cell(...
+        dir(fullfile(trEPRinfo('dir'),'GUI','trEPR*window.m')));
+    guiFileNames = guiFileNames(1,:);
+    guiSubWindowNames = struct2cell(...
+        dir(fullfile(trEPRinfo('dir'),'GUI','private','trEPR*window.m')));
+    guiFileNames = [ guiFileNames guiSubWindowNames(1,:) ];  
+    for k=1:length(guiFileNames)
+        windowTags.(guiFileNames{k}(1:end-2)) = guiFileNames{k}(1:end-2);
+    end
+    
+    windowTags
     
     % Define default tag
     defaultTag = windowTags.trEPRgui;

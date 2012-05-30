@@ -14,7 +14,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_AVGwindow');
+singleton = guiGetWindowHandle('trEPRgui_AVGwindow');
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -22,7 +22,7 @@ if (singleton)
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_AVGwindow',...
+hMainFigure = figure('Tag','trEPRgui_AVGwindow',...
     'Visible','off',...
     'Name','trEPR GUI : AVG Window',...
     'Units','Pixels',...

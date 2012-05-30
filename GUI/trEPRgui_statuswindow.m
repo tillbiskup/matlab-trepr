@@ -2,26 +2,26 @@ function varargout = trEPRgui_statuswindow(varargin)
 % TREPRGUI_STATUSWINDOW A GUI window displaying status messages of the
 % toolbox and GUI.
 %
-% Normally, this window is called from within the TAgui window.
+% Normally, this window is called from within the trEPRgui window.
 %
-% See also TAGUI
+% See also trEPRgui
 
 % (c) 2011-12, Till Biskup
-% 2012-04-25
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_statuswindow');
+singleton = getGuiWindowHandle('trEPRgui_statuswindow');
 if (singleton)
     figure(singleton);
     return;
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_statuswindow',...
+hMainFigure = figure('Tag','trEPRgui_statuswindow',...
     'Visible','off',...
     'Name','trEPR GUI : Status Window',...
     'Units','Pixels',...
@@ -61,7 +61,7 @@ guidata(hMainFigure,guihandles);
 set(hMainFigure,'Visible','on');
 
 % Set string
-mainGuiWindow = findobj('Tag','trepr_gui_mainwindow');
+mainGuiWindow = guiGetWindowHandle();
 if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata

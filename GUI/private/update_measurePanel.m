@@ -6,8 +6,11 @@ function status = update_measurePanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
+% (c) 2011-12, Till Biskup
+% 2012-05-30
+
 % Is there currently a trEPRgui object?
-mainWindow = findobj('Tag','trepr_gui_mainwindow');
+mainWindow = guiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;

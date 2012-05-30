@@ -22,14 +22,14 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-29
+% 2012-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trepr_gui_infowindow');
+singleton = findobj('Tag','trEPRgui_infowindow');
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -37,7 +37,7 @@ if (singleton)
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trepr_gui_infowindow',...
+hMainFigure = figure('Tag','trEPRgui_infowindow',...
     'Visible','off',...
     'Name','trEPR GUI : Info Window',...
     'Units','Pixels',...
