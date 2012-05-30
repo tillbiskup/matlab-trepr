@@ -1,7 +1,7 @@
 function varargout = busyWindow(varargin)
 % BUSYWINDOW Show window with message and spinning dots
 %
-%       Arguments: action (start, stop)
+%       Arguments: action (start, stop, delete)
 %
 %       Returns the handle of the window.
 
@@ -132,6 +132,7 @@ switch action
         clear('jObj');
     case 'delete'
         jObj.stop;
+        clear('jObj');
         delete(hMainFigure);
     otherwise
 end
