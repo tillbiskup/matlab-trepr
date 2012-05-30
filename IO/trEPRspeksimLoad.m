@@ -25,8 +25,8 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
-% (c) 2009-2011, Till Biskup
-% 2011-11-02
+% (c) 2009-2012, Till Biskup
+% 2012-05-30
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -55,7 +55,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
             varargout{2} = warnings;
         end
     else
-        switch exist(filename)
+        switch exist(filename) %#ok<EXIST>
             case 0
                 % If name does not exist.
                 % Check whether it is only a file basename

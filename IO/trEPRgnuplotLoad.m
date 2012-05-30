@@ -25,8 +25,8 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
-% (c) 2009-2011, Till Biskup
-% 2011-11-02
+% (c) 2009-2012, Till Biskup
+% 2012-05-30
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -55,7 +55,7 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
             varargout{2} = warnings;
         end
     else
-        switch exist(filename)
+        switch exist(filename) %#ok<EXIST>
             case 0
                 % If name does not exist.
                 % Check whether it is only a file basename
@@ -131,7 +131,7 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
                             checkFileFormat(fileNames(k).name)
-                        files{k} = importdata(fileNames(k).name,' ',3);
+                        files{k} = importdata(fileNames(k).name,' ',3); %#ok<AGROW>
                         content.data(k,:) = files{k}.data(:,2);
                         B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
                         content.axes.y.values(k) = str2double(B0{1});
@@ -156,7 +156,7 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
                             checkFileFormat(filename{k})
-                        files{k} = importdata(filename{k},' ',3);
+                        files{k} = importdata(filename{k},' ',3); %#ok<AGROW>
                         content.data(k,:) = files{k}.data(:,2);
                         B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
                         content.axes.y.values(k) = str2double(B0{1});
