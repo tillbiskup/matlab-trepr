@@ -1,5 +1,5 @@
-function status = update_statuswindow(statusmessages)
-% UPDATE_STATUSWINDOW Helper function that updates the status window
+function status = trEPRguiUpdateStatusWindow(statusmessages)
+% TREPRGUIUPDATESTATUSWINDOW Helper function that updates the status window
 %   of the trEPR GUI, namely trEPRgui_statuswindow.
 %
 %   STATUSMESSAGES: cell array containing the complete status messages

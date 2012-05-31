@@ -53,7 +53,7 @@ setappdata(mainwindow,'control',ad.control);
 % function that's located there, and afterwards return to original dir.
 PWD = pwd;
 cd(fileparts(mfilename('fullpath')));
-update_statuswindow(ad.control.status);
+trEPRguiUpdateStatusWindow(ad.control.status);
 cd(PWD);
 
 status = 0;

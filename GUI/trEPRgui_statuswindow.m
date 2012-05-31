@@ -73,7 +73,7 @@ else
         '  1: There seems to be no trEPR GUI main window...',...
         };
 end
-update_statuswindow(statusstring);
+trEPRguiUpdateStatusWindow(statusstring);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks

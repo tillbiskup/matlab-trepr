@@ -630,7 +630,7 @@ end
 
 % Set status message
 trEPRadd2status('trEPR GUI main window initialised successfully.');
-%update_statuswindow(ad.control.status);
+%trEPRguiUpdateStatusWindow(ad.control.status);
 
 % Add keypress function to every element that can have one...
 handles = findall(...
