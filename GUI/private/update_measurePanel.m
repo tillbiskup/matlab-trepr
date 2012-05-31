@@ -10,7 +10,7 @@ function status = update_measurePanel()
 % 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainWindow = trEPRtrEPRguiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
