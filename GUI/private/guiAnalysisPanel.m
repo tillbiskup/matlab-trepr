@@ -147,7 +147,7 @@ function pushbutton_Callback(~,~,action)
                         % Create filename with full path
                         fileName = fullfile(pathName,fileName);
                         
-                        busyWindow('start',...
+                        trEPRbusyWindow('start',...
                             'Trying to export dataset...<br />please wait.');
                         
                         % Export using export4glotaran
@@ -155,10 +155,10 @@ function pushbutton_Callback(~,~,action)
                             ad.data{ad.control.spectra.active},fileName);
                         if status
                             add2status(status);
-                            busyWindow('stop',...
+                            trEPRbusyWindow('stop',...
                                 'Trying to export dataset...<br /><b>failed</b>.');
                         else
-                            busyWindow('stop',...
+                            trEPRbusyWindow('stop',...
                                 'Trying to export dataset...<br /><b>done</b>.');
                         end
                         

@@ -148,13 +148,13 @@ try
             end
             if src == gh.data_panel_visible_listbox
                 if ~isempty(evt.Modifier) && (strcmpi(evt.Modifier{1},'shift'))
-                    [status,message] = removeDatasetFromMainGUI(...
+                    [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active,'force',true);
                     if status
                         disp(message);
                     end
                 else
-                    [status,message] = removeDatasetFromMainGUI(...
+                    [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active);
                     if status
                         disp(message);
@@ -167,13 +167,13 @@ try
             end
             if src == gh.data_panel_visible_listbox
                 if ~isempty(evt.Modifier) && (strcmpi(evt.Modifier{1},'shift'))
-                    [status,message] = removeDatasetFromMainGUI(...
+                    [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active,'force',true);
                     if status
                         disp(message);
                     end
                 else
-                    [status,message] = removeDatasetFromMainGUI(...
+                    [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active);
                     if status
                         disp(message);

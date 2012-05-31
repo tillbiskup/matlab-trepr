@@ -803,7 +803,7 @@ setappdata(hMainFigure,'blc',ad.blc);
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
 msgStr = 'BLC GUI window opened';
-add2status(msgStr);
+trEPRadd2status(msgStr);
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -853,7 +853,7 @@ function tbg_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -896,7 +896,7 @@ function fitarea_panel_slider_Callback(source,~,area)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -958,7 +958,7 @@ function addpoints_panel_checkbox_Callback(source,~,point)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -993,7 +993,7 @@ function addpoints_panel_slider_Callback(source,~,point)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1025,7 +1025,7 @@ function position_slider_Callback(source,~)
             otherwise
                 msg = sprintf('Display type %s currently unsupported',...
                     ad.control.axis.displayType);
-                add2status(msg);
+                trEPRadd2status(msg);
         end
         
         % Set appdata from BLC GUI
@@ -1037,7 +1037,7 @@ function position_slider_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1069,7 +1069,7 @@ function showposition_checkbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1105,7 +1105,7 @@ function visible_panel_listbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1158,7 +1158,7 @@ function displaytype_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1216,7 +1216,7 @@ function correctionmethod_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1244,7 +1244,7 @@ function pushbutton_Callback(~,~,action)
                         'Baseline correction (BLC) successful.'...
                         'Now trying to rewrite BLC data to main GUI.'...
                         };
-                    add2status(msgStr);
+                    trEPRadd2status(msgStr);
                     % Return BLC data to main GUI
                     for k=1:length(ad.blc.spectra)
                         % Remove blc field in data structure
@@ -1254,7 +1254,7 @@ function pushbutton_Callback(~,~,action)
                                 'blc'...
                                 );
                         end
-                        status = refreshDatasetInMainGUI(...
+                        status = trEPRrefreshDatasetInMainGUI(...
                             ad.data{ad.blc.spectra(k)},...
                             ad.blc.spectra(k),...
                             'modified',true);
@@ -1268,7 +1268,7 @@ function pushbutton_Callback(~,~,action)
                         'No baseline correction (BLC) has been performed. '...
                         'Alternatively, user discarded BLC.'
                         };
-                    add2status(msgStr);
+                    trEPRadd2status(msgStr);
                 end
                 % Look for BLC GUI Help window and if its there, close as
                 % well
@@ -1313,7 +1313,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1386,7 +1386,7 @@ function keypress_Callback(src,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1431,7 +1431,7 @@ function switchPanel(panelName)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1686,7 +1686,7 @@ function updateAxes()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1767,7 +1767,7 @@ function updateSpectra()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1843,7 +1843,7 @@ function update_position_display()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1892,7 +1892,7 @@ function update_fitarea_display()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1936,7 +1936,7 @@ function update_addpoint_display()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2064,7 +2064,7 @@ function if_BLC(action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

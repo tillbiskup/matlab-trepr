@@ -1,8 +1,8 @@
-function [status,message] = saveAsDatasetInMainGUI(id,varargin)
-% SAVEASDATASETINMAINGUI Save dataset in main GUI under different name.
+function [status,message] = trEPRsaveDatasetInMainGUI(id,varargin)
+% SAVEDATASETINMAINGUI Save dataset in main GUI.
 %
 % Usage:
-%   status = saveAsDatasetInMainGUI(id);
+%   status = trEPRsaveDatasetInMainGUI(id);
 %
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
@@ -43,60 +43,41 @@ try
     % Get appdata of main window
     ad = getappdata(mainWindow);
     
-    % Create default filename
-    [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
-    if ~isempty(ad.control.dirs.lastSave)
-        fpath = ad.control.dirs.lastSave;
-    end
-    if ~strcmp(fext,zipext)
-        ad.data{id}.file.name = fullfile(fpath,[fname zipext]);
-    end
-    % Need to test for existing file and in case, change default name
-    if (exist(ad.data{id}.file.name,'file'))
-        % 1. Check whether name ends with -NNN (where NNN are numbers)
-        % 2. existingFiles = dir(sprintf('%s*',filename));
-        % 2a. If name ends with -NNN, remove "-NNN" from filename before
-        % 3. regexp existingFiles for "-NNN" pattern
-        % 4. Get highest "-NNN" pattern and increment "NNN"
-        % 5. Use filename with incremented "NNN" as new default filename
-        if (regexp(fname,'_\d+$'))
-            filesInDir = ...
-                dir(sprintf('%s*',fullfile(fpath,regexprep(fname,'_\d+$',''))));
-        else
-            filesInDir = dir(sprintf('%s*',fullfile(fpath,fname)));
-        end
-        l=0;
-        numbers = [];
-        for k=1:length(filesInDir)
-            token = regexp(filesInDir(k).name,'_(\d+)\..*$','tokens');
-            if ~isempty(token)
-                l=l+1;
-                numbers(l) = str2double(token{1});
+    % Check whether selected dataset has a (valid) filename
+    if ~isfield(ad.data{id}.file,'name') || ...
+            (strcmp(ad.data{id}.file.name,''))
+        status = trEPRsaveAsDatasetInMainGUI(id);
+        return;
+    else
+        [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
+        if ~strcmp(fext,zipext)
+            ad.data{id}.file.name = fullfile(fpath,[fname zipext]);
+            % Need to test for existing file and in case, ask user...
+            if (exist(ad.data{id}.file.name,'file'))
+                answer = questdlg(...
+                    {'WARNING: You''re about to save the current dataset to the file'...
+                    ad.data{id}.file.name ...
+                    ' '...
+                    'This file exists already! Are you sure you want to overwrite it?'...
+                    ' '...
+                    'Please hold on and think twice before you hit "Overwrite".'...
+                    'Alternatively you can press "Save as" and choose a different name.'},...
+                    'Warning: File exists already...',...
+                    'Overwrite','Save as','Cancel',...
+                    'Cancel');
+                switch answer
+                    case 'Overwrite'
+                    case 'Save as'
+                        status = trEPRsaveAsDatasetInMainGUI(id);
+                        return;
+                    case 'Cancel'
+                        return;
+                    otherwise
+                        return;
+                end
             end
         end
-        if (~isempty(numbers));
-            number = max(numbers)+1;
-        else
-            number = 1;
-        end
-        ad.data{id}.file.name = fullfile(...
-            fpath,...
-            sprintf('%s_%i%s',fname,number,zipext));
     end
-    
-    % Show dialog for file selection
-    [FileName,PathName,~] = uiputfile(...
-        zipext,...
-        'Save dataset in a new file',...
-        ad.data{id}.file.name);
-    
-    if (FileName == 0)
-        status = -1;
-        return;
-    end
-    
-    % Set filename to save in
-    ad.data{id}.file.name = fullfile(PathName, FileName);
     
     for k = 1:length(ad.data)
         if (strcmp(ad.data{k}.file.name,ad.data{id}.file.name)) && (k ~= id)
@@ -112,7 +93,7 @@ try
                 'Cancel');
             switch answer
                 case 'Save as'
-                    status = saveAsDatasetInMainGUI(id);
+                    status = trEPRsaveAsDatasetInMainGUI(id);
                     return;
                 case 'Cancel'
                     return;
@@ -122,7 +103,7 @@ try
         end
     end
     
-    busyWindow('start','Trying to save spectra...<br />please wait.');
+    trEPRbusyWindow('start','Trying to save spectra...<br />please wait.');
     
     % Do the actual saving
     [ saveStatus, exception ] = ...
@@ -138,8 +119,9 @@ try
         msgStr{end+1} = ad.data{id}.file.name;
         msgStr = [ msgStr saveStatus ];
         status = add2status(msgStr);
-        busyWindow('stop','Trying to save spectra...<br /><b>failed</b>.');
+        trEPRbusyWindow('stop','Trying to save spectra...<br /><b>failed</b>.');
         clear msgStr;
+        status = -1;
         return;
     else
         % Get second output parameter from trEPRsave, i.e. filename
@@ -148,11 +130,10 @@ try
     end
     
     % Remove from modified
-    ad.control.spectra.modified(...
-        (ad.control.spectra.modified == id)) = [];
+    ad.control.spectra.modified(ad.control.spectra.modified == id) = [];
     
     % Set last save dir
-    ad.control.dirs.lastSave = PathName;
+    ad.control.dirs.lastSave = fpath;
     
     % Write appdata
     setappdata(mainWindow,'data',ad.data);
@@ -173,7 +154,7 @@ try
     update_processingPanel();
     update_mainAxis();
     
-    busyWindow('stop','Trying to save spectra...<br /><b>done</b>.');
+    trEPRbusyWindow('stop','Trying to save spectra...<br /><b>done</b>.');
     status = 0;
     
 catch exception
@@ -194,5 +175,4 @@ catch exception
     end
 end
 
-    
 end

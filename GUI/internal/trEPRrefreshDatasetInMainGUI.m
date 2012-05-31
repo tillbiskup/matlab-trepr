@@ -1,8 +1,8 @@
-function status = refreshDatasetInMainGUI(dataset,id,varargin)
+function status = trEPRrefreshDatasetInMainGUI(dataset,id,varargin)
 % REFRESHDATASETINMAINGUI Refresh dataset in main GUI.
 %
 % Usage:
-%   status = refreshDatasetInMainGUI(dataset,id);
+%   status = trEPRrefreshDatasetInMainGUI(dataset,id);
 %
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
@@ -78,7 +78,7 @@ try
             % that the corresponding dataset in the main GUI now has both a
             % different label and a different id, we savely append it to
             % the main GUI.
-            appendDatasetToMainGUI(dataset,'modified',p.Results.modified);
+            trEPRappendDatasetToMainGUI(dataset,'modified',p.Results.modified);
             status = 0;
             return;
         end

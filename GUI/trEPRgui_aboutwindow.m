@@ -225,7 +225,7 @@ end
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);

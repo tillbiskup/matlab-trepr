@@ -1,8 +1,8 @@
-function status = appendDatasetToMainGUI(dataset,varargin)
+function status = trEPRappendDatasetToMainGUI(dataset,varargin)
 % APPENDDATASETTOMAINGUI Append dataset to main GUI.
 %
 % Usage:
-%   status = appendDatasetToMainGUI(dataset);
+%   status = trEPRappendDatasetToMainGUI(dataset);
 %
 % Status:  0 - everything fine
 %         -1 - no main GUI window found

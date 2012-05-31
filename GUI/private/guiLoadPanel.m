@@ -252,14 +252,14 @@ function load_pushbutton_Callback(~,~)
         add2status(msg);
         clear msgStr msg;
         
-        busyWindow('start','Trying to load spectra...<br />please wait.');
+        trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
        
         [data,warnings] = trEPRload(FileName,'combine',state.comb);
 
         if isequal(data,0) || isempty(data)
             msg = 'Data could not be loaded.';
             add2status(msg);
-            busyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
+            trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
         
@@ -315,7 +315,7 @@ function load_pushbutton_Callback(~,~)
         end
         
         if isempty(data)
-            busyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
+            trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
         
@@ -403,7 +403,7 @@ function load_pushbutton_Callback(~,~)
         add2status(msg);
         clear msgStr msg;
 
-        busyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
+        trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
         
         % Get appdata again after making changes to it before
         ad = getappdata(mainWindow);

@@ -1,9 +1,9 @@
-function [status,message] = removeDatasetFromMainGUI(dataset,varargin)
+function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 % REMOVEDATASETFROMMAINGUI Remove dataset(s) from main GUI.
 %
 % Usage:
-%   status = removeDatasetFromMainGUI(dataset);
-%   [status,message] = removeDatasetFromMainGUI(dataset);
+%   status = trEPRremoveDatasetFromMainGUI(dataset);
+%   [status,message] = trEPRremoveDatasetFromMainGUI(dataset);
 %
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
@@ -87,7 +87,7 @@ try
                     'Save & Remove');
                 switch answer
                     case 'Save & Remove'
-                        status = saveDatasetInMainGUI(dataset);
+                        status = trEPRsaveDatasetInMainGUI(dataset);
                         if status
                             % That means that something went wrong with the saveAs
                             return;

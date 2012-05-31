@@ -447,7 +447,7 @@ function pushbutton_Callback(~,~,action)
                 % Get id of selected spectrum
                 selectedId = ad.control.spectra.visible(selected);
                 
-                saveDatasetInMainGUI(selectedId);
+                trEPRsaveDatasetInMainGUI(selectedId);
             case 'SaveAs'
                 % Get selected item of listbox
                 selected = get(gh.data_panel_visible_listbox,'Value');
@@ -455,7 +455,7 @@ function pushbutton_Callback(~,~,action)
                 % Get id of selected spectrum
                 selectedId = ad.control.spectra.visible(selected);
                 
-                saveAsDatasetInMainGUI(selectedId);
+                trEPRsaveAsDatasetInMainGUI(selectedId);
             case 'Remove'
                 % Get selected item of listbox
                 selected = get(gh.data_panel_visible_listbox,'Value');
@@ -463,7 +463,7 @@ function pushbutton_Callback(~,~,action)
                 % Get id of selected spectrum
                 selectedId = ad.control.spectra.visible(selected);
                 
-                removeDatasetFromMainGUI(selectedId);
+                trEPRremoveDatasetFromMainGUI(selectedId);
             case 'Duplicate'
                 % Get selected item of listbox
                 selected = get(gh.data_panel_visible_listbox,'Value');

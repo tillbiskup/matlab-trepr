@@ -1,4 +1,4 @@
-function varargout = busyWindow(varargin)
+function varargout = trEPRbusyWindow(varargin)
 % BUSYWINDOW Show window with message and spinning dots
 %
 %       Arguments: action (start, stop, delete)
@@ -6,7 +6,7 @@ function varargout = busyWindow(varargin)
 %       Returns the handle of the window.
 
 % (c) 2012, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 title = 'Processing...';
 position = [220,350,270,120];
@@ -39,7 +39,7 @@ end
 description = ['<html>' description '</html>'];
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','busyWindow');
+singleton = findobj('Tag',mfilename);
 if ~isempty(singleton)
     varargout{1} = figure(singleton);
     if ~nargin
@@ -52,7 +52,7 @@ if ~isempty(singleton)
     end
 else
     % Create main figure
-    hMainFigure = figure('Tag','busyWindow',...
+    hMainFigure = figure('Tag',mfilename,...
         'Visible','off',...
         'WindowStyle','modal',...
         'Name',title,...

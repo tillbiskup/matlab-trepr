@@ -1,6 +1,6 @@
-function status = add2status(statusmessage)
-% ADD2STATUS Helper function that adds a status message to the status cell 
-%   array of the trEPR GUI
+function status = trEPRadd2status(statusmessage)
+% TREPRADD2STATUS Helper function that adds a status message to the status
+% cell array of the trEPR GUI
 %
 %   STATUSMESSAGE: string/cell array containing the status message
 %
