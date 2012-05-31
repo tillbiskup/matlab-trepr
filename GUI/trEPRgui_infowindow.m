@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2686,7 +2686,7 @@ setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 
 % Load data from Main GUI
-mainGuiWindow = guiGetWindowHandle();
+mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     admain = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
@@ -2855,7 +2855,7 @@ end
 function dataset_listbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         ad.control.spectra.active = ad.control.spectra.loaded(...
@@ -2899,7 +2899,7 @@ function general_edit_Callback(source,~,value)
         end
         
         % Get appdata from main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         switch value
@@ -2972,7 +2972,7 @@ end
 
 function parameter_edit_Callback(source,~,value)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
 
@@ -3212,7 +3212,7 @@ end
 function history_listbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         ad.control.spectra.history{ad.control.spectra.active} = ... 
@@ -3249,7 +3249,7 @@ function pushbutton_Callback(~,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
 
         switch action
@@ -3344,7 +3344,7 @@ function pushbutton_Callback(~,~,action)
                 % main GUI
                 if ~isempty(ad.control.spectra.modified)
                     for k=1:length(ad.control.spectra.modified)
-                        if isempty(guiGetWindowHandle())
+                        if isempty(trEPRguiGetWindowHandle())
                             assignin('base',inputParameterName,ad.data);
                         else
                             status = refreshDatasetInMainGUI(...
@@ -3446,13 +3446,13 @@ end
 function guiClose()
     try
         % Look for Info GUI Help window and if its there, close as well
-        hHelpWindow = guiGetWindowHandle('trEPRgui_info_helpwindow');
+        hHelpWindow = trEPRguiGetWindowHandle('trEPRgui_info_helpwindow');
         if ishandle(hHelpWindow)
             delete(hHelpWindow);
         end
         msgStr = {'Closing Info GUI.'};
         add2status(msgStr);
-        delete(guiGetWindowHandle(mfilename));
+        delete(trEPRguiGetWindowHandle(mfilename));
     catch exception
         try
             msgStr = ['An exception occurred. '...
@@ -3475,7 +3475,7 @@ end
 function switchPanel(panelName)
     try
         % Get handles of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         gh = guihandles(mainWindow);
 
         panels = [p1 p2 p4 p3];
@@ -3558,7 +3558,7 @@ end
 function switchParameterPanel(panelName)
     try
         % Get handles of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         gh = guihandles(mainWindow);
 
         panels = [ ...
@@ -3613,7 +3613,7 @@ end
 
 function updateDatasets()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
             
@@ -3682,7 +3682,7 @@ end
 
 function updateGeneralPanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
         
@@ -3736,7 +3736,7 @@ end
 
 function updateParameterPanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
         
@@ -3942,7 +3942,7 @@ end
 
 function updateToolsPanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
         
@@ -3974,7 +3974,7 @@ end
 
 function updateHistoryPanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
         

@@ -8,11 +8,11 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % (c) 2011-12, Till Biskup
-% 2012-01-26
+% 2012-05-31
 
 try
     % Get handles of main window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     gh = guihandles(mainWindow);
     
     panels = [...

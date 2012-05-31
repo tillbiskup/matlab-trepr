@@ -7,10 +7,10 @@ function status = update_datasetPanel()
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-03-23
+% 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;

@@ -6,8 +6,8 @@ function handle = guiProcessingPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 11, Till Biskup
-% 2011-11-27
+% (c) 2011-12, Till Biskup
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -236,7 +236,7 @@ uicontrol('Tag','processing_panel_average_y_unit_edit',...
 function corrections_pushbutton_Callback(~,~,correction)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % If no dataset is selected
@@ -292,7 +292,7 @@ end
 function datasets_listbox_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -343,7 +343,7 @@ end
 function average_edit_Callback(source,~,value)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -501,7 +501,7 @@ end
 function datasetChangeLabel(index)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);

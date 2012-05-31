@@ -9,10 +9,10 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
@@ -665,7 +665,7 @@ end
 
 function display_legend(mainAxes)
 
-mainWindow = guiGetWindowHandle;
+mainWindow = trEPRguiGetWindowHandle;
 
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
@@ -712,7 +712,7 @@ end
 function setMinMax()
 
 % Get appdata from main GUI
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 
 if (isempty(ad.control.spectra.visible))

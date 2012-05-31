@@ -3,11 +3,11 @@ function guiClose()
 % subwindows that might still be open.
 
 % (c) 11, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 try
     % Get appdata of main window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
 
     % TODO: Check whether there is anything that is not saved...

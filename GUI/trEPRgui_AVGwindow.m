@@ -7,14 +7,14 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = guiGetWindowHandle('trEPRgui_AVGwindow');
+singleton = trEPRguiGetWindowHandle('trEPRgui_AVGwindow');
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -955,7 +955,7 @@ add2status(msgStr);
 
 
 % Load data from Main GUI
-mainGuiWindow = guiGetWindowHandle();
+mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     admain = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
@@ -1042,7 +1042,7 @@ end
 
 function position_slider_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
         
@@ -1099,7 +1099,7 @@ function position_edit_Callback(source,~,position)
         end
         
         % Get appdata of AVG GUI
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         % Be as robust as possible: if there is no axes, default is indices
@@ -1177,7 +1177,7 @@ end
 
 function showposition_checkbox_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
         
@@ -1223,7 +1223,7 @@ function area_edit_Callback(source,~,position)
         end
         
         % Get appdata of AVG GUI
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -1422,7 +1422,7 @@ end
 
 function visible_panel_listbox_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
         
@@ -1461,7 +1461,7 @@ function edit_Callback(source,~,field)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         value = get(source,'String');
@@ -1502,7 +1502,7 @@ function popupmenu_Callback(source,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
 
         values = cellstr(get(source,'String'));
@@ -1556,7 +1556,7 @@ function togglebutton_Callback(source,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
 
         % Get state of toggle button
@@ -1670,7 +1670,7 @@ function pushbutton_Callback(~,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -1841,7 +1841,7 @@ function pushbutton_Callback(~,~,action)
                 if ishandle(hHelpWindow)
                     delete(hHelpWindow);
                 end
-                delete(guiGetWindowHandle(mfilename));
+                delete(trEPRguiGetWindowHandle(mfilename));
             otherwise
                 disp('trEPRgui_fitwindow: pushbutton_Callback(): Unknown action');
                 disp(action);
@@ -1873,7 +1873,7 @@ function slider_Callback(source,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -1971,7 +1971,7 @@ function keypress_Callback(src,evt)
             % was pressed...
             return;
         end
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
 
@@ -2086,7 +2086,7 @@ end
 
 function updateSliderPanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata of AVG GUI
         ad = getappdata(mainWindow);
         
@@ -2166,7 +2166,7 @@ end
 
 function updateAveragePanel()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata of AVG GUI
         ad = getappdata(mainWindow);
         
@@ -2273,7 +2273,7 @@ end
 
 function updateSettingsPanel(varargin)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
 
@@ -2353,7 +2353,7 @@ end
         
 function updateSpectra()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from AVG GUI
         ad = getappdata(mainWindow);
         
@@ -2412,7 +2412,7 @@ function updateSpectra()
 end
 
 function update_position_display()
-    mainWindow = guiGetWindowHandle(mfilename);
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from AVG GUI
     ad = getappdata(mainWindow);
 
@@ -2488,7 +2488,7 @@ end
 
 
 function updateAxes()
-    mainWindow = guiGetWindowHandle(mfilename);
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from AVG GUI
     ad = getappdata(mainWindow);
 
@@ -2845,7 +2845,7 @@ end
 function switchMeasurePointer(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
 
         % Get handles from main window
@@ -2884,7 +2884,7 @@ end
 
 function trackPointer(varargin)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         
         % Get handles of mainwindow
         gh = guihandles(mainWindow);

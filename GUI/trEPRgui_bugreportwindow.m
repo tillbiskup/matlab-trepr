@@ -4,7 +4,7 @@ function varargout = trEPRgui_bugreportwindow(varargin)
 %          to the help command. 
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -21,7 +21,7 @@ else
 end
 
 % Make GUI effectively a singleton
-singleton = guiGetWindowHandle('trEPRgui_bugreportwindow');
+singleton = trEPRguiGetWindowHandle('trEPRgui_bugreportwindow');
 if (singleton)
     figure(singleton);
     return;

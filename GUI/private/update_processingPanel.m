@@ -7,10 +7,10 @@ function status = update_processingPanel()
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;
@@ -24,7 +24,7 @@ ad = getappdata(mainWindow);
 
 
 % Get appdata of main window
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 
 if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)

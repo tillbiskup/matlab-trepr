@@ -6,11 +6,11 @@ function status = switchDisplayType(displayType)
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
 % (c) 2011, Till Biskup
-% 2011-12-01
+% 2012-05-31
 
 try
     % Get appdata and handles of main window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
     gh = guihandles(mainWindow);
     

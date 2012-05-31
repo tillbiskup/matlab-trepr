@@ -1,4 +1,4 @@
-function handle = guiGetWindowHandle(varargin)
+function handle = trEPRguiGetWindowHandle(varargin)
 % GUIGETWINDOWHANDLE Private function to get window handles of GUI windows.
 %
 % The idea behind having this function is to have only one place where you
@@ -9,8 +9,8 @@ function handle = guiGetWindowHandle(varargin)
 % "private" directory of the GUI directory.
 %
 % Usage:
-%    handle = guiGetWindowHandle();
-%    handle = guiGetWindowHandle(identifier);
+%    handle = trEPRguiGetWindowHandle();
+%    handle = trEPRguiGetWindowHandle(identifier);
 %
 % Where, in the latter case, "identifier" is a string that defines which
 % GUI window to look for. Normally, for convenience, this should be the

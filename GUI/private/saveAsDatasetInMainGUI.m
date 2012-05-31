@@ -12,7 +12,7 @@ function [status,message] = saveAsDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-21
+% 2012-05-31
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -25,7 +25,7 @@ p.parse(id,varargin{:});
 
 try
     % First, find main GUI window
-    mainWindow = guiGetWindowHandle();
+    mainWindow = trEPRguiGetWindowHandle();
         
     % Preset message
     message = '';

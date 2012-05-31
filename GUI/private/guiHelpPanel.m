@@ -7,7 +7,8 @@ function handle = guiHelpPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -136,7 +137,7 @@ hPanelText = uicontrol('Tag','helptext_display',...
 
 try
     % Get appdata of main window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
     
     % Get guihandles of main window

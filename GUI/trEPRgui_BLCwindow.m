@@ -7,14 +7,14 @@ function varargout = trEPRgui_BLCwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = guiGetWindowHandle(mfilename);
+singleton = trEPRguiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -806,7 +806,7 @@ msgStr = 'BLC GUI window opened';
 add2status(msgStr);
 
 % Load data from Main GUI
-mainGuiWindow = guiGetWindowHandle();
+mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     admain = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
@@ -870,7 +870,7 @@ end
 
 function fitarea_panel_slider_Callback(source,~,area)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -913,7 +913,7 @@ end
 
 function addpoints_panel_checkbox_Callback(source,~,point)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get handles from main window
         gh = guidata(mainWindow);
         
@@ -975,7 +975,7 @@ end
 
 function addpoints_panel_slider_Callback(source,~,point)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1010,7 +1010,7 @@ end
 
 function position_slider_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1054,7 +1054,7 @@ end
 
 function showposition_checkbox_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1086,7 +1086,7 @@ end
 
 function visible_panel_listbox_Callback(source,~)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1272,14 +1272,14 @@ function pushbutton_Callback(~,~,action)
                 end
                 % Look for BLC GUI Help window and if its there, close as
                 % well
-                hHelpWindow = guiGetWindowHandle('trEPRgui_BLC_helpwindow');
+                hHelpWindow = trEPRguiGetWindowHandle('trEPRgui_BLC_helpwindow');
                 if ishandle(hHelpWindow)
                     delete(hHelpWindow);
                 end
-                delete(guiGetWindowHandle(mfilename));
+                delete(trEPRguiGetWindowHandle(mfilename));
                 return;
             case 'showMaximum'
-                mainWindow = guiGetWindowHandle(mfilename);
+                mainWindow = trEPRguiGetWindowHandle(mfilename);
                 % Get appdata from BLC GUI
                 ad = getappdata(mainWindow);
                 
@@ -1335,7 +1335,7 @@ function keypress_Callback(src,evt)
             % was pressed...
             return;
         end
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1447,7 +1447,7 @@ function switchPanel(panelName)
 end
 
 function updateAxes()
-    mainWindow = guiGetWindowHandle(mfilename);
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1703,7 +1703,7 @@ end
 
 function updateSpectra()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1784,7 +1784,7 @@ function updateSpectra()
 end
 
 function update_position_display()
-    mainWindow = guiGetWindowHandle(mfilename);
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1859,7 +1859,7 @@ function update_position_display()
 end
 
 function update_fitarea_display()
-    mainWindow = guiGetWindowHandle(mfilename);
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from BLC GUI
     ad = getappdata(mainWindow);
 
@@ -1909,7 +1909,7 @@ end
 
 function update_addpoint_display()
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from BLC GUI
         ad = getappdata(mainWindow);
         
@@ -1953,7 +1953,7 @@ end
 
 function if_BLC(action)
     try
-        mainWindow = guiGetWindowHandle(mfilename);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata and gui handles from BLC GUI
         ad = getappdata(mainWindow);
         gh = guidata(mainWindow);

@@ -10,10 +10,10 @@ function status = add2status(statusmessage)
 %            0: successfully updated status
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainwindow = guiGetWindowHandle();
+mainwindow = trEPRguiGetWindowHandle();
 if (isempty(mainwindow))
     status = -1;
     return;

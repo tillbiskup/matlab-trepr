@@ -11,7 +11,7 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    bugReport - cell array of strings containing the bug report
 
 % (c) 2011-12, Till Biskup
-% 2012-05-29
+% 2012-05-30
 
 % Set name and version of Toolbox (makes it easier to reuse this script
 % later on) 
@@ -55,7 +55,7 @@ generalInfo{end+1} = sprintf('Platform:           %s',platform);
 generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
 
 % Try to get status message from toolbox GUI
-mainGuiWindow = guiGetWindowHandle();
+mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata

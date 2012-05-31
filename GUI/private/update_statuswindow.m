@@ -12,10 +12,10 @@ function status = update_statuswindow(statusmessages)
 %   the last (i.e., most current) line of the status window is visible.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 % Is there currently a trEPRgui_statuswindow object?
-statuswindow = guiGetWindowHandle('trEPRgui_statuswindow');
+statuswindow = trEPRguiGetWindowHandle('trEPRgui_statuswindow');
 if (isempty(statuswindow))
     status = -1;
     return;

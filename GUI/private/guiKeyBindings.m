@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % (c) 2011-12, Till Biskup
-% 2012-04-20
+% 2012-05-31
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -17,7 +17,7 @@ try
     end
     
     % Get appdata and handles of main window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
     gh = guihandles(mainWindow);
     
@@ -91,7 +91,7 @@ try
                 case '8'
                     return;
                 case '9'
-                    status = switchMainPanel('Help');
+                    status = switchMainPanel('Configure');
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
@@ -133,6 +133,11 @@ try
             return;
         case 'f6'
             trEPRgui_BLCwindow();
+            return;
+        case 'f8'
+            if exist('trEPRgui_SIMwindow','var')
+                trEPRgui_SIMwindow();
+            end
             return;
         case 'f10'
             trEPRgui_statuswindow();

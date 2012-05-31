@@ -7,21 +7,21 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = getGuiWindowHandle('trEPRgui_statuswindow');
+singleton = trEPRguiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
     return;
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trEPRgui_statuswindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Status Window',...
     'Units','Pixels',...
@@ -61,7 +61,7 @@ guidata(hMainFigure,guihandles);
 set(hMainFigure,'Visible','on');
 
 % Set string
-mainGuiWindow = guiGetWindowHandle();
+mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata

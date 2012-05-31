@@ -7,7 +7,7 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-21
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -247,7 +247,7 @@ function pushbutton_Callback(~,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -566,7 +566,7 @@ end
 function visible_listbox_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -617,7 +617,7 @@ end
 function invisible_listbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % If user double clicked on list entry
@@ -654,7 +654,7 @@ function checkbox_Callback(source,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         switch action
@@ -693,7 +693,7 @@ end
 function datasetChangeLabel(index)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);

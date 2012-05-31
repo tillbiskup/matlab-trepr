@@ -4,10 +4,10 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trEPRgui');
+singleton = trEPRguiGetWindowHandle();
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -36,7 +36,7 @@ uicontrol('Tag','InitialisingText',...
     'Position',[10 10 280 55]...
     );
 
-hMainFigure = figure('Tag','trEPRgui',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Main Window',...
     'Units','Pixels',...
@@ -333,10 +333,9 @@ uicontrol('Tag','functionButtonGroup_function8_pushbutton',...
     'Style','pushbutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
-    'String','SVD',...
+    'String','Sim',...
     'TooltipString',sprintf('%s\n%s',...
-    'Perform basic singular value decomposition (SVD)',...
-    'of currently active dataaet (new window, F8)'),...
+    'Simulate TREPR spectra (new window, F8)'),...
     'pos',[7*mainFbWidth 0 mainFbWidth 25],...
     'Enable','off'...
     );
@@ -645,6 +644,11 @@ for k=1:length(handles)
     set(handles(k),'KeyPressFcn',@guiKeyBindings);
 end
 
+% Enable sim button if applicable
+if exist('trEPRgui_SIMwindow','var')
+    set(functionButtonGroup_function8_pushbutton,'Enable','On');
+end
+
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
 if ishandle(initDialogue)
@@ -675,7 +679,7 @@ end
 function slider_v1_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -721,7 +725,7 @@ end
 function slider_v2_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Convert slider value to scaling factor
@@ -777,7 +781,7 @@ end
 function slider_v3_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -826,7 +830,7 @@ end
 function slider_h1_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Convert slider value to scaling factor
@@ -882,7 +886,7 @@ end
 function slider_h2_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Depending on display type settings
@@ -931,7 +935,7 @@ end
 function zoom_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         if (get(source,'Value'))
@@ -967,7 +971,7 @@ end
 function fullscale_pushbutton_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -1005,7 +1009,7 @@ function reset_pushbutton_Callback(source,~)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Reset displacement and scaling for current spectrum
@@ -1145,7 +1149,7 @@ end
 function displaytype_popupmenu_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         displayTypes = cellstr(get(source,'String'));
@@ -1178,7 +1182,7 @@ end
 function previous_pushbutton_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % This shall never happen, as the element should not be active in this
@@ -1248,7 +1252,7 @@ end
 function next_pushbutton_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % This shall never happen, as the element should not be active in

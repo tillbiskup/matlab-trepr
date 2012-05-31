@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1594,7 +1594,7 @@ function checkbox_Callback(source,~,action)
         end
         
         % Get appdata of main GUI
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         switch action
@@ -1637,7 +1637,7 @@ function popupmenu_Callback(source,~,action)
         end
         
         % Get appdata of main GUI
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
 
         values = cellstr(get(source,'String'));
@@ -1696,7 +1696,7 @@ function edit_Callback(source,~,action)
         end
         
         % Get appdata of main GUI
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         active = ad.control.spectra.active;
@@ -1748,7 +1748,7 @@ function pushbutton_Callback(~,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
 
         % Make life easier
@@ -1939,7 +1939,7 @@ end
 function axislabels_edit_Callback(source,~,label)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         switch label
@@ -1993,7 +1993,7 @@ end
 function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         if (isempty(ad.control.spectra.active))
@@ -2063,7 +2063,7 @@ end
 function axislimits_edit_Callback(source,~,limit)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         switch limit
@@ -2141,7 +2141,7 @@ end
 function axislimits_auto_checkbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         ad.control.axis.limits.auto = get(source,'Value');
@@ -2176,7 +2176,7 @@ end
 function highlight_checkbox_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2233,7 +2233,7 @@ end
 function highlight_method_popupmenu_Callback(source,eventdata)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2299,7 +2299,7 @@ end
 function highlight_value_popupmenu_Callback(source,eventdata)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2376,7 +2376,7 @@ end
 function grid_x_togglebutton_Callback(source,eventdata)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         if (get(source,'Value'))
@@ -2412,7 +2412,7 @@ end
 function grid_y_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         if (get(source,'Value'))
@@ -2448,7 +2448,7 @@ end
 function grid_minor_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         if (get(source,'Value'))
@@ -2484,7 +2484,7 @@ end
 function grid_zero_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         ad.control.axis.grid.zero.visible = get(source,'Value');
@@ -2516,7 +2516,7 @@ end
 function grid_legend_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2607,7 +2607,7 @@ end
 function normalise_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2671,7 +2671,7 @@ end
 function datasets_listbox_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window
@@ -2725,7 +2725,7 @@ end
 function colour_type_popupmenu_Callback(source,~)
     try
         % Get handles and appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         gh = guihandles(mainWindow);
         ad = getappdata(mainWindow);
         
@@ -2781,7 +2781,7 @@ end
 function colour_type2_popupmenu_Callback(source,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
 
         % Get handles of main window
@@ -2830,7 +2830,7 @@ end
 function linewidth_popupmenu_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
 
         % Get handles of main window
@@ -2871,7 +2871,7 @@ end
 function linestyle_popupmenu_Callback(source,~,action)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
 
         lineStyles = ...
@@ -2949,7 +2949,7 @@ end
 function linemarker_popupmenu_Callback(~,~)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
 
         % Get handles of main window
@@ -3023,7 +3023,7 @@ end
 function axesexport_pushbutton_Callback(~,~)
     try
         % Get appdata and handles of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
 
@@ -3101,7 +3101,7 @@ end
 function dataexport_pushbutton_Callback(~,~)
     try
         % Get appdata and handles of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
 
@@ -3193,7 +3193,7 @@ end
 function show3d_edit_Callback(source,~,label)
     try
         % Get appdata and handles of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
         
@@ -3297,7 +3297,7 @@ function show3d_pushbutton_Callback(~,~)
         end
 
         % Get appdata and handles of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
         
@@ -3370,7 +3370,7 @@ function export3d_pushbutton_Callback(~,~)
         end
         
         % Get appdata and handles of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
         
@@ -3444,7 +3444,7 @@ end
 function datasetChangeLabel(index)
     try
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);

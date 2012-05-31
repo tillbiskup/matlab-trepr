@@ -7,7 +7,7 @@ function handle = guiConfigurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-01-26
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -250,7 +250,7 @@ function pushbutton_Callback(~,~,action)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
         % Get handles of main window

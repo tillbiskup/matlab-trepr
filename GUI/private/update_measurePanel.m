@@ -7,10 +7,10 @@ function status = update_measurePanel()
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 % Is there currently a trEPRgui object?
-mainWindow = guiGetWindowHandle();
+mainWindow = trEPRtrEPRguiGetWindowHandle();
 if (isempty(mainWindow))
     status = -1;
     return;

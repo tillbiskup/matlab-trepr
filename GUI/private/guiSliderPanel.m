@@ -7,7 +7,8 @@ function handle = guiSliderPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -389,7 +390,7 @@ function position_edit_Callback(source,~,value)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Be as robust as possible: if there is no axes, default is indices
@@ -484,7 +485,7 @@ function scaling_edit_Callback(source,~,value)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles from main window
@@ -622,7 +623,7 @@ function displacement_edit_Callback(source,~,value)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles from main window
@@ -747,7 +748,7 @@ function reset_pushbutton_Callback(source,~)
         end
         
         % Get appdata of main window
-        mainWindow = guiGetWindowHandle;
+        mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
         % Get handles of main window

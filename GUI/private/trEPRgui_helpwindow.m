@@ -13,14 +13,14 @@ function varargout = trEPRgui_helpwindow(varargin)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trEPRgui_helpwindow');
+singleton = trEPRguiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
     return;
 end
 
 % Get position of main window to position help window relative to it
-hMainGUI = guiGetWindowHandle();
+hMainGUI = trEPRguiGetWindowHandle();
 if ishandle(hMainGUI)
     mainGUIPosition = get(hMainGUI,'Position');
     position = [mainGUIPosition(1)+95,mainGUIPosition(2)+175,450,430];
@@ -29,7 +29,7 @@ else
 end
 
 % Construct the components
-hMainFigure = figure('Tag','trEPRgui_helpwindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Help Window',...
     'Units','Pixels',...
@@ -183,7 +183,7 @@ try
     % Try to show the help topic related to the currently active panel
     % Get gui handles of main figure
     % Get guihandles of main GUI window
-    mainWindow = guiGetWindowHandle;
+    mainWindow = trEPRguiGetWindowHandle;
     mgh = guihandles(mainWindow);
     if get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')
         helpTopicOffset = 11;
