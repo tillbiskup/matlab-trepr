@@ -58,7 +58,7 @@ end
 % spectrum
 if ~(ad.control.spectra.active)
     msg = 'update_mainAxis(): No active spectrum';
-    add2status(msg);
+    trEPRadd2status(msg);
     return;
 end
 
@@ -645,7 +645,7 @@ switch ad.control.axis.displayType
         display_legend(mainAxes);
     otherwise
         msg = sprintf('Display type %s currently unsupported',displayType);
-        add2status(msg);    
+        trEPRadd2status(msg);    
 end
 
 % Set grid

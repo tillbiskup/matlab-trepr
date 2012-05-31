@@ -290,7 +290,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -345,7 +345,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -393,7 +393,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -431,7 +431,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -530,7 +530,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 clear msgStr;
                 
                 % Update both list boxes
@@ -548,7 +548,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -599,7 +599,7 @@ function visible_listbox_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -632,7 +632,7 @@ function invisible_listbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -671,7 +671,7 @@ function checkbox_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -712,13 +712,13 @@ function datasetChangeLabel(index)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
         clear msgStr;
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

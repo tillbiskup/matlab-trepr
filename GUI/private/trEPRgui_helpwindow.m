@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -214,7 +214,7 @@ try
                 set(hpm,'Value',helpTopicOffset+8);
             otherwise
                 % That shall never happen
-                add2status('trEPRgui_helpwindow(): Unknown panel');
+                trEPRadd2status('trEPRgui_helpwindow(): Unknown panel');
         end
     else
         helpText = 'Welcome';
@@ -224,7 +224,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -254,7 +254,7 @@ function helptext_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -284,7 +284,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -320,7 +320,7 @@ function keypress_Callback(~,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -437,14 +437,14 @@ function helptext_selector(helpText)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                add2status('trEPRgui_helpwindow(): Unknown helptext');
+                trEPRadd2status('trEPRgui_helpwindow(): Unknown helptext');
                 browser.setCurrentLocation('');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -570,14 +570,14 @@ function helptext_selector2(helpText)
                 set(textdisplay,'String',helpText);
             otherwise
                 % That shall never happen
-                add2status('trEPRgui_helpwindow(): Unknown helptext');
+                trEPRadd2status('trEPRgui_helpwindow(): Unknown helptext');
                 set(textdisplay,'String','');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

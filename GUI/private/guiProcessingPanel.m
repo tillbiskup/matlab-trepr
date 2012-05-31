@@ -259,7 +259,7 @@ function corrections_pushbutton_Callback(~,~,correction)
                     'Correction method %s unknown or not (yet) supported.',...
                     correction);
                 msg{2} = 'If you think that this is a bug, please file a bug report.';
-                status = add2status(msg);
+                status = trEPRadd2status(msg);
                 % If for whatever weird reason the trEPR GUI contained no
                 % status field, print it to the commmand line
                 if (status == -2)
@@ -274,7 +274,7 @@ function corrections_pushbutton_Callback(~,~,correction)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -325,7 +325,7 @@ function datasets_listbox_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -479,7 +479,7 @@ function average_edit_Callback(source,~,value)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -511,7 +511,7 @@ function datasetChangeLabel(index)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

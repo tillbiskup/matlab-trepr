@@ -459,7 +459,7 @@ function position_edit_Callback(source,~,value)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -597,7 +597,7 @@ function scaling_edit_Callback(source,~,value)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -726,7 +726,7 @@ function displacement_edit_Callback(source,~,value)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -775,7 +775,7 @@ function reset_pushbutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

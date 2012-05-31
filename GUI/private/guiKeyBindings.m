@@ -37,7 +37,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '2'
@@ -45,7 +45,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '3'
@@ -53,7 +53,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '4'
@@ -61,7 +61,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '5'
@@ -69,7 +69,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '6'
@@ -77,7 +77,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '7'
@@ -85,7 +85,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 case '8'
@@ -95,7 +95,7 @@ try
                     if status
                         % Something went wrong...
                         msgStr = 'Something went wrong with switching the panels.';
-                        add2status(msgStr);
+                        trEPRadd2status(msgStr);
                     end
                     return;
                 % SWITCH DISPLAY MODE: Ctrl/Cmd+x/y/z

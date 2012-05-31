@@ -357,7 +357,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -397,7 +397,7 @@ function measure_setslider_checkbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -457,7 +457,7 @@ function measure_1point_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -514,7 +514,7 @@ function measure_2points_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -537,7 +537,7 @@ function clear_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -592,7 +592,7 @@ function switchMeasurePointer(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -640,7 +640,7 @@ function measureEnd()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -713,7 +713,7 @@ function assignPointsToDataStructure()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -762,7 +762,7 @@ function clearFields()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

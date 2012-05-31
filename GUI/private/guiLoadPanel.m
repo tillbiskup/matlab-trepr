@@ -217,7 +217,7 @@ function load_pushbutton_Callback(~,~)
         if isequal(FileName,0)
             msg = 'Loading dataset(s) cancelled by user.';
             % Update status
-            add2status(msg);
+            trEPRadd2status(msg);
             return;
         end
         
@@ -249,7 +249,7 @@ function load_pushbutton_Callback(~,~)
         msgStr = cell(0);
         msgStr{end+1} = 'Calling trEPRload and trying to load';
         msg = [ msgStr FileName];
-        add2status(msg);
+        trEPRadd2status(msg);
         clear msgStr msg;
         
         trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
@@ -258,7 +258,7 @@ function load_pushbutton_Callback(~,~)
 
         if isequal(data,0) || isempty(data)
             msg = 'Data could not be loaded.';
-            add2status(msg);
+            trEPRadd2status(msg);
             trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
@@ -279,7 +279,7 @@ function load_pushbutton_Callback(~,~)
                     msgStr{end+1} = warnings{k}.message; %#ok<AGROW>
                 end
             end
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
             clear msgStr;
         end
         
@@ -310,7 +310,7 @@ function load_pushbutton_Callback(~,~)
             msgStr{length(msgStr)+1} = ...
                 'The following files contained no numerical data (and were DISCARDED):';
             msg = [msgStr fnNoData];
-            add2status(msg);
+            trEPRadd2status(msg);
             clear msgStr msg;
         end
         
@@ -400,7 +400,7 @@ function load_pushbutton_Callback(~,~)
         msgStr{length(msgStr)+1} = ...
             sprintf('%i data set(s) successfully loaded:',length(data));
         msg = [msgStr fileNames];
-        add2status(msg);
+        trEPRadd2status(msg);
         clear msgStr msg;
 
         trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
@@ -472,7 +472,7 @@ function load_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

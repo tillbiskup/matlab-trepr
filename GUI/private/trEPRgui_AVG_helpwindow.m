@@ -3,6 +3,9 @@ function varargout = trEPRgui_AVG_helpwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
+% (c) 2011-12, Till Biskup
+% 2012-05-31
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -110,7 +113,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -166,14 +169,14 @@ function helptext_popupmenu_Callback(source,~)
                 set(textdisplay,'String',helpText);
             otherwise
                 % That shall never happen
-                add2status('guiHelpPanel(): Unknown helptext');
+                trEPRadd2status('guiHelpPanel(): Unknown helptext');
                 set(textdisplay,'String','');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -209,7 +212,7 @@ function keypress_Callback(~,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

@@ -253,7 +253,7 @@ switch ad.control.axis.displayType
             );
     otherwise
         msg = sprintf('Display type %s currently unsupported',ad.control.axis.displayType);
-        add2status(msg);
+        trEPRadd2status(msg);
 end
 
 status = 0;

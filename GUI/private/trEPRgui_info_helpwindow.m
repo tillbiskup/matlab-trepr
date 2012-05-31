@@ -6,7 +6,7 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 % See also TAGUI_HELPWINDOW
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -134,7 +134,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -190,14 +190,14 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                add2status('guiHelpPanel(): Unknown helptext');
+                trEPRadd2status('guiHelpPanel(): Unknown helptext');
                 set(textdisplay,'String','');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -227,7 +227,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -263,7 +263,7 @@ function keypress_Callback(~,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

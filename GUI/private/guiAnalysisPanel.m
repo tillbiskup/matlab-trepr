@@ -154,7 +154,7 @@ function pushbutton_Callback(~,~,action)
                         status = trEPRexport4glotaran(...
                             ad.data{ad.control.spectra.active},fileName);
                         if status
-                            add2status(status);
+                            trEPRadd2status(status);
                             trEPRbusyWindow('stop',...
                                 'Trying to export dataset...<br /><b>failed</b>.');
                         else
@@ -174,7 +174,7 @@ function pushbutton_Callback(~,~,action)
                 % IMPORtrEPRNT: Has to go AFTER setappdata
                 msgStr = sprintf('Exported dataset %i to format %s',...
                     ad.control.spectra.active,exportFormat);
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
             otherwise
                 fprintf('%s%s "%s"\n',...
                     'trEPRgui : guiAnalysisPanel() : ',...
@@ -186,7 +186,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

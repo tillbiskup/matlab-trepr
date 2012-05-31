@@ -307,7 +307,7 @@ function pushbutton_Callback(~,~,action)
                 % main window
                 status = guiConfigApply('trEPRgui');
                 if status
-                    add2status(status);
+                    trEPRadd2status(status);
                 end
             otherwise
                 fprintf('%s%s "%s"\n',...
@@ -320,7 +320,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

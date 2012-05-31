@@ -1572,7 +1572,7 @@ function pages_buttongroup_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1615,7 +1615,7 @@ function checkbox_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1674,7 +1674,7 @@ function popupmenu_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1726,7 +1726,7 @@ function edit_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1921,7 +1921,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1962,7 +1962,7 @@ function axislabels_edit_Callback(source,~,label)
                     mfilename ...
                     )...
                     };
-                status = add2status(msgstr);
+                status = trEPRadd2status(msgstr);
                 return;
         end
         
@@ -1975,7 +1975,7 @@ function axislabels_edit_Callback(source,~,label)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2045,7 +2045,7 @@ function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2076,7 +2076,7 @@ function axislimits_edit_Callback(source,~,limit)
                 else
                     set(source,'String',num2str(ad.control.axis.limits.x.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = add2status(msgstr);
+                    status = trEPRadd2status(msgstr);
                     return;
                 end
             case 'ymin'
@@ -2088,7 +2088,7 @@ function axislimits_edit_Callback(source,~,limit)
                 else
                     set(source,'String',num2str(ad.control.axis.limits.y.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = add2status(msgstr);
+                    status = trEPRadd2status(msgstr);
                     return;
                 end
             case 'zmin'
@@ -2100,7 +2100,7 @@ function axislimits_edit_Callback(source,~,limit)
                 else
                     set(source,'String',num2str(ad.control.axis.limits.z.max));
                     msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = add2status(msgstr);
+                    status = trEPRadd2status(msgstr);
                     return;
                 end
             otherwise
@@ -2110,7 +2110,7 @@ function axislimits_edit_Callback(source,~,limit)
                     mfilename ...
                     )...
                     };
-                status = add2status(msgstr);
+                status = trEPRadd2status(msgstr);
                 return;
         end
         
@@ -2123,7 +2123,7 @@ function axislimits_edit_Callback(source,~,limit)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2158,7 +2158,7 @@ function axislimits_auto_checkbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2215,7 +2215,7 @@ function highlight_checkbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2266,7 +2266,7 @@ function highlight_method_popupmenu_Callback(source,eventdata)
                     'Value',1);
             otherwise
                 msg = sprintf('Highlight type %s currently unsupported',highlightType);
-                add2status(msg);
+                trEPRadd2status(msg);
         end
         
         % Update appdata of main window
@@ -2281,7 +2281,7 @@ function highlight_method_popupmenu_Callback(source,eventdata)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2358,7 +2358,7 @@ function highlight_value_popupmenu_Callback(source,eventdata)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2394,7 +2394,7 @@ function grid_x_togglebutton_Callback(source,eventdata)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2430,7 +2430,7 @@ function grid_y_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2466,7 +2466,7 @@ function grid_minor_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2498,7 +2498,7 @@ function grid_zero_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2589,7 +2589,7 @@ function grid_legend_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2653,7 +2653,7 @@ function normalise_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2707,7 +2707,7 @@ function datasets_listbox_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2757,13 +2757,13 @@ function colour_type_popupmenu_Callback(source,~)
                 set(gh.display_panel_colour_b_edit,'Enable','On');
             otherwise
                 % That shall never happen
-                add2status('trEPRgui_infowindow(): Unknown colour type');
+                trEPRadd2status('trEPRgui_infowindow(): Unknown colour type');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2806,13 +2806,13 @@ function colour_type2_popupmenu_Callback(source,~)
             case 'RGB'
             otherwise
                 % That shall never happen
-                add2status('trEPRgui : guiDisplayPanel: Unknown colour type');
+                trEPRadd2status('trEPRgui : guiDisplayPanel: Unknown colour type');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2853,7 +2853,7 @@ function linewidth_popupmenu_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2896,7 +2896,7 @@ function linestyle_popupmenu_Callback(source,~,action)
                             ad.data{active}.line.style = 'none';
                         otherwise
                             % That shall never happen
-                            add2status('TAgui : guiDisplayPanel: Unknown line style');
+                            trEPRadd2status('TAgui : guiDisplayPanel: Unknown line style');
                     end
                 end
             case 'zeroline'
@@ -2913,14 +2913,14 @@ function linestyle_popupmenu_Callback(source,~,action)
                         ad.control.axis.grid.zero.style = 'none';
                     otherwise
                         % That shall never happen
-                        add2status('TAgui : guiDisplayPanel: Unknown line style');
+                        trEPRadd2status('TAgui : guiDisplayPanel: Unknown line style');
                 end
             otherwise
                 msgStr = sprintf([...
                     'TAgui>guiDisplayPanel>linestyle_popupmenu_Callback: ',...
                     'Unknown action "%s"'],action);
                 disp(msgStr);
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
         end
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -2931,7 +2931,7 @@ function linestyle_popupmenu_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2994,7 +2994,7 @@ function linemarker_popupmenu_Callback(~,~)
                     ad.data{active}.line.marker.type = 'h';
                 otherwise
                     % That shall never happen
-                    add2status('TAgui : guiDisplayPanel: Unknown line marker');
+                    trEPRadd2status('TAgui : guiDisplayPanel: Unknown line marker');
             end
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
@@ -3005,7 +3005,7 @@ function linemarker_popupmenu_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3074,7 +3074,7 @@ function axesexport_pushbutton_Callback(~,~)
         status = fig2file(newFig,fileName,...
             'fileType',fileType,'exportFormat',exportFormat);
         if status
-            add2status(status);
+            trEPRadd2status(status);
         end
         
         % Close figure window
@@ -3083,7 +3083,7 @@ function axesexport_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3153,7 +3153,7 @@ function dataexport_pushbutton_Callback(~,~)
                     ad.data{ad.control.spectra.active}.display.position.x;
             otherwise
                 msg = 'Cannot determine cross section direction (2D mode)';
-                add2status(msg);
+                trEPRadd2status(msg);
         end
         export1Dparameters.header.character = ...
             get(gh.display_panel_dataexport_header_edit,'String');
@@ -3169,13 +3169,13 @@ function dataexport_pushbutton_Callback(~,~)
         status = trEPRexport1D(...
             ad.data{ad.control.spectra.active},fileName,export1Dparameters);
         if status
-            add2status(status);
+            trEPRadd2status(status);
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3265,14 +3265,14 @@ function show3d_edit_Callback(source,~,label)
                     mfilename ...
                     )...
                     };
-                status = add2status(msgstr);
+                status = trEPRadd2status(msgstr);
                 return;
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3346,7 +3346,7 @@ function show3d_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3415,14 +3415,14 @@ function export3d_pushbutton_Callback(~,~)
         status = fig2file(figHandle,fileName,...
             'fileType',fileType,'exportFormat',exportFormat);
         if status
-            add2status(msg);
+            trEPRadd2status(msg);
         end
         
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3463,13 +3463,13 @@ function datasetChangeLabel(index)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
         clear msgStr;
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

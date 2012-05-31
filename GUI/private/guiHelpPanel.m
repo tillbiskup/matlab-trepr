@@ -156,7 +156,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -240,14 +240,14 @@ function helptext_popupmenu_Callback(source,~)
                 set(hPanelText,'String',helpText);
             otherwise
                 % That shall never happen
-                add2status('guiHelpPanel(): Unknown helptext');
+                trEPRadd2status('guiHelpPanel(): Unknown helptext');
                 set(hPanelText,'String','');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            add2status(msgStr);
+            trEPRadd2status(msgStr);
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

@@ -16,7 +16,7 @@ ad = getappdata(mainWindow);
 for k=1:length(ad.data{datasetnum}.history)
     if (isequal(ad.data{datasetnum}.history{k}.method,method))
         msg = sprintf('Operation "%s" has been applied already to this dataset.',method);
-        add2status(msg);
+        trEPRadd2status(msg);
         clear msg;
         return;
     end
@@ -71,6 +71,6 @@ msg{2} = sprintf(...
     'numBGprofiles',...
     numBGprofiles ...
     );
-status = add2status(msg);
+status = trEPRadd2status(msg);
 clear msg;
 end

@@ -26,7 +26,7 @@ try
             case 'Cancel'
                 msgStr = {'Closing GUI aborted by user. ' ...
                     'Reason: Modified and unsaved datasets'};
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
                 return;
             otherwise
                 return;
