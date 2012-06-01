@@ -646,7 +646,8 @@ end
 
 % Enable sim button if applicable
 if exist('trEPRgui_SIMwindow','file')
-    set(gh.functionButtonGroup_function8_pushbutton,'Enable','On');
+    set(gh.functionButtonGroup_function8_pushbutton,'Enable','On',...
+        'Callback','trEPRgui_SIMwindow');
 end
 
 % Make the GUI visible.
