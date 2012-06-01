@@ -1,9 +1,13 @@
 function varargout = trEPRgui_setLabelWindow(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_SETLABELWINDOW Set label of dataset that is used for display in
+% the dataset lists.
+%
+% Usage
+%   label = trEPRgui_setLabelWindow;
+%   label = trEPRgui_setLabelWindow(oldlabel);
 
-% (Leave a blank line following the help.)
+% (c) 2011-12, Till Biskup
+% 2012-06-01
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -24,7 +28,7 @@ else
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','setLabelWindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name',title,...
     'Units','Pixels',...
