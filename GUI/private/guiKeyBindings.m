@@ -135,7 +135,7 @@ try
             trEPRgui_BLCwindow();
             return;
         case 'f8'
-            if exist('trEPRgui_SIMwindow','var')
+            if exist('trEPRgui_SIMwindow','file')
                 trEPRgui_SIMwindow();
             end
             return;

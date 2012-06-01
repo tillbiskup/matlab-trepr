@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-01
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -621,9 +621,9 @@ catch exception
     throw(exception);
 end
 
-handles = guihandles;
-handles.mainAxis = hPlotAxes;
-guidata(hMainFigure,handles);
+gh = guihandles;
+gh.mainAxis = hPlotAxes;
+guidata(hMainFigure,gh);
 if (nargout == 1)
     varargout{1} = hMainFigure;
 end
@@ -645,8 +645,8 @@ for k=1:length(handles)
 end
 
 % Enable sim button if applicable
-if exist('trEPRgui_SIMwindow','var')
-    set(functionButtonGroup_function8_pushbutton,'Enable','On');
+if exist('trEPRgui_SIMwindow','file')
+    set(gh.functionButtonGroup_function8_pushbutton,'Enable','On');
 end
 
 % Make the GUI visible.
