@@ -8,7 +8,7 @@ function status = trEPRappendDatasetToMainGUI(dataset,varargin)
 %         -1 - no main GUI window found
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-01
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -88,7 +88,7 @@ try
         sprintf('Dataset %i successfully appended to main GUI',newId)...
         sprintf('Label: %s',dataset.label)...
         };
-    status = add2status(msg);
+    status = trEPRadd2status(msg);
     
     % Update main GUI's axes and panels
     update_visibleSpectra();
@@ -102,7 +102,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);

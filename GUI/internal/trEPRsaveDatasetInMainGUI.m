@@ -12,7 +12,7 @@ function [status,message] = trEPRsaveDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-01
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -118,7 +118,7 @@ try
             ad.data{id}.label);
         msgStr{end+1} = ad.data{id}.file.name;
         msgStr = [ msgStr saveStatus ];
-        status = add2status(msgStr);
+        status = trEPRadd2status(msgStr);
         trEPRbusyWindow('stop','Trying to save spectra...<br /><b>failed</b>.');
         clear msgStr;
         status = -1;
@@ -146,7 +146,7 @@ try
         sprintf('Label: %s',ad.data{id}.label)...
         sprintf('File: %s',filename)...
         };
-    status = add2status(msg);
+    status = trEPRadd2status(msg);
     
     % Update main GUI's axes and panels
     update_visibleSpectra();
@@ -161,7 +161,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);

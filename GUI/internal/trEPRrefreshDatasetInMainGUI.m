@@ -8,7 +8,7 @@ function status = trEPRrefreshDatasetInMainGUI(dataset,id,varargin)
 %         -1 - no main GUI window found
 
 % (c) 2011, Till Biskup
-% 2012-05-31
+% 2012-06-01
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -66,7 +66,7 @@ try
                 'Therefore, the first matching dataset has been used: %i',...
                 id)...
                 };
-            status = add2status(msgStr);
+            status = trEPRadd2status(msgStr);
             % Get appdata of main window
             ad = getappdata(mainWindow);
         else
@@ -102,7 +102,7 @@ try
         sprintf('Dataset %i successfully refreshed in main GUI',id)...
         sprintf('Label: %s',dataset.label)...
         };
-    status = add2status(msg);
+    status = trEPRadd2status(msg);
     
     % Update main GUI's axes and panels
     update_visibleSpectra();
@@ -116,7 +116,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        add2status(msgStr);
+        trEPRadd2status(msgStr);
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);

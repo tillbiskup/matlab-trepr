@@ -6,7 +6,7 @@ function varargout = trEPRbusyWindow(varargin)
 %       Returns the handle of the window.
 
 % (c) 2012, Till Biskup
-% 2012-05-31
+% 2012-06-01
 
 title = 'Processing...';
 position = [220,350,270,120];
@@ -120,7 +120,7 @@ switch action
         try
             jObj.setBusyText('Done');
         catch exception
-            add2status(exception.message);
+            trEPRadd2status(exception.message);
         end
         set(hBtn,'Visible','on');
         set(hMainFigure,'KeyPressFcn',@keypress_Callback);
@@ -171,7 +171,7 @@ varargout{1} = hMainFigure;
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -194,7 +194,7 @@ varargout{1} = hMainFigure;
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                add2status(msgStr);
+                trEPRadd2status(msgStr);
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
