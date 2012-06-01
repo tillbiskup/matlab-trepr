@@ -26,7 +26,7 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
 % (c) 2009-2012, Till Biskup
-% 2012-05-30
+% 2012-06-01
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -131,10 +131,32 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
                             checkFileFormat(fileNames(k).name)
-                        files{k} = importdata(fileNames(k).name,' ',3); %#ok<AGROW>
-                        content.data(k,:) = files{k}.data(:,2);
-                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                        content.axes.y.values(k) = str2double(B0{1});
+                        data = importdata(fileNames(k).name,' ',3);
+                        % Header of first file goes to header
+                        if isempty(content.header)
+                            content.header = data.textdata;
+                        end                        
+                        content.data(end+1,:) = data.data(:,2);
+                        tokens = regexp(...
+                            data.textdata{2},...
+                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
+                        switch tokens{1}{2}
+                            case 'Gauss'
+                                content.axes.y.unit = 'G';
+                            otherwise
+                                warnings{end+1} = struct(...
+                                    'identifier','trEPRgnuplotLoad:parseError',...
+                                    'message',sprintf(...
+                                    'Could not recognise unit for magnetic field: ''%s''',...
+                                    tokens{1}{2})...
+                                    ); %#ok<AGROW>
+                        end
+                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.parameters.bridge.MWfrequency.value(end+1) = ...
+                            str2double(tokens{1}{3});
+                        content.parameters.bridge.MWfrequency.unit = ...
+                            tokens{1}{4};
                     end
                 end
                 
@@ -156,10 +178,32 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
                             checkFileFormat(filename{k})
-                        files{k} = importdata(filename{k},' ',3); %#ok<AGROW>
-                        content.data(k,:) = files{k}.data(:,2);
-                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                        content.axes.y.values(k) = str2double(B0{1});
+                        data = importdata(filename{k},' ',3);
+                        % Header of first file goes to header
+                        if isempty(content.header)
+                            content.header = data.textdata;
+                        end                        
+                        content.data(end+1,:) = data.data(:,2);
+                        tokens = regexp(...
+                            data.textdata{2},...
+                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
+                        switch tokens{1}{2}
+                            case 'Gauss'
+                                content.axes.y.unit = 'G';
+                            otherwise
+                                warnings{end+1} = struct(...
+                                    'identifier','trEPRgnuplotLoad:parseError',...
+                                    'message',sprintf(...
+                                    'Could not recognise unit for magnetic field: ''%s''',...
+                                    tokens{1}{2})...
+                                    ); %#ok<AGROW>
+                        end
+                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.parameters.bridge.MWfrequency.value(end+1) = ...
+                            str2double(tokens{1}{3});
+                        content.parameters.bridge.MWfrequency.unit = ...
+                            tokens{1}{4};
                     end
                 end
                 
@@ -180,7 +224,6 @@ function [content,warnings] = loadFile(filename,varargin)
     else
         % If only a single filename is provided as input argument
         % Check whether file is in Freiburg gnuplot format.
-        files = cell(length(filename),1);
         if ~checkFileFormat(filename)
             warnings{end+1} = struct(...
                 'identifier','trEPRgnuplotLoad:wrongformat',...
@@ -191,23 +234,37 @@ function [content,warnings] = loadFile(filename,varargin)
             return
         end
 
-        files{1} = importdata(filename,' ',3);
-        content.data = files{1}.data(:,2)';
-        B0 = regexp(files{1}.textdata{2},'B0 = ([0-9.]*)','tokens');
-        content.parameters.field.start = str2double(B0{1});
-        content.parameters.field.stop = str2double(B0{1});
+        data = importdata(filename,' ',3);
+        content.header = data.textdata;
+        content.data = data.data(:,2)';
+        tokens = regexp(data.textdata{2},...
+            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+            'tokens');
+        switch tokens{1}{2}
+            case 'Gauss'
+                content.axes.y.unit = 'G';
+            otherwise
+                warnings{end+1} = struct(...
+                    'identifier','trEPRspeksimLoad:parseError',...
+                    'message',sprintf(...
+                    'Could not recognise unit for magnetic field: ''%s''',...
+                    tokens{1}{2})...
+                    );
+        end
+        content.parameters.field.start = str2double(tokens{1}{1});
+        content.parameters.field.stop = str2double(tokens{1}{1});
         content.parameters.field.step = 0;
-        content.parameters.axes.y.values = str2double(B0{1});
+        content.axes.y.values = str2double(tokens{1}{1});
+        content.parameters.bridge.MWfrequency.value = ...
+            str2double(tokens{1}{3});
+        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     end
     
     % Assign other parameters, as far as possible
 
-    % Header of first file goes to header
-    content.header = files{1}.textdata;
-
     % Parse field and MW frequency values
-    [tokens ~] = regexp(...
-        files{1}.textdata{2},...
+    tokens = regexp(...
+        content.header{2},...
         'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
         'tokens');
     switch tokens{1}{2}
@@ -222,33 +279,29 @@ function [content,warnings] = loadFile(filename,varargin)
                 );
     end
     content.axes.y.measure = 'magnetic field';
-    content.parameters.bridge.MWfrequency.value = str2double(tokens{1}{3});
     content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     
-    content.parameters.transient.points = length(files{1}.data(:,1));
+    content.parameters.transient.points = length(data.data(:,1));
     content.parameters.transient.length = ...
-        (abs(files{1}.data(1,1)) + files{1}.data(end,1)) / ...
-        (length(files{1}.data(:,1)) - 1) * length(files{1}.data(:,1));
+        (abs(data.data(1,1)) + data.data(end,1)) / ...
+        (length(data.data(:,1)) - 1) * length(data.data(:,1));
     % Bug fix for some very weird MATLAB problems with accuracy
     content.parameters.transient.length = ...
         round(content.parameters.transient.length*1e10)/1e10;
     % The floor is important due to the fact that the trigger position
     % might be between two points.
     content.parameters.transient.triggerPosition = ...
-        floor(abs(files{1}.data(1,1)) / ...
+        floor(abs(data.data(1,1)) / ...
         (content.parameters.transient.length / ...
-        length(files{1}.data(:,1))));
+        length(data.data(:,1))));
     
     % Create axis informations from parameters
-    content.axes.x.values = files{1}.data(:,1);
+    content.axes.x.values = data.data(:,1);
     content.axes.x.measure = 'time';
     content.axes.x.unit = 's';
     
     % Get label string from third line of file/header
-    content.label = strtrim(files{1}.textdata{3}(3:end));
-    
-    % Set Version string of content structure
-    content.version = '1.1';
+    content.label = strtrim(content.header{3}(3:end));
 end
 
 % --- Check whether the file is in Freiburg gnuplot format
@@ -278,5 +331,8 @@ function cleanName = cleanFileName(filename)
         filename,...
         {'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''}...
         );
+    if ~isletter(cleanName(1))
+        cleanName = sprintf('a%s',cleanName);
+    end
 end
 

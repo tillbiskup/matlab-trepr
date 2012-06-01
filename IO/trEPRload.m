@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2012, Till Biskup
-% 2012-03-23
+% 2012-06-01
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -474,7 +474,7 @@ function [content,warnings] = combineFile(filename)
     fclose(fid);
     
     if isBinary
-       fprintf('%s is a binary file!',filename); 
+       fprintf('%s is a binary file!',filename{1}); 
     else
         % else try to find a matching function from the ini file
         for k = 1 : length(asciiFileFormats) 
@@ -516,5 +516,9 @@ end
 % --- Cleaning up filename so that it can be used as variable name in the
 % MATLAB workspace 
 function cleanName = cleanFileName(filename)
-    cleanName = regexprep(filename,{'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''});
+    cleanName = regexprep(filename,...
+        {'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''});
+    if ~isletter(cleanName(1))
+        cleanName = sprintf('a%s',cleanName);
+    end
 end

@@ -26,7 +26,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2012, Till Biskup
-% 2012-05-30
+% 2012-06-01
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -128,17 +128,35 @@ function [content,warnings] = loadFile(filename,varargin)
                 % This is used in case filename is only a file basename.
                 % Read all files having filename as their file basename.
                 fileNames = dir(sprintf('%s.*',filename));
-                files = cell(length(fileNames),1);
-                l = 1;
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
                             checkFileFormat(fileNames(k).name)
-                        files{k} = importdata(fileNames(k).name,' ',5);
-                        content.data(l,:) = reshape(files{k}.data',1,[]);
-                        % Parsing the header for the magnetic field value
-                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                        content.axes.y.values(l) = str2double(B0{1});
-                        l=l+1;
+                        data = importdata(fileNames(k).name,' ',5);
+                        % Header of first file goes to header
+                        if isempty(content.header)
+                            content.header = data.textdata;
+                        end                        
+                        content.data(end+1,:) = reshape(data.data',1,[]);
+                        % Parsing the header for the magnetic field and
+                        % microwave frequency values
+                        tokens = regexp(data.textdata{2},...
+                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
+                        switch tokens{1}{2}
+                            case 'Gauss'
+                                content.axes.y.unit = 'G';
+                            otherwise
+                                warnings{end+1} = struct(...
+                                    'identifier','trEPRspeksimLoad:parseError',...
+                                    'message',sprintf(...
+                                    'Could not recognise unit for magnetic field: ''%s''',...
+                                    tokens{1}{2})...
+                                    ); %#ok<AGROW>
+                        end
+                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.parameters.bridge.MWfrequency.value(end+1) = ...
+                            str2double(tokens{1}{3});
+                        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
                     end
                 end
                 % In case we have not loaded anything
@@ -156,17 +174,35 @@ function [content,warnings] = loadFile(filename,varargin)
                     content.axes.y.values(2) - content.axes.y.values(1);
             case 'combine'
                 % This is used in case filename is a cell array of file names
-                files = cell(length(filename),1);
-                l = 1;
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
                             checkFileFormat(filename{k})
-                        files{k} = importdata(filename{k},' ',5);
-                        content.data(l,:) = reshape(files{k}.data',1,[]);
-                        % Parsing the header for the magnetic field value
-                        B0 = regexp(files{k}.textdata{2},'B0 = ([0-9.]*)','tokens');
-                        content.axes.y.values(l) = str2double(B0{1});
-                        l=l+1;
+                        data = importdata(filename{k},' ',5);
+                        % Header of first file goes to header
+                        if isempty(content.header)
+                            content.header = data.textdata;
+                        end                        
+                        content.data(end+1,:) = reshape(data.data',1,[]);
+                        % Parsing the header for the magnetic field and
+                        % microwave frequency values
+                        tokens = regexp(data.textdata{2},...
+                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
+                        switch tokens{1}{2}
+                            case 'Gauss'
+                                content.axes.y.unit = 'G';
+                            otherwise
+                                warnings{end+1} = struct(...
+                                    'identifier','trEPRspeksimLoad:parseError',...
+                                    'message',sprintf(...
+                                    'Could not recognise unit for magnetic field: ''%s''',...
+                                    tokens{1}{2})...
+                                    ); %#ok<AGROW>
+                        end
+                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.parameters.bridge.MWfrequency.value(end+1) = ...
+                            str2double(tokens{1}{3});
+                        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
                     end
                 end
                 % In case we have not loaded anything
@@ -199,42 +235,36 @@ function [content,warnings] = loadFile(filename,varargin)
             return;
         end
 
-        files{1} = importdata(filename,' ',5);
-        content.data = reshape(files{1}.data',1,[]);
-        B0 = regexp(files{1}.textdata{2},'B0 = ([0-9.]*)','tokens');
-        content.parameters.field.start = str2double(B0{1});
-        content.parameters.field.stop = str2double(B0{1});
+        data = importdata(filename,' ',5);
+        content.data = reshape(data.data',1,[]);
+        content.header = data.textdata;
+        tokens = regexp(data.textdata{2},...
+            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+            'tokens');
+        switch tokens{1}{2}
+            case 'Gauss'
+                content.axes.y.unit = 'G';
+            otherwise
+                warnings{end+1} = struct(...
+                    'identifier','trEPRspeksimLoad:parseError',...
+                    'message',sprintf(...
+                    'Could not recognise unit for magnetic field: ''%s''',...
+                    tokens{1}{2})...
+                    );
+        end
+        content.parameters.field.start = str2double(tokens{1}{1});
+        content.parameters.field.stop = str2double(tokens{1}{1});
         content.parameters.field.step = 0;
-        content.parameters.axes.y.values = str2double(B0{1});
+        content.axes.y.values = str2double(tokens{1}{1});
+        content.parameters.bridge.MWfrequency.value = ...
+            str2double(tokens{1}{3});
+        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     end
     
     % Assign other parameters, as far as possible
-    
-    % Header of first file goes to header
-    content.header = files{1}.textdata;
-
-    % Parse field and MW frequency values
-    [tokens ~] = regexp(...
-        files{1}.textdata{2},...
-        'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-        'tokens');
-    switch tokens{1}{2}
-        case 'Gauss'
-            content.axes.y.unit = 'G';
-        otherwise
-            warnings{end+1} = struct(...
-                'identifier','trEPRspeksimLoad:parseError',...
-                'message',sprintf(...
-                'Could not recognise unit for magnetic field: ''%s''',...
-                tokens{1}{2})...
-                );
-    end
     content.axes.y.measure = 'magnetic field';
-    content.parameters.bridge.MWfrequency.value = str2double(tokens{1}{3});
-    content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
-    
-    timeParams = textscan(files{1}.textdata{4},'%f %f %f %f %f %f');
-    units = textscan(files{1}.textdata{5},'%s %s');
+    timeParams = textscan(content.header{4},'%f %f %f %f %f %f');
+    units = textscan(content.header{5},'%s %s');
     content.parameters.transient.points = timeParams{2};
     content.parameters.transient.length = ...
         (abs(timeParams{3}) + timeParams{4}) / (timeParams{2} - 1) * ...
@@ -257,10 +287,7 @@ function [content,warnings] = loadFile(filename,varargin)
     content.axes.x.unit = char(units{1});
     
     % Get label string from third line of file/header
-    content.label = strtrim(files{1}.textdata{3});
-    
-    % Set Version string of content structure
-    content.version = '1.1';
+    content.label = strtrim(content.header{3});
 end
 
 % --- Check whether the file is in speksim format
@@ -290,5 +317,8 @@ function cleanName = cleanFileName(filename)
         filename,...
         {'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''}...
         );
+    if ~isletter(cleanName(1))
+        cleanName = sprintf('a%s',cleanName);
+    end
 end
 
