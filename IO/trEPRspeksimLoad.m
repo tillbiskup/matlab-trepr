@@ -22,6 +22,10 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %
 %   warnings - cell array of strings
 %              empty if there are no warnings
+%
+% Please note: As each time trace records its own MW frequency value, the
+% field "data.parameters.bridge.MWfrequency.value" is an array in case more
+% than one time trace has been read and combined.
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
