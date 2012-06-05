@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-05
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1868,7 +1868,7 @@ function pushbutton_Callback(~,~,action)
                 end
                 ad.data{active}.line.marker.edgeColor = uisetcolor(...
                     ad.data{active}.line.marker.edgeColor,...
-                    'Set MFoff line marker edge colour');
+                    'Set line marker edge colour');
         
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -1887,7 +1887,7 @@ function pushbutton_Callback(~,~,action)
                 end
                 ad.data{active}.line.marker.faceColor = uisetcolor(...
                     ad.data{active}.line.marker.faceColor,...
-                    'Set MFoff line marker face colour');
+                    'Set line marker face colour');
         
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -2896,7 +2896,7 @@ function linestyle_popupmenu_Callback(source,~,action)
                             ad.data{active}.line.style = 'none';
                         otherwise
                             % That shall never happen
-                            trEPRadd2status('TAgui : guiDisplayPanel: Unknown line style');
+                            trEPRadd2status('trEPRgui : guiDisplayPanel: Unknown line style');
                     end
                 end
             case 'zeroline'

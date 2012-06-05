@@ -1,15 +1,15 @@
-% Sample configuration file for the TAgui_ACCwindow function of the 
-% TA toolbox
+% Sample configuration file for the trEPRgui_ACCwindow function of the 
+% trEPR toolbox
 %
 % (c) 2012, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
-% configuration in the file "TAgui_ACCwindow.ini" in the same directory.
+% configuration in the file "trEPRgui_ACCwindow.ini" in the same directory.
 %
 % To automatically generate a valid config file from this file, 
-% use TAconf('create') at the MATLAB(r) command line.
+% use trEPRconf('create') at the MATLAB(r) command line.
 % Alternatively, you may use the functions provided by the "Configuration" 
-% panel of the TA toolbox main GUI.
+% panel of the trEPR toolbox main GUI.
 
 [acc]
 weights.min = 1
