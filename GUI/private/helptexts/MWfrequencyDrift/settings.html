@@ -9,7 +9,21 @@
     <body>
 		<h1>Settings</h1>
 		<p class="intro">
-			The settings panel will let you make settings regarding the appearance of the MW Frequency Drift Analysis GUI. 
+			The settings panel lets you make settings regarding the appearance of the MW Frequency Drift Analysis GUI. 
+		</p>
+		<h2>Line settings</h2>
+		<p>
+			To provide maximum control over the display of both the MW frequency plot and the average MW frequency display, the line settings of both can be controlled as far as Matlab&trade; allows, meaning line colour, width, style, and marker.
+		</p>
+		<p>
+			To show only the (unconnected) data points, set "Style" to none and choose from one of the "Markers".
+		</p>
+		<p>
+		  <strong>Please note:</strong> Although you can set line markers for the mean MW frequency display, this does not make too much sense in practise, as the line is displayed as only two connected datapoints.
+		</p>
+		<h2>Std. dev. area</h2>
+		<p>
+			The confidence interval of the mean MW frequency (mean +/- stdev) gets displayed as a coloured area (a "patch" in Matlab&trade;). You can set both colour and transparency ("alpha") of that area.
 		</p>
 		<div class="footer">
 		<p class="copyright">
