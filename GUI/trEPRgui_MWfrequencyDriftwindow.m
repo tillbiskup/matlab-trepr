@@ -1892,7 +1892,7 @@ function updateAnalysisPanel()
         
         fieldDeviationDelta = (max(MWfreq)-min(MWfreq))*1e9*hplanck /...
             (gelectron*bohrmagneton);
-        fieldDeviationStdev = std(MWfreq)*2*1e9*hplanck /...
+        fieldDeviationStdev = std(MWfreq,1)*2*1e9*hplanck /...
             (gelectron*bohrmagneton);
         switch lower(ad.data{active}.axes.y.unit)
             case 'g'
@@ -1976,13 +1976,13 @@ function updateSettingsPanel(varargin)
             ad.control.axis.grid.y = ad.configuration.axis.grid.y;
             ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
             ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
-            % Reset avg settings
-            ad.MWfreq.area.patch.color = ad.configuration.avg.area.patch.color;
-            ad.MWfreq.area.patch.alpha = ad.configuration.avg.area.patch.alpha;
-            ad.MWfreq.line.color = ad.configuration.avg.line.color;
-            ad.MWfreq.line.width = ad.configuration.avg.line.width;
-            ad.MWfreq.line.style = ad.configuration.avg.line.style;
-            setappdata(mainWindow,'avg',ad.avg);
+            % Reset MWfreq settings
+            ad.MWfreq.area.patch.color = ad.configuration.MWfreq.area.patch.color;
+            ad.MWfreq.area.patch.alpha = ad.configuration.MWfreq.area.patch.alpha;
+            ad.MWfreq.line.color = ad.configuration.MWfreq.line.color;
+            ad.MWfreq.line.width = ad.configuration.MWfreq.line.width;
+            ad.MWfreq.line.style = ad.configuration.MWfreq.line.style;
+            setappdata(mainWindow,'MWfreq',ad.MWfreq);
             setappdata(mainWindow,'control',ad.control);
         end
         

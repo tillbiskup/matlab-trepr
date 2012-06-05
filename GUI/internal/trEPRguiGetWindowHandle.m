@@ -21,7 +21,7 @@ function handle = trEPRguiGetWindowHandle(varargin)
 % If no handle could be found, an empty cell array will be returned.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-06-05
 
 try
     % Check whether we are called with input argument
@@ -43,11 +43,25 @@ try
     guiFileNames = guiFileNames(1,:);
     guiSubWindowNames = struct2cell(...
         dir(fullfile(trEPRinfo('dir'),'GUI','private','trEPR*window.m')));
-    guiFileNames = [ guiFileNames guiSubWindowNames(1,:) ];  
+    % Get module subdirectories - do it generically for all modules
+    moduleDirs = struct2cell(dir(fullfile(trEPRinfo('dir'),'modules')));
+    moduleDirs = moduleDirs(1,[moduleDirs{4,:}]);
+    moduleDirs(strncmp(moduleDirs,'.',1)) = [];
+    if ~isempty(moduleDirs)
+        guiModuleWindowNames = cell(0);
+        for k=1:length(moduleDirs)
+            tmpNames = struct2cell(dir(fullfile(trEPRinfo('dir'),'modules',...
+                moduleDirs{k},'GUI','trEPR*window.m')));
+            guiModuleWindowNames = [guiModuleWindowNames tmpNames(1,:)]; %#ok<AGROW>
+        end
+        guiFileNames = [ guiFileNames guiSubWindowNames(1,:) ...
+            guiModuleWindowNames(1,:)];
+    else
+        guiFileNames = [ guiFileNames guiSubWindowNames(1,:)];
+    end
     for k=1:length(guiFileNames)
         windowTags.(guiFileNames{k}(1:end-2)) = guiFileNames{k}(1:end-2);
     end
-    
     % Define default tag
     defaultTag = windowTags.trEPRgui;
     
