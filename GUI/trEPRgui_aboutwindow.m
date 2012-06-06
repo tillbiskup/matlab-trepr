@@ -4,7 +4,7 @@ function varargout = trEPRgui_aboutwindow()
 %                   to the help command. 
 
 % (c) 2011-12, Till Biskup
-% 2012-03-24
+% 2012-06-06
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -15,6 +15,15 @@ singleton = findobj('Tag','trEPRgui_help_about');
 if (singleton)
     varargout{1} = figure(singleton);
     return;
+end
+
+% Try to get main GUI position
+mainGUIHandle = trEPRguiGetWindowHandle();
+if ishandle(mainGUIHandle)
+    mainGUIPosition = get(mainGUIHandle,'Position');
+    guiPosition = [mainGUIPosition(1)+50,mainGUIPosition(2)+250,528,300];
+else
+    guiPosition = [70,290,528,300];
 end
 
 info = trEPRinfo;
@@ -28,14 +37,13 @@ copyrightInfo = {...
     ''...
     sprintf('%s',info.url)...
     };
-position = [70,290,528,300];
 
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_help_about',...
     'Visible','off',...
     'Name',title,...
     'Units','Pixels',...
-    'Position',position,...
+    'Position',guiPosition,...
     'Resize','off',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
@@ -52,15 +60,15 @@ jLabel = javax.swing.JLabel('');
 jLabel.setIcon(icon);
 bgcolor = num2cell(get(hMainFigure, 'Color'));
 jLabel.setBackground(java.awt.Color(bgcolor{:}));
-javacomponent(jLabel,[20 position(4)-128-20 128 128],hMainFigure);
+javacomponent(jLabel,[20 guiPosition(4)-128-20 128 128],hMainFigure);
 
 % Set length of scrolling panel depending on the platform
 if any(strfind(platform,'Linux'))
     scrollPanelHeight = position(4)+2300;
 elseif any(strfind(platform,'Windows'))
-    scrollPanelHeight = position(4)+2080;
+    scrollPanelHeight = guiPosition(4)+2080;
 else % In case we are on a Mac
-    scrollPanelHeight = position(4)+2500;
+    scrollPanelHeight = guiPosition(4)+2500;
 end
 
 hPanel = uipanel('Parent',hMainFigure,...

@@ -11,7 +11,7 @@ function status = update_visibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-06
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -81,9 +81,6 @@ if isempty(ad.control.spectra.visible)
     set(gh.processing_panel_datasets_listbox,'Enable','off');
     set(gh.display_panel_datasets_listbox,'Enable','off');
     set(gh.data_panel_visible_listbox,'Enable','off');
-    set(gh.displaytype_popupmenu,'Enable','off');
-    set(gh.previous_pushbutton,'Enable','off');
-    set(gh.next_pushbutton,'Enable','off');
 else
     set(gh.data_panel_hide_pushbutton,'Enable','on');
     set(gh.data_panel_hideall_pushbutton,'Enable','on');
@@ -92,9 +89,6 @@ else
     set(gh.processing_panel_datasets_listbox,'Enable','on');
     set(gh.display_panel_datasets_listbox,'Enable','on');
     set(gh.data_panel_visible_listbox,'Enable','on');
-    set(gh.displaytype_popupmenu,'Enable','on');
-    set(gh.previous_pushbutton,'Enable','on');
-    set(gh.next_pushbutton,'Enable','on');
 
     % Make "Save" button active only if currently active spectrum is
     % modified

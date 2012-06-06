@@ -26,5 +26,10 @@ The <strong>labels</strong> of your datasets get used in the figure legend. Use 
 
 If you don't provide a unit for an axis label, the slash will not be displayed.
 
-You can scroll through the visible datasets using the "PgUp" and "PgDown" keys
-.
+You can scroll through the visible datasets using the "PgUp" and "PgDown" keys.
+
+The MW Frequency Drift Analysis Window lets you analyse MW frequency drifts in quite some detail. See the analysis panel.
+
+If you have averaged datasets, you can display the standard deviation as error bars Set the option in the display panel.
+
+You can configure the position of the main GUI via the INI file. Subwindows are positioned relative to the main GUI window.

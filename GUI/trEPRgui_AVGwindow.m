@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-06
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -21,12 +21,21 @@ if (singleton)
     return;
 end
 
+% Try to get main GUI position
+mainGUIHandle = trEPRguiGetWindowHandle();
+if ishandle(mainGUIHandle)
+    mainGUIPosition = get(mainGUIHandle,'Position');
+    guiPosition = [mainGUIPosition(1)+10,mainGUIPosition(2)+10,800,670];
+else
+    guiPosition = [30,50,800,670];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_AVGwindow',...
     'Visible','off',...
     'Name','trEPR GUI : AVG Window',...
     'Units','Pixels',...
-    'Position',[30,50,800,670],...
+    'Position',guiPosition,...
     'Resize','off',...
     'NumberTitle','off', ...
     'KeyPressFcn',@keypress_Callback,...

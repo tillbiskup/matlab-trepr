@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-06
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,12 +20,21 @@ if (singleton)
     return;
 end
 
+% Try to get main GUI position
+mainGUIHandle = trEPRguiGetWindowHandle();
+if ishandle(mainGUIHandle)
+    mainGUIPosition = get(mainGUIHandle,'Position');
+    guiPosition = [mainGUIPosition(1)+10,mainGUIPosition(2)+10,950,250];
+else
+    guiPosition = [30,50,950,250];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Status Window',...
     'Units','Pixels',...
-    'Position',[30,50,950,250],...
+    'Position',guiPosition,...
     'Resize','off',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
