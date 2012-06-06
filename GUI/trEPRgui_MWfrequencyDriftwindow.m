@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2012, Till Biskup
-% 2012-06-05
+% 2012-06-06
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1272,11 +1272,8 @@ function pushbutton_Callback(~,~,action)
 
         switch action
             case 'exportFigure'
-                % Open new figure window
-                newFig = figure();
-                
-                % Make new figure window invisible
-                set(newFig,'Visible','off');
+                % Open new figure window and make it invisible
+                newFig = figure('Visible','off');
                 
                 % Plot into new figure window
                 updateAxes(newFig);
@@ -1295,8 +1292,8 @@ function pushbutton_Callback(~,~,action)
                 
                 % Generate default file name if possible, be very defensive
                 if ad.control.spectra.visible
-                    [~,fileNameSuggested,~] = fileparts(...
-                        ad.data{ad.control.spectra.visible(1)}.file.name);
+                    [~,fileNameSuggested,~] = ...
+                        fileparts(ad.data{active}.file.name);
                 else
                     fileNameSuggested = '';
                 end
@@ -1308,6 +1305,7 @@ function pushbutton_Callback(~,~,action)
                     [fileNameSuggested '-MWfreqDriftPlot']);
                 % If user aborts process, return
                 if fileName == 0
+                    close(newFig);
                     return;
                 end
                 % Create filename with full path
@@ -1322,6 +1320,7 @@ function pushbutton_Callback(~,~,action)
                 
                 % Close figure window
                 close(newFig);
+                return;
             case 'lineColourPalette'
                 switch lower(lineType)
                     case 'main'

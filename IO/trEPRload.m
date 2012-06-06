@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2012, Till Biskup
-% 2012-06-01
+% 2012-06-06
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -43,6 +43,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('filename', @(x)ischar(x) || iscell(x) || isstruct(x));
 p.addParamValue('combine',logical(false),@islogical);
+p.addParamValue('loadInfoFile',logical(false),@islogical);
 p.parse(filename,varargin{:});
 
 if iscell(filename)
