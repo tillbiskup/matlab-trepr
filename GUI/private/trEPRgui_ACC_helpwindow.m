@@ -163,9 +163,6 @@ end
 
 function helptext_popupmenu_Callback(source,~)
     try
-        % Get handles of main window
-        gh = guihandles(hMainFigure);
-        
         helpTexts = cellstr(get(source,'String'));
         helpText = helpTexts{get(source,'Value')};
         
@@ -203,7 +200,11 @@ function helptext_popupmenu_Callback(source,~)
             otherwise
                 % That shall never happen
                 trEPRadd2status('guiHelpPanel(): Unknown helptext');
-                set(textdisplay,'String','');
+                htmlText = ['<html>' ...
+                    '<h1>Sorry, help could not be found</h1>'...
+                    '<p>The help text you requested could not be found.</p>'...
+                    '</html>'];
+                browser.setHtmlText(htmlText);
         end
     catch exception
         try
@@ -254,7 +255,7 @@ function pushbutton_Callback(~,~,action)
     end
 end
 
-function keypress_Callback(src,evt)
+function keypress_Callback(~,evt)
     try
         if isempty(evt.Character) && isempty(evt.Key)
             % In case "Character" is the empty string, i.e. only modifier

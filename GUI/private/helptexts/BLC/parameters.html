@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de"
+      lang="de" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../help.css" />
+        <title>trEPR GUI : BLC window : Parameters</title>
+    </head>
+    <body>
+		<h1>Parameters</h1>
+		<p class="intro">
+			The parameters panel lets you control the areas used to fit the baseline to.
+		</p>
+		<h2>Fit area width</h2>
+		<p>
+			The left and right area is the number of time traces averaged over and subtracted in case of the linear background correction of zeroth and first order.
+		</p>
+		<p>
+			At the same time, these areas are used to fit the baseline to the spectrum averaged averaged over the last n points in time, as displayed on the bottom left.
+		</p>
+		<p>
+			The back area gives the number of time points used to average for the spectrum displayed at the bottom left, that is used to fit the baseline to. Usually, averaging over the last n points in time and display this spectrum gives a clear indication of any baseline present in the currently displayed dataset, even if the signal didn't decay completely at the end of the time traces.
+		</p>
+		<h2>Additional points in fit</h2>
+		<p>
+			These settings currently don't influence the BLC.
+		</p>
+		<p>
+			The idea is here, especially in conjunction with the (still not implemented) fitting of nonlinear functions, to have a better control over how the baseline is fitted to the data.
+		</p>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2011-12, Till Biskup
+		</p>
+		<p class="lastchange">
+			2012-06-07
+		</p>
+		</div>
+	</body>
+</html>

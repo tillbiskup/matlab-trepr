@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -438,7 +438,11 @@ function helptext_selector(helpText)
             otherwise
                 % That shall never happen
                 trEPRadd2status('trEPRgui_helpwindow(): Unknown helptext');
-                browser.setCurrentLocation('');
+                htmlText = ['<html>' ...
+                    '<h1>Sorry, help could not be found</h1>'...
+                    '<p>The help text you requested could not be found.</p>'...
+                    '</html>'];
+                browser.setHtmlText(htmlText);
         end
     catch exception
         try

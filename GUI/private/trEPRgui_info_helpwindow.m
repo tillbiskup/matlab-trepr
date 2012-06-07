@@ -200,7 +200,11 @@ function helptext_popupmenu_Callback(source,~)
             otherwise
                 % That shall never happen
                 trEPRadd2status('guiHelpPanel(): Unknown helptext');
-                set(textdisplay,'String','');
+                htmlText = ['<html>' ...
+                    '<h1>Sorry, help could not be found</h1>'...
+                    '<p>The help text you requested could not be found.</p>'...
+                    '</html>'];
+                browser.setHtmlText(htmlText);
         end
     catch exception
         try
