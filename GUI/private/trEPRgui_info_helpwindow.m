@@ -6,7 +6,7 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 % See also TAGUI_HELPWINDOW
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -19,12 +19,21 @@ if (singleton)
     return;
 end
 
+% Try to get main GUI position
+infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_infowindow');
+if ishandle(infoGUIHandle)
+    infoGUIPosition = get(infoGUIHandle,'Position');
+    guiPosition = [infoGUIPosition(1)+70,infoGUIPosition(2)+100,450,450];
+else
+    guiPosition = [100,150,450,450];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_info_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : Info : Help Window',...
     'Units','Pixels',...
-    'Position',[100,150,450,450],...
+    'Position',guiPosition,...
     'Resize','off',...
     'KeyPressFcn',@keypress_Callback,...
     'NumberTitle','off', ...

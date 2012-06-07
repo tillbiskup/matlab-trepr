@@ -6,7 +6,7 @@ function varargout = trEPRgui_ACC_helpwindow(varargin)
 % See also trEPRGUI_ACCWINDOW
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -19,12 +19,21 @@ if (singleton)
     return;
 end
 
+% Try to get main GUI position
+infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_ACCwindow');
+if ishandle(infoGUIHandle)
+    infoGUIPosition = get(infoGUIHandle,'Position');
+    guiPosition = [infoGUIPosition(1)+20,infoGUIPosition(2)+200,450,450];
+else
+    guiPosition = [50,250,450,450];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_ACC_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : ACC : Help Window',...
     'Units','Pixels',...
-    'Position',[50,250,450,450],...
+    'Position',guiPosition,...
     'Resize','off',...
     'KeyPressFcn',@keypress_Callback,...
     'NumberTitle','off', ...

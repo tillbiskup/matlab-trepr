@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -35,12 +35,21 @@ for k=1:length(formatNames)
     end
 end
 
+% Try to get main GUI position
+mainGUIHandle = trEPRguiGetWindowHandle();
+if ishandle(mainGUIHandle)
+    mainGUIPosition = get(mainGUIHandle,'Position');
+    guiPosition = [mainGUIPosition(1)+10,mainGUIPosition(2)+150,650,510];
+else
+    guiPosition = [30,200,650,510];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_combinewindow',...
     'Visible','off',...
     'Name','trEPR GUI : Combine Window',...
     'Units','Pixels',...
-    'Position',[30,200,650,510],...
+    'Position',guiPosition,...
     'Resize','off',...
     'NumberTitle','off', ...
     'KeyPressFcn',@keypress_Callback,...

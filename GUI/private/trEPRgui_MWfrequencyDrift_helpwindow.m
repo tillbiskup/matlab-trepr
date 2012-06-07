@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDrift_helpwindow(varargin)
 % See also TREPRGUI_MWFREQUENCYDRIFTWINDOW
 
 % (c) 2012, Till Biskup
-% 2012-06-05
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -28,9 +28,9 @@ end
 mainGUIHandle = trEPRguiGetWindowHandle('trEPRgui_MWfrequencyDriftwindow');
 if ishandle(mainGUIHandle)
     mainGUIPosition = get(mainGUIHandle,'Position');
-    guiPosition = [mainGUIPosition(1)+30,mainGUIPosition(2)+50,450,450];
+    guiPosition = [mainGUIPosition(1)+140,mainGUIPosition(2)+60,450,450];
 else
-    guiPosition = [50,230,450,450];
+    guiPosition = [160,240,450,450];
 end
 
 %  Construct the components

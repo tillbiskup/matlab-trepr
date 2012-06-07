@@ -4,7 +4,7 @@ function varargout = trEPRgui_AVG_helpwindow(varargin)
 %          to the help command. 
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -17,12 +17,21 @@ if (singleton)
     return;
 end
 
+% Try to get main GUI position
+infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_AVGwindow');
+if ishandle(infoGUIHandle)
+    infoGUIPosition = get(infoGUIHandle,'Position');
+    guiPosition = [infoGUIPosition(1)+20,infoGUIPosition(2)+200,450,450];
+else
+    guiPosition = [50,250,450,450];
+end
+
 %  Construct the components
 hMainFigure = figure('Tag','trEPRgui_AVG_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : AVG : Help Window',...
     'Units','Pixels',...
-    'Position',[50,250,450,450],...
+    'Position',guiPosition,...
     'Resize','off',...
     'KeyPressFcn',@keypress_Callback,...
     'NumberTitle','off', ...

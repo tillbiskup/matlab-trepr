@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2012, Till Biskup
-% 2012-06-06
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1887,7 +1887,7 @@ function updateAnalysisPanel()
         
         % Set Field subpanel fields
         set(gh.field_step_edit,'String',...
-            num2str(ad.data{active}.parameters.field.step));
+            num2str(ad.data{active}.parameters.field.step.value));
         
         fieldDeviationDelta = (max(MWfreq)-min(MWfreq))*1e9*hplanck /...
             (gelectron*bohrmagneton);
@@ -1918,20 +1918,20 @@ function updateAnalysisPanel()
             'String',ad.data{active}.axes.y.unit);
         
         % Set background of deviation fields accordingly
-        if fieldDeviationDelta > ad.data{active}.parameters.field.step
+        if fieldDeviationDelta > ad.data{active}.parameters.field.step.value
             set(gh.field_deviation_delta_edit,...
                 'BackgroundColor',[1 0.8 0.8]);
-        elseif fieldDeviationDelta > 0.5*ad.data{active}.parameters.field.step
+        elseif fieldDeviationDelta > 0.5*ad.data{active}.parameters.field.step.value
             set(gh.field_deviation_delta_edit,...
                 'Background',[1 1 0.8]);
         else
             set(gh.field_deviation_delta_edit,...
                 'Background',[0.8 1 0.8]);
         end
-        if fieldDeviationStdev > ad.data{active}.parameters.field.step
+        if fieldDeviationStdev > ad.data{active}.parameters.field.step.value
             set(gh.field_deviation_stdev_edit,...
                 'BackgroundColor',[1 0.8 0.8]);
-        elseif fieldDeviationStdev > 0.5*ad.data{active}.parameters.field.step
+        elseif fieldDeviationStdev > 0.5*ad.data{active}.parameters.field.step.value
             set(gh.field_deviation_stdev_edit,...
                 'Background',[1 1 0.8]);
         else
