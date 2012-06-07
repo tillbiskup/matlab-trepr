@@ -30,7 +30,7 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
 % (c) 2009-2012, Till Biskup
-% 2012-06-01
+% 2012-06-07
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -148,6 +148,12 @@ function [content,warnings] = loadFile(filename,varargin)
                         switch tokens{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
+                                content.parameters.field.start.unit = ...
+                                    content.axes.y.unit;
+                                content.parameters.field.stop.unit = ...
+                                    content.axes.y.unit;
+                                content.parameters.field.step.unit = ...
+                                    content.axes.y.unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRgnuplotLoad:parseError',...
@@ -171,11 +177,11 @@ function [content,warnings] = loadFile(filename,varargin)
                     return;
                 end
                 
-                content.parameters.field.start = ...
+                content.parameters.field.start.value = ...
                     content.axes.y.values(1);
-                content.parameters.field.stop = ...
+                content.parameters.field.stop.value = ...
                     content.axes.y.values(end);
-                content.parameters.field.step = ...
+                content.parameters.field.step.value = ...
                     content.axes.y.values(2) - content.axes.y.values(1);
             case 'combine'
                 % This is used in case filename is a cell array of file names
@@ -195,6 +201,12 @@ function [content,warnings] = loadFile(filename,varargin)
                         switch tokens{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
+                                content.parameters.field.start.unit = ...
+                                    content.axes.y.unit;
+                                content.parameters.field.stop.unit = ...
+                                    content.axes.y.unit;
+                                content.parameters.field.step.unit = ...
+                                    content.axes.y.unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRgnuplotLoad:parseError',...
@@ -217,11 +229,11 @@ function [content,warnings] = loadFile(filename,varargin)
                     return;
                 end
                 
-                content.parameters.field.start = ...
+                content.parameters.field.start.value = ...
                     content.axes.y.values(1);
-                content.parameters.field.stop = ...
+                content.parameters.field.stop.value = ...
                     content.axes.y.values(end);
-                content.parameters.field.step = ...
+                content.parameters.field.step.value = ...
                     content.axes.y.values(2) - content.axes.y.values(1);
             otherwise
         end
@@ -247,6 +259,9 @@ function [content,warnings] = loadFile(filename,varargin)
         switch tokens{1}{2}
             case 'Gauss'
                 content.axes.y.unit = 'G';
+                content.parameters.field.start.unit = content.axes.y.unit;
+                content.parameters.field.stop.unit = content.axes.y.unit;
+                content.parameters.field.step.unit = content.axes.y.unit;
             otherwise
                 warnings{end+1} = struct(...
                     'identifier','trEPRspeksimLoad:parseError',...
@@ -255,9 +270,9 @@ function [content,warnings] = loadFile(filename,varargin)
                     tokens{1}{2})...
                     );
         end
-        content.parameters.field.start = str2double(tokens{1}{1});
-        content.parameters.field.stop = str2double(tokens{1}{1});
-        content.parameters.field.step = 0;
+        content.parameters.field.start.value = str2double(tokens{1}{1});
+        content.parameters.field.stop.value = str2double(tokens{1}{1});
+        content.parameters.field.step.value = 0;
         content.axes.y.values = str2double(tokens{1}{1});
         content.parameters.bridge.MWfrequency.value = ...
             str2double(tokens{1}{3});
@@ -286,23 +301,24 @@ function [content,warnings] = loadFile(filename,varargin)
     content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     
     content.parameters.transient.points = length(data.data(:,1));
-    content.parameters.transient.length = ...
+    content.parameters.transient.length.value = ...
         (abs(data.data(1,1)) + data.data(end,1)) / ...
         (length(data.data(:,1)) - 1) * length(data.data(:,1));
     % Bug fix for some very weird MATLAB problems with accuracy
-    content.parameters.transient.length = ...
-        round(content.parameters.transient.length*1e10)/1e10;
+    content.parameters.transient.length.value = ...
+        round(content.parameters.transient.length.value*1e10)/1e10;
     % The floor is important due to the fact that the trigger position
     % might be between two points.
     content.parameters.transient.triggerPosition = ...
         floor(abs(data.data(1,1)) / ...
-        (content.parameters.transient.length / ...
+        (content.parameters.transient.length.value / ...
         length(data.data(:,1))));
     
     % Create axis informations from parameters
     content.axes.x.values = data.data(:,1);
     content.axes.x.measure = 'time';
     content.axes.x.unit = 's';
+    content.parameters.transient.length.unit = content.axes.x.unit;
     
     % Get label string from third line of file/header
     content.label = strtrim(content.header{3}(3:end));

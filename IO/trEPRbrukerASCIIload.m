@@ -97,16 +97,17 @@ try
     % Details of the structure can be found at the toolbox homepage, look
     % for description of the trEPRload return argument format
     data.parameters.runs = 1;
-    data.parameters.field.start = data.axes.y.values(1);
-    data.parameters.field.stop = data.axes.y.values(end);
-    data.parameters.field.step = ...
+    data.parameters.field.start.value = data.axes.y.values(1);
+    data.parameters.field.stop.value = data.axes.y.values(end);
+    data.parameters.field.step.value = ...
         data.axes.y.values(2)-data.axes.y.values(1);
+    data.parameters.field.start.unit = data.axes.x.measure;
+    data.parameters.field.stop.unit = data.axes.x.measure;
+    data.parameters.field.step.unit = data.axes.x.measure;
     data.parameters.transient.points = length(data.axes.x.values);
-    data.parameters.transient.length = ...
+    data.parameters.transient.length.value = ...
         data.axes.x.values(end)-data.axes.x.values(1);
-    
-    % Set Version string of content structure
-    data.version = '1.1';
+    data.parameters.transient.length.unit = data.axes.x.unit;
 catch exception
     throw(exception);
 end
