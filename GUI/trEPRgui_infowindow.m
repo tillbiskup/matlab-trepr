@@ -3703,6 +3703,30 @@ function pushbutton_Callback(~,~,action)
                         return;
                     end
                 end
+                % Check whether file exists already
+                if exist(ad.control.spectra.infoFile{active}.output.name,'file')
+                    while 1
+                        button = questdlg(...
+                            sprintf('File\n  %s\n exists already. Overwrite?',...
+                            ad.control.spectra.infoFile{active}.output.name),...
+                            'File exists...',...
+                            'Yes','No','Cancel','No');
+                        switch lower(button)
+                            case 'no'
+                                [FileName,PathName] = uiputfile('*.info',...
+                                    'Select filename for info file');
+                                if ~isempty(FileName) && FileName ~= 0;
+                                    ad.control.spectra.infoFile{active}.output.name = ...
+                                        fullfile(PathName,FileName);
+                                    break;
+                                end
+                            case 'cancel'
+                                return;
+                            otherwise
+                                break;
+                        end
+                    end
+                end
                 % Get contents of text display
                 infoFileText = get(gh.tools_panel_infofiledisplay_edit,...
                     'String');

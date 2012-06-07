@@ -33,3 +33,7 @@ The MW Frequency Drift Analysis Window lets you analyse MW frequency drifts in q
 If you have averaged datasets, you can display the standard deviation as error bars Set the option in the display panel.
 
 You can configure the position of the main GUI via the INI file. Subwindows are positioned relative to the main GUI window.
+
+You can read trEPR Info Files using the Info GUI. That helps you greatly with applying all parameters from the Info files to datasets.
+
+Files saved in older versions of the trEPR toolbox format get converted during read.
