@@ -150,6 +150,12 @@ if exist('data','var')
     struct.data = data;
     clear data
 end
+% Convert to current toolbox format if necessary
+[struct,convertWarning] = trEPRfileFormatConvert(struct);
+if ~isempty(convertWarning)
+    warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';
+    warning{end}.message = convertWarning;
+end
 if nargout
     varargout{1} = struct;
     varargout{2} = warning;

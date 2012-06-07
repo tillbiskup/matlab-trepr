@@ -373,9 +373,6 @@ function [content,warnings] = loadFile(filename,parameters)
             datestr(datenum(...
             content.parameters.date.start,'ddd mmm dd, yyyy; HH:MM:SS'),31);
     end
-    
-    % Set Version string of content structure
-    content.version = '1.1';
 end
 
 
