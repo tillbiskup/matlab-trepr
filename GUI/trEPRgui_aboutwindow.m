@@ -4,7 +4,7 @@ function varargout = trEPRgui_aboutwindow()
 %                   to the help command. 
 
 % (c) 2011-12, Till Biskup
-% 2012-06-06
+% 2012-06-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -64,7 +64,7 @@ javacomponent(jLabel,[20 guiPosition(4)-128-20 128 128],hMainFigure);
 
 % Set length of scrolling panel depending on the platform
 if any(strfind(platform,'Linux'))
-    scrollPanelHeight = position(4)+2300;
+    scrollPanelHeight = guiPosition(4)+2300;
 elseif any(strfind(platform,'Windows'))
     scrollPanelHeight = guiPosition(4)+2080;
 else % In case we are on a Mac
