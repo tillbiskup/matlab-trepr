@@ -51,7 +51,7 @@ function varargout = trEPRinfo(varargin)
 % See also VER
 
 % (c) 2007-12, Till Biskup
-% 2011-12-30
+% 2012-06-07
 
 % The place to centrally manage the revision number and date is the file
 % "Contents.m" in the root directory of the trEPR toolbox.
@@ -83,6 +83,8 @@ info.vcs = struct(...
     'type','git',...
     'url','https://r3c.de/gitweb/?p=till/trepr.git'...
     );
+info.description = ...
+    'a Matlab toolbox for transient Electron Paramagnetic Resonance';
 
 % For all version information, parse the "Contents.m" file in the toolbox
 % root directory
@@ -98,6 +100,7 @@ for k=1:2
 end
 fclose(fid);
 
+info.name = contentsFileHeader{1}(3:end);
 C = textscan(contentsFileHeader{2}(3:end),'%s %s %s %s');
 
 info.version = struct();
@@ -133,8 +136,8 @@ elseif nargout
 else
     fprintf('==================================================================\n');
     fprintf('\n');
-    fprintf(' trEPR toolbox\n');
-    fprintf(' - a Matlab toolbox for transient Electron Paramagnetic Resonance  \n');
+    fprintf(' %s\n',info.name);
+    fprintf(' - %s\n',info.description);
     fprintf('\n');
     fprintf(' Release:         %s %s\n',info.version.Version,info.version.Date);
     fprintf(' Directory:       %s\n',info.path);
