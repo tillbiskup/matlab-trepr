@@ -39,7 +39,7 @@ tip = 1
 [load]
 combine = 0
 loaddir = 0
-AVG = 0
+infofile = 0
 POC = 0
 BGC = 0
 labels = 1

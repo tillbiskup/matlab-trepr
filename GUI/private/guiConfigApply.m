@@ -88,6 +88,10 @@ try
                 set(gh.load_panel_files_directory_checkbox,...
                     'Value',ad.configuration.load.loaddir);
             end
+            if isfield(ad.configuration.load,'infofile')
+                set(gh.load_panel_infofile_checkbox,...
+                    'Value',ad.configuration.load.infofile);
+            end
             if isfield(ad.configuration.load,'POC')
                 set(gh.load_panel_preprocessing_offset_checkbox,...
                     'Value',ad.configuration.load.POC);
