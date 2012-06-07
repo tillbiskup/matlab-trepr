@@ -246,6 +246,25 @@ else    % -> if iscell(filename)
     end
 end
 
+if exist('content','var') && p.Results.loadInfoFile ...
+        && ~strcmpi(content.file.format,'xmlzip')
+    % Try to load info file
+    [fpath,fname,~] = fileparts(filename);
+    infoFileName = fullfile(fpath,[fname '.info']);
+    if exist(infoFileName,'file')
+        [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
+        if isempty(ifpwarnings)
+            content = structcopy(content,parameters);
+        else
+            warnings{end+1} = ifpwarnings;
+        end
+    else
+        warnings{end+1} = 'Could not find accompanying info file.';
+    end
+    varargout{1} = content;
+    varargout{2} = warnings;
+end
+    
 if ~exist('content','var') && nargout
     varargout{1} = 0;
     varargout{2} = [];

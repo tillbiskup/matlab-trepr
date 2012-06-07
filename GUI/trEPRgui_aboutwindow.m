@@ -1,7 +1,6 @@
 function varargout = trEPRgui_aboutwindow()
-% TREPRGUI_ABOUTWINDOW Brief description of GUI.
-%                   Comments displayed at the command line in response 
-%                   to the help command. 
+% TREPRGUI_ABOUTWINDOW Display basic information about the trEPR toolbox,
+% including links to the toolbox homepage and a list of contributors.
 
 % (c) 2011-12, Till Biskup
 % 2012-06-07
@@ -33,7 +32,7 @@ toolboxNameString = 'trEPR Toolbox';
 versionString = ...
     sprintf('v.%s (%s)',info.version.Version,info.version.Date);
 copyrightInfo = {...
-    sprintf('(c) 2005-12, Till Biskup, <%s>',info.maintainer.email)...
+    sprintf('(c) 2005-12, %s, <%s>',info.maintainer.name,info.maintainer.email)...
     ''...
     sprintf('%s',info.url)...
     };
@@ -205,7 +204,7 @@ end
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    function keypress_Callback(src,evt)
+    function keypress_Callback(~,evt)
         try
             if isempty(evt.Character) && isempty(evt.Key)
                 % In case "Character" is the empty string, i.e. only
@@ -217,7 +216,7 @@ end
                         (strcmpi(evt.Modifier{1},'control'))
                     switch evt.Key
                         case 'w'
-                            closeWindow(src,evt);
+                            closeWindow();
                             return;
                     end
                 end
