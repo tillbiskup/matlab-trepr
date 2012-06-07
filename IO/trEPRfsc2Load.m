@@ -182,9 +182,6 @@ function [content,warnings] = loadFile(filename,parameters)
     for k=lineNumber:length(content.header)
         for l=1:length(matching) % length(matching) = nRows of matching
             if ~isempty(strfind(content.header{k},matching{l,1})) ...
-%                     && isempty(getCascadedField(...
-%                     content.parameters,...
-%                     matching{l,2}));
                 switch matching{l,3}
                     case 'numeric'
                         [tokens ~] = regexp(...
@@ -255,9 +252,13 @@ function [content,warnings] = loadFile(filename,parameters)
     
     % Check for direction of field axis
     if content.parameters.field.stop.value < content.parameters.field.start.value
-        reverse = logical(true);
+        content.parameters.field.sequence = 'down';
+        tmpvalue = content.parameters.field.stop.value;
+        content.parameters.field.stop.value = content.parameters.field.start.value;
+        content.parameters.field.start.value = tmpvalue;
+        clear tmpvalue;
     else
-        reverse = logical(false);
+        content.parameters.field.sequence = 'up';
     end
 
     % Load data of the file
@@ -296,15 +297,9 @@ function [content,warnings] = loadFile(filename,parameters)
                 );
         else
             rows = length(data)/cols;
-            if reverse
-                content.parameters.field.start.value = ...
-                    content.parameters.field.stop.value - ...
-                    rows * content.parameters.field.step.value;
-            else
-                content.parameters.field.stop.value = ...
-                    content.parameters.field.start.value + ...
-                    rows * content.parameters.field.step.value;
-            end
+            content.parameters.field.stop.value = ...
+                content.parameters.field.start.value + ...
+                rows * content.parameters.field.step.value;
             warnings{end+1} = struct(...
                 'identifier','trEPRfsc2Load:dimensionMismatch',...
                 'message',sprintf(...
@@ -332,7 +327,7 @@ function [content,warnings] = loadFile(filename,parameters)
         content.data = sum(dataArray,3);
     else
         content.data = reshape(data,cols,rows)';
-        if reverse
+        if strcmpi(content.parameters.field.sequence,'down')
             % If measured from high to low magnetic field
             content.data = flipud(content.data);
         end
@@ -365,17 +360,10 @@ function [content,warnings] = loadFile(filename,parameters)
     content.axes.x.measure = 'time';
     content.axes.x.unit = content.parameters.transient.length.unit;
     
-    if reverse
-        content.axes.y.values = ...
-            content.parameters.field.stop.value : ...
-            content.parameters.field.step.value : ...
-            content.parameters.field.start.value;
-    else
-        content.axes.y.values = ...
-            content.parameters.field.start.value : ...
-            content.parameters.field.step.value : ...
-            content.parameters.field.stop.value;
-    end
+    content.axes.y.values = ...
+        content.parameters.field.start.value : ...
+        content.parameters.field.step.value : ...
+        content.parameters.field.stop.value;
     content.axes.y.measure = 'magnetic field';
     content.axes.y.unit = content.parameters.field.start.unit;
     
