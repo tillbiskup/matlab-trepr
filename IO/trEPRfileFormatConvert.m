@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % (c) 2012, Till Biskup
-% 2012-06-07
+% 2012-06-08
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -41,10 +41,13 @@ end
 if ~isfield(data,'version') && ~isfield(data,'format')
     % Looks like we're in version < 1.1
     version = '1.0';
-elseif isfield(data,'version')
-    version = data.version;
-else
+elseif isfield(data,'format') && isfield(data.format,'version')
     version = data.format.version;
+    if isfield(data,'version')
+        data = rmfield(data,'version');
+    end
+else
+    version = data.version;
 end
 
 % There is nothing to do for the most current version...
