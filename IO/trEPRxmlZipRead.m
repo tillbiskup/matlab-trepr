@@ -16,7 +16,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % SEE ALSO TREPRXMLZIPWRITE
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-06-08
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -116,12 +116,11 @@ try
         end
     end
 catch errmsg
-    warning{end+1} = struct(...
-        'identifier','trEPRxmlZipRead:xmlParser',...
-        'message',sprintf('%s\n%s\n"%s"\n',...
+    warning{end+1}.identifier = 'trEPRxmlZipRead:xmlParser';
+    warning{end}.message = sprintf('%s\n%s\n"%s"\n',...
         errmsg.identifier,...
         'Problems with parsing XML in file:',...
-        filename));
+        filename);
     if nargout
         varargout{1} = logical(false);
         varargout{2} = warning;
@@ -150,6 +149,7 @@ if exist('data','var')
     struct.data = data;
     clear data
 end
+cd(PWD);
 % Convert to current toolbox format if necessary
 [struct,convertWarning] = trEPRfileFormatConvert(struct);
 if ~isempty(convertWarning)
@@ -163,7 +163,6 @@ else
     varname=char(DOMnode.getDocumentElement.getNodeName);
     assignin('caller',varname,struct);
 end
-cd(PWD);
 end
 
 function data = readBinary(filename)

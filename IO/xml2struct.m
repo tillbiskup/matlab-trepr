@@ -12,7 +12,7 @@ function varargout = xml2struct(docNode)
 
 % (c) 2010, Martin Hussels
 % (c) 2010-2012, Till Biskup
-% 2012-02-03
+% 2012-06-08
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -75,12 +75,20 @@ function thiselement=traverse(node)
                             reshape(char(node.getTextContent),msize);
                     catch exception
                         try
-                        thiselement=...
-                            reshape(char(node.getTextContent),...
-                            [msize(1) msize(2)-1]);
+                            thiselement=...
+                                reshape(char(node.getTextContent),...
+                                [msize(1) msize(2)-1]);
                         catch exception2
+                            try
+                                thiselement=...
+                                    reshape(char(node.getTextContent),...
+                                    size(char(node.getTextContent)));
+                            catch exception3
+                            size(char(node.getTextContent))
                             exception = addCause(exception2, exception);
+                            exception = addCause(exception3, exception);
                             throw(exception);
+                            end
                         end
                     end
                 else

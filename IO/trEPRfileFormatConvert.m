@@ -76,10 +76,12 @@ switch version
             newdata.parameters.bridge.calibration.start.value = data.parameters.bridge.calibration.values(1);
             newdata.parameters.bridge.calibration.end.value = data.parameters.bridge.calibration.values(end);
         end
-        newdata.parameters.bridge.calibration.start.unit = data.parameters.bridge.calibration.unit;
-        newdata.parameters.bridge.calibration.end.unit = data.parameters.bridge.calibration.unit;
-        newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'values');
-        newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'unit');
+        if ~isfield(data.parameters.bridge.calibration,'start')
+            newdata.parameters.bridge.calibration.start.unit = data.parameters.bridge.calibration.unit;
+            newdata.parameters.bridge.calibration.end.unit = data.parameters.bridge.calibration.unit;
+            newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'values');
+            newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'unit');
+        end
     case '1.3'
         newdata.parameters.date.start = data.parameters.date;
         newdata.parameters.date.end = '';

@@ -1,4 +1,19 @@
 function docNode = struct2xml(str)
+% XML2STRUCT Convert XML into struct
+%
+% Usage:
+%   docNode = xml2struct(struct);
+%
+%   struct  - struct
+%             content of the XML file
+%   docNode - string
+%             XML tree, org.apache.xerces.dom.DocumentImpl
+%
+
+% (c) 2010, Martin Hussels
+% (c) 2010-2012, Till Biskup
+% 2012-06-08
+
 docNode = com.mathworks.xml.XMLUtils.createDocument(inputname(1));
 docRootNode = docNode.getDocumentElement;
 function traverse(thiselement,childnode)
@@ -31,6 +46,9 @@ function traverse(thiselement,childnode)
             childnode.appendChild(nextnode);
         end
     else
+        if strcmp(class(thiselement),'function_handle') 
+            thiselement = func2str(thiselement);
+        end
         childnode.setAttributeNode(docNode.createAttribute('class'));
         childnode.setAttribute('class',class(thiselement));
         childnode.setAttributeNode(docNode.createAttribute('size'));
