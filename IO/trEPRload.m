@@ -7,7 +7,7 @@ function varargout = trEPRload(filename, varargin)
 %   [data,warnings] = trEPRload(filename)
 %
 %   filename - string
-%              name of a valid filename (of a fsc2 file)
+%              name of a valid filename
 %   data     - struct
 %              structure containing data and additional fields
 %

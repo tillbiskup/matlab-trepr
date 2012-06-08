@@ -1,8 +1,25 @@
 function varargout = trEPRsave(filename,struct)
-% Save data from the trEPR toolbox as ZIP-compressed XML files
+% TREPRSAVE Save data from the trEPR toolbox as ZIP-compressed XML files
+%
+% Usage
+%   trEPRsave(filename,struct)
+%   [status] = trEPRsave(filename,struct)
+%   [status,exception] = trEPRsave(filename,struct)
+%
+%   filename  - string
+%               name of a valid filename
+%   data      - struct
+%               structure containing data and additional fields
+%
+%   status    - cell array
+%               empty if there are no warnings
+%   exception - object
+%               empty if there are no exceptions
+%
+% See also TREPRLOAD
 
 % (c) 2010-12, Till Biskup
-% 2012-04-20
+% 2012-06-08
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -53,8 +70,8 @@ try
             fullfile(pathstr,[name zipext]));
         delete(fullfile(tempdir,[name xmlext]));
     end
-    % Second parameter is filename with full path
-    exception = fullfile(pathstr,[name zipext]);
+    % Second parameter is empty
+    exception = [];
 catch exception
     status{end+1} = 'A problem occurred:';
     status{end+1} = exception.message;
