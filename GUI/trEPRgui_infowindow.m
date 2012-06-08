@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-07
+% 2012-06-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3876,7 +3876,6 @@ function popupmenu_Callback(source,~,action)
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata and handles of main window
         ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
         
         % Get value
         values = cellstr(get(source,'String'));
@@ -4423,6 +4422,7 @@ function updateParameterPanel()
                         set(gh.(matchingParameter{idx,1}),'String',...
                             num2str(value(matchingParameter{idx,4})));
                     else
+                        matchingParameter{idx,1}
                         set(gh.(matchingParameter{idx,1}),'String',...
                             getCascadedField(...
                             ad.data{active}.parameters,...

@@ -63,14 +63,18 @@ newdata = structcopy(trEPRdataStructure('structure'),data);
 
 switch version
     case '1.4'
-        newdata.parameters.field.start.value = data.parameters.field.start;
-        newdata.parameters.field.start.unit = data.axes.y.unit;
-        newdata.parameters.field.stop.value = data.parameters.field.stop;
-        newdata.parameters.field.stop.unit = data.axes.y.unit;
-        newdata.parameters.field.step.value = data.parameters.field.step;        
-        newdata.parameters.field.step.unit = data.axes.y.unit;
-        newdata.parameters.transient.length.value = data.parameters.transient.length;
-        newdata.parameters.transient.length.unit = data.axes.x.unit;
+        if isnumeric(data.parameters.field.start)
+            newdata.parameters.field.start.value = data.parameters.field.start;
+            newdata.parameters.field.start.unit = data.axes.y.unit;
+            newdata.parameters.field.stop.value = data.parameters.field.stop;
+            newdata.parameters.field.stop.unit = data.axes.y.unit;
+            newdata.parameters.field.step.value = data.parameters.field.step;
+            newdata.parameters.field.step.unit = data.axes.y.unit;
+        end
+        if isnumeric(data.parameters.transient.length)
+            newdata.parameters.transient.length.value = data.parameters.transient.length;
+            newdata.parameters.transient.length.unit = data.axes.x.unit;
+        end
         if ~isempty(data.parameters.bridge.calibration) ...
                 && length(data.parameters.bridge.calibration) > 1
             newdata.parameters.bridge.calibration.start.value = data.parameters.bridge.calibration.values(1);
