@@ -1,8 +1,8 @@
-function status = export4glotaran(dataset,filename,varargin)
-% EXPORT4GLOTARAN exports a dataset in a format glotaran can read.
+function status = trEPRexport4glotaran(dataset,filename,varargin)
+% TREPREXPORT4GLOTARAN exports a dataset in a format glotaran can read.
 %
 % Usage
-%   export4glotaran(dataset)
+%   trEPRexport4glotaran(dataset)
 %
 %   dataset - struct
 %             dataset in TA toolbox format
@@ -11,8 +11,8 @@ function status = export4glotaran(dataset,filename,varargin)
 % Original file: glotaran.m
 % (c) 2011, Bernd Paulus
 
-% (c) 2011, Till Biskup
-% 2011-12-06
+% (c) 2011-12, Till Biskup
+% 2012-06-10
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.

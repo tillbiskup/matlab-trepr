@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-07
+% 2012-06-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -443,139 +443,6 @@ function helptext_selector(helpText)
                     '<p>The help text you requested could not be found.</p>'...
                     '</html>'];
                 browser.setHtmlText(htmlText);
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function helptext_selector2(helpText)
-    try
-        switch helpText
-            case 'Welcome'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','welcome.txt');
-                helpText = textFileRead(helpTextFile);
-                % Workaround: Get rid of the second paragraph saying that one
-                % sees this text only until pressing one of the panel switch
-                % buttons.
-                helpText(3:4) = [];
-                set(textdisplay,'String',helpText);
-            case 'New features'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','newfeatures.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Key bindings'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','keybindings.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Why this GUI?'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','whygui.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Key concepts'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','keyconcepts.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Known bugs'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','knownbugs.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Report a bug' 
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','bugreport.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Other resources'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','resources.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Disclaimer'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','disclaimer.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Load panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','load_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Datasets panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','datasets_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Slider panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','slider_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Measure panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','measure_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Display panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','display_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Processing panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','processing_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Analysis panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','analysis_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            case 'Configure panel'
-                % Read text from file and display it
-                helpTextFile = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','helptexts','main','configure_panel.txt');
-                helpText = textFileRead(helpTextFile);
-                set(textdisplay,'String',helpText);
-            otherwise
-                % That shall never happen
-                trEPRadd2status('trEPRgui_helpwindow(): Unknown helptext');
-                set(textdisplay,'String','');
         end
     catch exception
         try

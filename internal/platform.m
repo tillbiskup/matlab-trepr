@@ -1,59 +1,58 @@
-function platform = platform
-%  PLATFORM display general platform dependend information.
-%     P = PLATFORM returns the result in a string.
+function p = platform
+%PLATFORM display general platform dependend information.
+%   p = platform returns string p denoting the type of computer
+%   on which MATLAB is executing.
+%
+%   See also: COMPUTER
 
-% Copyright (C) 2007 Till Biskup, <till.biskup@fu-berlin.de>
-% This file ist free software.
-% $Id$
+% (c) 2007-12, Till Biskup
+% 2012-06-10
 
 % find platform OS
-	
-if ( exist('matlabroot') )
-	
-	if ispc
-        platform = [system_dependent('getos'),' ',system_dependent('getwinsys')];
-	elseif ( strfind(computer, 'MAC') == 1 )
-		[fail, input] = unix('sw_vers');
 
+if exist('matlabroot','builtin')
+    if ispc
+        p = [system_dependent('getos'),' ',system_dependent('getwinsys')];
+    elseif ( strfind(computer, 'MAC') == 1 )
+        [fail, input] = unix('sw_vers');
+        
         if ~fail
-            platform = strrep(input, 'ProductName:', '');
-			platform = strrep(platform, sprintf('\t'), '');
-			platform = strrep(platform, sprintf('\n'), ' ');
-			platform = strrep(platform, 'ProductVersion:', ' Version: ');
-			platform = strrep(platform, 'BuildVersion:', 'Build: ');
-		else
-			platform = system_dependent('getos');
-		end
-	else    
-		[fail, input] = unix('uname -srmo');
-	    if ~fail
-			platform = input;
-		else
-			platform = system_dependent('getos');
-		end		   
-	end
+            p = strrep(input, 'ProductName:', '');
+            p = strrep(p, sprintf('\t'), '');
+            p = strrep(p, sprintf('\n'), ' ');
+            p = strrep(p, 'ProductVersion:', ' Version: ');
+            p = strrep(p, 'BuildVersion:', 'Build: ');
+        else
+            p = system_dependent('getos');
+        end
+    else
+        [fail, input] = unix('uname -srmo');
+        if ~fail
+            p = input;
+        else
+            p = system_dependent('getos');
+        end
+    end
 else
-	if ispc
-	   platform = computer();
-	elseif findstr('apple', computer)
-	    [fail, input] = unix('sw_vers');
-	    if ~fail
-			platform = strrep(input, 'ProductName:', '');
-			platform = strrep(platform, sprintf('\t'), '');
-			platform = strrep(platform, sprintf('\n'), ' ');
-			platform = strrep(platform, 'ProductVersion:', ' Version: ');
-			platform = strrep(platform, 'BuildVersion:', 'Build: ');
-		else
-			platform = computer();
-		end
-	else    
-		[fail, input] = unix('uname -srmo');
-	    if ~fail
-			platform = input;
-		else
-			platform = computer();
-		end		   
-	end
+    if ispc
+        p = computer();
+    elseif strfind(computer,'apple')
+        [fail, input] = unix('sw_vers');
+        if ~fail
+            p = strrep(input, 'ProductName:', '');
+            p = strrep(p, sprintf('\t'), '');
+            p = strrep(p, sprintf('\n'), ' ');
+            p = strrep(p, 'ProductVersion:', ' Version: ');
+            p = strrep(p, 'BuildVersion:', 'Build: ');
+        else
+            p = computer();
+        end
+    else
+        [fail, input] = unix('uname -srmo');
+        if ~fail
+            p = input;
+        else
+            p = computer();
+        end
+    end
 end
-
-%******

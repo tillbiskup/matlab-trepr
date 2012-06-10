@@ -1,4 +1,13 @@
 function xmlFileSerialize(filename)
+% XMLFILESERIALIZE Serialise a XML File (read XML file and write complete
+% content back into the same file as one single line).
+%
+% Usage:
+%   xmlFileSerialize(filename)
+
+% (c) 2010-2012, Till Biskup
+% 2012-06-10
+
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
 parser.FunctionName = mfilename; % Function name included in error messages

@@ -37,7 +37,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
 % (c) 2009-2012, Till Biskup
-% 2012-06-07
+% 2012-06-10
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -176,12 +176,11 @@ function [content,warnings] = loadFile(filename,parameters)
         if (value == 0)
             lineNumber = length(content.header)-30;
         end
-        lineNumber = length(content.header)-30;
     end
 
     for k=lineNumber:length(content.header)
         for l=1:length(matching) % length(matching) = nRows of matching
-            if ~isempty(strfind(content.header{k},matching{l,1})) ...
+            if ~isempty(strfind(content.header{k},matching{l,1}))
                 switch matching{l,3}
                     case 'numeric'
                         [tokens ~] = regexp(...
@@ -383,24 +382,6 @@ function cleanName = cleanFileName(filename)
         filename,...
         {'\.','[^a-zA-Z0-9_]','^[0-9]','^_'},{'_','','',''}...
         );
-end
-
-
-% --- Get field of cascaded struct
-function value = getCascadedField (struct, fieldName)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    switch length(nDots)
-        case 0
-            value = struct.(fieldName);
-        case 1
-            value = getfield(getfield(...
-                struct,...
-                fieldName(1:nDots(1)-1)),...
-                fieldName(nDots(1)+1:length(fieldName)));
-        otherwise
-            value = '';
-    end
 end
 
 % --- Set field of cascaded struct

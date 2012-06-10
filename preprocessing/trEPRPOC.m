@@ -1,11 +1,31 @@
 function varargout = trEPRPOC (data, triggerPosition, varargin)
-% Compensating large-scale oscillations and drifts that affect both the
-% signal part and the pretrigger part (dark signal before laser pulse) of
-% a transient EPR time profile: Subtract the averaged amplitude of the
-% pretrigger part from the whole time profile.
+% TREPRPOC Pretrigger offset compensation of trEPR data.
+%   Compensating large-scale oscillations and drifts that affect both the
+%   signal part and the pretrigger part (dark signal before laser pulse) of
+%   a transient EPR time profile: Subtract the averaged amplitude of the
+%   pretrigger part from the whole time profile.
+%
+% Usage
+%   data = trEPRPOC(data,triggerPosition)
+%   data = trEPRPOC(data,triggerPosition,cutRight)
+%
+% data            - matrix
+%                   dataset to operate on
+% triggerPosition - scalar
+%                   index in time direction of the (laser) trigger (t=0)
+% cutRight        - scalar
+%                   time points subtracted from triggerPosition (such as
+%                   not to interfere with signals with a very sharp signal
+%                   rise around the trigger position)
+%                   Default: 5
 % 
 % Works both with 1D and 2D data (single time profiles, S(t) and complete
 % datasets, S(B0,t)).
+%
+% See also: trEPRBGC
+
+% (c) 2010-12, Till Biskup
+% 2012-06-10
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.

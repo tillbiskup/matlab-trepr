@@ -1,9 +1,26 @@
 function varargout = trEPRBGC (data, varargin)
-% Compensating laser background of a transient EPR time profile: Subtract
-% the average of the first n time profiles from the complete 2D dataset.
+% TREPRBGC Compensating laser background of a transient EPR time profile:
+% Subtract the average of the first n time profiles from the complete 2D
+% dataset. 
 % 
 % Should always be applied to a dataset whose pretrigger offset has been
 % compensated for, see trEPRPOC for more detais.
+%
+% Usage:
+%   data = trEPRBGC(data)
+%   data = trEPRBGC(data,numBGprofiles)
+%
+% data          - matrix
+%                 dataset to operate on
+% numBGprofiles - scalar
+%                 number of time profiles averaged over and used as
+%                 background subtracted from data
+%                 Default: 5
+%
+% See also: trEPRPOC
+
+% (c) 2010-12, Till Biskup
+% 2012-06-10
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
