@@ -662,7 +662,7 @@ if isfield(ad.configuration,'start') && ...
         showTips = showTip('File',fullfile(...
             trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'));
         if ~showTips
-            conf = guiConfigLoad(mfilename);
+            conf = trEPRguiConfigLoad(mfilename);
             conf.start.tip = showTips;
             warnings = guiConfigWrite(mfilename,conf);
             if warnings

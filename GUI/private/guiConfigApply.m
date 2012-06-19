@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-19
 
 status = 0;
 
@@ -29,7 +29,7 @@ try
     % Get handle for GUI
     % NOTE: That means that an instance of the GUI must exist.
     handle = trEPRguiGetWindowHandle(guiname);
-    if isempty(handle) or ~ishandle(handle)
+    if isempty(handle) || ~ishandle(handle)
         status = -2;
         return;
     end

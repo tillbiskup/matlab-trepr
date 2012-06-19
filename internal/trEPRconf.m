@@ -34,9 +34,12 @@ function varargout = trEPRconf(action,varargin)
 %               The filename here is that of the local config file, not of
 %               the distributed config file (i.e., "<basename>.ini", not
 %               "<basename>.ini.dist").
+%
+%   module    - string
+%               Name of the module the config file(s) belong(s) to.
 
 % (c) 2011-12, Till Biskup
-% 2012-04-22
+% 2012-06-19
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -54,6 +57,7 @@ p.addRequired('action', @(x)ischar(x));
 % Add a few optional parameters, with default values
 p.addParamValue('overwrite',logical(false),@islogical);
 p.addParamValue('file','',@(x) ischar(x));
+p.addParamValue('module','',@(x) ischar(x));
 % Parse input arguments
 p.parse(action,varargin{:});
 
@@ -63,7 +67,13 @@ try
     switch lower(action)
         case 'create'
             % Change to config directory
-            confDir = fullfile(trEPRinfo('dir'),'GUI','private','conf');
+            if isempty(p.Results.module)
+                confDir = fullfile(trEPRinfo('dir'),...
+                    'GUI','private','conf');
+            else
+                confDir = fullfile(trEPRinfo('dir'),'modules',...
+                    p.Results.module,'GUI','private','conf');
+            end
             if ~exist(confDir,'dir')
                 fprintf('%s:\n  %s\n%s\n',...
                     'Serious problem: Config dir',...
@@ -103,8 +113,13 @@ try
             % Change directory back to original directory
             cd(PWD);
         case 'files'
-            confFiles = dir(...
-                fullfile(trEPRinfo('dir'),'GUI','private','conf','*.ini'));
+            if isempty(p.Results.module)
+                confFiles = dir(fullfile(trEPRinfo('dir'),...
+                    'GUI','private','conf','*.ini'));
+            else
+                confFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
+                    p.Results.module,'GUI','private','conf','*.ini'));
+            end
             if isempty(confFiles)
                 varargout{1} = cell(0);
                 return;
@@ -116,8 +131,13 @@ try
             end
             varargout{1} = confFileNames;
         case 'distfiles'
-            confFiles = dir(...
-                fullfile(trEPRinfo('dir'),'GUI','private','conf','*.ini.dist'));
+            if isempty(p.Results.module)
+                confFiles = dir(fullfile(trEPRinfo('dir'),...
+                    'GUI','private','conf','*.ini.dist'));
+            else
+                confFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
+                    p.Results.module,'GUI','private','conf','*.ini.dist'));
+            end
             if isempty(confFiles)
                 varargout{1} = cell(0);
                 return;
