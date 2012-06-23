@@ -153,22 +153,34 @@ switch version
         newdata.parameters.laser.tunable.model = data.parameters.laser.opoDye;
         newdata.parameters.laser = rmfield(newdata.parameters.laser,'opoDye');
     case '1.0'
+        if ~isstruct(data.parameters.field.start)
         newdata.parameters.field.start.value = data.parameters.field.start;
         newdata.parameters.field.start.unit = data.axes.y.unit;
+        end
+        if ~isstruct(data.parameters.field.stop)
         newdata.parameters.field.stop.value = data.parameters.field.stop;
         newdata.parameters.field.stop.unit = data.axes.y.unit;
+        end
+        if ~isstruct(data.parameters.field.step)
         newdata.parameters.field.step.value = data.parameters.field.step;        
         newdata.parameters.field.step.unit = data.axes.y.unit;
+        end
+        if ~isstruct(data.parameters.recorder.timeBase)
         newdata.parameters.recorder.timeBase.value = data.parameters.recorder.timeBase;
         newdata.parameters.recorder.timeBase.unit = '';
+        end
+        if ~isstruct(data.parameters.transient.length)
         newdata.parameters.transient.length.value = data.parameters.transient.length;
         newdata.parameters.transient.length.unit = data.axes.x.unit;
+        end
         if ~isstruct(data.parameters.bridge.MWfrequency)
             newdata.parameters.bridge.MWfrequency.value = data.parameters.bridge.MWfrequency;
             newdata.parameters.bridge.MWfrequency.unit = 'GHz';
         end
-        newdata.parameters.bridge.attenuation.value = data.parameters.bridge.attenuation;
-        newdata.parameters.bridge.attenuation.unit = 'dB';
+        if ~isstruct(data.parameters.bridge.attenuation)
+            newdata.parameters.bridge.attenuation.value = data.parameters.bridge.attenuation;
+            newdata.parameters.bridge.attenuation.unit = 'dB';
+        end
         if isfield(data.parameters.bridge,'calibration')
             if ~isempty(data.parameters.bridge.calibration) ...
                     && length(data.parameters.bridge.calibration) > 1
@@ -180,12 +192,18 @@ switch version
             newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'values');
             newdata.parameters.bridge.calibration = rmfield(newdata.parameters.bridge.calibration,'unit');
         end
-        newdata.parameters.temperature.value = data.parameters.temperature;
-        newdata.parameters.temperature.unit = 'K';
-        newdata.parameters.laser.wavelength.value = data.parameters.laser.wavelength;
-        newdata.parameters.laser.wavelength.unit = 'nm';
-        newdata.parameters.laser.repetitionRate.value = data.parameters.laser.repetitionRate;
-        newdata.parameters.laser.repetitionRate.unit = 'Hz';
+        if ~isstruct(data.parameters.temperature)
+            newdata.parameters.temperature.value = data.parameters.temperature;
+            newdata.parameters.temperature.unit = 'K';
+        end
+        if ~isstruct(data.parameters.laser.wavelength)
+            newdata.parameters.laser.wavelength.value = data.parameters.laser.wavelength;
+            newdata.parameters.laser.wavelength.unit = 'nm';
+        end
+        if ~isstruct(data.parameters.laser.repetitionRate)
+            newdata.parameters.laser.repetitionRate.value = data.parameters.laser.repetitionRate;
+            newdata.parameters.laser.repetitionRate.unit = 'Hz';
+        end
         % Finally, recopy to ensure to have all fields
         newdata = structcopy(trEPRdataStructure('structure'),newdata);
 end
