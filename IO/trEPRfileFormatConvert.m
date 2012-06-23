@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % (c) 2012, Till Biskup
-% 2012-06-08
+% 2012-06-23
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -163,8 +163,10 @@ switch version
         newdata.parameters.recorder.timeBase.unit = '';
         newdata.parameters.transient.length.value = data.parameters.transient.length;
         newdata.parameters.transient.length.unit = data.axes.x.unit;
-        newdata.parameters.bridge.MWfrequency.value = data.parameters.bridge.MWfrequency;
-        newdata.parameters.bridge.MWfrequency.unit = 'GHz';
+        if ~isstruct(data.parameters.bridge.MWfrequency)
+            newdata.parameters.bridge.MWfrequency.value = data.parameters.bridge.MWfrequency;
+            newdata.parameters.bridge.MWfrequency.unit = 'GHz';
+        end
         newdata.parameters.bridge.attenuation.value = data.parameters.bridge.attenuation;
         newdata.parameters.bridge.attenuation.unit = 'dB';
         if isfield(data.parameters.bridge,'calibration')
@@ -186,6 +188,13 @@ switch version
         newdata.parameters.laser.repetitionRate.unit = 'Hz';
         % Finally, recopy to ensure to have all fields
         newdata = structcopy(trEPRdataStructure('structure'),newdata);
+end
+
+% Handle situation with reversed field axis
+if newdata.parameters.field.start.value > newdata.parameters.field.stop.value
+    newdata.parameters.field.start.value = newdata.axes.y.values(1);
+    newdata.parameters.field.stop.value = newdata.axes.y.values(end);
+    newdata.parameters.field.sequence = 'down';
 end
 
 if nargout == 2
