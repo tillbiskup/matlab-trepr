@@ -15,6 +15,7 @@ function varargout = trEPRinfo(varargin)
 %   version = trEPRinfo('version')
 %   url = trEPRinfo('url')
 %   dir = trEPRinfo('dir')
+%   modules = trEPRinfo('modules')
 %
 %   info    - struct
 %             Fields: maintainer, url, bugtracker, vcs, version, path
@@ -48,10 +49,13 @@ function varargout = trEPRinfo(varargin)
 %   dir     - string
 %             installation directory of the toolbox
 %
+%   modules - cell array of structs
+%             Struct fields: maintainer, url, bugtracker, vcs, version, path
+%
 % See also VER
 
 % (c) 2007-12, Till Biskup
-% 2012-06-07
+% 2012-06-23
 
 % The place to centrally manage the revision number and date is the file
 % "Contents.m" in the root directory of the trEPR toolbox.
@@ -129,6 +133,23 @@ if nargin
             varargout{1} = info.url;
         case 'dir'
             varargout{1} = info.path;
+        case 'modules'
+            % Get modules from subdirectories in 'module' directory
+            moduleDirs = dir(fullfile(trEPRinfo('dir'),'modules'));
+            for k=1:length(moduleDirs)
+                if moduleDirs(k).isdir && ...
+                        ~strncmp(moduleDirs(k).name,'.',1) && ...
+                        ~strcmp(moduleDirs(k).name,'private')
+                    infoFunName = ['trEPR' moduleDirs(k).name 'info'];
+                    if exist(infoFunName,'file')
+                        infoFun = str2func(infoFunName);
+                        moduleInfo.(moduleDirs(k).name) = infoFun();
+                    else
+                        moduleInfo.(moduleDirs(k).name) = struct();
+                    end
+                end
+            end
+            varargout{1} = moduleInfo;
         otherwise
     end
 elseif nargout
@@ -144,10 +165,10 @@ else
     fprintf(' Matlab version:  %s\n',version);
     fprintf(' Platform:        %s\n',platform);
     fprintf('\n');
-    fprintf(' Homepage:        %s\n',info.url);
+    fprintf(' Homepage:        <a href="%s">%s</a>\n',info.url,info.url);
     fprintf(' Maintainer:      %s, <%s>\n',info.maintainer.name,info.maintainer.email);
     fprintf('\n');
-    fprintf(' Bug tracker:     %s\n',info.bugtracker.url);
+    fprintf(' Bug tracker:     <a href="%s">%s</a>\n',info.bugtracker.url,info.bugtracker.url);
     fprintf('\n');
     fprintf('==================================================================\n');
 end
