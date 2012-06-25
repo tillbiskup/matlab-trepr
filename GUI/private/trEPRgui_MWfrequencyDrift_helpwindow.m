@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDrift_helpwindow(varargin)
 % See also TREPRGUI_MWFREQUENCYDRIFTWINDOW
 
 % (c) 2012, Till Biskup
-% 2012-06-07
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -135,6 +135,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
+    trEPRadd2status('trEPR GUI MWfrequency drift help window opened.','info');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -148,7 +149,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr);
+        trEPRadd2status(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -199,7 +200,7 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                trEPRadd2status('guiHelpPanel(): Unknown helptext');
+                trEPRadd2status('guiHelpPanel(): Unknown helptext','info');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -210,7 +211,7 @@ function helptext_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -240,7 +241,7 @@ function pushbutton_Callback(~,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -276,7 +277,7 @@ function keypress_Callback(~,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -299,11 +300,12 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
+        trEPRadd2status('trEPR GUI MWfrequency drift help window closed.','info');
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

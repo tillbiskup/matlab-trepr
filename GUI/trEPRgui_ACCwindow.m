@@ -7,14 +7,14 @@ function varargout = trEPRgui_ACCwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-06
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trEPRgui_ACCwindow');
+singleton = findobj('Tag',mfilename);
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -31,7 +31,7 @@ else
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trEPRgui_ACCwindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Accumulate (ACC) Window',...
     'Units','Pixels',...
@@ -1223,8 +1223,7 @@ setappdata(hMainFigure,'acc',ad.acc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-msgStr = 'ACC GUI window opened';
-trEPRadd2status(msgStr);
+trEPRadd2status('ACC GUI window opened','info');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -1320,7 +1319,7 @@ function tbg_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1350,9 +1349,10 @@ function slider_Callback(source,~)
                 ad.acc.data.display.position.x = ...
                     int16(get(source,'Value'));
             otherwise
-                msg = sprintf('Display type %s currently unsupported',...
-                    ad.control.axis.displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(...
+                    [mfilename ' : slider_Callback() : '...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -1367,7 +1367,7 @@ function slider_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1404,7 +1404,7 @@ function accumulated_listbox_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1464,8 +1464,12 @@ function position_edit_Callback(source,~,position)
                     value = length(x);
                 else
                     value = round(str2double(value));
-                    if (value > length(x)) value = length(x); end
-                    if (value < 1) value = 1; end
+                    if (value > length(x)) 
+                        value = length(x); 
+                    end
+                    if (value < 1) 
+                        value = 1;
+                    end
                 end
                 ad.acc.data.display.position.x = ...
                     value;
@@ -1474,12 +1478,16 @@ function position_edit_Callback(source,~,position)
                     value = x(end);
                 else
                     value = str2double(value);
-                    if (value < x(1)) value = x(1); end
-                    if (value > x(end)) value = x(end); end
+                    if (value < x(1)) 
+                        value = x(1); 
+                    end
+                    if (value > x(end)) 
+                        value = x(end); 
+                    end
                     if length(x)>1
                         ad.acc.data.display.position.x = ...
                             interp1(...
-                            x,[1:length(x)],...
+                            x,1:length(x),...
                             value,...
                             'nearest'...
                             );
@@ -1490,8 +1498,12 @@ function position_edit_Callback(source,~,position)
                     value = length(y);
                 else
                     value = round(str2double(value));
-                    if (value > length(y)) value = length(y); end
-                    if (value < 1) value = 1; end
+                    if (value > length(y)) 
+                        value = length(y); 
+                    end
+                    if (value < 1) 
+                        value = 1; 
+                    end
                     ad.acc.data.display.position.y = ...
                         value;
                 end
@@ -1500,12 +1512,16 @@ function position_edit_Callback(source,~,position)
                     value = x(end);
                 else
                     value = str2double(value);
-                    if (value < y(1)) value = y(1); end
-                    if (value > y(end)) value = y(end); end
+                    if (value < y(1)) 
+                        value = y(1); 
+                    end
+                    if (value > y(end)) 
+                        value = y(end); 
+                    end
                     if length(y)>1
                         ad.acc.data.display.position.y = ...
                             interp1(...
-                            y,[1:length(y)],...
+                            y,1:length(y),...
                             value,...
                             'nearest'...
                             );
@@ -1527,7 +1543,7 @@ function position_edit_Callback(source,~,position)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1565,7 +1581,7 @@ function edit_Callback(~,~,position)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1634,8 +1650,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
-                    disp(action);
+                    trepradd2status(...
+                        [mfilename ' : togglebutton_Callback() : '...
+                        'unknown action "' action '"'],'warning');
                     return;
             end
         else % If toggle button switched OFF
@@ -1669,8 +1686,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
-                    disp(action);
+                    trepradd2status(...
+                        [mfilename ' : togglebutton_Callback() : '...
+                        'unknown action "' action '"'],'warning');
                     return;
             end
         end
@@ -1678,7 +1696,7 @@ function togglebutton_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1707,8 +1725,8 @@ function checkbox_Callback(source,~,action)
             case 'showonlyactive'
                 ad.control.axis.onlyActive = get(source,'Value');
             otherwise
-                disp([mfilename ' : pushbutton_Callback() : '...
-                    'Unknown action "' action '"']);
+                trEPRadd2status([mfilename ' : pushbutton_Callback() : '...
+                    'Unknown action "' action '"'],'warning');
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
@@ -1717,7 +1735,7 @@ function checkbox_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1957,21 +1975,22 @@ function pushbutton_Callback(~,~,action)
                         'Datasets have been successfully accumulated.'...
                         'Now trying to append accumulated data to main GUI.'...
                         };
-                    trEPRadd2status(msgStr);
+                    trEPRadd2status(msgStr,'info');
                     % Add accData to main GUI
                     status = trEPRappendDatasetToMainGUI(...
                         ad.acc.data,'modified',true);
                     if status
-                        disp('Hmm... some problems with appending accumulated dataset to main GUI.');
+                        msgStr = ['Hmm... some problems with appending '...
+                            'accumulated dataset to main GUI.'];
+                        trEPRadd2status(msgStr,'error');
                     end
                 else
                     msgStr = {...
-                        'ACC GUI window closed.'...
                         'No datasets have been successfully accumulated. '...
                         'Alternatively, user discarded accumulation.'...
                         'Therefore, no dataset added.'
                         };
-                    trEPRadd2status(msgStr);
+                    trEPRadd2status(msgStr,'info');
                 end
 
                 % Look for ACC GUI Help window and if its there, close as
@@ -1981,16 +2000,18 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
+                trEPRadd2status('ACC GUI window closed.','info');
             otherwise
-                disp([mfilename ' : pushbutton_Callback() : '...
-                    'Unknown action "' action '"']);
+                trEPRadd2status(...
+                    [mfilename ' : pushbutton_Callback() : '...
+                    'Unknown action "' action '"'],'warning');
                 return;
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2065,15 +2086,15 @@ function popupmenu_Callback(source,~,action)
                             'Enable','Off');
                 end
             otherwise
-                disp([mfilename ' : popupmenu_Callback() : '...
-                    'Unknown action "' action '"']);
+                trEPRadd2status([mfilename ' : popupmenu_Callback() : '...
+                    'Unknown action "' action '"'],'warning');
                 return;
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2145,7 +2166,7 @@ function keypress_Callback(src,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2191,7 +2212,7 @@ function switchPanel(panelName)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2295,7 +2316,7 @@ function updateDimensionPanel(panel)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2402,7 +2423,7 @@ function updateSpectra()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2483,7 +2504,7 @@ function updateSliderPanel()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -2938,7 +2959,7 @@ function updateAxes()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3012,7 +3033,7 @@ function setAccParameters()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

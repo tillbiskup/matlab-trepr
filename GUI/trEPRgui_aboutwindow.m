@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-23
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -182,6 +182,7 @@ uicontrol('Tag','close_pushbutton',...
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+trEPRadd2status('About window opened.','info');
 
 
 % Add keypress function to every element that can have one...
@@ -253,7 +254,7 @@ end
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr);
+                trEPRadd2status(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -279,7 +280,23 @@ end
         end
         try
             delete(hMainFigure);
-        catch
+            trEPRadd2status('About window closed.','info');
+        catch exception
+            try
+                msgStr = ['An exception occurred. '...
+                    'The bug reporter should have been opened'];
+                trEPRadd2status(msgStr,'error');
+            catch exception2
+                exception = addCause(exception2, exception);
+                disp(msgStr);
+            end
+            try
+                trEPRgui_bugreportwindow(exception);
+            catch exception3
+                % If even displaying the bug report window fails...
+                exception = addCause(exception3, exception);
+                throw(exception);
+            end
         end
     end
 

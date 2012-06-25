@@ -4,7 +4,7 @@ function varargout = trEPRgui_moduleswindow()
 % homepage.
 
 % (c) 2012, Till Biskup
-% 2012-06-23
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -189,6 +189,7 @@ guidata(hMainFigure,gh);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+trEPRadd2status('Modules window opened.','info');
 
 % % Add keypress function to every element that can have one...
 % handles = findall(...
@@ -240,7 +241,7 @@ end
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr);
+                trEPRadd2status(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -293,7 +294,7 @@ end
             try
                 msgStr = ['An exception occurred. '...
                     'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr);
+                trEPRadd2status(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -311,7 +312,23 @@ end
     function closeWindow(~,~)
         try
             delete(hMainFigure);
-        catch
+            trEPRadd2status('Modules window closed.','info');
+        catch exception
+            try
+                msgStr = ['An exception occurred. '...
+                    'The bug reporter should have been opened'];
+                trEPRadd2status(msgStr,'error');
+            catch exception2
+                exception = addCause(exception2, exception);
+                disp(msgStr);
+            end
+            try
+                trEPRgui_bugreportwindow(exception);
+            catch exception3
+                % If even displaying the bug report window fails...
+                exception = addCause(exception3, exception);
+                throw(exception);
+            end
         end
     end
 

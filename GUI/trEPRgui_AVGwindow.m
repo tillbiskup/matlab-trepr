@@ -7,14 +7,14 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-06
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = trEPRguiGetWindowHandle('trEPRgui_AVGwindow');
+singleton = trEPRguiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
     varargout{1} = singleton;
@@ -31,7 +31,7 @@ else
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trEPRgui_AVGwindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : AVG Window',...
     'Units','Pixels',...
@@ -959,8 +959,7 @@ setappdata(hMainFigure,'avgdata',ad.avgdata);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-msgStr = 'AVG GUI window opened';
-trEPRadd2status(msgStr);
+trEPRadd2status('AVG GUI window opened','info');
 
 
 % Load data from Main GUI
@@ -1034,7 +1033,7 @@ function tbg_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1066,7 +1065,7 @@ function position_slider_Callback(source,~)
             otherwise
                 msg = sprintf('Display type %s currently unsupported',...
                     ad.control.axis.displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Set appdata from AVG GUI
@@ -1078,7 +1077,7 @@ function position_slider_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1131,26 +1130,42 @@ function position_edit_Callback(source,~,position)
         switch position
             case 'xindex'
                 value = round(str2double(get(source,'String')));
-                if (value > length(x)) value = length(x); end
-                if (value < 1) value = 1; end
+                if (value > length(x)) 
+                    value = length(x); 
+                end
+                if (value < 1) 
+                    value = 1; 
+                end
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     value;
             case 'xunit'
                 value = str2double(get(source,'String'));
-                if (value < x(1)) value = x(1); end
-                if (value > x(end)) value = x(end); end
+                if (value < x(1)) 
+                    value = x(1); 
+                end
+                if (value > x(end)) 
+                    value = x(end); 
+                end
                 ad.data{ad.control.spectra.active}.display.position.x = ...
-                    interp1(x,[1:length(x)],value,'nearest');
+                    interp1(x,1:length(x),value,'nearest');
             case 'yindex'
                 value = round(str2double(get(source,'String')));
-                if (value > length(y)) value = length(y); end
-                if (value < 1) value = 1; end
+                if (value > length(y)) 
+                    value = length(y); 
+                end
+                if (value < 1) 
+                    value = 1; 
+                end
                 ad.data{ad.control.spectra.active}.display.position.y = ...
                     value;
             case 'yunit'
                 value = str2double(get(source,'String'));
-                if (value < y(1)) value = y(1); end
-                if (value > y(end)) value = y(end); end
+                if (value < y(1)) 
+                    value = y(1); 
+                end
+                if (value > y(end)) 
+                    value = y(end); 
+                end
                 ad.data{ad.control.spectra.active}.display.position.y = ...
                     interp1(y,1:length(y),value,'nearest');
             otherwise
@@ -1169,7 +1184,7 @@ function position_edit_Callback(source,~,position)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1201,7 +1216,7 @@ function showposition_checkbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1267,8 +1282,12 @@ function area_edit_Callback(source,~,position)
         switch position
             case 'startindex'
                 value = round(str2double(get(source,'String')));
-                if (value > length(dim)) value = length(dim); end
-                if (value < 1) value = 1; end
+                if (value > length(dim)) 
+                    value = length(dim); 
+                end
+                if (value < 1) 
+                    value = 1; 
+                end
                 ad.data{active}.avg.start = value;
                 % Set stop value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
@@ -1287,8 +1306,12 @@ function area_edit_Callback(source,~,position)
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'startunit'
                 value = str2double(get(source,'String'));
-                if (value < dim(1)) value = dim(1); end
-                if (value > dim(end)) value = dim(end); end
+                if (value < dim(1)) 
+                    value = dim(1); 
+                end
+                if (value > dim(end)) 
+                    value = dim(end); 
+                end
                 ad.data{active}.avg.start = ...
                     interp1(...
                     dim,1:length(dim),...
@@ -1312,8 +1335,12 @@ function area_edit_Callback(source,~,position)
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopindex'
                 value = round(str2double(get(source,'String')));
-                if (value > length(dim)) value = length(dim); end
-                if (value < 1) value = 1; end
+                if (value > length(dim)) 
+                    value = length(dim); 
+                end
+                if (value < 1) 
+                    value = 1; 
+                end
                 ad.data{active}.avg.stop = value;
                 % Set start value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
@@ -1332,8 +1359,12 @@ function area_edit_Callback(source,~,position)
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopunit'
                 value = str2double(get(source,'String'));
-                if (value < dim(1)) value = dim(1); end
-                if (value > dim(end)) value = dim(end); end
+                if (value < dim(1)) 
+                    value = dim(1); 
+                end
+                if (value > dim(end)) 
+                    value = dim(end); 
+                end
                 ad.data{active}.avg.stop = ...
                     interp1(...
                     dim,1:length(dim),...
@@ -1357,8 +1388,12 @@ function area_edit_Callback(source,~,position)
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'deltaindex'
                 value = round(str2double(get(source,'String')));
-                if (value > length(dim)) value = length(dim); end
-                if (value < 0) value = 0; end
+                if (value > length(dim)) 
+                    value = length(dim); 
+                end
+                if (value < 0) 
+                    value = 0; 
+                end
                 ad.data{active}.avg.delta = value;
                 % Check whether start + delta > length(dim)
                 if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
@@ -1371,8 +1406,12 @@ function area_edit_Callback(source,~,position)
                 end
             case 'deltaunit'
                 value = str2double(get(source,'String'));
-                if (value < 0) value = 0; end
-                if (value > dim(end)-dim(1)) value = dim(end)-dim(1); end
+                if (value < 0) 
+                    value = 0; 
+                end
+                if (value > dim(end)-dim(1)) 
+                    value = dim(end)-dim(1); 
+                end
                 ad.data{active}.avg.delta = ...
                     interp1(...
                     0+abs(dim(2)-dim(1)):abs(dim(2)-dim(1)):(abs(dim(2)-dim(1))*(length(dim))),...
@@ -1393,8 +1432,9 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             otherwise
-                disp('trEPRgui_AVGwindow() : area_edit_Callback() : Unknown action');
-                disp(action);
+                trEPRadd2status(...
+                    [mfilename ' : area_edit_Callback() : '...
+                    'Unknown action "' action '".'],'warning');
                 return;
         end
         
@@ -1414,7 +1454,7 @@ function area_edit_Callback(source,~,position)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1448,7 +1488,7 @@ function visible_panel_listbox_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1489,7 +1529,7 @@ function edit_Callback(source,~,field)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1535,15 +1575,16 @@ function popupmenu_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                disp('Unknown popupmenu')
-                disp(action);
+                trEPRadd2status(...
+                    [mfilename ' : popupmenu_Callback() : '...
+                    'Unknown popupmenu "' action '".'],'warning');
         end
 
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1612,8 +1653,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
-                    disp(action);
+                    trEPRadd2status(...
+                        [mfilename ' : togglebutton_Callback() : '...
+                        'Unknown action "' action '".'],'warning');
                     return;
             end
         else % If toggle button switched OFF
@@ -1647,8 +1689,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    disp('trEPRgui_fitwindow: togglebutton_Callback(): Unknown action');
-                    disp(action);
+                    trEPRadd2status(...
+                        [mfilename ' : togglebutton_Callback() : '...
+                        'Unknown action "' action '".'],'warning');
                     return;
             end
         end
@@ -1657,7 +1700,7 @@ function togglebutton_Callback(source,~,action)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1822,7 +1865,7 @@ function pushbutton_Callback(~,~,action)
                         ['Trying to append averaged data as new '...
                         'datasets to main GUI.']...
                         };
-                    trEPRadd2status(msgStr);
+                    trEPRadd2status(msgStr,'info');
                     % Return BLC data to main GUI
                     for k=1:length(ad.avgdata)
                         % Remove avg field in data structure
@@ -1837,13 +1880,13 @@ function pushbutton_Callback(~,~,action)
                             ad.avgdata{k},...
                             'modified',true);
                         if status
-                            disp('Hmm... some problems with appending baseline-correced dataset to main GUI.');
+                            trEPRadd2status(...
+                                ['Hmm... some problems with appending '...
+                                'baseline-correced dataset to main GUI.'],...
+                                'error');
                         end
                     end
                 end
-                msgStr = 'AVG GUI window closed.';
-                trEPRadd2status(msgStr);
-
                 % Look for AVG GUI Help window and if its there, close as
                 % well
                 hHelpWindow = findobj('Tag','trEPRgui_AVG_helpwindow');
@@ -1851,16 +1894,18 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
+                trEPRadd2status('AVG GUI window closed.','info');
             otherwise
-                disp('trEPRgui_fitwindow: pushbutton_Callback(): Unknown action');
-                disp(action);
+                trEPRadd2status(...
+                    [mfilename ' : pushbutton_Callback() : '...
+                    'Unknown action "' action '".'],'warning');
                 return;
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1898,14 +1943,15 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                disp('trEPRgui_fitwindow: slider_Callback(): Unknown action');
-                disp(action);
+                trEPRadd2status(...
+                    [mfilename ' : slider_Callback() : '...
+                    'Unknown action "' action '".'],'warning');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1958,7 +2004,7 @@ function displaytype_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2031,7 +2077,7 @@ function keypress_Callback(src,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2078,7 +2124,7 @@ function switchPanel(panelName)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2158,7 +2204,7 @@ function updateSliderPanel()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -2265,7 +2311,7 @@ function updateAveragePanel()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -2345,7 +2391,7 @@ function updateSettingsPanel(varargin)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2404,7 +2450,7 @@ function updateSpectra()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2480,7 +2526,7 @@ function update_position_display()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2809,8 +2855,9 @@ function updateAxes()
                         'Parent',gh.axis2);
                 end
             otherwise
-                disp('trEPRgui_AVGwindow : updateAxis(): Unknown AVG dimension');
-                disp(ad.avg.dimension);
+                trEPRadd2status(...
+                    [mfilename ' : updateAxis(): Unknown AVG dimension "'...
+                    ad.avg.dimension '".'],'warning');
         end
         
         % Set grid for main axis
@@ -2836,7 +2883,7 @@ function updateAxes()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2876,7 +2923,7 @@ function switchMeasurePointer(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3129,7 +3176,7 @@ function trackPointer(varargin)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

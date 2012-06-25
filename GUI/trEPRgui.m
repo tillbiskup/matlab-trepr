@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-08
+% 2012-06-25
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -627,8 +627,7 @@ if (nargout == 1)
 end
 
 % Set status message
-trEPRadd2status('trEPR GUI main window initialised successfully.');
-%trEPRguiUpdateStatusWindow(ad.control.status);
+trEPRadd2status('trEPR GUI main window initialised successfully.','info');
 
 % Add keypress function to every element that can have one...
 handles = findall(...
@@ -666,7 +665,7 @@ if isfield(ad.configuration,'start') && ...
             conf.start.tip = showTips;
             warnings = guiConfigWrite(mfilename,conf);
             if warnings
-                trEPRadd2status(warnings);
+                trEPRadd2status(warnings,'warning');
             end
         end
     end
@@ -693,7 +692,7 @@ function slider_v1_Callback(source,~)
                     int16(get(source,'Value'));
             otherwise
                 msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Update appdata of main window
@@ -708,7 +707,7 @@ function slider_v1_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -749,7 +748,7 @@ function slider_v2_Callback(source,~)
                     scalingFactor;
             otherwise
                 msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Update appdata of main window
@@ -764,7 +763,7 @@ function slider_v2_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -798,7 +797,7 @@ function slider_v3_Callback(source,~)
                     get(source,'Value');
             otherwise
                 msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Update appdata of main window
@@ -813,7 +812,7 @@ function slider_v3_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -854,7 +853,7 @@ function slider_h1_Callback(source,~)
                     scalingFactor;
             otherwise
                 msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Update appdata of main window
@@ -869,7 +868,7 @@ function slider_h1_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -903,7 +902,7 @@ function slider_h2_Callback(source,~)
                     get(source,'Value');
             otherwise
                 msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRadd2status(msg);
+                trEPRadd2status(msg,'warning');
         end
         
         % Update appdata of main window
@@ -918,7 +917,7 @@ function slider_h2_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -954,7 +953,7 @@ function zoom_togglebutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -988,7 +987,7 @@ function fullscale_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1034,7 +1033,7 @@ function reset_pushbutton_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1060,7 +1059,7 @@ function export_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1082,13 +1081,13 @@ function tbg_Callback(source,~)
         if status
             % Something went wrong...
             msgStr = 'Something went wrong with switching the panels.';
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'warning');
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1110,7 +1109,7 @@ function closeGUI(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1132,7 +1131,7 @@ function keyBindings(src,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1165,7 +1164,7 @@ function displaytype_popupmenu_Callback(source,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1214,7 +1213,7 @@ function previous_pushbutton_Callback(~,~)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        trEPRadd2status(msgStr);
+        trEPRadd2status(msgStr,'info');
         clear msgStr;
         
         % Update processing panel
@@ -1235,7 +1234,7 @@ function previous_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1284,7 +1283,7 @@ function next_pushbutton_Callback(~,~)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        trEPRadd2status(msgStr);
+        trEPRadd2status(msgStr,'info');
         clear msgStr;
         
         % Update processing panel
@@ -1305,7 +1304,7 @@ function next_pushbutton_Callback(~,~)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
