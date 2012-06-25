@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-07
+% 2012-06-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -349,16 +349,16 @@ end
 
 % If there are no combinable datasets, close GUI and return
 if ~checkForCombinableDatasets
-    msgStr = 'combine GUI window not opened: missing combinable datasets';
-    trEPRadd2status(msgStr);
+    trEPRadd2status(...
+        'Combine GUI window not opened: missing combinable datasets',...
+        'warning');
     delete(hMainFigure);
     return;
 end
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-msgStr = 'combine GUI window opened';
-trEPRadd2status(msgStr);
+trEPRadd2status('Combine GUI window opened','info');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -384,7 +384,7 @@ end
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function listbox_Callback(source,~,field)
+function listbox_Callback(~,~,field)
     try
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from combine GUI
@@ -399,8 +399,9 @@ function listbox_Callback(source,~,field)
             case 'notcombine'
             case 'combine'
             otherwise
-                disp('trEPRgui_combinewindow: listbox_Callback(): Unknown field');
-                disp(field);
+                trEPRadd2status(...
+                    [mfilename ' : listbox_Callback() : Unknown field "'...
+                    field '".'],'warning');
                 return;
         end
         updateSpectra();
@@ -408,7 +409,7 @@ function listbox_Callback(source,~,field)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -447,7 +448,7 @@ function edit_Callback(source,~,field)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -601,9 +602,6 @@ function pushbutton_Callback(~,~,action)
                 % Bring combine GUI to fromt
                 trEPRgui_combinewindow();
             case 'Close'
-                msgStr = 'combine GUI window closed.';
-                trEPRadd2status(msgStr);
-
                 % Look for combine GUI Help window and if its there, close as
                 % well
                 hHelpWindow = trEPRguiGetWindowHandle('trEPRgui_combine_helpwindow');
@@ -611,16 +609,18 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
+                trEPRadd2status('Combine GUI window closed.','info')
             otherwise
-                disp('trEPRgui_combinewindow: pushbutton_Callback(): Unknown action');
-                disp(action);
+                trEPRadd2status(...
+                    [mfilename ' : pushbutton_Callback() : '...
+                    'Unknown action "' action '".'],'warning');
                 return;
         end
     catch exception
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -669,7 +669,7 @@ function keypress_Callback(src,evt)
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            trEPRadd2status(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -711,7 +711,7 @@ function status = checkForCombinableDatasets()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -759,7 +759,7 @@ function updateFileformats()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -820,7 +820,7 @@ function updateBasenames()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -888,7 +888,7 @@ function updateSpectra()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -926,7 +926,7 @@ function updateLabel()
         try
             msgstr = ['an exception occurred. '...
                 'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr);
+            trEPRadd2status(msgstr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);

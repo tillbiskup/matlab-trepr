@@ -13,7 +13,7 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           wrong.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-01
+% 2012-06-25
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -167,13 +167,13 @@ try
     for k=1:length(removedDatasetsLabels)
         msg{end+1} = sprintf('  Label: %s',removedDatasetsLabels{k});
     end
-    status = trEPRadd2status(msg);
+    status = trEPRadd2status(msg,'info');
     invStr = sprintf('%i ',ad.control.spectra.invisible);
     visStr = sprintf('%i ',ad.control.spectra.visible);
     msgStr = sprintf(...
         'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
         invStr,visStr,length(ad.data));
-    trEPRadd2status(msgStr);
+    trEPRadd2status(msgStr,'info');
     clear msgStr;
     
     % Update main GUI's axes and panels
@@ -189,7 +189,7 @@ catch exception
     try
         msgStr = ['An exception occurred. '...
             'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr);
+        trEPRadd2status(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
