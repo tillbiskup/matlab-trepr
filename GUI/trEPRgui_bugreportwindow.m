@@ -55,7 +55,9 @@ hMainFigure = figure('Tag',mfilename,...
     'Resize','off',...
     'NumberTitle','off', ...
     'Color',[1 .8 .8],...
-    'Menu','none','Toolbar','none');
+    'Menu','none','Toolbar','none',...
+    'KeyPressFcn',@keypress_Callback...
+    );
 
 defaultBackground = get(hMainFigure,'Color');
 
@@ -200,6 +202,18 @@ set(description,'String',descriptionText);
 % Set bugreport text
 set(textdisplay,'String',report);
 
+% Add keypress function to every element that can have one...
+handles = findall(...
+    allchild(hMainFigure),'style','pushbutton',...
+    '-or','style','togglebutton',...
+    '-or','style','edit',...
+    '-or','style','listbox',...
+    '-or','style','slider',...
+    '-or','style','popupmenu');
+for k=1:length(handles)
+    set(handles(k),'KeyPressFcn',@keypress_Callback);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -245,8 +259,34 @@ function button_Callback(varargin)
         case 'close'
             try
                 delete(hMainFigure);
-            catch
+            catch exception
+                trEPRmsg(['Cannot close ' mfilename],'error');
+                throw(exception);
             end
+    end
+end
+
+function keypress_Callback(~,evt)
+    try
+        if isempty(evt.Character) && isempty(evt.Key)
+            % In case "Character" is the empty string, i.e. only
+            % modifier key was pressed...
+            return;
+        end
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                switch evt.Key
+                    case 'w'
+                        button_Callback('',evt,'close');
+                        return;
+                end
+            end
+        end
+%         switch evt.Key
+%         end
+    catch exception
+            throw(exception);
     end
 end
 
