@@ -11,7 +11,7 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    bugReport - cell array of strings containing the bug report
 
 % (c) 2011-12, Till Biskup
-% 2012-05-30
+% 2012-06-26
 
 % Set name and version of Toolbox (makes it easier to reuse this script
 % later on) 
@@ -48,12 +48,6 @@ dateTime = datestr(clock);
 % Get exception in nicely readable form - MATLAB(TM) helps here a lot
 msgString = getReport(exception, 'extended', 'hyperlinks', 'off');
 
-% Try to get further info about toolbox and system
-generalInfo = cell(0);
-generalInfo{end+1} = sprintf('Toolbox Release:    %s',tbversion);
-generalInfo{end+1} = sprintf('Platform:           %s',platform);
-generalInfo{end+1} = sprintf('MATLAB(TM) version: %s',version);
-
 % Try to get status message from toolbox GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
@@ -69,15 +63,14 @@ else
 end
 
 bugReport = cell(0);
-% For test purposes, simply print the information gathered so far
-bugReport{end+1} = sprintf('Bug report for %s',tbname);
-bugReport{end+1} = ' ';
-bugReport{end+1} = sprintf('Date: %s',dateTime);
-bugReport{end+1} = ' ';
 bugReport{end+1} = sprintf('General information:');
 bugReport{end+1} = sprintf('--------------------');
 bugReport{end+1} = ' ';
-bugReport = [bugReport generalInfo];
+bugReport{end+1} = sprintf('Date:               %s',dateTime);
+bugReport{end+1} = sprintf('Toolbox:            %s',tbname);
+bugReport{end+1} = sprintf('Toolbox Release:    %s',tbversion);
+bugReport{end+1} = sprintf('Platform:           %s',platform);
+bugReport{end+1} = sprintf('MATLAB(TM) version: %s',version);
 bugReport{end+1} = ' ';
 bugReport{end+1} = sprintf('Exception caught:');
 bugReport{end+1} = sprintf('-----------------');
