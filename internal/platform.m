@@ -6,7 +6,7 @@ function p = platform
 %   See also: COMPUTER
 
 % (c) 2007-12, Till Biskup
-% 2012-06-10
+% 2012-06-26
 
 % find platform OS
 
@@ -56,3 +56,5 @@ else
         end
     end
 end
+% Make sure there is no additional CR/LF
+p = strtrim(p);
