@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -36,56 +36,56 @@ try
                     status = switchMainPanel('Load');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '2'
                     status = switchMainPanel('Datasets');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '3'
                     status = switchMainPanel('Slider');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '4'
                     status = switchMainPanel('Measure');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '5'
                     status = switchMainPanel('Display');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '6'
                     status = switchMainPanel('Processing');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '7'
                     status = switchMainPanel('Analysis');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 case '8'
@@ -94,8 +94,8 @@ try
                     status = switchMainPanel('Configure');
                     if status
                         % Something went wrong...
-                        msgStr = 'Something went wrong with switching the panels.';
-                        trEPRadd2status(msgStr);
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
                     end
                     return;
                 % SWITCH DISPLAY MODE: Ctrl/Cmd+x/y/z
@@ -151,13 +151,13 @@ try
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active,'force',true);
                     if status
-                        disp(message);
+                        trEPRmsg(message,'warning');
                     end
                 else
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active);
                     if status
-                        disp(message);
+                        trEPRmsg(message,'warning');
                     end
                 end
             end
@@ -170,13 +170,13 @@ try
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active,'force',true);
                     if status
-                        disp(message);
+                        trEPRmsg(message,'warning');
                     end
                 else
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
                         ad.control.spectra.active);
                     if status
-                        disp(message);
+                        trEPRmsg(message,'warning');
                     end
                 end
             end
@@ -215,10 +215,18 @@ try
     end
 catch exception
     try
-        trEPRgui_bugreportwindow(exception);
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
-        % If even displaying the bug report window fails...
         exception = addCause(exception2, exception);
+        disp(msgStr);
+    end
+    try
+        trEPRgui_bugreportwindow(exception);
+    catch exception3
+        % If even displaying the bug report window fails...
+        exception = addCause(exception3, exception);
         throw(exception);
     end
 end

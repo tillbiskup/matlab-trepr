@@ -7,7 +7,7 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -290,7 +290,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -345,7 +345,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -393,7 +393,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -431,7 +431,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr);
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -530,7 +530,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr);
                 clear msgStr;
                 
                 % Update both list boxes
@@ -540,15 +540,17 @@ function pushbutton_Callback(~,~,action)
                 %Update main axis
                 update_mainAxis();
             otherwise
-                disp('trEPRgui : guiDatasetPanel() : pushbutton_Callback(): Unknown action');
-                disp(action);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -597,9 +599,9 @@ function visible_listbox_Callback(~,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -630,9 +632,9 @@ function invisible_listbox_Callback(source,~)
         update_invisibleSpectra();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -661,17 +663,19 @@ function checkbox_Callback(source,~,action)
             case 'showonlyactive'
                 ad.control.axis.onlyActive = get(source,'Value');
             otherwise
-                disp([mfilename ' : pushbutton_Callback() : '...
-                    'Unknown action "' action '"']);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -712,13 +716,13 @@ function datasetChangeLabel(index)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        trEPRadd2status(msgStr);
+        trEPRmsg(msgStr);
         clear msgStr;
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

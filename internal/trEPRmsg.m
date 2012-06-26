@@ -19,30 +19,17 @@ function status = trEPRmsg(message,varargin)
 %             -1: no trEPRgui window found
 %             -2: trEPRgui window appdata don't contain necessary fields
 %              0: successfully updated status
+%
+% NOTE: If there is currently no trEPR GUI window open, the message will
+% get displayed on the Matlab(tm) command line.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
-
-% Is there currently a trEPRgui object?
-mainwindow = trEPRguiGetWindowHandle();
-if (isempty(mainwindow))
-    status = -1;
-    return;
-end
+% 2012-06-26
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their
 % importance, to be able to query the set log level
 logLevels = {'error','warning','info','debug','all'};
-
-% Get appdata from mainwindow
-ad = getappdata(mainwindow);
-
-% Check for availability of necessary fields in appdata
-if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
-    status = -2;
-    return;
-end
 
 % Append indicator for message level, if present
 logLevelAbbr = '';
@@ -61,6 +48,37 @@ if nargin > 1 && ischar(varargin{1})
         otherwise
             fprintf('Unknown log level "%s"\n',varargin{1});
     end
+end
+
+% Is there currently a trEPRgui object?
+mainwindow = trEPRguiGetWindowHandle();
+if (isempty(mainwindow))
+    % Display message in main window
+    if iscell(message)
+        for k=1:length(message)
+            disp(message(k));
+        end
+    else
+        disp(message);
+    end
+    status = -1;
+    return;
+end
+
+% Get appdata from mainwindow
+ad = getappdata(mainwindow);
+
+% Check for availability of necessary fields in appdata
+if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
+    if iscell(message)
+        for k=1:length(message)
+            disp(message(k));
+        end
+    else
+        disp(message);
+    end
+    status = -2;
+    return;
 end
 
 % Prepend date and time to statusmessage

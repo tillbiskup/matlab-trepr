@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -57,8 +57,9 @@ end
 % Just to be on the save side, check whether we have a currently active
 % spectrum
 if ~(ad.control.spectra.active)
-    msg = 'update_mainAxis(): No active spectrum';
-    trEPRadd2status(msg);
+    st = dbstack;
+    trEPRmsg(...
+        [st.name ' : No active spectrum'],'warning');
     return;
 end
 
@@ -644,8 +645,11 @@ switch ad.control.axis.displayType
         % Display legend - internal function
         display_legend(mainAxes);
     otherwise
-        msg = sprintf('Display type %s currently unsupported',displayType);
-        trEPRadd2status(msg);    
+        st = dbstack;
+        trEPRmsg(...
+            [st.name ' : unknown display type "' ...
+            ad.control.axis.displayType '"'],'warning');
+        return;
 end
 
 % Set grid

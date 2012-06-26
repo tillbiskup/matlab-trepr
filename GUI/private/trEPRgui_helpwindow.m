@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -174,7 +174,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRadd2status('trEPR GUI help window opened.','info');
+    trEPRmsg('trEPR GUI help window opened.','info');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -215,7 +215,12 @@ try
                 set(hpm,'Value',helpTopicOffset+8);
             otherwise
                 % That shall never happen
-                trEPRadd2status('trEPRgui_helpwindow(): Unknown panel');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : Unknown panel "' ...
+                    get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')...
+                    '"'], 'warning');
+                trEPRmsg('trEPRgui_helpwindow(): Unknown panel');
         end
     else
         helpText = 'Welcome';
@@ -223,9 +228,9 @@ try
     helptext_selector(helpText);
 catch exception
     try
-        msgStr = ['An exception occurred. '...
-            'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr,'error');
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -253,9 +258,9 @@ function helptext_popupmenu_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -283,9 +288,9 @@ function pushbutton_Callback(~,~,action)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -319,9 +324,9 @@ function keypress_Callback(~,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -339,12 +344,12 @@ end
 function closeWindow(~,~)
     try
         delete(hMainFigure);
-        trEPRadd2status('trEPR GUI help window closed.','info');
+        trEPRmsg('trEPR GUI help window closed.','info');
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -461,9 +466,10 @@ function helptext_selector(helpText)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                trEPRadd2status(...
-                    [mfilename ' : helptext_selector() :'...
-                    'Unknown helptext "' helpText '"'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : Unknown helptext "' helpText '"'],...
+                    'warning');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -472,9 +478,9 @@ function helptext_selector(helpText)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

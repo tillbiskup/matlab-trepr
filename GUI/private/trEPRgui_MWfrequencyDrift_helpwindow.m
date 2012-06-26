@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDrift_helpwindow(varargin)
 % See also TREPRGUI_MWFREQUENCYDRIFTWINDOW
 
 % (c) 2012, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -135,21 +135,21 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRadd2status('trEPR GUI MWfrequency drift help window opened.','info');
+    trEPRmsg('MWfrequency drift help window opened.','info');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end
     % Read text for welcome message from file and display it
-    helpTextFile = fullfile(...
-        trEPRinfo('dir'),'GUI','private','helptexts','MWfrequencyDrift','intro.html');
+    helpTextFile = fullfile(trEPRinfo('dir'),...
+        'GUI','private','helptexts','MWfrequencyDrift','intro.html');
     browser.setCurrentLocation(helpTextFile);
 catch exception
     try
-        msgStr = ['An exception occurred. '...
-            'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr,'error');
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -200,7 +200,7 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                trEPRadd2status('guiHelpPanel(): Unknown helptext','info');
+                trEPRmsg('guiHelpPanel(): Unknown helptext','info');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -209,9 +209,9 @@ function helptext_popupmenu_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -239,9 +239,9 @@ function pushbutton_Callback(~,~,action)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -275,9 +275,9 @@ function keypress_Callback(~,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -300,12 +300,12 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
-        trEPRadd2status('trEPR GUI MWfrequency drift help window closed.','info');
+        trEPRmsg('MWfrequency drift help window closed.','info');
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

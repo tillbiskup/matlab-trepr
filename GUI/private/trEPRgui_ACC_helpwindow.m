@@ -6,30 +6,30 @@ function varargout = trEPRgui_ACC_helpwindow(varargin)
 % See also trEPRGUI_ACCWINDOW
 
 % (c) 2011-12, Till Biskup
-% 2012-06-07
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Make GUI effectively a singleton
-singleton = findobj('Tag','trEPRgui_ACC_helpwindow');
+singleton = findobj('Tag',mfilename);
 if (singleton)
     figure(singleton);
     return;
 end
 
 % Try to get main GUI position
-infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_ACCwindow');
-if ishandle(infoGUIHandle)
-    infoGUIPosition = get(infoGUIHandle,'Position');
+accGUIHandle = trEPRguiGetWindowHandle('trEPRgui_ACCwindow');
+if ishandle(accGUIHandle)
+    infoGUIPosition = get(accGUIHandle,'Position');
     guiPosition = [infoGUIPosition(1)+20,infoGUIPosition(2)+200,450,450];
 else
     guiPosition = [50,250,450,450];
 end
 
 %  Construct the components
-hMainFigure = figure('Tag','trEPRgui_ACC_helpwindow',...
+hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : ACC : Help Window',...
     'Units','Pixels',...
@@ -130,6 +130,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
+    trEPRmsg('ACC GUI help window opened.','info')
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -141,9 +142,9 @@ try
     browser.setCurrentLocation(helpTextFile);
 catch exception
     try
-        msgStr = ['An exception occurred. '...
-            'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr);
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -199,7 +200,10 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                trEPRadd2status('guiHelpPanel(): Unknown helptext');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : Unknown helptext "' helpText '"'],...
+                    'warning');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -208,9 +212,9 @@ function helptext_popupmenu_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -238,9 +242,9 @@ function pushbutton_Callback(~,~,action)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -274,9 +278,9 @@ function keypress_Callback(~,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -299,11 +303,12 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
+        trEPRmsg('ACC GUI help window closed.','info');
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

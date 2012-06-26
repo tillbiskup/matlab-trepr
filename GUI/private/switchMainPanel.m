@@ -8,7 +8,7 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 try
     % Get handles of main window
@@ -92,15 +92,29 @@ try
             set(buttons,'Value',0);
             set(gh.configure_panel,'Visible','on');
             set(gh.tbConfigure,'Value',1);
+        otherwise
+            st = dbstack;
+            trEPRmsg(...
+                [st.name ' : unknown panel "' panelName '"'],...
+                'warning');
+            return;
     end
     
     status = 0;
 catch exception
     try
-        trEPRgui_bugreportwindow(exception);
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
-        % If even displaying the bug report window fails, what lasts to do?
         exception = addCause(exception2, exception);
+        disp(msgStr);
+    end
+    try
+        trEPRgui_bugreportwindow(exception);
+    catch exception3
+        % If even displaying the bug report window fails...
+        exception = addCause(exception3, exception);
         throw(exception);
     end
     status = -1;

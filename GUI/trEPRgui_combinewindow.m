@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -349,7 +349,7 @@ end
 
 % If there are no combinable datasets, close GUI and return
 if ~checkForCombinableDatasets
-    trEPRadd2status(...
+    trEPRmsg(...
         'Combine GUI window not opened: missing combinable datasets',...
         'warning');
     delete(hMainFigure);
@@ -358,7 +358,7 @@ end
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('Combine GUI window opened','info');
+trEPRmsg('Combine GUI window opened','info');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -399,17 +399,18 @@ function listbox_Callback(~,~,field)
             case 'notcombine'
             case 'combine'
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : listbox_Callback() : Unknown field "'...
-                    field '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown field "' field '"'],...
+                    'warning');
                 return;
         end
         updateSpectra();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -442,13 +443,17 @@ function edit_Callback(source,~,field)
                 setappdata(mainWindow,'combine',ad.combine);
                 updateLabel();
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown field "' field '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -609,18 +614,19 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRadd2status('Combine GUI window closed.','info')
+                trEPRmsg('Combine GUI window closed.','info')
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : pushbutton_Callback() : '...
-                    'Unknown action "' action '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -667,9 +673,9 @@ function keypress_Callback(src,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -709,9 +715,9 @@ function status = checkForCombinableDatasets()
         end
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -757,9 +763,9 @@ function updateFileformats()
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -818,9 +824,9 @@ function updateBasenames()
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -886,9 +892,9 @@ function updateSpectra()
         end
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -924,9 +930,9 @@ function updateLabel()
 
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);

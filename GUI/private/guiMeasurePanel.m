@@ -8,7 +8,7 @@ function handle = guiMeasurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -355,9 +355,9 @@ try
         'Value',ad.configuration.measure.setslider);
 catch exception
     try
-        msgStr = ['An exception occurred. '...
-            'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr);
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -395,9 +395,9 @@ function measure_setslider_checkbox_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -455,9 +455,9 @@ function measure_1point_togglebutton_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -512,9 +512,9 @@ function measure_2points_togglebutton_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -535,9 +535,9 @@ function clear_pushbutton_Callback(~,~)
         clearFields();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -577,12 +577,18 @@ function switchMeasurePointer(~,~)
                         assignPointsToDataStructure();
                     otherwise
                         % That shall never happen!
-                        disp('guiMeasurePanel() -> switchMeasurePointer(): Unrecognised point');
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown point "' ...
+                            ad.control.measure.point '"'],'warning');
                         return;
                 end
             otherwise
                 % That shall never happen!
-                disp('guiMeasurePanel() -> switchMeasurePointer(): Unrecognised nPoints');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown nPoints "' ...
+                    ad.control.measure.nPoints '"'],'warning');
                 return;
         end
         
@@ -590,9 +596,9 @@ function switchMeasurePointer(~,~)
         setappdata(mainWindow,'control',ad.control);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -638,9 +644,9 @@ function measureEnd()
         refresh;
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -702,7 +708,11 @@ function assignPointsToDataStructure()
                         ad.data{active}.display.measure.point(1).index(1);
                 otherwise
                     % That shall never happen
-                    disp('guiMeasurePanel(): Unrecognised displayType');
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : unknown display type "' ...
+                        ad.control.axis.displayType '"'],...
+                        'warning');
                     return;
             end
         end
@@ -711,9 +721,9 @@ function assignPointsToDataStructure()
         setappdata(mainWindow,'data',ad.data);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -760,9 +770,9 @@ function clearFields()
         setappdata(mainWindow,'data',ad.data);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

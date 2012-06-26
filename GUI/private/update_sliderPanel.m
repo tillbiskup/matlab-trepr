@@ -7,7 +7,7 @@ function status = update_sliderPanel()
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -252,8 +252,11 @@ switch ad.control.axis.displayType
             ad.data{ad.control.spectra.active}.display.displacement.y...
             );
     otherwise
-        msg = sprintf('Display type %s currently unsupported',ad.control.axis.displayType);
-        trEPRadd2status(msg);
+        st = dbstack;
+        trEPRmsg(...
+            [st.name ' : unknown display type "' ...
+            ad.control.axis.displayType '"'],'warning');
+        return;
 end
 
 status = 0;

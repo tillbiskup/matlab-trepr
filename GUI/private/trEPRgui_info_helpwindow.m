@@ -6,7 +6,7 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 % See also TAGUI_HELPWINDOW
 
 % (c) 2011-12, Till Biskup
-% 2012-06-07
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -117,7 +117,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Close Info GUI Help window',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
-    'Callback',{@delete,hMainFigure}...
+    'Callback',{@closeWindow}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -130,6 +130,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
+    trEPRmsg('Info GUI help window opened','info');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -141,9 +142,9 @@ try
     browser.setCurrentLocation(helpTextFile);
 catch exception
     try
-        msgStr = ['An exception occurred. '...
-            'The bug reporter should have been opened'];
-        trEPRadd2status(msgStr);
+        msgStr = ['An exception occurred in ' ...
+            exception.stack(1).name  '.'];
+        trEPRmsg(msgStr,'error');
     catch exception2
         exception = addCause(exception2, exception);
         disp(msgStr);
@@ -199,7 +200,10 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setCurrentLocation(helpTextFile);
             otherwise
                 % That shall never happen
-                trEPRadd2status('guiHelpPanel(): Unknown helptext');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : Unknown helptext "' helpText '"'],...
+                    'warning');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -208,9 +212,9 @@ function helptext_popupmenu_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -238,9 +242,9 @@ function pushbutton_Callback(~,~,action)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -267,16 +271,39 @@ function keypress_Callback(~,evt)
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
-                        delete(hMainFigure);
+                        closeWindow();
                         return;
                 end
             end
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function closeWindow(~,~)
+    try
+        delete(hMainFigure);
+        trEPRmsg('Info GUI help window closed.','info');
+    catch exception
+        try
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

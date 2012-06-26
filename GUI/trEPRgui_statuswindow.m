@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % (c) 2011-12, Till Biskup
-% 2012-06-06
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -68,6 +68,7 @@ guidata(hMainFigure,guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+trEPRmsg('Status window opened.','info');
 
 % Set string
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -91,11 +92,12 @@ trEPRguiUpdateStatusWindow(statusstring);
 function closeGUI(~,~)
     try
         delete(hMainFigure);
+        trEPRmsg('Status window closed.','info');
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -134,9 +136,9 @@ function keyBindings(~,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

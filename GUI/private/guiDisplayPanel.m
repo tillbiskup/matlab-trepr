@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-05
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1570,9 +1570,9 @@ function pages_buttongroup_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1603,8 +1603,10 @@ function checkbox_Callback(source,~,action)
             case 'legendbox'
                 ad.control.axis.legend.box = get(source,'Value');
             otherwise
-                disp([mfilename '() : checkbox_Callback() : '...
-                    'Unknown action "' action '"']);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
@@ -1613,9 +1615,9 @@ function checkbox_Callback(source,~,action)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1661,8 +1663,10 @@ function popupmenu_Callback(source,~,action)
                     ad.data{active}.line.marker.faceColor = value;
                 end
             otherwise
-                disp([mfilename '() : popupmenu_Callback() : '...
-                    'Unknown action "' action '"']);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
         setappdata(mainWindow,'data',ad.data);
@@ -1672,9 +1676,9 @@ function popupmenu_Callback(source,~,action)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1712,8 +1716,10 @@ function edit_Callback(source,~,action)
                 ad.data{active}.line.marker.size = ...
                     str2double(strrep(get(source,'String'),',','.'));
             otherwise
-                disp(['trEPRgui_MFEwindow() : edit_Callback() : '...
-                    'Unknown action "' action '"']);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
@@ -1724,9 +1730,9 @@ function edit_Callback(source,~,action)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1913,15 +1919,17 @@ function pushbutton_Callback(~,~,action)
                 update_mainAxis();
                 return;                
             otherwise
-                disp(['trEPRgui : guiDisplayPanel() : pushbutton_Callback(): '...
-                    'Unknown action "' action '"']);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1956,13 +1964,10 @@ function axislabels_edit_Callback(source,~,label)
             case 'zunit'
                 ad.control.axis.labels.z.unit = get(source,'String');
             otherwise
-                msgstr = { 'Unknown axis label in callback function call.' ...
-                    sprintf('Function "%s" in file "%s"',...
-                    'axislabels_edit_Callback',...
-                    mfilename ...
-                    )...
-                    };
-                status = trEPRadd2status(msgstr);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown axis label "' label '"'],...
+                    'warning');
                 return;
         end
         
@@ -1973,9 +1978,9 @@ function axislabels_edit_Callback(source,~,label)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2043,9 +2048,9 @@ function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2071,46 +2076,49 @@ function axislimits_edit_Callback(source,~,limit)
                 ad.control.axis.limits.x.min = str2double(get(source,'String'));
             case 'xmax'
                 % Test whether value is larger than min for same axis
-                if (str2num(get(source,'String')) > ad.control.axis.limits.x.min)
+                if (str2double(get(source,'String')) > ad.control.axis.limits.x.min)
                     ad.control.axis.limits.x.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.x.max));
-                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = trEPRadd2status(msgstr);
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : Upper limit of an axis must be '...
+                        'always bigger than lower limit'],'warning');
                     return;
                 end
             case 'ymin'
                 ad.control.axis.limits.y.min = str2double(get(source,'String'));
             case 'ymax'
                 % Test whether value is larger than min for same axis
-                if (str2num(get(source,'String')) > ad.control.axis.limits.y.min)
+                if (str2double(get(source,'String')) > ad.control.axis.limits.y.min)
                     ad.control.axis.limits.y.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.y.max));
-                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = trEPRadd2status(msgstr);
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : Upper limit of an axis must be '...
+                        'always bigger than lower limit'],'warning');
                     return;
                 end
             case 'zmin'
                 ad.control.axis.limits.z.min = str2double(get(source,'String'));
             case 'zmax'
                 % Test whether value is larger than min for same axis
-                if (str2num(get(source,'String')) > ad.control.axis.limits.z.min)
+                if (str2double(get(source,'String')) > ad.control.axis.limits.z.min)
                     ad.control.axis.limits.z.max = str2double(get(source,'String'));
                 else
                     set(source,'String',num2str(ad.control.axis.limits.z.max));
-                    msgstr = 'Upper limit of an axis must be always bigger than lower limit.';
-                    status = trEPRadd2status(msgstr);
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : Upper limit of an axis must be '...
+                        'always bigger than lower limit'],'warning');
                     return;
                 end
             otherwise
-                msgstr = { 'Unknown axis limit in callback function call.' ...
-                    sprintf('Function "%s" in file "%s"',...
-                    'axislimits_edit_Callback',...
-                    mfilename ...
-                    )...
-                    };
-                status = trEPRadd2status(msgstr);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown axis limit "' limit '"'],...
+                    'warning');
                 return;
         end
         
@@ -2121,9 +2129,9 @@ function axislimits_edit_Callback(source,~,limit)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2156,9 +2164,9 @@ function axislimits_auto_checkbox_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2213,9 +2221,9 @@ function highlight_checkbox_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2265,8 +2273,10 @@ function highlight_method_popupmenu_Callback(source,eventdata)
                 set(gh.display_panel_highlight_value_popupmenu,...
                     'Value',1);
             otherwise
-                msg = sprintf('Highlight type %s currently unsupported',highlightType);
-                trEPRadd2status(msg);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown highlight type "' highlightType '"'],...
+                    'warning');
         end
         
         % Update appdata of main window
@@ -2279,9 +2289,9 @@ function highlight_method_popupmenu_Callback(source,eventdata)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2296,7 +2306,7 @@ function highlight_method_popupmenu_Callback(source,eventdata)
     end
 end
 
-function highlight_value_popupmenu_Callback(source,eventdata)
+function highlight_value_popupmenu_Callback(~,~)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
@@ -2356,9 +2366,9 @@ function highlight_value_popupmenu_Callback(source,eventdata)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2373,7 +2383,7 @@ function highlight_value_popupmenu_Callback(source,eventdata)
     end
 end
 
-function grid_x_togglebutton_Callback(source,eventdata)
+function grid_x_togglebutton_Callback(source,~)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
@@ -2392,9 +2402,9 @@ function grid_x_togglebutton_Callback(source,eventdata)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2428,9 +2438,9 @@ function grid_y_togglebutton_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2464,9 +2474,9 @@ function grid_minor_togglebutton_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2496,9 +2506,9 @@ function grid_zero_togglebutton_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2587,9 +2597,9 @@ function grid_legend_togglebutton_Callback(source,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2651,9 +2661,9 @@ function normalise_togglebutton_Callback(source,~)
         update_sliderPanel();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2705,114 +2715,9 @@ function datasets_listbox_Callback(~,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function colour_type_popupmenu_Callback(source,~)
-    try
-        % Get handles and appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        gh = guihandles(mainWindow);
-        ad = getappdata(mainWindow);
-        
-        colourTypes = cellstr(get(source,'String'));
-        colourType = colourTypes{get(source,'Value')};
-        
-        switch colourType
-            case 'name'
-                set(gh.display_panel_colour_type2_popupmenu,'Value',1);
-                set(gh.display_panel_colour_type2_popupmenu,'String',...
-                    'b|g|r|c|m|y|k'...
-                    );
-                if ad.control.spectra.active && ...
-                        ischar(ad.data{ad.control.spectra.active}.line.color)
-                    set(gh.display_panel_colour_type2_popupmenu,...
-                        'Value',strfind('bgrcmyk',...
-                        ad.data{ad.control.spectra.active}.line.color));
-                end
-                set(gh.display_panel_colour_r_edit,'Enable','Off');
-                set(gh.display_panel_colour_g_edit,'Enable','Off');
-                set(gh.display_panel_colour_b_edit,'Enable','Off');
-            case 'RGB'
-                set(gh.display_panel_colour_type2_popupmenu,'Value',1);
-                set(gh.display_panel_colour_type2_popupmenu,'String',...
-                    '0-1|0-255|0-FF'...
-                    );
-                set(gh.display_panel_colour_r_edit,'Enable','On');
-                set(gh.display_panel_colour_g_edit,'Enable','On');
-                set(gh.display_panel_colour_b_edit,'Enable','On');
-            otherwise
-                % That shall never happen
-                trEPRadd2status('trEPRgui_infowindow(): Unknown colour type');
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function colour_type2_popupmenu_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        colourTypes = ...
-            cellstr(get(gh.display_panel_colour_type_popupmenu,'String'));
-        colourType = ...
-            colourTypes{get(gh.display_panel_colour_type_popupmenu,'Value')};
-                
-        switch colourType
-            case 'name'
-                colourNames = cellstr(get(source,'String'));
-                if ad.control.spectra.active
-                    ad.data{ad.control.spectra.active}.line.color = ...
-                        colourNames{get(source,'Value')};
-                    % Update appdata of main window
-                    setappdata(mainWindow,'data',ad.data);
-                    % Update main axes
-                    update_mainAxis();
-                end
-            case 'RGB'
-            otherwise
-                % That shall never happen
-                trEPRadd2status('trEPRgui : guiDisplayPanel: Unknown colour type');
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2851,9 +2756,9 @@ function linewidth_popupmenu_Callback(~,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2896,7 +2801,10 @@ function linestyle_popupmenu_Callback(source,~,action)
                             ad.data{active}.line.style = 'none';
                         otherwise
                             % That shall never happen
-                            trEPRadd2status('trEPRgui : guiDisplayPanel: Unknown line style');
+                            st = dbstack;
+                            trEPRmsg(...
+                                [st.name ' : unknown line style "' lineStyle '"'],...
+                                'warning');
                     end
                 end
             case 'zeroline'
@@ -2913,14 +2821,16 @@ function linestyle_popupmenu_Callback(source,~,action)
                         ad.control.axis.grid.zero.style = 'none';
                     otherwise
                         % That shall never happen
-                        trEPRadd2status('TAgui : guiDisplayPanel: Unknown line style');
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line style "' lineStyle '"'],...
+                            'warning');
                 end
             otherwise
-                msgStr = sprintf([...
-                    'TAgui>guiDisplayPanel>linestyle_popupmenu_Callback: ',...
-                    'Unknown action "%s"'],action);
-                disp(msgStr);
-                trEPRadd2status(msgStr);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
         end
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -2929,9 +2839,9 @@ function linestyle_popupmenu_Callback(source,~,action)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2994,7 +2904,10 @@ function linemarker_popupmenu_Callback(~,~)
                     ad.data{active}.line.marker.type = 'h';
                 otherwise
                     % That shall never happen
-                    trEPRadd2status('TAgui : guiDisplayPanel: Unknown line marker');
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : unknown line marker "' lineMarker '"'],...
+                        'warning');
             end
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
@@ -3003,9 +2916,9 @@ function linemarker_popupmenu_Callback(~,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3050,10 +2963,8 @@ function axesexport_pushbutton_Callback(~,~)
         
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
-            [p,f,e] = ...
+            [~,fileNameSuggested,~] = ...
                 fileparts(ad.data{ad.control.spectra.visible(1)}.file.name);
-            fileNameSuggested = f;
-            clear p f e;
         else
             fileNameSuggested = '';
         end
@@ -3074,16 +2985,16 @@ function axesexport_pushbutton_Callback(~,~)
         status = fig2file(newFig,fileName,...
             'fileType',fileType,'exportFormat',exportFormat);
         if status
-            trEPRadd2status(status);
+            trEPRmsg(status,'warning');
         end
         
         % Close figure window
         close(newFig);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3113,10 +3024,9 @@ function dataexport_pushbutton_Callback(~,~)
         
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
-            [p,f,e] = ...
+            [~,fileNameSuggested,~] = ...
                 fileparts(ad.data{ad.control.spectra.visible(1)}.file.name);
-            fileNameSuggested = [f '-1Dcrosssection'];
-            clear p f e;
+            fileNameSuggested = [fileNameSuggested '-1Dcrosssection'];
         else
             fileNameSuggested = '';
         end
@@ -3153,7 +3063,7 @@ function dataexport_pushbutton_Callback(~,~)
                     ad.data{ad.control.spectra.active}.display.position.x;
             otherwise
                 msg = 'Cannot determine cross section direction (2D mode)';
-                trEPRadd2status(msg);
+                trEPRmsg(msg);
         end
         export1Dparameters.header.character = ...
             get(gh.display_panel_dataexport_header_edit,'String');
@@ -3169,13 +3079,13 @@ function dataexport_pushbutton_Callback(~,~)
         status = trEPRexport1D(...
             ad.data{ad.control.spectra.active},fileName,export1Dparameters);
         if status
-            trEPRadd2status(status);
+            trEPRmsg(status,'warning');
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3259,20 +3169,17 @@ function show3d_edit_Callback(source,~,label)
                 set(source,'String',...
                     round(str2double(get(source,'String'))));
             otherwise
-                msgstr = { 'Unknown label in callback function call.' ...
-                    sprintf('Function "%s" in file "%s"',...
-                    'threeDdisplay_edit_Callback',...
-                    mfilename ...
-                    )...
-                    };
-                status = trEPRadd2status(msgstr);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown label "' label '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3344,9 +3251,9 @@ function show3d_pushbutton_Callback(~,~)
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3391,10 +3298,9 @@ function export3d_pushbutton_Callback(~,~)
         
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
-            [p,f,e] = ...
+            [~,fileNameSuggested,~] = ...
                 fileparts(ad.data{ad.control.spectra.active}.file.name);
-            fileNameSuggested = [f '-3D'];
-            clear p f e;
+            fileNameSuggested = [fileNameSuggested '-3D'];
         else
             fileNameSuggested = '';
         end
@@ -3415,14 +3321,14 @@ function export3d_pushbutton_Callback(~,~)
         status = fig2file(figHandle,fileName,...
             'fileType',fileType,'exportFormat',exportFormat);
         if status
-            trEPRadd2status(msg);
+            trEPRmsg(msg,'warning');
         end
         
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3463,13 +3369,13 @@ function datasetChangeLabel(index)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        trEPRadd2status(msgStr);
+        trEPRmsg(msgStr,'info');
         clear msgStr;
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

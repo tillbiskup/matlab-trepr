@@ -7,7 +7,7 @@ function handle = guiConfigurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -307,20 +307,20 @@ function pushbutton_Callback(~,~,action)
                 % main window
                 status = guiConfigApply('trEPRgui');
                 if status
-                    trEPRadd2status(status);
+                    trEPRmsg(status,'info');
                 end
             otherwise
-                fprintf('%s%s "%s"\n',...
-                    'trEPRgui : guiAnalysisPanel() : ',...
-                    'pushbutton_Callback(): Unknown action',...
-                    action);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

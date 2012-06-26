@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -959,7 +959,7 @@ setappdata(hMainFigure,'avgdata',ad.avgdata);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('AVG GUI window opened','info');
+trEPRmsg('AVG GUI window opened','info');
 
 
 % Load data from Main GUI
@@ -1031,9 +1031,9 @@ function tbg_Callback(source,~)
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1063,9 +1063,11 @@ function position_slider_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'value'));
             otherwise
-                msg = sprintf('Display type %s currently unsupported',...
-                    ad.control.axis.displayType);
-                trEPRadd2status(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Set appdata from AVG GUI
@@ -1075,9 +1077,9 @@ function position_slider_Callback(source,~)
         update_position_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1182,9 +1184,9 @@ function position_edit_Callback(source,~,position)
         updateAxes();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1214,9 +1216,9 @@ function showposition_checkbox_Callback(source,~)
         updateAxes();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1432,8 +1434,9 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : area_edit_Callback() : '...
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
                     'Unknown action "' action '".'],'warning');
                 return;
         end
@@ -1452,9 +1455,9 @@ function area_edit_Callback(source,~,position)
         updateAxes();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1486,9 +1489,9 @@ function visible_panel_listbox_Callback(source,~)
         update_position_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1527,9 +1530,9 @@ function edit_Callback(source,~,field)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1575,16 +1578,17 @@ function popupmenu_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : popupmenu_Callback() : '...
-                    'Unknown popupmenu "' action '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Unknown action "' action '".'],'warning');
         end
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1653,8 +1657,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRadd2status(...
-                        [mfilename ' : togglebutton_Callback() : '...
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' :' ...
                         'Unknown action "' action '".'],'warning');
                     return;
             end
@@ -1689,8 +1694,9 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRadd2status(...
-                        [mfilename ' : togglebutton_Callback() : '...
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' :' ...
                         'Unknown action "' action '".'],'warning');
                     return;
             end
@@ -1698,9 +1704,9 @@ function togglebutton_Callback(source,~,action)
         
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1865,7 +1871,7 @@ function pushbutton_Callback(~,~,action)
                         ['Trying to append averaged data as new '...
                         'datasets to main GUI.']...
                         };
-                    trEPRadd2status(msgStr,'info');
+                    trEPRmsg(msgStr,'info');
                     % Return BLC data to main GUI
                     for k=1:length(ad.avgdata)
                         % Remove avg field in data structure
@@ -1880,7 +1886,7 @@ function pushbutton_Callback(~,~,action)
                             ad.avgdata{k},...
                             'modified',true);
                         if status
-                            trEPRadd2status(...
+                            trEPRmsg(...
                                 ['Hmm... some problems with appending '...
                                 'baseline-correced dataset to main GUI.'],...
                                 'error');
@@ -1894,18 +1900,19 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRadd2status('AVG GUI window closed.','info');
+                trEPRmsg('AVG GUI window closed.','info');
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : pushbutton_Callback() : '...
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
                     'Unknown action "' action '".'],'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1943,15 +1950,16 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : slider_Callback() : '...
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
                     'Unknown action "' action '".'],'warning');
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2002,9 +2010,9 @@ function displaytype_popupmenu_Callback(source,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2075,9 +2083,9 @@ function keypress_Callback(src,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2122,9 +2130,9 @@ function switchPanel(panelName)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2202,9 +2210,9 @@ function updateSliderPanel()
             );
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -2309,9 +2317,9 @@ function updateAveragePanel()
         end
     catch exception
         try
-            msgstr = ['an exception occurred. '...
-                'the bug reporter should have been opened'];
-            trEPRadd2status(msgstr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addcause(exception2, exception);
             disp(msgstr);
@@ -2389,9 +2397,9 @@ function updateSettingsPanel(varargin)
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2448,9 +2456,9 @@ function updateSpectra()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2524,9 +2532,9 @@ function update_position_display()
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2855,9 +2863,10 @@ function updateAxes()
                         'Parent',gh.axis2);
                 end
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : updateAxis(): Unknown AVG dimension "'...
-                    ad.avg.dimension '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Unknown AVG dimension "' ad.avg.dimension '".'],'warning');
         end
         
         % Set grid for main axis
@@ -2881,9 +2890,9 @@ function updateAxes()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2921,9 +2930,9 @@ function switchMeasurePointer(~,~)
         setappdata(mainWindow,'control',ad.control);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2998,9 +3007,6 @@ function trackPointer(varargin)
                     findobj('Parent',hPlotAxes,'-and','Type','line'),...
                     'ydata');
             end
-    
-            % Get id of current spectrum (to shorten lines afterwards)
-            active = ad.control.spectra.active;
             
             % If we are in 1D display mode and there are more than one spectrum
             % and/or a zero line displayed
@@ -3152,8 +3158,11 @@ function trackPointer(varargin)
                     indy=indx;
                 otherwise
                     % That shall never happen!
-                    disp('trackPointer(): Unrecognised displayType');
-                    disp(ad.control.axis.displayType);
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' :' ...
+                        'Unknown display type "' ...
+                        ad.control.axis.displayType '".'],'warning');
                     set(mainWindow,'Pointer','arrow');
                     return;
             end
@@ -3174,9 +3183,9 @@ function trackPointer(varargin)
         
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

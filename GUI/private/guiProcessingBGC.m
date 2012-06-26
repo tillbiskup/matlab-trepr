@@ -1,7 +1,11 @@
 function guiProcessingBGC(datasetnum)
+% GUIPROCESSINGBGC Wrapper between trEPR GUI and actual background
+% processing function.
+%
+% Normally only called from within the trEPR GUI.
 
 % (c) 2011-12, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 method = 'trEPRBGC';
 fun = str2func(method);
@@ -15,9 +19,9 @@ ad = getappdata(mainWindow);
 % Check whether operation has been applied to that dataset before
 for k=1:length(ad.data{datasetnum}.history)
     if (isequal(ad.data{datasetnum}.history{k}.method,method))
-        msg = sprintf('Operation "%s" has been applied already to this dataset.',method);
-        trEPRadd2status(msg);
-        clear msg;
+        trEPRmsg(...
+            ['Operation "' method '" has been applied already '...
+            'to this dataset.'],'warning');
         return;
     end
 end
@@ -29,7 +33,7 @@ ad.data{datasetnum}.data = ...
 
 
 % Add modified spectrum to list of modified spectra
-if isempty(find(ad.control.spectra.modified==datasetnum))
+if isempty(ad.control.spectra.modified==datasetnum)
     ad.control.spectra.modified = [...
         ad.control.spectra.modified ...
         datasetnum];
@@ -71,6 +75,6 @@ msg{2} = sprintf(...
     'numBGprofiles',...
     numBGprofiles ...
     );
-status = trEPRadd2status(msg);
+trEPRmsg(msg,'info');
 clear msg;
 end

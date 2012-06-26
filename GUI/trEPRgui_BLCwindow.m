@@ -7,7 +7,7 @@ function varargout = trEPRgui_BLCwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -811,7 +811,7 @@ setappdata(hMainFigure,'blc',ad.blc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('BLC GUI window opened','info');
+trEPRmsg('BLC GUI window opened','info');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -859,9 +859,9 @@ function tbg_Callback(source,~)
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -902,9 +902,9 @@ function fitarea_panel_slider_Callback(source,~,area)
         update_fitarea_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -964,9 +964,9 @@ function addpoints_panel_checkbox_Callback(source,~,point)
         update_addpoint_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -999,9 +999,9 @@ function addpoints_panel_slider_Callback(source,~,point)
         update_addpoint_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1031,9 +1031,11 @@ function position_slider_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'value'));
             otherwise
-                msg = sprintf('Display type %s currently unsupported',...
-                    ad.control.axis.displayType);
-                trEPRadd2status(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown display type "' ...
+                    ad.control.axis.displayType '"'],...
+                    'warning');
         end
         
         % Set appdata from BLC GUI
@@ -1043,9 +1045,9 @@ function position_slider_Callback(source,~)
         update_position_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1075,9 +1077,9 @@ function showposition_checkbox_Callback(source,~)
         updateAxes();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1111,9 +1113,9 @@ function visible_panel_listbox_Callback(source,~)
         update_addpoint_display();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1160,13 +1162,18 @@ function displaytype_popupmenu_Callback(source,~)
                 updateAxes()
             otherwise
                 % unknown
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown display type "' ...
+                    ad.control.axis.displayType '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1218,13 +1225,17 @@ function correctionmethod_popupmenu_Callback(source,~)
                     'Currently doesn''t work.'});
             otherwise
                 % unknown
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown method "' correctionMethod '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1252,7 +1263,7 @@ function pushbutton_Callback(~,~,action)
                         'Baseline correction (BLC) successful.'...
                         'Now trying to rewrite BLC data to main GUI.'...
                         };
-                    trEPRadd2status(msgStr,'info');
+                    trEPRmsg(msgStr,'info');
                     % Return BLC data to main GUI
                     for k=1:length(ad.blc.spectra)
                         % Remove blc field in data structure
@@ -1267,7 +1278,7 @@ function pushbutton_Callback(~,~,action)
                             ad.blc.spectra(k),...
                             'modified',true);
                         if status
-                            trEPRadd2status(...
+                            trEPRmsg(...
                                 ['Hmm... some problems with appending '...
                                 'baseline-correced dataset to main GUI.'],'error');
                         end
@@ -1277,7 +1288,7 @@ function pushbutton_Callback(~,~,action)
                         'No baseline correction (BLC) has been performed. '...
                         'Alternatively, user discarded BLC.'
                         };
-                    trEPRadd2status(msgStr,'info');
+                    trEPRmsg(msgStr,'info');
                 end
                 % Look for BLC GUI Help window and if its there, close as
                 % well
@@ -1286,7 +1297,7 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRadd2status('BLC GUI window closed.','info')
+                trEPRmsg('BLC GUI window closed.','info')
                 return;
             case 'showMaximum'
                 mainWindow = trEPRguiGetWindowHandle(mfilename);
@@ -1317,13 +1328,17 @@ function pushbutton_Callback(~,~,action)
                 if_BLC('reset');
                 return;
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1394,9 +1409,9 @@ function keypress_Callback(src,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1436,12 +1451,16 @@ function switchPanel(panelName)
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown panel "' panelName '"'],...
+                    'warning');
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1694,9 +1713,9 @@ function updateAxes()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1775,9 +1794,9 @@ function updateSpectra()
             );
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1851,9 +1870,9 @@ function update_position_display()
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1900,9 +1919,9 @@ function update_fitarea_display()
             ad.data{ad.control.spectra.active}.blc.fit.area.back);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -1944,9 +1963,9 @@ function update_addpoint_display()
             ad.data{ad.control.spectra.active}.blc.fit.point(2).position);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -2067,14 +2086,17 @@ function if_BLC(action)
                 updateAxes();
                 return;
             otherwise
-                disp('Unknown action');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

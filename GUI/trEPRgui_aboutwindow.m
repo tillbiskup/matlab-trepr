@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -182,7 +182,7 @@ uicontrol('Tag','close_pushbutton',...
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('About window opened.','info');
+trEPRmsg('About window opened.','info');
 
 
 % Add keypress function to every element that can have one...
@@ -252,9 +252,9 @@ end
             end
         catch exception
             try
-                msgStr = ['An exception occurred. '...
-                    'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr,'error');
+                msgStr = ['An exception occurred in ' ...
+                    exception.stack(1).name  '.'];
+                trEPRmsg(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -280,12 +280,12 @@ end
         end
         try
             delete(hMainFigure);
-            trEPRadd2status('About window closed.','info');
+            trEPRmsg('About window closed.','info');
         catch exception
             try
-                msgStr = ['An exception occurred. '...
-                    'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr,'error');
+                msgStr = ['An exception occurred in ' ...
+                    exception.stack(1).name  '.'];
+                trEPRmsg(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);

@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-06
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -241,9 +241,7 @@ function load_pushbutton_Callback(~,~)
         
         % If the user cancels file selection, print status message and return
         if isequal(FileName,0)
-            msg = 'Loading dataset(s) cancelled by user.';
-            % Update status
-            trEPRadd2status(msg);
+            trEPRmsg('Loading dataset(s) cancelled by user.','info');
             return;
         end
         
@@ -272,11 +270,8 @@ function load_pushbutton_Callback(~,~)
         setappdata(mainWindow,'control',ad.control);
         
         % Adding status line
-        msgStr = cell(0);
-        msgStr{end+1} = 'Calling trEPRload and trying to load';
-        msg = [ msgStr FileName];
-        trEPRadd2status(msg);
-        clear msgStr msg;
+        trEPRmsg(['Calling trEPRload and trying to load "' fileName '".'],...
+            'info');
         
         trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
        
@@ -284,8 +279,7 @@ function load_pushbutton_Callback(~,~)
             'loadInfoFile',loadInfoFile);
 
         if isequal(data,0) || isempty(data)
-            msg = 'Data could not be loaded.';
-            trEPRadd2status(msg);
+            trEPRmsg('Data could not be loaded.','error');
             trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
             return;
         end
@@ -306,7 +300,7 @@ function load_pushbutton_Callback(~,~)
                     msgStr{end+1} = warnings{k}.message; %#ok<AGROW>
                 end
             end
-            trEPRadd2status(msgStr);
+            trEPRmsg(msgStr,'warning');
             clear msgStr;
         end
         
@@ -337,7 +331,7 @@ function load_pushbutton_Callback(~,~)
             msgStr{length(msgStr)+1} = ...
                 'The following files contained no numerical data (and were DISCARDED):';
             msg = [msgStr fnNoData];
-            trEPRadd2status(msg);
+            trEPRmsg(msg,'warning');
             clear msgStr msg;
         end
         
@@ -427,7 +421,7 @@ function load_pushbutton_Callback(~,~)
         msgStr{length(msgStr)+1} = ...
             sprintf('%i data set(s) successfully loaded:',length(data));
         msg = [msgStr fileNames];
-        trEPRadd2status(msg);
+        trEPRmsg(msg,'info');
         clear msgStr msg;
 
         trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
@@ -497,9 +491,9 @@ function load_pushbutton_Callback(~,~)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

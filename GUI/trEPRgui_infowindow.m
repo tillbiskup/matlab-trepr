@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3081,7 +3081,7 @@ switchPanel('General');
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('Info GUI window opened.','info');
+trEPRmsg('Info GUI window opened.','info');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -3116,9 +3116,9 @@ function tbg_Callback(source,~)
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3138,9 +3138,9 @@ function ptbg_Callback(source,~)
         switchParameterPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3175,9 +3175,9 @@ function dataset_listbox_Callback(source,~)
         updateHistoryPanel();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3241,9 +3241,10 @@ function general_edit_Callback(source,~,value)
                 end
             otherwise
                 % fallback
-                trEPRadd2status(...
-                    [mfilename ' : general_edit_Callback() : '...
-                    'Unknown field "' value '".'],'warning')
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown field "' value '"'],...
+                    'warning');
                 return;
         end
         
@@ -3258,9 +3259,9 @@ function general_edit_Callback(source,~,value)
         updateDatasets();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3516,9 +3517,9 @@ function parameter_edit_Callback(source,~,value)
         updateDatasets();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3549,9 +3550,9 @@ function history_listbox_Callback(source,~)
         updateHistoryPanel();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3810,19 +3811,19 @@ function pushbutton_Callback(~,~,action)
                             % there.
                         case 'Discard & Close'
                             msgStr = 'Closing Info GUI and discarding all changes.';
-                            trEPRadd2status(msgStr);
+                            trEPRmsg(msgStr);
                             guiClose();
                             return;
                         case 'Cancel'
                             msgStr = {'Closing Info GUI aborted by user. ' ...
                                 'Reason: Modified and unsaved datasets'};
-                            trEPRadd2status(msgStr);
+                            trEPRmsg(msgStr);
                             return;
                         otherwise
                             msgStr = {...
                                 sprintf('Info GUI: Unknown answer "%s".',...
                                 answer)};
-                            trEPRadd2status(msgStr);
+                            trEPRmsg(msgStr);
                             return;
                     end
 
@@ -3847,16 +3848,17 @@ function pushbutton_Callback(~,~,action)
                 end
                 guiClose();
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : pushbutton_Callback() : '...
-                    'Unknown action "' action '".'],'warning')
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3900,16 +3902,17 @@ function popupmenu_Callback(source,~,action)
                         return;
                 end
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : popupmenu_Callback() : '...
-                    'Unknown action "' action '".'],'warning')
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3964,9 +3967,9 @@ function keypress_Callback(src,evt)
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -3993,13 +3996,13 @@ function guiClose()
         if ishandle(hHelpWindow)
             delete(hHelpWindow);
         end
-        trEPRadd2status('Closing Info GUI.','info');
+        trEPRmsg('Info GUI window closed.','info');
         delete(trEPRguiGetWindowHandle(mfilename));
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4074,16 +4077,17 @@ function switchPanel(panelName)
                     });
                 updateToolsPanel()
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : switchPanel(): '...
-                    'Unknown panel "' panelName '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown panel "' panelName '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4131,16 +4135,17 @@ function switchParameterPanel(panelName)
                 set(gh.parameter_page3_panel,'Visible','on');
                 set(gh.parameter_page3_togglebutton,'Value',1);
             otherwise
-                trEPRadd2status(...
-                    [mfilename ' : switchParameterPanel(): '...
-                    'Unknown panel "' panelName '".'],'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown panel "' panelName '"'],...
+                    'warning');
                 return;
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4207,9 +4212,9 @@ function updateDatasets()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4261,9 +4266,9 @@ function updateGeneralPanel()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4507,9 +4512,9 @@ function updateParameterPanel()
         end
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4541,7 +4546,7 @@ function updateToolsPanel()
         try
             msgStr = ['An exception occurred. '...
                 'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4628,9 +4633,9 @@ function updateHistoryPanel()
 
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4670,9 +4675,9 @@ function value = getCascadedField (struct, fieldName)
         try
             disp(fieldName);
             disp(struct);
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -4709,9 +4714,9 @@ function struct = setCascadedField (struct, fieldName, value)
         try
             disp(fieldName);
             disp(struct);
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr,'error');
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

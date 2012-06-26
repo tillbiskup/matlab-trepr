@@ -7,7 +7,7 @@ function handle = guiProcessingPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-08
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -259,12 +259,7 @@ function corrections_pushbutton_Callback(~,~,correction)
                     'Correction method %s unknown or not (yet) supported.',...
                     correction);
                 msg{2} = 'If you think that this is a bug, please file a bug report.';
-                status = trEPRadd2status(msg);
-                % If for whatever weird reason the trEPR GUI contained no
-                % status field, print it to the commmand line
-                if (status == -2)
-                    fprintf('%s\n%s\n',msg{1},msg{2});
-                end
+                trEPRmsg(msg,'warning');
                 clear msg;
         end
         
@@ -272,9 +267,9 @@ function corrections_pushbutton_Callback(~,~,correction)
         update_visibleSpectra();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -323,9 +318,9 @@ function datasets_listbox_Callback(~,~)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -466,8 +461,11 @@ function edit_Callback(source,~,value)
                 ad.data{active}.display.smoothing.y.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             otherwise
-                disp('guiProcessingPanel : edit_Callback : unknown value');
-                disp(value);
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown value "' value '"'],...
+                    'warning');
+                return;
         end
         
         % Update appdata of main window
@@ -486,9 +484,9 @@ function edit_Callback(source,~,value)
         update_mainAxis();
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);
@@ -518,9 +516,9 @@ function datasetChangeLabel(index)
         setappdata(mainWindow,'data',ad.data);
     catch exception
         try
-            msgStr = ['An exception occurred. '...
-                'The bug reporter should have been opened'];
-            trEPRadd2status(msgStr);
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
         catch exception2
             exception = addCause(exception2, exception);
             disp(msgStr);

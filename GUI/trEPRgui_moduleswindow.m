@@ -4,7 +4,7 @@ function varargout = trEPRgui_moduleswindow()
 % homepage.
 
 % (c) 2012, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -189,7 +189,7 @@ guidata(hMainFigure,gh);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('Modules window opened.','info');
+trEPRmsg('Modules window opened.','info');
 
 % % Add keypress function to every element that can have one...
 % handles = findall(...
@@ -239,9 +239,9 @@ end
             end
         catch exception
             try
-                msgStr = ['An exception occurred. '...
-                    'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr,'error');
+                msgStr = ['An exception occurred in ' ...
+                    exception.stack(1).name  '.'];
+                trEPRmsg(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -292,9 +292,9 @@ end
                 {@startBrowser,moduleInfo.(module).bugtracker.url});
         catch exception
             try
-                msgStr = ['An exception occurred. '...
-                    'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr,'error');
+                msgStr = ['An exception occurred in ' ...
+                    exception.stack(1).name  '.'];
+                trEPRmsg(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);
@@ -312,12 +312,12 @@ end
     function closeWindow(~,~)
         try
             delete(hMainFigure);
-            trEPRadd2status('Modules window closed.','info');
+            trEPRmsg('Modules window closed.','info');
         catch exception
             try
-                msgStr = ['An exception occurred. '...
-                    'The bug reporter should have been opened'];
-                trEPRadd2status(msgStr,'error');
+                msgStr = ['An exception occurred in ' ...
+                    exception.stack(1).name  '.'];
+                trEPRmsg(msgStr,'error');
             catch exception2
                 exception = addCause(exception2, exception);
                 disp(msgStr);

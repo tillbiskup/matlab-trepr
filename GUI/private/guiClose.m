@@ -3,7 +3,7 @@ function guiClose()
 % subwindows that might still be open.
 
 % (c) 11, Till Biskup
-% 2012-05-31
+% 2012-06-26
 
 try
     % Get appdata of main window
@@ -26,7 +26,7 @@ try
             case 'Cancel'
                 msgStr = {'Closing GUI aborted by user. ' ...
                     'Reason: Modified and unsaved datasets'};
-                trEPRadd2status(msgStr);
+                trEPRmsg(msgStr,'info');
                 return;
             otherwise
                 return;

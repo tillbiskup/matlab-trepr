@@ -7,7 +7,7 @@ function varargout = trEPRgui_setLabelWindow(varargin)
 %   label = trEPRgui_setLabelWindow(oldlabel);
 
 % (c) 2011-12, Till Biskup
-% 2012-06-25
+% 2012-06-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -114,7 +114,7 @@ guidata(hMainFigure,guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRadd2status('Set label window opened.','info');
+trEPRmsg('Set label window opened.','info');
 
 % Give edit control the focus
 uicontrol(edit);
@@ -133,10 +133,10 @@ function setLabel_Callback(~,~,action)
             varargout{1} = newLabel;
         case 'cancel'
             delete(hMainFigure);
-            trEPRadd2status('Set label window closed.','info');
+            trEPRmsg('Set label window closed.','info');
             varargout{1} = oldLabel;
         otherwise
-            trEPRadd2status([mfilename ...
+            trEPRmsg([mfilename ...
                 ': Whatever you did, but that shall never happen...'],...
                 'warning');
     end
