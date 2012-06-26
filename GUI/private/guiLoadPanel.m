@@ -270,7 +270,7 @@ function load_pushbutton_Callback(~,~)
         setappdata(mainWindow,'control',ad.control);
         
         % Adding status line
-        trEPRmsg(['Calling trEPRload and trying to load "' fileName '".'],...
+        trEPRmsg(['Calling trEPRload and trying to load "' FileName '".'],...
             'info');
         
         trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');

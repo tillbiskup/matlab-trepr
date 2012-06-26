@@ -290,7 +290,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr);
+                trEPRmsg(msgStr,'info');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -345,7 +345,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr);
+                trEPRmsg(msgStr,'info');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -393,7 +393,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr);
+                trEPRmsg(msgStr,'info');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -431,7 +431,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr);
+                trEPRmsg(msgStr,'info');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -530,7 +530,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr);
+                trEPRmsg(msgStr,'info');
                 clear msgStr;
                 
                 % Update both list boxes
@@ -716,7 +716,7 @@ function datasetChangeLabel(index)
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr);
+        trEPRmsg(msgStr,'info');
         clear msgStr;
     catch exception
         try

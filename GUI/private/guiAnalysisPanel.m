@@ -212,9 +212,10 @@ function pushbutton_Callback(~,~,action)
                 end
                 active = ad.control.spectra.active;
                 if isscalar(ad.data{active}.parameters.bridge.MWfrequency.value) && ...
-                        length(ad.data{active}.parameters.bridge.calibration.values) < 2
+                        (~isfield(ad.data{active}.parameters.bridge.calibration,'values') || ...
+                        length(ad.data{active}.parameters.bridge.calibration.values) < 2)
                     msgbox('Currently active dataset has not enough frequency values.',...
-                        'Frequency Drift Plot','error');
+                        'Frequency Drift Plot','warn');
                     return;
                 end
                 trEPRgui_MWfrequencyDriftwindow();

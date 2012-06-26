@@ -2040,7 +2040,11 @@ function if_BLC(action)
                         updateAxes();
                         return;
                     otherwise
-                        disp('Unknown correction method');
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown correction method "' ...
+                            correctionMethod '"'],'warning');
+                        return;
                 end
             case 'resetPreview'
                 ad.blc.corrFun.values = [];
