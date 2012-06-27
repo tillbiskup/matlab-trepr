@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-27
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -691,8 +691,11 @@ function slider_v1_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'Value'));
             otherwise
-                msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRmsg(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -747,8 +750,11 @@ function slider_v2_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.scaling.z = ...
                     scalingFactor;
             otherwise
-                msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRmsg(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -796,8 +802,11 @@ function slider_v3_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.displacement.z = ...
                     get(source,'Value');
             otherwise
-                msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRmsg(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -852,8 +861,11 @@ function slider_h1_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.scaling.y = ...
                     scalingFactor;
             otherwise
-                msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRmsg(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' :' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -901,8 +913,11 @@ function slider_h2_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.displacement.y = ...
                     get(source,'Value');
             otherwise
-                msg = sprintf('Display type %s currently unsupported',displayType);
-                trEPRmsg(msg,'warning');
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : ' ...
+                    'Display type "' ad.control.axis.displayType '" '...
+                    'currently unsupported'],'warning');
         end
         
         % Update appdata of main window
@@ -1079,9 +1094,11 @@ function tbg_Callback(source,~)
         status = switchMainPanel(get(get(source,'SelectedObject'),'String'));
         
         if status
-            % Something went wrong...
-            msgStr = 'Something went wrong with switching the panels.';
-            trEPRmsg(msgStr,'warning');
+            st = dbstack;
+            trEPRmsg(...
+                [st.name ' :' ...
+                'Something went wrong with switching the panels.'],...
+                'warning');
         end
     catch exception
         try

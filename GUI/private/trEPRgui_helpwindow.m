@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -220,7 +220,6 @@ try
                     [st.name ' : Unknown panel "' ...
                     get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')...
                     '"'], 'warning');
-                trEPRmsg('trEPRgui_helpwindow(): Unknown panel');
         end
     else
         helpText = 'Welcome';
