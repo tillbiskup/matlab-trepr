@@ -7,7 +7,7 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -282,15 +282,16 @@ function pushbutton_Callback(~,~,action)
                 % IMPORTANT: Has to go AFTER setappdata
                 msgStr = cell(0,1);
                 msgStr{end+1} = sprintf(...
-                    'Moved dataset %i (%s) to visible',...
-                    ad.control.spectra.active,...
-                    ad.data{ad.control.spectra.active}.label);
+                    'Moved dataset %i to visible',...
+                    ad.control.spectra.active);
+                msgStr{end+1} = ['Label: ' ...
+                    ad.data{ad.control.spectra.active}.label];
                 invStr = sprintf('%i ',ad.control.spectra.invisible);
                 visStr = sprintf('%i ',ad.control.spectra.visible);
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
+                trEPRmsg(msgStr,'debug');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -337,15 +338,15 @@ function pushbutton_Callback(~,~,action)
                 % IMPORTANT: Has to go AFTER setappdata
                 msgStr = cell(0,1);
                 msgStr{end+1} = sprintf(...
-                    'Moved dataset %i (%s) to invisible',...
-                    selectedId,...
-                    ad.data{selectedId}.label);
+                    'Moved dataset %i to invisible',selectedId);
+                msgStr{end+1} = ['Label: ' ...
+                    ad.data{ad.control.spectra.active}.label];
                 invStr = sprintf('%i ',ad.control.spectra.invisible);
                 visStr = sprintf('%i ',ad.control.spectra.visible);
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
+                trEPRmsg(msgStr,'debug');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -393,7 +394,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
+                trEPRmsg(msgStr,'debug');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -431,7 +432,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
+                trEPRmsg(msgStr,'debug');
                 
                 % Update both list boxes
                 update_invisibleSpectra();
@@ -530,7 +531,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
+                trEPRmsg(msgStr,'debug');
                 clear msgStr;
                 
                 % Update both list boxes

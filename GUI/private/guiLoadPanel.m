@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-28
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -270,14 +270,17 @@ function load_pushbutton_Callback(~,~)
         setappdata(mainWindow,'control',ad.control);
         
         % Adding status line
-        trEPRmsg(['Calling trEPRload and trying to load "' FileName '".'],...
-            'info');
+        trEPRmsg({'Calling trEPRload and trying to load:',FileName},'info');
         
         trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
        
         [data,warnings] = trEPRload(FileName,'combine',state.comb,...
             'loadInfoFile',loadInfoFile);
 
+        % Get appdata, to make sure not to skip any messages that might be
+        % written by trEPRload
+        ad = getappdata(mainWindow);
+        
         if isequal(data,0) || isempty(data)
             trEPRmsg('Data could not be loaded.','error');
             trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
@@ -288,7 +291,7 @@ function load_pushbutton_Callback(~,~)
             % Add warnings to status messages
             msgStr = cell(0);
             msgStr{end+1} = 'Some warnings occurred when trying to load ';
-            msgStr = [msgStr FileName];
+            msgStr{end+1} = FileName;
             for k=1:length(warnings)
                 if length(warnings{k})>1
                     for m=1:length(warnings{k})

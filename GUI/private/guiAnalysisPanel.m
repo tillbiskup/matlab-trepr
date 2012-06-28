@@ -7,7 +7,7 @@ function handle = guiAnalysisPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -173,6 +173,9 @@ function pushbutton_Callback(~,~,action)
                             fileNameSuggested);
                         % If user aborts process, return
                         if fileName == 0
+                            trEPRmsg(...
+                                ['Export of dataset aborted (presumably by user): '...
+                                'No filename.'],'info');
                             return;
                         end
                         % Create filename with full path
@@ -191,6 +194,12 @@ function pushbutton_Callback(~,~,action)
                         else
                             trEPRbusyWindow('stop',...
                                 'Trying to export dataset...<br /><b>done</b>.');
+                            msgStr{1} = sprintf('Exported dataset %i to format %s',...
+                                ad.control.spectra.active,exportFormat);
+                            msgStr{end+1} = ['Label: ' ...
+                                ad.data{ad.control.spectra.active}.label];
+                            msgStr{end+1} = ['File:  ' fileName ];
+                            trEPRmsg(msgStr,'info');
                         end
                         
                     otherwise
@@ -200,12 +209,6 @@ function pushbutton_Callback(~,~,action)
                             exportFormat);
                         return;
                 end
-                
-                % Add status message (mainly for debug reasons)
-                % IMPORtrEPRNT: Has to go AFTER setappdata
-                msgStr = sprintf('Exported dataset %i to format %s',...
-                    ad.control.spectra.active,exportFormat);
-                trEPRmsg(msgStr,'info');
             case 'mwfreqdriftplot'
                 if ~ad.control.spectra.active
                     return;
@@ -216,6 +219,9 @@ function pushbutton_Callback(~,~,action)
                         length(ad.data{active}.parameters.bridge.calibration.values) < 2)
                     msgbox('Currently active dataset has not enough frequency values.',...
                         'Frequency Drift Plot','warn');
+                    trEPRmsg(['Frequency drift analysis failed: ' ...
+                        'Dataset has not enough frequency values.'],...
+                        'warning');
                     return;
                 end
                 trEPRgui_MWfrequencyDriftwindow();

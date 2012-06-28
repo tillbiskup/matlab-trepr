@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2012, Till Biskup
-% 2012-06-06
+% 2012-06-28
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -246,6 +246,8 @@ else    % -> if iscell(filename)
     end
 end
 
+trEPRmsg(['File format: ' content.file.format],'debug');
+
 if exist('content','var') && p.Results.loadInfoFile ...
         && ~strcmpi(content.file.format,'xmlzip')
     % Try to load info file
@@ -255,11 +257,14 @@ if exist('content','var') && p.Results.loadInfoFile ...
         [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
         if isempty(ifpwarnings)
             content = structcopy(content,parameters);
+            trEPRmsg({'Loaded info file and applied contents to dataset',...
+                infoFileName},'info');
         else
             warnings{end+1} = ifpwarnings;
         end
     else
-        warnings{end+1} = 'Could not find accompanying info file.';
+        warnings{end+1} = struct('identifier','trEPRload:missingInfoFile',...
+            'message','Could not find accompanying info file.');
     end
     varargout{1} = content;
     varargout{2} = warnings;

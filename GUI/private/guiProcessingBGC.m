@@ -5,7 +5,7 @@ function guiProcessingBGC(datasetnum)
 % Normally only called from within the trEPR GUI.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-27
 
 method = 'trEPRBGC';
 fun = str2func(method);
@@ -21,7 +21,7 @@ for k=1:length(ad.data{datasetnum}.history)
     if (isequal(ad.data{datasetnum}.history{k}.method,method))
         trEPRmsg(...
             ['Operation "' method '" has been applied already '...
-            'to this dataset.'],'warning');
+            'to this dataset. Nothing done.'],'warning');
         return;
     end
 end
