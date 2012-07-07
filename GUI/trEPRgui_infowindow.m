@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-07-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3935,7 +3935,21 @@ function keypress_Callback(src,evt)
             return;
         end
         if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
+            if any(strcmpi('shift',evt.Modifier)) && ...
+                    (any(strcmpi('command',evt.Modifier)) || ...
+                    any(strcmpi('control',evt.Modifier)))
+                % If parameters panel is active
+                if find(cell2mat(get([tb1 tb2 tb3 tb4],'Value'))) == 2
+                    switch evt.Key
+                        case '1'
+                            switchParameterPanel('Page 1');
+                        case '2'
+                            switchParameterPanel('Page 2');
+                        case '3'
+                            switchParameterPanel('Page 3');
+                    end
+                end
+            elseif (strcmpi(evt.Modifier{1},'command')) || ...
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
