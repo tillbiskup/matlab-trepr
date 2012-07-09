@@ -37,3 +37,5 @@ You can configure the position of the main GUI via the INI file. Subwindows are 
 You can read trEPR Info Files using the Info GUI. That helps you greatly with applying all parameters from the Info files to datasets.
 
 Files saved in older versions of the trEPR toolbox format get converted during read.
+
+You can change between supanels in the parameters panel of the Info GUI with Ctrl+Shift+<number>.
