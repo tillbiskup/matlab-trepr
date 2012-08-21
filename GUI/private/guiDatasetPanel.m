@@ -7,7 +7,7 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-27
+% 2012-08-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -340,7 +340,7 @@ function pushbutton_Callback(~,~,action)
                 msgStr{end+1} = sprintf(...
                     'Moved dataset %i to invisible',selectedId);
                 msgStr{end+1} = ['Label: ' ...
-                    ad.data{ad.control.spectra.active}.label];
+                    ad.data{selectedId}.label];
                 invStr = sprintf('%i ',ad.control.spectra.invisible);
                 visStr = sprintf('%i ',ad.control.spectra.visible);
                 msgStr{end+1} = sprintf(...
