@@ -5,9 +5,14 @@ function varargout = trEPRgui_setLabelWindow(varargin)
 % Usage
 %   label = trEPRgui_setLabelWindow;
 %   label = trEPRgui_setLabelWindow(oldlabel);
+%   [label,status] = trEPRgui_setLabelWindow;
+%   [label,status] = trEPRgui_setLabelWindow(oldlabel);
+%
+% Output
+%   status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-12, Till Biskup, Bernd Paulus
+% 2012-08-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -131,10 +136,12 @@ function setLabel_Callback(~,~,action)
         case 'apply'
             delete(hMainFigure);
             varargout{1} = newLabel;
+            varargout{2} = 0;
         case 'cancel'
             delete(hMainFigure);
             trEPRmsg('Set label window closed.','info');
             varargout{1} = oldLabel;
+            varargout{2} = -1;
         otherwise
             trEPRmsg([mfilename ...
                 ': Whatever you did, but that shall never happen...'],...
