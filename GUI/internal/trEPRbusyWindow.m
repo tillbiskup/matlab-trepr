@@ -1,12 +1,12 @@
 function varargout = trEPRbusyWindow(varargin)
 % BUSYWINDOW Show window with message and spinning dots
 %
-%       Arguments: action (start, stop, delete)
+%       Arguments: action (start, stop, fail, delete)
 %
 %       Returns the handle of the window.
 
 % (c) 2012, Till Biskup
-% 2012-06-26
+% 2012-08-22
 
 title = 'Processing...';
 position = [220,350,270,120];
@@ -128,6 +128,21 @@ switch action
             set(hMainFigure,'Name',parameters.title);
         else
             set(hMainFigure,'Name','Completed.');
+        end
+        clear('jObj');
+    case 'fail'
+        jObj.stop;
+        try
+            jObj.setBusyText('Failed');
+        catch exception
+            trEPRmsg(exception.message);
+        end
+        set(hBtn,'Visible','on');
+        set(hMainFigure,'KeyPressFcn',@keypress_Callback);
+        if isfield(parameters,'title')
+            set(hMainFigure,'Name',parameters.title);
+        else
+            set(hMainFigure,'Name','Failed.');
         end
         clear('jObj');
     case 'delete'
