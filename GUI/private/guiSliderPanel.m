@@ -383,7 +383,8 @@ function position_edit_Callback(source,~,value)
     try
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String'))))
+        if (isempty(get(source,'String')) || ...
+                isnan(str2double(strrep(get(source,'String'),',','.'))))
             % Update slider panel
             update_sliderPanel();
             return;
@@ -412,13 +413,13 @@ function position_edit_Callback(source,~,value)
         
         switch value
             case 'xindex'
-                value = round(str2double(get(source,'String')));
+                value = round(str2double(strrep(get(source,'String'),',','.')));
                 if (value > length(x)) value = length(x); end
                 if (value < 1) value = 1; end
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     value;
             case 'xunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < x(1)) value = x(1); end
                 if (value > x(end)) value = x(end); end
                 ad.data{ad.control.spectra.active}.display.position.x = ...
@@ -428,13 +429,13 @@ function position_edit_Callback(source,~,value)
                     'nearest'...
                     );
             case 'yindex'
-                value = round(str2double(get(source,'String')));
+                value = round(str2double(strrep(get(source,'String'),',','.')));
                 if (value > length(y)) value = length(y); end
                 if (value < 1) value = 1; end
                 ad.data{ad.control.spectra.active}.display.position.y = ...
                     value;
             case 'yunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < y(1)) value = y(1); end
                 if (value > y(end)) value = y(end); end
                 ad.data{ad.control.spectra.active}.display.position.y = ...
@@ -478,7 +479,8 @@ function scaling_edit_Callback(source,~,value)
     try
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String'))))
+        if (isempty(get(source,'String')) || ...
+                isnan(str2double(strrep(get(source,'String'),',','.'))))
             % Update slider panel
             update_sliderPanel();
             return;
@@ -510,7 +512,7 @@ function scaling_edit_Callback(source,~,value)
         
         switch value
             case 'xindex'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < (1/((get(gh.vert2_slider,'Max')*2))))
                     value = 1/((get(gh.vert2_slider,'Max')*2));
                 end
@@ -520,7 +522,7 @@ function scaling_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.scaling.x = ...
                     value;
             case 'xunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < -(x(end)-x(1))/(get(gh.vert2_slider,'Max')*2))
                     value = -(x(end)-x(1))/(get(gh.vert2_slider,'Max')*2);
                 end
@@ -530,7 +532,7 @@ function scaling_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.scaling.x = ...
                     1+value/(x(end)-x(1));
             case 'yindex'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < (1/((get(gh.vert2_slider,'Max')*2))))
                     value = 1/((get(gh.vert2_slider,'Max')*2));
                 end
@@ -540,7 +542,7 @@ function scaling_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.scaling.y = ...
                     value;
             case 'yunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < -(y(end)-y(1))/(get(gh.vert2_slider,'Max')*2))
                     value = -(y(end)-y(1))/(get(gh.vert2_slider,'Max')*2);
                 end
@@ -550,7 +552,7 @@ function scaling_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.scaling.y = ...
                     1+value/(y(end)-y(1));
             case 'zindex'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < (1/((get(gh.vert2_slider,'Max')*2))))
                     value = 1/((get(gh.vert2_slider,'Max')*2));
                 end
@@ -560,7 +562,7 @@ function scaling_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.scaling.z = ...
                     value;
             case 'zunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 switch ad.control.axis.normalisation
                     case 'pkpk'
                         z = [0 1];
@@ -616,7 +618,8 @@ function displacement_edit_Callback(source,~,value)
     try
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String'))))
+        if (isempty(get(source,'String')) || ...
+                isnan(str2double(strrep(get(source,'String'),',','.'))))
             % Update slider panel
             update_sliderPanel();
             return;
@@ -648,31 +651,31 @@ function displacement_edit_Callback(source,~,value)
         
         switch value
             case 'xindex'
-                value = round(str2double(get(source,'String')));
+                value = round(str2double(strrep(get(source,'String'),',','.')));
                 if (value > length(x)) value = length(x); end
                 if (value < -length(x)) value = -length(x); end
                 ad.data{ad.control.spectra.active}.display.displacement.x = ...
                     value;
             case 'xunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < -(x(2)-x(1))*length(x)) value = -(x(2)-x(1))*length(x); end
                 if (value > (x(2)-x(1))*length(x)) value = (x(2)-x(1))*length(x); end
                 ad.data{ad.control.spectra.active}.display.displacement.x = ...
                     value/(x(2)-x(1));
             case 'yindex'
-                value = round(str2double(get(source,'String')));
+                value = round(str2double(strrep(get(source,'String'),',','.')));
                 if (value > length(y)) value = length(y); end
                 if (value < -length(y)) value = -length(y); end
                 ad.data{ad.control.spectra.active}.display.displacement.y = ...
                     value;
             case 'yunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < -(y(2)-y(1))*length(y)) value = -(y(2)-y(1))*length(y); end
                 if (value > (y(2)-y(1))*length(y)) value = (y(2)-y(1))*length(y); end
                 ad.data{ad.control.spectra.active}.display.displacement.y = ...
                     value/(y(2)-y(1));
             case 'zindex'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value > get(gh.vert3_slider,'Max'))
                     value = get(gh.vert3_slider,'Max');
                 end
@@ -682,7 +685,7 @@ function displacement_edit_Callback(source,~,value)
                 ad.data{ad.control.spectra.active}.display.displacement.z = ...
                     value;
             case 'zunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 switch ad.control.axis.normalisation
                     case 'pkpk'
                         z = [0 1];
