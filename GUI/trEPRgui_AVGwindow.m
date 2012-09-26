@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-09-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1102,7 +1102,8 @@ function position_edit_Callback(source,~,position)
         
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String'))))
+        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String')))...
+                || isnan(str2double(strrep(get(source,'String'),',','.'))) )
             % Update slider panel
             updateSliderPanel();
             return;
@@ -1141,7 +1142,7 @@ function position_edit_Callback(source,~,position)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     value;
             case 'xunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < x(1)) 
                     value = x(1); 
                 end
@@ -1161,7 +1162,7 @@ function position_edit_Callback(source,~,position)
                 ad.data{ad.control.spectra.active}.display.position.y = ...
                     value;
             case 'yunit'
-                value = str2double(get(source,'String'));
+                value = str2double(strrep(get(source,'String'),',','.'));
                 if (value < y(1)) 
                     value = y(1); 
                 end
@@ -1239,10 +1240,11 @@ function area_edit_Callback(source,~,position)
             return;
         end
         
+        value = str2double(strrep(get(source,'String'),',','.'));
+        
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if isempty(get(source,'String')) || ...
-                isnan(str2double(get(source,'String')))
+        if (isempty(value) || isnan(value))
             % Update slider panel
             updateAveragePanel();
             return;
@@ -1283,7 +1285,7 @@ function area_edit_Callback(source,~,position)
         
         switch position
             case 'startindex'
-                value = round(str2double(get(source,'String')));
+                value = round(value);
                 if (value > length(dim)) 
                     value = length(dim); 
                 end
@@ -1307,7 +1309,6 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'startunit'
-                value = str2double(get(source,'String'));
                 if (value < dim(1)) 
                     value = dim(1); 
                 end
@@ -1336,7 +1337,7 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopindex'
-                value = round(str2double(get(source,'String')));
+                value = round(value);
                 if (value > length(dim)) 
                     value = length(dim); 
                 end
@@ -1360,7 +1361,6 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopunit'
-                value = str2double(get(source,'String'));
                 if (value < dim(1)) 
                     value = dim(1); 
                 end
@@ -1389,7 +1389,7 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'deltaindex'
-                value = round(str2double(get(source,'String')));
+                value = round(value);
                 if (value > length(dim)) 
                     value = length(dim); 
                 end
@@ -1407,7 +1407,6 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             case 'deltaunit'
-                value = str2double(get(source,'String'));
                 if (value < 0) 
                     value = 0; 
                 end
@@ -1525,6 +1524,17 @@ function edit_Callback(source,~,field)
                     setappdata(mainWindow,'data',ad.data);
                 end
                 updateAveragePanel();
+            case 'averageareaAlpha'
+                value = str2double(strrep(get(source,'String'),',','.'));
+                if (isempty(value) || isnan(value))
+                    updateSettingsPanel();
+                    return;
+                end
+                set(gh.averageareasettings_alpha_edit,'String',num2str(value));
+                ad.avg.area.patch.alpha = value;
+                setappdata(mainWindow,'avg',ad.avg);
+                updateSettingsPanel();
+                updateAxes();
             otherwise
                 return;
         end
