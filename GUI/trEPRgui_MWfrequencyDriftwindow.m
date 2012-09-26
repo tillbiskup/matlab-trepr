@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2012, Till Biskup
-% 2012-06-26
+% 2012-09-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1904,6 +1904,8 @@ function updateAnalysisPanel()
         % Set Field subpanel fields
         set(gh.field_step_edit,'String',...
             num2str(ad.data{active}.parameters.field.step.value));
+        set(gh.field_sequence_edit,'String',...
+            num2str(ad.data{active}.parameters.field.sequence));
         
         fieldDeviationDelta = (max(MWfreq)-min(MWfreq))*1e9*hplanck /...
             (gelectron*bohrmagneton);
