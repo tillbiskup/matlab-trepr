@@ -10,7 +10,7 @@ function status = trEPRinstall()
 %
 
 % (c) 2012, Till Biskup
-% 2012-04-23
+% 2012-10-02
 
 % There are several tasks a good installation program should perform:
 %
@@ -128,6 +128,8 @@ fprintf('\n');
 end
 
 function directories = getToolboxPaths(path)
+% GETTOOLBOXPATHS Internal function returning all subdirectories of the
+% current toolbox installation.
 directories = cell(0);
 traverse(path);
     function traverse(directory)

@@ -39,7 +39,7 @@ function varargout = trEPRconf(action,varargin)
 %               Name of the module the config file(s) belong(s) to.
 
 % (c) 2011-12, Till Biskup
-% 2012-06-19
+% 2012-10-02
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -64,6 +64,15 @@ p.parse(action,varargin{:});
 try
     % Save current directory
     PWD = pwd;
+    % Get modules
+    modules = cell(0);
+    modulesList = dir(fullfile(trEPRinfo('dir'),'modules'));
+    for k=1:length(modulesList)
+        if modulesList(k).isdir && ~strncmp(modulesList(k).name,'.',1) && ...
+                ~strcmp(modulesList(k).name,'private')
+            modules{end+1} = modulesList(k).name; %#ok<AGROW>
+        end
+    end
     switch lower(action)
         case 'create'
             % Change to config directory
@@ -116,6 +125,12 @@ try
             if isempty(p.Results.module)
                 confFiles = dir(fullfile(trEPRinfo('dir'),...
                     'GUI','private','conf','*.ini'));
+                % Get module config files
+                for k=1:length(modules)
+                    modConfFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
+                        modules{k},'GUI','private','conf','*.ini'));
+                    confFiles = [ confFiles; modConfFiles ];
+                end
             else
                 confFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
                     p.Results.module,'GUI','private','conf','*.ini'));
