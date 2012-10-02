@@ -125,11 +125,33 @@ try
             if isempty(p.Results.module)
                 confFiles = dir(fullfile(trEPRinfo('dir'),...
                     'GUI','private','conf','*.ini'));
+                if ~isempty(confFiles)
+                    for k=1:length(confFiles)
+                        confFiles(k).name = fullfile(trEPRinfo('dir'),...
+                            'GUI','private','conf',confFiles(k).name);
+                    end
+                end
                 % Get module config files
-                for k=1:length(modules)
-                    modConfFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
-                        modules{k},'GUI','private','conf','*.ini'));
-                    confFiles = [ confFiles; modConfFiles ];
+                if ~isempty(modules)
+                    for k=1:length(modules)
+                        thisModConfFiles = dir(fullfile(trEPRinfo('dir'),...
+                            'modules',modules{k},'GUI','private',...
+                            'conf','*.ini'));
+                        if ~isempty(thisModConfFiles)
+                            for m=1:length(thisModConfFiles)
+                                thisModConfFiles(m).name = fullfile(...
+                                    trEPRinfo('dir'),'modules',...
+                                    modules{k},'GUI','private',...
+                                    'conf',thisModConfFiles(m).name);
+                            end
+                        end
+                        if exist('modConfFiles','var')
+                            modConfFiles = ...
+                                [ modConfFiles ; thisModConfFiles ]; %#ok<AGROW>
+                        else
+                            modConfFiles = thisModConfFiles;
+                        end
+                    end
                 end
             else
                 confFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
@@ -139,10 +161,14 @@ try
                 varargout{1} = cell(0);
                 return;
             end
-            confFileNames = cell(length(confFiles),1);
-            for k=1:length(confFiles)
-                confFileNames{k} = fullfile(...
-                    trEPRinfo('dir'),'GUI','private','conf',confFiles(k).name);
+            confFileNames = cell(length(confFiles)+length(modConfFiles),1);
+            for k=1:length(confFiles)+length(modConfFiles)
+                if k <= length(confFiles)
+                    confFileNames{k} = confFiles(k).name;
+                else
+                    confFileNames{k} = ...
+                        modConfFiles(k-length(confFiles)).name;
+                end
             end
             varargout{1} = confFileNames;
         case 'distfiles'
