@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-12, Till Biskup
-% 2012-09-25
+% 2012-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3212,8 +3212,9 @@ function general_edit_Callback(source,~,value)
                 end
             case 'comment'
                 oldValue = ad.data{ad.control.spectra.active}.comment;
-                if length(oldValue) ~= length(get(source,'String')) || ...
-                        all(strcmp(oldValue,get(source,'String')))
+                if length(oldValue') ~= length(get(source,'String')) || ...
+                        (iscell(oldValue) && isempty(oldValue)) || ...
+                        ~all(strcmp(oldValue',get(source,'String')))
                     ad.data{ad.control.spectra.active}.comment = ...
                         transpose(get(source,'String'));
                     % If current active spectrum is not labeled "modified", do so
