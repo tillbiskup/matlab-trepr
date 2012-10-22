@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % (c) 2012, Till Biskup
-% 2012-06-23
+% 2012-10-22
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -51,7 +51,7 @@ else
 end
 
 % There is nothing to do for the most current version...
-if strcmpi(version,'1.5')
+if strcmpi(version,'1.6')
     if nargout == 2
         varargout{1} = warning;
     end
@@ -62,6 +62,9 @@ end
 newdata = structcopy(trEPRdataStructure('structure'),data);
 
 switch version
+    case '1.5'
+        newdata.parameters.purpose = {''};
+        newdata.sample.buffer = {''};
     case '1.4'
         if isnumeric(data.parameters.field.start)
             newdata.parameters.field.start.value = data.parameters.field.start;
