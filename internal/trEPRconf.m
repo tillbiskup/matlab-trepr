@@ -39,7 +39,7 @@ function varargout = trEPRconf(action,varargin)
 %               Name of the module the config file(s) belong(s) to.
 
 % (c) 2011-12, Till Biskup
-% 2012-10-02
+% 2012-10-25
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -152,6 +152,8 @@ try
                             modConfFiles = thisModConfFiles;
                         end
                     end
+                else
+                    modConfFiles = {};
                 end
             else
                 confFiles = dir(fullfile(trEPRinfo('dir'),'modules',...
