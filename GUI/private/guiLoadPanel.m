@@ -6,8 +6,8 @@ function handle = guiLoadPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-28
+% (c) 2011-13, Till Biskup
+% 2013-01-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -270,7 +270,7 @@ function load_pushbutton_Callback(~,~)
         setappdata(mainWindow,'control',ad.control);
         
         % Adding status line
-        trEPRmsg({'Calling trEPRload and trying to load:',FileName},'info');
+        trEPRmsg([{'Calling trEPRload and trying to load:'} FileName],'info');
         
         trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
        
@@ -306,7 +306,7 @@ function load_pushbutton_Callback(~,~)
             trEPRmsg(msgStr,'warning');
             clear msgStr;
         end
-        
+
         % Check whether data{n}.data is numeric (very basic test for format)
         fnNoData = cell(0);
         nNoData = [];
@@ -420,12 +420,9 @@ function load_pushbutton_Callback(~,~)
         setappdata(mainWindow,'origdata',ad.origdata);
         
         % Adding status line
-        msgStr = cell(0);
-        msgStr{length(msgStr)+1} = ...
-            sprintf('%i data set(s) successfully loaded:',length(data));
-        msg = [msgStr fileNames];
-        trEPRmsg(msg,'info');
-        clear msgStr msg;
+        msgStr = sprintf('%i data set(s) successfully loaded:',length(data));
+        trEPRmsg([msgStr {fileNames}],'info');
+        clear msgStr;
 
         trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
         
