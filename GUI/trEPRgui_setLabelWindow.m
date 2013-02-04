@@ -11,8 +11,8 @@ function varargout = trEPRgui_setLabelWindow(varargin)
 % Output
 %   status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% (c) 2011-12, Till Biskup, Bernd Paulus
-% 2012-08-22
+% (c) 2011-13, Till Biskup, Bernd Paulus
+% 2013-02-04
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -42,6 +42,7 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'WindowStyle','modal',...
     'Menu','none','Toolbar','none',...
+    'KeyPressFcn',@keypress_Callback,...
     'CloseRequestFcn',{@setLabel_Callback,'cancel'});
 
 defaultBackground = get(hMainFigure,'Color');
@@ -66,10 +67,9 @@ edit = uicontrol('Tag','label_edit',...
     'Units','Pixels',...
     'Position',[10 50 guiSize(1)-20 25],...
     'HorizontalAlignment','Left',...
-    'String',oldLabel...
+    'String',oldLabel,...
+    'Callback',{@setLabel_Callback,'apply'}...
     );
-%     'Callback',{@setLabel_Callback,'apply'}...
-%     );
 
 uicontrol('Tag','info_pushbutton',...
     'Style','pushbutton',...
@@ -147,6 +147,37 @@ function setLabel_Callback(~,~,action)
             trEPRmsg([mfilename ...
                 ': Whatever you did, but that shall never happen...'],...
                 'warning');
+    end
+end
+
+function keypress_Callback(~,evt)
+    try
+        if isempty(evt.Character) && isempty(evt.Key)
+            % In case "Character" is the empty string, i.e. only modifier
+            % key was pressed...
+            return;
+        end
+        if ~isempty(evt.Modifier)
+            if (strcmpi(evt.Modifier{1},'command')) || ...
+                    (strcmpi(evt.Modifier{1},'control'))
+                switch evt.Key
+                    case 'w'
+                        delete(hMainFigure);
+                        varargout{1} = oldLabel;
+                    otherwise
+                        return;
+                end
+            end
+        end
+        switch evt.Key
+            case 'escape'
+                delete(hMainFigure);
+                varargout{1} = oldLabel;
+            otherwise
+                return;
+        end
+    catch exception
+        throw(exception);
     end
 end
 
