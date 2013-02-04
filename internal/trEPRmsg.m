@@ -36,7 +36,7 @@ logLevelAbbr = '';
 logLevel = '';
 if nargin > 1 && ischar(varargin{1})
     logLevel = varargin{1};
-    switch lower(varargin{1})
+    switch lower(logLevel)
         case 'debug'
             logLevelAbbr = '(DD) ';
         case 'info'
@@ -46,13 +46,13 @@ if nargin > 1 && ischar(varargin{1})
         case 'error'
             logLevelAbbr = '(EE) ';
         otherwise
-            fprintf('Unknown log level "%s"\n',varargin{1});
+            fprintf('Unknown log level "%s"\n',logLevel);
     end
 end
 
 % Is there currently a trEPRgui object?
-mainwindow = trEPRguiGetWindowHandle();
-if (isempty(mainwindow))
+mainWindow = trEPRguiGetWindowHandle();
+if (isempty(mainWindow))
     % Display message in main window
     if iscell(message)
         for k=1:length(message)
@@ -66,7 +66,9 @@ if (isempty(mainwindow))
 end
 
 % Get appdata from mainwindow
-ad = getappdata(mainwindow);
+ad = getappdata(mainWindow);
+% Get handles from main GUI
+gh = guidata(mainWindow);
 
 % Check for availability of necessary fields in appdata
 if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
@@ -115,8 +117,20 @@ else
     ad.control.status = [ ad.control.status message ];
 end
 
+% Update main gui status lights if necessary
+if ~isempty(logLevel)
+    switch lower(logLevel)
+        case 'warning'
+            set(gh.status_panel_status_text,'String','WW');
+            set(gh.status_panel_status_text,'BackgroundColor',[.9 .9 .7]);
+        case 'error'
+            set(gh.status_panel_status_text,'String','EE');
+            set(gh.status_panel_status_text,'BackgroundColor',[.9 .7 .7]);
+    end
+end
+
 % Push appdata back to main gui
-setappdata(mainwindow,'control',ad.control);
+setappdata(mainWindow,'control',ad.control);
 
 % Update status window
 % As MATLAB(TM) had some problems with calling a private function in some

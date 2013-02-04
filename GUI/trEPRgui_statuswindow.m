@@ -6,8 +6,8 @@ function varargout = trEPRgui_statuswindow(varargin)
 %
 % See also trEPRgui
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-04
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -91,6 +91,11 @@ trEPRguiUpdateStatusWindow(statusstring);
 
 function closeGUI(~,~)
     try
+        if ishandle(mainGUIHandle)
+            gh = guidata(mainGUIHandle);
+            set(gh.status_panel_status_text,'String','OK');
+            set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
+        end
         delete(hMainFigure);
         trEPRmsg('Status window closed.','info');
     catch exception
@@ -128,6 +133,9 @@ function keyBindings(~,evt)
         end
         switch evt.Key
             case 'f1'
+                return;
+            case 'escape'
+                closeGUI();
                 return;
             otherwise
                 %             disp(evt);

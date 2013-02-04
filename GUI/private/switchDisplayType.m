@@ -5,8 +5,8 @@ function status = switchDisplayType(displayType)
 %
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
-% (c) 2011, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-04
 
 try
     % Get appdata and handles of main window
@@ -24,6 +24,13 @@ try
     [~,idx] = max(strcmpi(displayType,displayTypes));
     set(gh.displaytype_popupmenu,'Value',idx);
     ad.control.axis.displayType = displayType;
+    
+    % Switch mode to none in case that we have switched to '2D plot' and
+    % mode was "scale" or "displace"
+    if strcmpi(displayType,'2D plot') && ...
+            any(strcmpi(ad.control.mode,{'scale','displace'}))
+        trEPRsetMode('none');
+    end
     
     % Update appdata of main window
     setappdata(mainWindow,'control',ad.control);
