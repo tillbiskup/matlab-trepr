@@ -46,16 +46,74 @@ p.addOptional('opt',cell(0),@(x)iscell(x));
 p.parse(cmd,varargin{:});
 opt = p.Results.opt;
 
-% For the time being, print apologies to the Matlab console
-fprintf('%s%s\n%s\n','Sorry, this function doesn''t work yet. ',...
-    'Please, come back later.',...
-    'We apologise for any inconvenience this may cause.');
-return;
+% % For the time being, print apologies to the Matlab console
+% fprintf('%s%s\n%s\n','Sorry, this function doesn''t work yet. ',...
+%     'Please, come back later.',...
+%     'We apologise for any inconvenience this may cause.');
+% return;
 
-% For debug purposes.
-disp(cmd);
-if ~isempty(opt)
-    celldisp(opt);
+% Is there currently a trEPRgui object?
+mainWindow = trEPRguiGetWindowHandle();
+if (isempty(mainWindow))
+    warnings{end+1} = 'No trEPRgui window could be found.';
+    status = -1;
+    return;
+end
+
+% Get appdata from mainwindow
+ad = getappdata(mainWindow);
+% Get handles from main GUI
+% gh = guidata(mainWindow);
+
+% For convenience and shorter lines
+active = ad.control.spectra.active;
+
+switch lower(cmd)
+    case 'pick'
+        if isempty(opt)
+            return;
+        end
+        if isempty(ad.data)
+            return;
+        end
+        switch lower(opt{1}(1:3))
+            case 'min'
+                [~,ximin] = min(min(ad.data{active}.data));
+                [~,yimin] = min(ad.data{active}.data(:,ximin));
+                ad.data{active}.display.position.x = ximin;
+                ad.data{active}.display.position.y = yimin;
+                
+                % Set appdata from main GUI
+                setappdata(mainWindow,'data',ad.data);
+        
+                % Update slider panel
+                update_sliderPanel();
+                
+                %Update main axis
+                update_mainAxis();
+                return;
+            case 'max'
+                [~,ximax] = max(max(ad.data{active}.data));
+                [~,yimax] = max(ad.data{active}.data(:,ximax));
+                ad.data{active}.display.position.x = ximax;
+                ad.data{active}.display.position.y = yimax;
+                
+                % Set appdata from main GUI
+                setappdata(mainWindow,'data',ad.data);
+                
+                % Update slider panel
+                update_sliderPanel();
+                
+                %Update main axis
+                update_mainAxis();
+                return;
+        end
+    otherwise
+        % For debug purposes.
+        disp(cmd);
+        if ~isempty(opt)
+            celldisp(opt);
+        end
 end
 
 end

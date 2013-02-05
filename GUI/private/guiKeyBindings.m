@@ -214,11 +214,13 @@ try
         % Keys for mode switching
         case {'c','d'}
             if ad.control.spectra.active && ...
+                    ~strcmpi(ad.control.mode,'command') && ...
                     ~strcmpi(ad.control.axis.displayType,'2D plot')
                 trEPRguiSetMode(evt.Key);
             end
         case {'s','z','m','p'}
-            if ad.control.spectra.active
+            if ad.control.spectra.active && ...
+                    ~strcmpi(ad.control.mode,'command')
                 trEPRguiSetMode(evt.Key);
             end
         case 'escape'
