@@ -225,14 +225,46 @@ try
             trEPRguiSetMode('none');
         case {'uparrow','downarrow','leftarrow','rightarrow'}
             if any(strcmpi(ad.control.mode,{'scroll','scale','displace'}))
+                funHandle = str2func(['gui' ad.control.mode]);
                 % TODO: Handle arrow keys
-                if (strcmpi(evt.Modifier{1},'command')) || ...
-                        (strcmpi(evt.Modifier{1},'control'))
+                if ~isempty(evt.Modifier) && ...
+                        ((strcmpi(evt.Modifier{1},'command')) || ...
+                        (strcmpi(evt.Modifier{1},'control')))
+                    switch evt.Key
+                        case 'uparrow'
+                            funHandle('y',+10);
+                        case 'downarrow'
+                            funHandle('y',-10);
+                        case 'leftarrow'
+                            funHandle('x',-10);
+                        case 'rightarrow'
+                            funHandle('x',+10);
+                    end
                 elseif ~isempty(evt.Modifier) && ...
                         (strcmpi(evt.Modifier{1},'alt'))
+                    switch evt.Key
+                        case 'uparrow'
+                            funHandle('y','last');
+                        case 'downarrow'
+                            funHandle('y','first');
+                        case 'leftarrow'
+                            funHandle('x','first');
+                        case 'rightarrow'
+                            funHandle('x','last');
+                    end
                 elseif ~isempty(evt.Modifier) && ...
                         (strcmpi(evt.Modifier{1},'shift'))
                 else
+                    switch evt.Key
+                        case 'uparrow'
+                            funHandle('y',+1);
+                        case 'downarrow'
+                            funHandle('y',-1);
+                        case 'leftarrow'
+                            funHandle('x',-1);
+                        case 'rightarrow'
+                            funHandle('x',+1);
+                    end
                 end
             end
         otherwise

@@ -1,6 +1,6 @@
 function status = trEPRmsg(message,varargin)
-% TREPRADD2STATUS Helper function adding a status message to the status
-% cell array of the appdata of the trEPR GUI
+% TREPRMSG Helper function adding a status message to the status cell array
+% of the appdata of the trEPR GUI 
 %
 % Usage:
 %   trEPRmsg(message)
@@ -24,7 +24,7 @@ function status = trEPRmsg(message,varargin)
 % get displayed on the Matlab(tm) command line.
 
 % (c) 2011-13, Till Biskup
-% 2013-01-21
+% 2013-02-05
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their

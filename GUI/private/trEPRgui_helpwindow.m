@@ -5,8 +5,8 @@ function varargout = trEPRgui_helpwindow(varargin)
 % Besides that, it gives access to all the other sources of additional
 % help, such as the Matlab Help Browser and the toolbox website.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-27
+% (c) 2011-13, Till Biskup
+% 2013-02-05
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -320,6 +320,11 @@ function keypress_Callback(~,evt)
                         return;
                 end
             end
+        end
+        switch evt.Key
+            case 'escape'
+                closeWindow();
+                return;
         end
     catch exception
         try

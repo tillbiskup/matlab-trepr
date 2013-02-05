@@ -611,7 +611,8 @@ uicontrol('Tag','command_panel_edit',...
     'Enable','inactive',...
     'Units','Pixels',...
     'Position',[0 0 guiSize(1)-mainPanelWidth-60 25],...
-    'String','Future feature: enter command here'...
+    'String','Future feature: enter command here',...
+    'Callback',{@command_Callback}...
     );
 
 % Add status panel for displaying some status things
@@ -1433,6 +1434,32 @@ function next_pushbutton_Callback(~,~)
             throw(exception);
         end
     end
+end
+
+function command_Callback(source,~)
+    try
+        [status,warning] = trEPRguiCommand(get(source,'String'));
+        if status
+            trEPRmsg(warning,'warning')
+        end
+        set(source,'String','');
+    catch exception
+        try
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end    
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

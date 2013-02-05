@@ -1,5 +1,5 @@
 function handle = guiMeasurePanel(parentHandle,position)
-% GUIWELCOMEPANEL Add a panel for measurements to a gui
+% GUIMEASUREPANEL Add a panel for measurements to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,8 +7,8 @@ function handle = guiMeasurePanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-05
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -424,6 +424,12 @@ function measure_1point_togglebutton_Callback(source,~)
         if (get(source,'Value'))
             % Switch off other togglebutton
             set(gh.measure_panel_2points_togglebutton,'Value',0);
+
+            % Switch zoom mode off
+            zh = zoom(mainWindow);
+            set(zh,'Enable','off');
+            refresh;
+            set(gh.zoom_togglebutton,'Value',0);
             
             % Reset display of values
             clearFields();
@@ -484,6 +490,12 @@ function measure_2points_togglebutton_Callback(source,~)
         if (get(source,'Value'))
             % Switch off other togglebutton
             set(gh.measure_panel_1point_togglebutton,'Value',0);
+
+            % Switch zoom mode off
+            zh = zoom(mainWindow);
+            set(zh,'Enable','off');
+            refresh;
+            set(gh.zoom_togglebutton,'Value',0);
             
             % Set nPoints to measure in appdata
             ad.control.measure.nPoints = 2;

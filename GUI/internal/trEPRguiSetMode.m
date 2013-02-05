@@ -2,8 +2,8 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 % TREPRSETMODE Helper function setting the mode of the trEPR GUI
 %
 % Usage:
-%   trEPRsetMode(mode)
-%   mode = trEPRsetMode(mode)
+%   trEPRguiSetMode(mode)
+%   [status,warnings] = trEPRguiSetMode(mode)
 %
 %   mode    - string (not case sensitive)
 %             Mode to set the GUI into
@@ -25,14 +25,14 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-04
+% 2013-02-05
 
 status = 0;
 warnings = cell(0);
 
 % If called with no input arguments, just display help and exit
 if (nargin==0)
-    help trEPRsetMode;
+    help trEPRguiSetMode;
     return;
 end
 
