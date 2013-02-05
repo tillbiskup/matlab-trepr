@@ -71,9 +71,11 @@ active = ad.control.spectra.active;
 switch lower(cmd)
     case 'pick'
         if isempty(opt)
+            trEPRmsg(['Command "' lower(cmd) '" needs options.'],'warning');
             return;
         end
-        if isempty(ad.data)
+        if ~active
+            trEPRmsg(['Command "' lower(cmd) '" needs an active dataset.'],'warning');
             return;
         end
         switch lower(opt{1}(1:3))

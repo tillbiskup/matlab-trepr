@@ -60,6 +60,8 @@ input = regexp(command,' ','split');
 cmd = input{1};
 if (length(input) > 1)
     opt = input(2:end);
+    % Remove empty opts
+    opt = opt(~cellfun('isempty',opt));
     [cmdParserStatus,cmdParserWarnings] = trEPRguiCmdParser(cmd,opt);
 else
     [cmdParserStatus,cmdParserWarnings] = trEPRguiCmdParser(cmd);
