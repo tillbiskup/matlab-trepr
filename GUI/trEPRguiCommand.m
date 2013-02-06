@@ -62,14 +62,23 @@ if (length(input) > 1)
     opt = input(2:end);
     % Remove empty opts
     opt = opt(~cellfun('isempty',opt));
-    [cmdParserStatus,cmdParserWarnings] = trEPRguiCmdParser(cmd,opt);
 else
-    [cmdParserStatus,cmdParserWarnings] = trEPRguiCmdParser(cmd);
+    opt = cell(0);
 end
 
-if cmdParserStatus
-    warnings = [warnings cmdParserWarnings];
-    status = -3;
+if exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
+    fun = str2func(['cmd' upper(cmd(1)) lower(cmd(2:end))]);
+    [cmdStatus,cmdWarnings] = fun(mainWindow,opt);
+    if cmdStatus
+        warnings = [warnings cmdWarnings];
+        status = -3;
+    end
+else
+    % For debug purposes.
+    disp(cmd);
+    if ~isempty(opt)
+        celldisp(opt);
+    end
 end
 
 end
