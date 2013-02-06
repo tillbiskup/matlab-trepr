@@ -3,10 +3,11 @@ function guiScroll(dimension,step)
 %
 % Arguments:
 %     dimension - char (x,y,z)
-%     step      - scalar
+%     step      - scalar|string
+%                 if string, one of {'first','last','end'}
 
 % (c) 2013, Till Biskup
-% 2013-02-05
+% 2013-02-06
 
 try
     % Get appdata of main window
@@ -26,7 +27,7 @@ try
         case 'x'
             if ischar(step) && strcmpi(step,'first')
                 ad.data{active}.display.position.x = 1;
-            elseif ischar(step) && strcmpi(step,'last')
+            elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                 ad.data{active}.display.position.x = x;
             elseif isscalar(step)
                 ad.data{active}.display.position.x = ...
@@ -44,7 +45,7 @@ try
         case 'y'
             if ischar(step) && strcmpi(step,'first')
                 ad.data{active}.display.position.y = 1;
-            elseif ischar(step) && strcmpi(step,'last')
+            elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                 ad.data{active}.display.position.y = y;
             elseif isscalar(step)
                 ad.data{active}.display.position.y = ...

@@ -3,10 +3,11 @@ function guiDisplace(dimension,step)
 %
 % Arguments:
 %     dimension - char (x,y,z)
-%     step      - scalar
+%     step      - scalar|string
+%                 if string, one of {'first','last','end'}
 
 % (c) 2013, Till Biskup
-% 2013-02-05
+% 2013-02-06
 
 try
     % Get appdata of main window
@@ -34,7 +35,7 @@ try
                 case '1D along x'
                     if ischar(step) && strcmpi(step,'first')
                         ad.data{active}.display.displacement.x = -x;
-                    elseif ischar(step) && strcmpi(step,'last')
+                    elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                         ad.data{active}.display.displacement.x = x;
                     elseif isscalar(step)
                         ad.data{active}.display.displacement.x = ...
@@ -54,7 +55,7 @@ try
                 case '1D along y'
                     if ischar(step) && strcmpi(step,'first')
                         ad.data{active}.display.displacement.y = -y;
-                    elseif ischar(step) && strcmpi(step,'last')
+                    elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                         ad.data{active}.display.displacement.y = y;
                     elseif isscalar(step)
                         ad.data{active}.display.displacement.y = ...

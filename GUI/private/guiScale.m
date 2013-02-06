@@ -3,10 +3,11 @@ function guiScale(dimension,step)
 %
 % Arguments:
 %     dimension - char (x,y,z)
-%     step      - scalar
+%     step      - scalar|string
+%                 if string, one of {'first','last','end'}
 
 % (c) 2013, Till Biskup
-% 2013-02-05
+% 2013-02-06
 
 try
     % Get appdata of main window
@@ -18,9 +19,6 @@ try
     % For convenience and shorter lines
     active = ad.control.spectra.active;
     
-    % Get dimension of active dataset
-    [y,x] = size(ad.data{active}.data);
-
     vMax = [0.5 2];
     vStep = 0.001;
     
@@ -31,7 +29,7 @@ try
                 case '1D along x'
                     if ischar(step) && strcmpi(step,'first')
                         ad.data{active}.display.scaling.x = vMax(1);
-                    elseif ischar(step) && strcmpi(step,'last')
+                    elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                         ad.data{active}.display.scaling.x = vMax(2);
                     elseif isscalar(step)
                         ad.data{active}.display.scaling.x = ...
@@ -58,7 +56,7 @@ try
                 case '1D along y'
                     if ischar(step) && strcmpi(step,'first')
                         ad.data{active}.display.scaling.y = vMax(1);
-                    elseif ischar(step) && strcmpi(step,'last')
+                    elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                         ad.data{active}.display.scaling.y = vMax(2);
                     elseif isscalar(step)
                         ad.data{active}.display.scaling.y = ...
@@ -86,7 +84,7 @@ try
         case 'y'
             if ischar(step) && strcmpi(step,'first')
                 ad.data{active}.display.scaling.z = vMax(1);
-            elseif ischar(step) && strcmpi(step,'last')
+            elseif ischar(step) && any(strcmpi(step,{'last','end'}))
                 ad.data{active}.display.scaling.z = vMax(2);
             elseif isscalar(step)
                 ad.data{active}.display.scaling.z = ...
