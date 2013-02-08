@@ -197,6 +197,8 @@ try
             setappdata(mainWindow,'control',ad.control);
             update_mainAxis();
             update_visibleSpectra();
+            update_processingPanel();
+            update_sliderPanel();
         case 'pagedown'
             if ~ad.control.spectra.active || ...
                     length(ad.control.spectra.visible) == 1
@@ -211,6 +213,8 @@ try
             setappdata(mainWindow,'control',ad.control);
             update_mainAxis();
             update_visibleSpectra();
+            update_processingPanel();
+            update_sliderPanel();
         % Keys for mode switching
         case {'c','d'}
             if ad.control.spectra.active && ...
