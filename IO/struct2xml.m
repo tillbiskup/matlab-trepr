@@ -11,8 +11,11 @@ function docNode = struct2xml(str)
 %
 
 % (c) 2010, Martin Hussels
-% (c) 2010-2012, Till Biskup
-% 2012-06-08
+% (c) 2010-2013, Till Biskup
+% 2013-02-15
+
+% Define precision of floats
+precision = 16;
 
 docNode = com.mathworks.xml.XMLUtils.createDocument(inputname(1));
 docRootNode = docNode.getDocumentElement;
@@ -28,7 +31,7 @@ function traverse(thiselement,childnode)
                 name=names{n};
                 nextnode=docNode.createElement(name);
                 nextnode.setAttributeNode(docNode.createAttribute('id'));
-                nextnode.setAttribute('id',num2str(i));
+                nextnode.setAttribute('id',num2str(i,precision));
                 traverse(thiselement(i).(name),nextnode);
                 childnode.appendChild(nextnode);
             end
@@ -41,19 +44,19 @@ function traverse(thiselement,childnode)
         for i=1:length(thiselement(:))
             nextnode=docNode.createElement('cell');
             nextnode.setAttributeNode(docNode.createAttribute('id'));
-            nextnode.setAttribute('id',num2str(i));
+            nextnode.setAttribute('id',num2str(i,precision));
             traverse(thiselement{i},nextnode);
             childnode.appendChild(nextnode);
         end
     else
-        if strcmp(class(thiselement),'function_handle') 
+        if isa(thiselement,'function_handle') 
             thiselement = func2str(thiselement);
         end
         childnode.setAttributeNode(docNode.createAttribute('class'));
         childnode.setAttribute('class',class(thiselement));
         childnode.setAttributeNode(docNode.createAttribute('size'));
         childnode.setAttribute('size',mat2str(size(thiselement)));
-        childnode.setTextContent(num2str(reshape(thiselement,1,[])));
+        childnode.setTextContent(num2str(reshape(thiselement,1,[]),precision));
     end
 end
 traverse(str,docRootNode);

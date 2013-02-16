@@ -43,8 +43,8 @@ function [ warnings ] = trEPRiniFileWrite ( fileName, data, varargin )
 %
 % See also: trEPRiniFileRead
 
-% (c) 2008-12, Till Biskup
-% 2012-04-21
+% (c) 2008-13, Till Biskup
+% 2013-02-15
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -70,6 +70,9 @@ assignmentChar = p.Results.assignmentChar;
 
 % headerFirstLine
 % headerCreationDate
+
+% Set precision for floats
+precision = 16;
 
 warnings = '';
 
@@ -121,12 +124,12 @@ for k = 1 : length(blockNames)
     for m = 1 : length(fieldNames)
         if isstruct(data.(blockNames{k}).(fieldNames{m}))
             traverse(data.(blockNames{k}).(fieldNames{m}),fieldNames{m},...
-                assignmentChar,fh);
+                assignmentChar,fh,precision);
         else
             fieldValue = data.(blockNames{k}).(fieldNames{m});
             % in case the value is not a string, but numeric
             if isnumeric(fieldValue)
-                fieldValue = num2str(fieldValue);
+                fieldValue = num2str(fieldValue,precision);
             end
             fprintf(fh,'%s%s %s\n',fieldNames{m},assignmentChar,fieldValue);
         end
@@ -149,7 +152,7 @@ end
 end
 
 
-function traverse(structure,parent,assignmentChar,fileHandle)
+function traverse(structure,parent,assignmentChar,fileHandle,precision)
 
 fieldNames = fieldnames(structure);
 for k=1:length(fieldNames)
@@ -160,10 +163,10 @@ for k=1:length(fieldNames)
     else
         field = sprintf('%s.%s',parent,fieldNames{k});
         if isnumeric(structure.(fieldNames{k}))
-            value = num2str(structure.(fieldNames{k}));
+            value = num2str(structure.(fieldNames{k}),precision);
             fprintf(fileHandle,'%s.%s%s %s\n',...
                 parent,fieldNames{k},assignmentChar,...
-                num2str(structure.(fieldNames{k})));
+                num2str(structure.(fieldNames{k}),precision));
         elseif ischar(structure.(fieldNames{k}))
             value = structure.(fieldNames{k});
             fprintf(fileHandle,'%s.%s%s %s\n',...
