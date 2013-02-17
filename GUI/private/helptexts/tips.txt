@@ -38,4 +38,14 @@ You can read trEPR Info Files using the Info GUI. That helps you greatly with ap
 
 Files saved in older versions of the trEPR toolbox format get converted during read.
 
-You can change between supanels in the parameters panel of the Info GUI with Ctrl+Shift+<number>.
+You can change between supanels in the parameters panel of the Info GUI with "Ctrl+Shift+<number>".
+
+"Ctrl+l" switches the focus to the command line.
+
+You can use the new command line to start controlling your toolbox via keyboard.
+
+The "Net Polarisation Analysis Window" lets you analyse the time development of the net polarisation in your TREPR spectra with ease.
+
+You can switch between the different modes with keyboard shortcuts: "s" for scroll, "c" for scale, "d" for displace, "z" for zoom, "Esc" to leave the mode(s).
+
+The status display on the bottom right of the main GUI allows you to have the current toolbox status always under control. It is reset by opening the status window.

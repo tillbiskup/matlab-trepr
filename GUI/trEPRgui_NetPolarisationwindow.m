@@ -612,7 +612,7 @@ uicontrol('Tag','display_panel_line_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[80 245 panel_size-90 20],...
-    'String','main|average NP',...
+    'String','main|average pretrig NP',...
     'Callback',{@popupmenu_Callback,'line'}...
     );
 uicontrol('Tag','display_panel_linecolour_text',...
@@ -1007,6 +1007,7 @@ if (mainGuiWindow)
 
     updateAxes();
     updateAnalysisPanel();
+    updateSettingsPanel();
 end
 
 %updateAxes();
@@ -1349,7 +1350,7 @@ function pushbutton_Callback(~,~,action)
                 [fileName,pathName] = uiputfile(...
                     sprintf('*.%s',fileType),...
                     'Get filename to export figure to',...
-                    [fileNameSuggested '-NPDriftPlot']);
+                    [fileNameSuggested '-NetPolarisationPlot']);
                 % If user aborts process, return
                 if fileName == 0
                     close(newFig);
@@ -1584,7 +1585,7 @@ function popupmenu_Callback(source,~,action)
                                     'Unknown line style ' lineStyle]);
                         end
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
+                    case 'average pretrig np'
                         switch value
                             case 'solid'
                                 ad.NP.line.style = '-';
@@ -1646,7 +1647,7 @@ function popupmenu_Callback(source,~,action)
                                     'Unknown line marker ' lineMarker]);
                         end
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
+                    case 'average pretrig np'
                         switch value
                             case 'none'
                                 ad.NP.line.marker.type = 'none';
@@ -1698,7 +1699,7 @@ function popupmenu_Callback(source,~,action)
                             ad.data{active}.line.marker.edgeColor = value;
                         end
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
+                    case 'average pretrig np'
                     otherwise
                         disp([mfilename ': popupmenu_Callback(): '...
                             'Unknown line type ' lineType]);
@@ -1715,7 +1716,7 @@ function popupmenu_Callback(source,~,action)
                             ad.data{active}.line.marker.faceColor = value;
                         end
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
+                    case 'average pretrig np'
                     otherwise
                         disp([mfilename ': popupmenu_Callback(): '...
                             'Unknown line type ' lineType]);
@@ -2114,7 +2115,7 @@ function updateSettingsPanel(varargin)
                 % Set line marker size
                 set(gh.display_panel_markersize_edit,'String',...
                     num2str(ad.data{active}.line.marker.size));
-            case 'average mwfreq'
+            case 'average pretrig np'
                 set(gh.display_panel_linecoloursample_text,'Background',...
                     ad.NP.line.color);
                 set(gh.display_panel_linewidth_edit,'String',...
