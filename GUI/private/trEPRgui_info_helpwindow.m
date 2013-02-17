@@ -5,8 +5,8 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 %
 % See also TAGUI_HELPWINDOW
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -117,7 +117,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Close Info GUI Help window',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
-    'Callback',{@closeWindow}...
+    'Callback',{@closeGUI}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -271,10 +271,16 @@ function keypress_Callback(~,evt)
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
-                        closeWindow();
+                        closeGUI();
                         return;
                 end
             end
+        else
+            switch evt.Key
+                case 'escape'
+                    closeGUI();
+                    return;
+            end                    
         end
     catch exception
         try
@@ -295,7 +301,7 @@ function keypress_Callback(~,evt)
     end
 end
 
-function closeWindow(~,~)
+function closeGUI(~,~)
     try
         delete(hMainFigure);
         trEPRmsg('Info GUI help window closed.','info');

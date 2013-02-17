@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-05
+% 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -161,7 +161,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Close ACC GUI Help window',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
-    'Callback',{@closeWindow}...
+    'Callback',{@closeGUI}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -316,14 +316,14 @@ function keypress_Callback(~,evt)
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
-                        closeWindow();
+                        closeGUI();
                         return;
                 end
             end
         end
         switch evt.Key
             case 'escape'
-                closeWindow();
+                closeGUI();
                 return;
         end
     catch exception
@@ -345,7 +345,7 @@ function keypress_Callback(~,evt)
     end
 end
 
-function closeWindow(~,~)
+function closeGUI(~,~)
     try
         delete(hMainFigure);
         trEPRmsg('trEPR GUI help window closed.','info');

@@ -5,8 +5,8 @@ function varargout = trEPRgui_ACC_helpwindow(varargin)
 %
 % See also trEPRGUI_ACCWINDOW
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -275,6 +275,12 @@ function keypress_Callback(~,evt)
                         return;
                 end
             end
+        else
+            switch evt.Key
+                case 'escape'
+                    closeGUI();
+                    return;
+            end                    
         end
     catch exception
         try

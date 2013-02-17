@@ -272,6 +272,12 @@ function keypress_Callback(~,evt)
                         return;
                 end
             end
+        else
+            switch evt.Key
+                case 'escape'
+                    closeGUI();
+                    return;
+            end                    
         end
     catch exception
         try

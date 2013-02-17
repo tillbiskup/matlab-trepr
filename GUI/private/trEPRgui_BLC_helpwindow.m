@@ -3,8 +3,8 @@ function varargout = trEPRgui_BLC_helpwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -115,7 +115,7 @@ uicontrol('Tag','close_pushbutton',...
     'TooltipString','Close BLC GUI Help window',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
-    'Callback',{@closeWindow}...
+    'Callback',{@closeGUI}...
     );
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -264,10 +264,16 @@ function keypress_Callback(~,evt)
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
                     case 'w'
-                        delete(hMainFigure);
+                        closeGUI();
                         return;
                 end
             end
+        else
+            switch evt.Key
+                case 'escape'
+                    closeGUI();
+                    return;
+            end                    
         end
     catch exception
         try
@@ -288,7 +294,7 @@ function keypress_Callback(~,evt)
     end
 end
 
-function closeWindow(~,~)
+function closeGUI(~,~)
     try
         delete(hMainFigure);
         trEPRmsg('BLC GUI help window closed.','info');
