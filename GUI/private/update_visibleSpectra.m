@@ -10,8 +10,8 @@ function status = update_visibleSpectra()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated panels listing the spectra
 
-% (c) 2011-12, Till Biskup
-% 2012-06-06
+% (c) 2011-13, Till Biskup
+% 2013-02-17
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -111,10 +111,13 @@ end
 % Update list of spectra of the processing panel
 procPLbox = gh.processing_panel_datasets_listbox;
 set(procPLbox,'String',labels);
+procPLbox2 = gh.processing_panel_datasets2_listbox;
+set(procPLbox2,'String',labels);
 
 % Highlight currently active
 if ad.control.spectra.active
     set(procPLbox,'Value',find(vis==ad.control.spectra.active));
+    set(procPLbox2,'Value',find(vis==ad.control.spectra.active));
 end
 
 % Update list of spectra of the display panel

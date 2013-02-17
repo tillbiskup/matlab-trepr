@@ -703,7 +703,7 @@ function listbox_Callback(~,~,action)
     end
 end
 
-function edit_Callback(source,~,value)
+function edit_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
@@ -717,6 +717,17 @@ function edit_Callback(source,~,value)
             return;
         end
         
+        % Get value of edit field and replace comma with dot
+        value = str2double(strrep(get(source,'String'),',','.'));
+
+        % If value is empty or NaN after conversion to numeric, restore
+        % previous entry and return
+        if (isempty(value) || isnan(value))
+            % Update slider panel
+            update_processingPanel();
+            return;
+        end
+        
         [y,x] = size(ad.data{active}.data);
         
         filterTypes = cellstr(...
@@ -724,7 +735,7 @@ function edit_Callback(source,~,value)
         filterType = filterTypes{...
             get(gh.processing_panel_average_type_popupmenu,'Value')};
 
-        switch value
+        switch action
             case 'avg_xindex'
                 % Fix values: only integers >= 1
                 if (str2double(get(source,'String')) < 1) || ...
@@ -744,7 +755,6 @@ function edit_Callback(source,~,value)
                     sprintf('trEPRfilter_%s',filterType);
             case 'avg_xunit'
                 x = linspace(1,x,x);
-                y = linspace(1,y,y);
                 if (isfield(ad.data{active},'axes') ...
                         && isfield(ad.data{active}.axes,'x') ...
                         && isfield(ad.data{active}.axes.x,'values') ...
@@ -794,7 +804,6 @@ function edit_Callback(source,~,value)
                 ad.data{active}.display.smoothing.y.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             case 'avg_yunit'
-                x = linspace(1,x,x);
                 y = linspace(1,y,y);
                 if (isfield(ad.data{active},'axes') ...
                         && isfield(ad.data{active}.axes,'y') ...
@@ -828,10 +837,14 @@ function edit_Callback(source,~,value)
                     round(str2double(get(source,'String'))/atomic);
                 ad.data{active}.display.smoothing.y.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
+            case 'scale'
+                set(source,'String',num2str(value));
+                pushbutton_Callback([],[],'scale');
+                return;
             otherwise
                 st = dbstack;
                 trEPRmsg(...
-                    [st.name ' : unknown value "' value '"'],...
+                    [st.name ' : unknown action "' action '"'],...
                     'warning');
                 return;
         end

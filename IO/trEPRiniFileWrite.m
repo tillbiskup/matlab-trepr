@@ -44,7 +44,7 @@ function [ warnings ] = trEPRiniFileWrite ( fileName, data, varargin )
 % See also: trEPRiniFileRead
 
 % (c) 2008-13, Till Biskup
-% 2013-02-15
+% 2013-02-17
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -159,7 +159,7 @@ for k=1:length(fieldNames)
     if isstruct(structure.(fieldNames{k}))
         traverse(...
             structure.(fieldNames{k}),[parent '.' fieldNames{k}],...
-            assignmentChar,fileHandle);
+            assignmentChar,fileHandle,precision);
     else
         field = sprintf('%s.%s',parent,fieldNames{k});
         if isnumeric(structure.(fieldNames{k}))

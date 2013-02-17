@@ -1,0 +1,32 @@
+% Sample configuration file for the trEPRgui_NetPolarisationwindow 
+% function of the trEPR toolbox
+%
+% (c) 2012, Till Biskup <till@till-biskup.de>
+%
+% This file serves as an example and documentation for the real
+% configuration in the file "trEPRgui_NetPolarisationwindow.ini" in the 
+% same directory.
+%
+% To automatically generate a valid config file from this file, 
+% use trEPRconf('create') at the MATLAB(r) command line.
+% Alternatively, you may use the functions provided by the "Configuration" 
+% panel of the trEPR toolbox main GUI.
+
+[NP]
+line.style = --
+line.color = [1 0 0]
+line.width = 1
+line.marker.type = none
+line.marker.edgeColor = auto
+line.marker.faceColor = none
+line.marker.size = 6
+area.patch.color = [0.5 0.5 1]
+area.patch.alpha = 0.4
+area.patch.edge = none
+
+[axis]
+grid.x = off
+grid.y = off
+grid.minor = off
+mean = 0
+stdev = 0
