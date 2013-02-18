@@ -2237,10 +2237,10 @@ function updateAnalysisPanel()
             find(ad.data{active}.axes.x.values>0,1))));
         
         % Set unit fields
-        set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
-            'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
-        set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
-            'String',ad.data{active}.axes.y.unit);
+%         set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
+%             'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
+%         set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
+%             'String',ad.data{active}.axes.y.unit);
         
         % Set background of deviation fields accordingly
         if minNPval < (min(PTNP))
