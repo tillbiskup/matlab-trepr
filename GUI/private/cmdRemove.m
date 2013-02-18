@@ -22,7 +22,7 @@ function [status,warnings] = cmdRemove(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-07
+% 2013-02-18
 
 status = 0;
 warnings = cell(0);
@@ -81,7 +81,43 @@ try
     end
     
     switch lower(opt{1})
+        case 'visible'
+            if isempty(ad.control.spectra.visible)
+                return;
+            end
+            visible = sort(ad.control.spectra.visible);
+            for k=length(visible):-1:1
+                if length(opt) > 1 &&  strcmpi(opt{2},'force')
+                    trEPRremoveDatasetFromMainGUI(visible(k),'force',true);
+                else
+                    trEPRremoveDatasetFromMainGUI(visible(k));
+                end
+            end
+            return;
+        case 'invisible'
+            if isempty(ad.control.spectra.invisible)
+                return;
+            end
+            invisible = sort(ad.control.spectra.invisible);
+            for k=length(invisible):-1:1
+                if length(opt) > 1 && strcmpi(opt{2},'force')
+                    trEPRremoveDatasetFromMainGUI(invisible(k),'force',true);
+                else
+                    trEPRremoveDatasetFromMainGUI(invisible(k));
+                end
+            end
+            return;
         case 'all'
+            if isempty(ad.data)
+                return;
+            end
+            for k=length(ad.data):-1:1
+                if length(opt) > 1 &&  strcmpi(opt{2},'force')
+                    trEPRremoveDatasetFromMainGUI(k,'force',true);
+                else
+                    trEPRremoveDatasetFromMainGUI(k);
+                end
+            end
             return;
         otherwise
             status = -3;
