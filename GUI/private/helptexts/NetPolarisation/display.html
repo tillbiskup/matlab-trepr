@@ -25,6 +25,16 @@
 		<p>
 			To help analyse the net polarisation, you can display both mean and standard deviation (as area, mean +/- stdev) of the pretrigger part of the signal independently or together. Additionally, you can display min and max of the pretrigger part of the signal as area.
 		</p>
+		<h2>Smoothing (running average filter)</h2>
+		<p>
+			To get a bit better an idea of how the time evolution of the net polarisation of your spectrum looks, it is often helpful to smooth the curve displayed, given that the sum along the magnetic field axis is often quite noisy.
+		</p>
+		<p>
+			The controls are basically the same as those in the main GUI, allowing you to select a filter function and set the filter window width (both, as points and in real units of the time axis).
+		</p>
+		<p>
+			The smoothed curve will only be displayed if you select a filter window > 1 point. The standard settings for the smoothed line can be set in the corresponding ini file of the Net Polarisation GUI.
+		</p>
 		<h2>Export figure</h2>
 		<p>
 To export the current display to a file, choose the file type (currently Matlab&trade; FIG, EPS, PDF, PNG) and hit "Export".
@@ -37,7 +47,7 @@ To export the current display to a file, choose the file type (currently Matlab&
 			&copy; 2013, Till Biskup
 		</p>
 		<p class="lastchange">
-			2013-02-17
+			2013-02-18
 		</p>
 		</div>
 	</body>

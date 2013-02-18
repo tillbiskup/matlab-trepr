@@ -1,7 +1,7 @@
 % Sample configuration file for the trEPRgui_NetPolarisationwindow 
 % function of the trEPR toolbox
 %
-% (c) 2012, Till Biskup <till@till-biskup.de>
+% (c) 2013, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
 % configuration in the file "trEPRgui_NetPolarisationwindow.ini" in the 
@@ -23,6 +23,15 @@ line.marker.size = 6
 area.patch.color = [0.5 0.5 1]
 area.patch.alpha = 0.4
 area.patch.edge = none
+smooth.window = 1
+smooth.filterfun = boxcar
+smooth.style = -
+smooth.color = [1 0 0]
+smooth.width = 2
+smooth.marker.type = none
+smooth.marker.edgeColor = auto
+smooth.marker.faceColor = none
+smooth.marker.size = 6
 
 [axis]
 grid.x = off
