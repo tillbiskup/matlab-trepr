@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-05
+% 2013-02-18
 
 status = 0;
 warnings = cell(0);
@@ -49,10 +49,10 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get appdata from mainwindow
-ad = getappdata(mainWindow);
-% Get handles from main GUI
-gh = guidata(mainWindow);
+% % Get appdata from mainwindow
+% ad = getappdata(mainWindow);
+% % Get handles from main GUI
+% gh = guidata(mainWindow);
 
 % For future use: parse command, split it at spaces, use first part as
 % command, all other parts as options
@@ -66,7 +66,28 @@ else
     opt = cell(0);
 end
 
-if exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
+% For now, just a list of internal commands and their translation into
+% existing commands.
+% Currently, just a struct with field names equivalent to the commands
+% Field name  = command as entered on the command line
+% Field value = actual Matlab command issued
+cmdMatch = struct(...
+    'help','trEPRgui_helpwindow',...
+    'about','trEPRgui_aboutwindow',...
+    'info','trEPRgui_infowindow',...
+    'acc','trEPRgui_ACCwindow',...
+    'avg','trEPRgui_AVGwindow',...
+    'blc','trEPRgui_BLCwindow',...
+    'sim','trEPRgui_SIMwindow',...
+    'status','trEPRgui_statuswindow',...
+    'combine','trEPRgui_combinewindow',...
+    'modules','trEPRgui_moduleswindow' ...
+    );
+
+if isfield(cmdMatch,lower(cmd))
+    fun = str2func(cmdMatch.(lower(cmd)));
+    fun();
+elseif exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
     fun = str2func(['cmd' upper(cmd(1)) lower(cmd(2:end))]);
     [cmdStatus,cmdWarnings] = fun(mainWindow,opt);
     if cmdStatus

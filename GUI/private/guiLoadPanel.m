@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-01-21
+% 2013-02-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -421,7 +421,7 @@ function load_pushbutton_Callback(~,~)
         
         % Adding status line
         msgStr = sprintf('%i data set(s) successfully loaded:',length(data));
-        trEPRmsg([msgStr {fileNames}],'info');
+        trEPRmsg([msgStr fileNames],'info');
         clear msgStr;
 
         trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
