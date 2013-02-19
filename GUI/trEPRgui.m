@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-04
+% 2013-02-18
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -591,7 +591,7 @@ uicontrol('Tag','next_pushbutton',...
     'Callback',{@next_pushbutton_Callback}...
     );
 
-% Add command panel for later script command functionality
+% Add command panel for script command functionality
 hp_command = uipanel('Tag','command_panel',...
     'Parent',hMainFigure,...
     'BackgroundColor',defaultBackground,...
@@ -612,6 +612,7 @@ uicontrol('Tag','command_panel_edit',...
     'Units','Pixels',...
     'Position',[0 0 guiSize(1)-mainPanelWidth-60 25],...
     'String','Enter command - Ctrl-l / Cmd-l for access',...
+    'KeyPressFcn',@command_keypress_Callback,...
     'Callback',{@command_Callback}...
     );
 
@@ -736,10 +737,15 @@ handles = findall(...
     '-or','style','listbox',...
     '-or','style','checkbox',...
     '-or','style','slider',...
-    '-or','style','popupmenu');
+    '-or','style','popupmenu',...
+    '-not','tag','command_panel_edit');
 for k=1:length(handles)
     set(handles(k),'KeyPressFcn',@guiKeyBindings);
 end
+
+% As Matlab seems to ignore me four lines above, set the KeyPressFcn again
+% for the command line edit control
+set(gh.command_panel_edit,'KeyPressFcn',@command_keypress_Callback);
 
 % Enable sim button if applicable
 if exist('trEPRgui_SIMwindow','file')
@@ -1443,6 +1449,52 @@ function command_Callback(source,~)
             trEPRmsg(warning,'warning')
         end
         set(source,'String','');
+    catch exception
+        try
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end    
+end
+
+function command_keypress_Callback(source,evt)
+    try
+        if ~strcmpi(evt.Key,{'uparrow','downarrow'})
+            return;
+        end
+
+        % Get appdata of main window
+        mainWindow = trEPRguiGetWindowHandle;
+        ad = getappdata(mainWindow);
+        
+        switch evt.Key
+            case 'uparrow'
+                if ad.control.cmd.historypos
+                    set(source,'String',ad.control.cmd.history{...
+                        ad.control.cmd.historypos});
+                    ad.control.cmd.historypos = ad.control.cmd.historypos-1;
+                end
+            case 'downarrow'
+                if ad.control.cmd.historypos < length(ad.control.cmd.history)
+                    set(source,'String',ad.control.cmd.history{...
+                        ad.control.cmd.historypos+1});
+                    ad.control.cmd.historypos = ad.control.cmd.historypos+1;
+                else
+                    set(source,'String','');
+                end
+        end
+        setappdata(mainWindow,'control',ad.control);
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
