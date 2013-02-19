@@ -1470,10 +1470,6 @@ end
 
 function command_keypress_Callback(source,evt)
     try
-        if ~strcmpi(evt.Key,{'uparrow','downarrow'})
-            return;
-        end
-
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
@@ -1493,6 +1489,8 @@ function command_keypress_Callback(source,evt)
                 else
                     set(source,'String','');
                 end
+            otherwise
+                guiKeyBindings(source,evt);
         end
         setappdata(mainWindow,'control',ad.control);
     catch exception
