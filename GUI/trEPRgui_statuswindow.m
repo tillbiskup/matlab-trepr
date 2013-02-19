@@ -13,10 +13,19 @@ function varargout = trEPRgui_statuswindow(varargin)
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+% Reset colour of main GUI window status display
+mainGuiWindow = trEPRguiGetWindowHandle();
+if (mainGuiWindow)
+    gh = guidata(mainGuiWindow);
+    set(gh.status_panel_status_text,'String','OK');
+    set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
+end
+
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle(mfilename);
 if (singleton)
     figure(singleton);
+    varargout{1} = singleton;
     return;
 end
 
@@ -66,12 +75,41 @@ textdisplay = uicontrol('Tag','status_text',...
 % Store handles in guidata
 guidata(hMainFigure,guihandles);
 
+% Apply configuration
+guiConfigApply(mfilename);
+
+% Apply configuration settings
+ad = getappdata(hMainFigure);
+if isfield(ad,'configuration') && isfield(ad.configuration,'general')
+    switch lower(ad.configuration.general.positioning)
+        case 'relative'
+            % Try to get main GUI position
+            mainGUIHandle = trEPRguiGetWindowHandle();
+            if ishandle(mainGUIHandle)
+                mainGUIPosition = get(mainGUIHandle,'Position');
+                statusWindowPosition = get(hMainFigure,'Position');
+                statusWindowPosition(1) = ...
+                    mainGUIPosition(1)+ad.configuration.general.dx;
+                statusWindowPosition(2) = ...
+                    mainGUIPosition(2)+ad.configuration.general.dy;
+            end
+        case 'absolute'
+            statusWindowPosition = get(hMainFigure,'Position');
+            statusWindowPosition(1) = ad.configuration.general.dx;
+            statusWindowPosition(2) = ad.configuration.general.dy;
+    end
+    set(hMainFigure,'Position',statusWindowPosition);
+end
+
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
 trEPRmsg('Status window opened.','info');
 
+if (nargout == 1)
+    varargout{1} = hMainFigure;
+end
+
 % Set string
-mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
@@ -91,11 +129,6 @@ trEPRguiUpdateStatusWindow(statusstring);
 
 function closeGUI(~,~)
     try
-        if ishandle(mainGUIHandle)
-            gh = guidata(mainGUIHandle);
-            set(gh.status_panel_status_text,'String','OK');
-            set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
-        end
         delete(hMainFigure);
         trEPRmsg('Status window closed.','info');
     catch exception

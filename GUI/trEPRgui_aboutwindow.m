@@ -2,8 +2,8 @@ function varargout = trEPRgui_aboutwindow()
 % TREPRGUI_ABOUTWINDOW Display basic information about the trEPR toolbox,
 % including links to the toolbox homepage and a list of contributors.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-02-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -194,7 +194,7 @@ handles = findall(...
     '-or','style','slider',...
     '-or','style','popupmenu');
 for k=1:length(handles)
-    set(handles(k),'KeyPressFcn',@guiKeyBindings);
+    set(handles(k),'KeyPressFcn',@keypress_Callback);
 end
 
 % Define timer for all the fun stuff

@@ -1,0 +1,23 @@
+% Sample configuration file for the trEPRgui_statuswindow function of the 
+% trEPR toolbox
+%
+% (c) 2013, Till Biskup <till@till-biskup.de>
+%
+% This file serves as an example and documentation for the real
+% configuration in the file "trEPRgui_statuswindow.ini" in the same directory.
+%
+% To automatically generate a valid config file from this file, 
+% use trEPRconf('create') at the MATLAB(r) command line.
+% Alternatively, you may use the functions provided by the "Configuration" 
+% panel of the trEPR toolbox main GUI.
+
+% General configuration settings
+%
+% dx, dy - Position of the status window
+% positioning - relative|absolute
+%               relative - relative to the main GUI
+%               absolute - absolute on the screen
+[general]
+dx = 20
+dy = 40
+positioning = relative
