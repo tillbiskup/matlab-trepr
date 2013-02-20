@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-18
+% 2013-02-19
 
 status = 0;
 warnings = cell(0);
@@ -77,27 +77,27 @@ else
     opt = cell(0);
 end
 
+% Assign some important variables for potential use in command assignment
+active = ad.control.spectra.active; %#ok<NASGU>
+
 % For now, just a list of internal commands and their translation into
 % existing commands.
-% Currently, just a struct with field names equivalent to the commands
-% Field name  = command as entered on the command line
-% Field value = actual Matlab command issued
-cmdMatch = struct(...
-    'info',   'trEPRgui_infowindow',...
-    'acc',    'trEPRgui_ACCwindow',...
-    'avg',    'trEPRgui_AVGwindow',...
-    'blc',    'trEPRgui_BLCwindow',...
-    'sim',    'trEPRgui_SIMwindow',...
-    'status', 'trEPRgui_statuswindow',...
-    'combine','trEPRgui_combinewindow',...
-    'netpol', 'trEPRgui_NetPolarisationwindow',...
-    'mwfreq', 'trEPRgui_MWfrequencyDriftwindow', ...
-    'label',  'trEPRgui_setLabelWindow' ...
-    );
+guiCommands;
 
-if isfield(cmdMatch,lower(cmd))
-    fun = str2func(cmdMatch.(lower(cmd)));
-    fun();
+if find(strcmpi(cmdMatch(:,1),cmd)) %#ok<NODEF>
+    fun = str2func(cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),2});
+    if cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),4}
+        arguments = cmdMatch((strcmpi(cmdMatch(:,1),cmd)),3);
+        if ~isempty(arguments)
+            if iscell(arguments)
+                fun(arguments{:});
+            else
+                fun(arguments);
+            end
+        else
+            fun();
+        end
+    end
 elseif strcmpi(cmd,'help')
     if ~isempty(opt)
         switch lower(opt{1})
@@ -112,7 +112,7 @@ elseif strcmpi(cmd,'help')
                     '" not known for command help.'],'warning');
         end
     else
-        trEPRgui_helpwindow();
+        trEPRgui_cmd_helpwindow('introduction');
     end
 elseif exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
     fun = str2func(['cmd' upper(cmd(1)) lower(cmd(2:end))]);
