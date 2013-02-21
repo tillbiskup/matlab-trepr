@@ -84,6 +84,12 @@ active = ad.control.spectra.active; %#ok<NASGU>
 % existing commands.
 guiCommands;
 
+% Handle special situations, such as "?"
+switch lower(cmd)
+    case '?'
+        cmd = 'help';
+end
+
 if find(strcmpi(cmdMatch(:,1),cmd)) %#ok<NODEF>
     fun = str2func(cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),2});
     if cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),4}
@@ -97,22 +103,6 @@ if find(strcmpi(cmdMatch(:,1),cmd)) %#ok<NODEF>
         else
             fun();
         end
-    end
-elseif strcmpi(cmd,'help')
-    if ~isempty(opt)
-        switch lower(opt{1})
-            case 'help'
-                trEPRgui_helpwindow();
-            case 'about'
-                trEPRgui_aboutwindow();
-            case 'modules'
-                trEPRgui_moduleswindow();
-            otherwise
-                trEPRmsg(['Option "' opt{1} ...
-                    '" not known for command help.'],'warning');
-        end
-    else
-        trEPRgui_cmd_helpwindow('introduction');
     end
 elseif exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
     fun = str2func(['cmd' upper(cmd(1)) lower(cmd(2:end))]);

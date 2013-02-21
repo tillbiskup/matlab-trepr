@@ -2,7 +2,7 @@
 % commands to Matlab(tm) functions
 
 % (c) 2013, Till Biskup
-% 2013-02-19
+% 2013-02-21
 
 % PLEASE NOTE: All variables from within the context of the calling
 % function (normally, this should be "trEPRguiCommand") are accessible
@@ -34,7 +34,6 @@ cmdMatch = {...
     'netpol', 'trEPRgui_NetPolarisationwindow',  '', true; ...
     'mwfreq', 'trEPRgui_MWfrequencyDriftwindow', '', true; ...
     'label',  'trEPRgui_setLabelWindow',         label, active; ...
-    '?',      'trEPRgui_cmd_helpwindow',         '' true; ...
     };
 
 % Tidy up

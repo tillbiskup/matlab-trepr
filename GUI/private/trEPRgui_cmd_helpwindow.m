@@ -7,7 +7,7 @@ function varargout = trEPRgui_cmd_helpwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-02-20
+% 2013-02-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -205,7 +205,7 @@ try
     cmds2 = dir(fullfile(trEPRinfo('dir'),'GUI','private','cmd*'));
     cmds2 = cellfun(@(x)lower(x(4:strfind(x,'.')-1)),{cmds2.name},...
         'UniformOutput',false);
-    cmds = sort([ cmds' cmds2 ]);
+    cmds = sort([ '?' cmds' cmds2 ]);
     set(hCommandListListbox,'String',cmds);
     % Tidy up
     clear active label;
@@ -229,6 +229,10 @@ try
             set(hCommandButton,'Value',1);
             set(p2,'Visible','on');
             set(hCommandListListbox,'Value',find(strcmpi(varargin{1},cmds)))
+            % Handle special characters, such as "?" command
+            if strcmpi(varargin{1},'?')
+                varargin{1} = 'questionmark';
+            end
             helpTextFile = fullfile(trEPRinfo('dir'),...
                 'GUI','private','helptexts','cmd','cmd',...
                 [varargin{1} '.html']);
@@ -438,6 +442,16 @@ function keypress_Callback(~,evt)
             if (strcmpi(evt.Modifier{1},'command')) || ...
                     (strcmpi(evt.Modifier{1},'control'))
                 switch evt.Key
+                    case '1'
+                        set(hGeneralButton,'Value',1);
+                        set(hCommandButton,'Value',0);
+                        buttongroup_Callback(hButtonGroup,'','topics');
+                        return;
+                    case '2'
+                        set(hGeneralButton,'Value',0);
+                        set(hCommandButton,'Value',1);
+                        buttongroup_Callback(hButtonGroup,'','topics');
+                        return;
                     case 'w'
                         closeGUI();
                         return;

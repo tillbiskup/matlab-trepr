@@ -692,7 +692,7 @@ set(hbg_fb,'Visible','on');
     
 % Be very careful, such as not to break old installations without updated
 % config files
-if isfield(ad.configuration,'start')
+if isfield(ad.configuration,'start') && ...
         isfield(ad.configuration.start,'welcome')
     if ad.configuration.start.welcome
         set(hp0,'Visible','on');
@@ -710,7 +710,7 @@ ylabel(hPlotAxes,'intensity / a.u.');
 set(hPlotAxes,'YLim',[-.01,0.02]);
 set(hPlotAxes,'XLim',[-.0001,0.0002]);
 % set(hPlotAxes,'XLim',[-10 20000]);
-    
+
 % Display splash
 try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
