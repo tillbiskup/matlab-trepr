@@ -1455,7 +1455,7 @@ function command_Callback(source,~)
     try
         [status,warning] = trEPRguiCommand(get(source,'String'));
         if status
-            trEPRmsg(warning,'warning')
+            trEPRmsg(warning,'warning');
         end
         set(source,'String','');
     catch exception
@@ -1500,6 +1500,7 @@ function command_keypress_Callback(source,evt)
                 end
             otherwise
                 guiKeyBindings(source,evt);
+                return;
         end
         setappdata(mainWindow,'control',ad.control);
     catch exception

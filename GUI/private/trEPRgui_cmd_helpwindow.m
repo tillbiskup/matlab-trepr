@@ -202,7 +202,7 @@ try
     % FIX for the time being - should be done properly later, with one file
     % containing all available commands
     % Get commands with regular file name
-    cmds2 = dir(fullfile(trEPRinfo('dir'),'GUI','private','cmd*'));
+    cmds2 = dir(fullfile(trEPRinfo('dir'),'GUI','private','cmd*.m'));
     cmds2 = cellfun(@(x)lower(x(4:strfind(x,'.')-1)),{cmds2.name},...
         'UniformOutput',false);
     cmds = sort([ '?' cmds' cmds2 ]);

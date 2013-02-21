@@ -10,13 +10,6 @@
 % script will be accessible within the scope of the calling function.
 % Therefore, the last task of this script is to tidy up a bit, such as not
 % to leave any additional variables that might lead to confusion later on.
-    
-% Some additional stuff
-if ~active
-    label = '';
-else
-    label = ad.data{active}.label;
-end
 
 % Extended version: cell array allowing for optional arguments
 % column 1: string; command as entered on the command line
@@ -33,7 +26,6 @@ cmdMatch = {...
     'combine','trEPRgui_combinewindow',          '', true; ...
     'netpol', 'trEPRgui_NetPolarisationwindow',  '', true; ...
     'mwfreq', 'trEPRgui_MWfrequencyDriftwindow', '', true; ...
-    'label',  'trEPRgui_setLabelWindow',         label, active; ...
     };
 
 % Tidy up
