@@ -2,16 +2,23 @@ function status = fig2file(figHandle,fileName,varargin)
 % FIG2FILE Save Matlab figure window to file
 %
 % Usage
-%   fig2file(figHandle,fileName,fileType);
-%   status = fig2file(figHandle,fileName,fileType);
-%   status = fig2file(figHandle,fileName,'fileType','<fileType>');
-%   status = fig2file(figHandle,fileName,'exportFormat','<exportFormat>');
+%   fig2file(figHandle,fileName);
+%   status = fig2file(figHandle,fileName);
+%   status = fig2file(figHandle,fileName,...);
 %
 % figHandle    - handle
 %                Handle of the Matlab figure to be saved
 % fileName     - string
 %                Name of the file the figure should be saved to
 %                Should at least be a filename with extension
+%
+% status       - string
+%                Empty string if everything is fine
+%                Otherwise it contains an error description
+%
+% You can pass optional parameters. For details see below.
+%
+% Parameters
 %
 % fileType     - string
 %                Setting the file type used to save the figure to
@@ -26,13 +33,9 @@ function status = fig2file(figHandle,fileName,varargin)
 %                You can set all details and additional formats in the file
 %                'fig2file.ini' that is in the same directory as fig2file.m
 %
-% status       - string
-%                Empty string if everything is fine
-%                Otherwise it contains an error description
-%
 
-% (c) 2011, Till Biskup
-% 2011-12-07
+% (c) 2011-12, Till Biskup
+% 2012-11-12
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -55,8 +58,8 @@ exportFormat = p.Results.exportFormat;
 try
     % Read configuration for export formats (geometries) from ini file
     exportFormatsConfigFile = [mfilename('full') '.ini'];
-    exportFormats = trEPRiniFileRead(exportFormatsConfigFile,...
-        'typeConversion',false);
+    exportFormats = ...
+        TAiniFileRead(exportFormatsConfigFile,'typeConversion',false);
 
     % Set export format only in case of not having "fig" as fileType
     if ~strcmpi(fileType,'fig')
@@ -105,27 +108,32 @@ try
                 % afterwards, all the font settings are those from the axis
                 % handle, even if there were different settings for the
                 % labels.
-                axisHandle = findobj(allchild(figHandle),'type','axes');
+                axisHandle = findobj(allchild(figHandle),'type','axes',...
+                    '-not','tag','legend');
                 if ~isempty(axisHandle)
                     oldParams.(fieldNames{k}) = get(axisHandle,fieldNames{k});
                     set(axisHandle,fieldNames{k},...
                         exportFormats.(exportFormat).(fieldNames{k}));
-                end                    
+                end
                 % Try to get text handles that are child of axes
-                textHandles = findobj(allchild(...
-                    findobj(allchild(figHandle),'type','axes')),'type','text');
-                % If there are any, set their text properties
-                if ~isempty(textHandles)
-                    set(textHandles,fieldNames{k},...
-                        exportFormats.(exportFormat).(fieldNames{k}));
+                for hidx=1:length(axisHandle)
+                    textHandles = findobj(allchild(axisHandle(hidx)),...
+                        'type','text');
+                    % If there are any, set their text properties
+                    if ~isempty(textHandles)
+                        set(textHandles,fieldNames{k},...
+                            exportFormats.(exportFormat).(fieldNames{k}));
+                    end
                 end
             end
         end
+        
         % Try to set axis such that it fills the paper position
         % rectangle, but taking care of tick marks, labels, and title
         % Therefore, try to get axis handle, and if there is one, set
         % properties.
-        axisHandle = findobj(allchild(figHandle),'type','axes');
+        axisHandle = findobj(allchild(figHandle),'type','axes',...
+            '-not','tag','legend');
         if ~isempty(axisHandle)
             oldAxisUnits = get(axisHandle,'Unit');
             oldAxisPosition = get(axisHandle,'Position');
@@ -174,23 +182,27 @@ try
                 % handle, even if there were different settings for the
                 % labels.
                 % Try to get axis handle
-                axisHandle = findobj(allchild(figHandle),'type','axes');
+                axisHandle = findobj(allchild(figHandle),'type','axes',...
+                    '-not','tag','legend');
                 if ~isempty(axisHandle)
                     set(axisHandle,fieldNames{k},...
                         oldParams.(fieldNames{k}));
                 end                    
                 % Try to get text handles that are child of axes
-                textHandles = findobj(allchild(...
-                    findobj(allchild(figHandle),'type','axes')),'type','text');
-                % If there are any, set their text properties
-                if ~isempty(textHandles)
-                    set(textHandles,fieldNames{k},...
-                        oldParams.(fieldNames{k}));
+                for hidx=1:length(axisHandle)
+                    textHandles = findobj(allchild(axisHandle(hidx)),...
+                        'type','text');
+                    % If there are any, set their text properties
+                    if ~isempty(textHandles)
+                        set(textHandles,fieldNames{k},...
+                            oldParams.(fieldNames{k}));
+                    end
                 end
             end    
         end
         % Reset axis units
-        axisHandle = findobj(allchild(figHandle),'type','axes');
+        axisHandle = findobj(allchild(figHandle),'type','axes',...
+            '-not','tag','legend');
         if ~isempty(axisHandle)
             set(axisHandle,'Unit',oldAxisUnits);
             set(axisHandle,'Position',oldAxisPosition);

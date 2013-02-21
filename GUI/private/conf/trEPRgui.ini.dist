@@ -19,12 +19,14 @@ dy = 40
 
 % Configuration of the behaviour of the toolbox when started
 %
-% welcome - Whether to show the "Welcome panel" at start.
-%           Alternatively, directly the "Load panel" is displayed.
-% tip     - Whether to show a "Did you know...?" message at start.
+% welcome      - Whether to show the "Welcome panel" at start.
+%                Alternatively, directly the "Load panel" is displayed.
+% tip          - Whether to show a "Did you know...?" message at start.
+% statuswindow - Toggle between displaying the status window on startup 
 [start]
 welcome = 1
 tip = 1
+statuswindow = 0
 
 % Configuration for the load panel
 %

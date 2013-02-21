@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-19
+% 2013-02-21
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -692,7 +692,7 @@ set(hbg_fb,'Visible','on');
     
 % Be very careful, such as not to break old installations without updated
 % config files
-if isfield(ad.configuration,'start') && ...
+if isfield(ad.configuration,'start')
         isfield(ad.configuration.start,'welcome')
     if ad.configuration.start.welcome
         set(hp0,'Visible','on');
@@ -765,9 +765,9 @@ end
 
 % Be very careful, such as not to break old installations without updated
 % config files
-if isfield(ad.configuration,'start') && ...
-        isfield(ad.configuration.start,'tip')
-    if ad.configuration.start.tip
+if isfield(ad.configuration,'start')
+    if isfield(ad.configuration.start,'tip') && ...
+            ad.configuration.start.tip
         showTips = showTip('File',fullfile(...
             trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'));
         if ~showTips
@@ -779,7 +779,12 @@ if isfield(ad.configuration,'start') && ...
             end
         end
     end
+    if isfield(ad.configuration.start,'statuswindow') && ...
+            ad.configuration.start.statuswindow
+        trEPRgui_statuswindow();
+    end
 end
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
