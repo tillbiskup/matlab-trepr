@@ -199,6 +199,13 @@ try
     label = ''; %#ok<NASGU>
     guiCommands;
     cmds = sort(cmdMatch(:,1)); %#ok<NODEF>
+    % FIX for the time being - should be done properly later, with one file
+    % containing all available commands
+    % Get commands with regular file name
+    cmds2 = dir(fullfile(trEPRinfo('dir'),'GUI','private','cmd*'));
+    cmds2 = cellfun(@(x)lower(x(4:strfind(x,'.')-1)),{cmds2.name},...
+        'UniformOutput',false);
+    cmds = sort([ cmds' cmds2 ]);
     set(hCommandListListbox,'String',cmds);
     % Tidy up
     clear active label;
