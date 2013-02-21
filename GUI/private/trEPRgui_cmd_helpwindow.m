@@ -316,6 +316,12 @@ function listbox_Callback(source,~,action)
                     browser.setHtmlText(htmlText);
                 end
             case 'commands'
+                % Handle special case of special characters used as
+                % command, such as the "?" command, that would lead to
+                % rather problematic file names.
+                if strcmpi(value,'?')
+                    value = 'questionmark';
+                end
                 helpTextFile = fullfile(trEPRinfo('dir'),...
                     'GUI','private','helptexts','cmd','cmd',[value '.html']);
                 if exist(helpTextFile,'file')
