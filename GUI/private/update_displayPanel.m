@@ -6,8 +6,8 @@ function status = update_displayPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-12, Till Biskup
-% 2012-05-31
+% (c) 2011-13, Till Biskup
+% 2013-02-22
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -89,6 +89,8 @@ end
 % Set colour sample
 set(gh.display_panel_zerolinecoloursample_text,'BackgroundColor',...
     ad.control.axis.grid.zero.color);
+set(gh.display_panel_zerolinecoloursample_text,'TooltipString',...
+    num2str(ad.control.axis.grid.zero.color));
 
 % Set line width
 set(gh.display_panel_zerolinewidth_edit,'String',...
@@ -111,6 +113,8 @@ if ad.control.spectra.active
     % Set colour sample
     set(gh.display_panel_linecoloursample_text,'BackgroundColor',...
         ad.data{active}.line.color);
+    set(gh.display_panel_linecoloursample_text,'TooltipString',...
+        num2str(ad.data{active}.line.color));
     
     % Set line width
     set(gh.display_panel_linewidth_popupmenu,'Value',...
@@ -146,16 +150,22 @@ if ad.control.spectra.active
         switch lineMarkerEdgeColor
             case 'none'
                 set(gh.display_panel_markeredgecoloursample_text,...
-                    'BackgroundColor',get(mainWindow,'Color'))
+                    'BackgroundColor',get(mainWindow,'Color'));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'TootipString','none');
             case 'auto'
                 set(gh.display_panel_markeredgecoloursample_text,...
                     'BackgroundColor',ad.data{active}.line.color);
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'TooltipString',num2str(ad.data{active}.line.color));
         end
     else
         set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
             find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
         set(gh.display_panel_markeredgecoloursample_text,...
             'BackgroundColor',ad.data{active}.line.marker.edgeColor);
+        set(gh.display_panel_markeredgecoloursample_text,...
+            'TooltipString',num2str(ad.data{active}.line.marker.edgeColor));
     end
     % Set line marker face colour
     lineMarkerFaceColor = ad.data{active}.line.marker.faceColor;
@@ -168,16 +178,22 @@ if ad.control.spectra.active
         switch lineMarkerFaceColor
             case 'none'
                 set(gh.display_panel_markerfacecoloursample_text,...
-                    'BackgroundColor',get(mainWindow,'Color'))
+                    'BackgroundColor',get(mainWindow,'Color'));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'TooltipString','none');
             case 'auto'
                 set(gh.display_panel_markerfacecoloursample_text,...
                     'BackgroundColor',get(gca,'Color'));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'TooltipString',num2str(get(gca,'Color')));
         end
     else
         set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
             find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
         set(gh.display_panel_markerfacecoloursample_text,...
             'BackgroundColor',ad.data{active}.line.marker.faceColor);
+        set(gh.display_panel_markerfacecoloursample_text,...
+            'TooltipString',num2str(ad.data{active}.line.marker.faceColor));
     end
     % Set line marker size
     set(gh.display_panel_markersize_edit,'String',...

@@ -49,3 +49,5 @@ The "Net Polarisation Analysis Window" lets you analyse the time development of 
 You can switch between the different modes with keyboard shortcuts: "s" for scroll, "c" for scale, "d" for displace, "z" for zoom, "Esc" to leave the mode(s).
 
 The status display on the bottom right of the main GUI allows you to have the current toolbox status always under control. It is reset by opening the status window.
+
+You can get help for any command in the command line using the command <tt>?</tt> followed by the command you would get help displayed for.
