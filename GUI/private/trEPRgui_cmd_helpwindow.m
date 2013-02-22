@@ -7,7 +7,7 @@ function varargout = trEPRgui_cmd_helpwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-02-21
+% 2013-02-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -247,6 +247,19 @@ try
                 'GUI','private','helptexts','cmd','general',...
                 [varargin{1} '.html']);
             browser.setCurrentLocation(helpTextFile);
+        else
+            switch lower(varargin{1})
+                case 'general'
+                    set([p1 p2],'Visible','off');
+                    set(hGeneralButton,'Value',1);
+                    set(hCommandButton,'Value',0);
+                    set(p1,'Visible','on');
+                case 'commands'
+                    set([p1 p2],'Visible','off');
+                    set(hGeneralButton,'Value',0);
+                    set(hCommandButton,'Value',1);
+                    set(p2,'Visible','on');
+            end
         end
     end
     
@@ -401,35 +414,35 @@ function buttongroup_Callback(source,~,action)
     end
 end
 
-function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        switch action
-            case 'browserback'
-                browser.executeScript('javascript:history.back()');
-            case 'browserforward'
-                browser.executeScript('javascript:history.forward()');
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
+% function pushbutton_Callback(~,~,action)
+%     try
+%         if isempty(action)
+%             return;
+%         end
+%         switch action
+%             case 'browserback'
+%                 browser.executeScript('javascript:history.back()');
+%             case 'browserforward'
+%                 browser.executeScript('javascript:history.forward()');
+%         end
+%     catch exception
+%         try
+%             msgStr = ['An exception occurred in ' ...
+%                 exception.stack(1).name  '.'];
+%             trEPRmsg(msgStr,'error');
+%         catch exception2
+%             exception = addCause(exception2, exception);
+%             disp(msgStr);
+%         end
+%         try
+%             trEPRgui_bugreportwindow(exception);
+%         catch exception3
+%             % If even displaying the bug report window fails...
+%             exception = addCause(exception3, exception);
+%             throw(exception);
+%         end
+%     end
+% end
 
 function keypress_Callback(~,evt)
     try
