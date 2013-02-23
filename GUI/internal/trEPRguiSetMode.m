@@ -69,6 +69,9 @@ end
 
 % Check whether mode has changed, and if not, return
 if strcmpi(ad.control.mode,mode)
+    if strcmpi(mode,'command')
+        uicontrol(gh.command_panel_edit);
+    end
     return;
 end
 

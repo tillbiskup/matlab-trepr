@@ -3700,24 +3700,25 @@ function pushbutton_Callback(~,~,action)
                 if isempty(ad.data)
                     return;
                 end
-                if isempty(ad.control.spectra.infoFile{...
-                        ad.control.spectra.active}.input.name)
+                active = ad.control.spectra.active;
+                if isempty(ad.control.spectra.infoFile{active}.input.name)
                     return;
                 end
                 [parameters,warnings] = trEPRinfoFileParse(...
-                    ad.control.spectra.infoFile{...
-                    ad.control.spectra.active}.input.name,'map');
+                    ad.control.spectra.infoFile{active}.input.name,'map');
                 if isempty(warnings)
-                    ad.data{ad.control.spectra.active} = structcopy(...
-                        ad.data{ad.control.spectra.active},parameters);
-                    setappdata(mainWindow,'data',ad.data);
-                    if ~any(ad.control.spectra.unsaved==ad.control.spectra.active)
-                        ad.control.spectra.unsaved(end+1) = ...
-                            ad.control.spectra.active;
+                    % Handle situation with MWfrequency parameters
+                    if length(ad.data{active}.parameters.bridge.MWfrequency.value) > 1
+                        ad.data{active}.parameters.bridge.MWfrequency.values = ...
+                            ad.data{active}.parameters.bridge.MWfrequency.value;
                     end
-                    if ~any(ad.control.spectra.modified==ad.control.spectra.active)
-                        ad.control.spectra.modified(end+1) = ...
-                            ad.control.spectra.active;
+                    ad.data{active} = structcopy(ad.data{active},parameters);
+                    setappdata(mainWindow,'data',ad.data);
+                    if ~any(ad.control.spectra.unsaved==active)
+                        ad.control.spectra.unsaved(end+1) = active;
+                    end
+                    if ~any(ad.control.spectra.modified==active)
+                        ad.control.spectra.modified(end+1) = active;
                     end
                     setappdata(mainWindow,'control',ad.control);
                     updateParameterPanel();

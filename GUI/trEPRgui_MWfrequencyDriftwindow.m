@@ -7,8 +7,8 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2012, Till Biskup
-% 2012-09-25
+% (c) 2012-13, Till Biskup
+% 2013-02-23
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1889,7 +1889,11 @@ function updateAnalysisPanel()
         end
         
         % Set Frequency subpanel fields
-        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+        if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
+            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
+        else
+            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+        end
         if isscalar(MWfreq) && length(ad.data{active}.parameters.bridge.calibration.values) > 1
             MWfreq = ad.data{active}.parameters.bridge.calibration.values;
         end
@@ -2216,7 +2220,11 @@ function updateAxes(varargin)
             B0 = ad.data{active}.axes.y.values;
         end
         % Get MW frequency
-        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+        if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
+            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
+        else
+            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+        end
         if isscalar(MWfreq)
             if length(ad.data{active}.parameters.bridge.calibration.values) == 2
                 MWfreq = ad.data{active}.parameters.bridge.calibration.values;

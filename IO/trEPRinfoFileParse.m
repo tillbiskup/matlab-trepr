@@ -29,8 +29,8 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 %
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
-% (c) 2012, Till Biskup
-% 2012-10-22
+% (c) 2012-13, Till Biskup
+% 2013-02-23
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -52,6 +52,9 @@ warnings = cell(0);
 
 % Define identifierString for Info File format
 identifierString = 'trEPR Info file - ';
+
+% Define comment character
+commentChar = '%';
 
 try
     parameters = struct();
@@ -161,7 +164,7 @@ try
                 blocks.(blocknames{k})+1 : ...
                 lineNumbers(find(...
                 lineNumbers > blocks.(blocknames{k}), 1 ))-2 ...
-                ));
+                ),commentChar);
         end
     end
     
@@ -209,8 +212,6 @@ try
     matching = {...
         % GENERAL
         'general.filename','file.name','copy';...
-        'general.start','parameters.date.start','copy';...
-        'general.end','parameters.date.end','copy';...
         'general.operator','parameters.operator','copy';...
         'general.label','label','copy';...
         'general.purpose','parameters.purpose','copy';
@@ -358,6 +359,14 @@ try
                     getCascadedField(parameters,matching{k,1}));
         end
     end
+    
+    % Handle the special case of date and time that get combined in one
+    % field
+    dataStructure.parameters.date.start = [...
+        parameters.general.date ' ' parameters.general.timeStart];
+    dataStructure.parameters.date.end = [...
+        parameters.general.date ' ' parameters.general.timeEnd];
+    
 catch exception
     throw(exception);
 end
@@ -401,7 +410,7 @@ end
 %              block data to be parsed
 % parameters - struct
 %              structure containing key-value pairs
-function parameters = parseBlocks(blockData)
+function parameters = parseBlocks(blockData,commentChar)
 
 % Assign output parameter
 parameters = struct();
@@ -427,6 +436,11 @@ blockLines = cellfun(...
 for k=1:length(blockLines)
     % Fill parameters structure
     if ~isempty(blockLines{k}{1}) % Prevent empty lines being parsed
+        % Remove comments
+        commentCharPos = regexp(blockLines{k}{2},['\s' commentChar],'start');
+        if ~isempty(commentCharPos)
+            blockLines{k}{2} = blockLines{k}{2}(1:commentCharPos);
+        end
         % If not convertible into number - or containing commas
         if isnan(str2double(blockLines{k}{2})) || ...
                 any(strfind(blockLines{k}{2},','))
