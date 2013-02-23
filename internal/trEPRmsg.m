@@ -24,7 +24,7 @@ function status = trEPRmsg(message,varargin)
 % get displayed on the Matlab(tm) command line.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-05
+% 2013-02-23
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their
@@ -71,7 +71,7 @@ ad = getappdata(mainWindow);
 gh = guidata(mainWindow);
 
 % Check for availability of necessary fields in appdata
-if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
+if ~isfield(ad,'control') || ~isfield(ad.control,'status')
     if iscell(message)
         for k=1:length(message)
             disp(message(k));
@@ -133,13 +133,7 @@ end
 setappdata(mainWindow,'control',ad.control);
 
 % Update status window
-% As MATLAB(TM) had some problems with calling a private function in some
-% special context, change the directory to the "private" dir, call the
-% function that's located there, and afterwards return to original dir.
-PWD = pwd;
-cd(fileparts(mfilename('fullpath')));
 trEPRguiUpdateStatusWindow(ad.control.status);
-cd(PWD);
 
 status = 0;
 

@@ -25,7 +25,7 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-05
+% 2013-02-23
 
 status = 0;
 warnings = cell(0);
@@ -60,13 +60,17 @@ ad = getappdata(mainWindow);
 gh = guidata(mainWindow);
 
 % Check for availability of necessary fields in appdata
-if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
+if ~isfield(ad,'control') || ~isfield(ad.control,'status')
     warnings{end+1} = ['trEPRgui window appdata don''t contain '...
         'necessary fields'];
     status = -2;
     return;
 end
 
+% Check whether mode has changed, and if not, return
+if strcmpi(ad.control.mode,mode)
+    return;
+end
 
 % Handle modes
 % Current modes are: None, Scroll, sCale, Displace, Zoom, Measure, Pick

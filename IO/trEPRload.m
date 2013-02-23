@@ -32,8 +32,8 @@ function varargout = trEPRload(filename, varargin)
 %
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
-% (c) 2009-2012, Till Biskup
-% 2012-10-26
+% (c) 2009-2013, Till Biskup
+% 2013-02-23
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -246,8 +246,8 @@ else    % -> if iscell(filename)
     end
 end
 
-if isfield('content','file') && isstruct(content.file) && ...
-        isfield('content.file','format')
+if isfield(content,'file') && isstruct(content.file) && ...
+        isfield(content.file,'format')
     trEPRmsg(['File format: ' content.file.format],'debug');
 else
     warnStr = 'File format unknown/undetectable';

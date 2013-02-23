@@ -28,6 +28,20 @@ welcome = 1
 tip = 1
 statuswindow = 0
 
+% Configuration of the directories used internally
+%
+% You may use "pwd" here instead of a full directory
+[dirs]
+load = pwd
+save = pwd
+savefig = pwd
+export = pwd
+
+% Configuration of messaging
+[messages]
+display.level = all
+debug.level = all
+
 % Configuration for the load panel
 %
 % The first lines, "combine/loaddir/POC/BGC/labels", are switches settin

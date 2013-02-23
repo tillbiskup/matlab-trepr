@@ -757,6 +757,15 @@ if exist('trEPRgui_SIMwindow','file')
         'Callback','trEPRgui_SIMwindow');
 end
 
+% Set directories
+dirs = fieldnames(ad.control.dirs);
+for k=1:length(dirs)
+    if any(strcmpi(ad.control.dirs.(dirs{k}),{'pwd',''}))
+        ad.control.dirs.(dirs{k}) = pwd;
+    end
+end
+setappdata(hMainFigure,'control',ad.control);
+
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
 if ishandle(initDialogue)

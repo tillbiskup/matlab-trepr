@@ -14,8 +14,8 @@ function status = guiConfigApply(guiname)
 %
 % See also GUICONFIGLOAD, INIFILEREAD
 
-% (c) 2011-12, Till Biskup
-% 2012-06-19
+% (c) 2011-13, Till Biskup
+% 2013-02-23
 
 status = 0;
 
@@ -112,6 +112,18 @@ try
                     if strcmpi(fileTypes{k},ad.configuration.load.format)
                         set(gh.load_panel_filetype_popupmenu,'Value',k);
                     end
+                end
+            end
+            % Generically set a number of configuration settings where we
+            % have a direct match
+            matchConfig = {...
+                'dirs','dirs'; ...
+                'messages','messages'; ...
+                };
+            for k=1:length(matchConfig(:,1))
+                if isfield(ad.configuration,matchConfig{k,1})
+                    ad.control.(matchConfig{k,2}) = ...
+                        ad.configuration.(matchConfig{k,1});
                 end
             end
         otherwise
