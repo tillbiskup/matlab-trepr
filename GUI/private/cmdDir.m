@@ -22,7 +22,7 @@ function [status,warnings] = cmdDir(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-22
+% 2013-02-24
 
 status = 0;
 warnings = cell(0);
@@ -76,7 +76,7 @@ switch lower(opt{1})
         end
     case {'save','savedir'}
         if size(opt) < 2
-            trEPRmsg(['Load dir: ' ad.control.dirs.lastSave],'info');
+            trEPRmsg(['Save dir: ' ad.control.dirs.lastSave],'info');
             return;
         else
             if strcmpi(opt{2},'pwd')
@@ -88,7 +88,7 @@ switch lower(opt{1})
         end
     case {'savefig','savefigdir','figsave','figsavedir','fig','figdir'}
         if size(opt) < 2
-            trEPRmsg(['Load dir: ' ad.control.dirs.lastFigSave],'info');
+            trEPRmsg(['Save figure dir: ' ad.control.dirs.lastFigSave],'info');
             return;
         else
             if strcmpi(opt{2},'pwd')
@@ -100,7 +100,7 @@ switch lower(opt{1})
         end
     case {'export','exportdir'}
         if size(opt) < 2
-            trEPRmsg(['Load dir: ' ad.control.dirs.lastExport],'info');
+            trEPRmsg(['Export dir: ' ad.control.dirs.lastExport],'info');
             return;
         else
             if strcmpi(opt{2},'pwd')
@@ -108,6 +108,18 @@ switch lower(opt{1})
             end
             if exist(opt{2},'dir')
                 ad.control.dirs.lastExport = opt{2};
+            end
+        end
+    case {'snapshot','snapshotdir'}
+        if size(opt) < 2
+            trEPRmsg(['Snapshot dir: ' ad.control.dirs.lastSnapshot],'info');
+            return;
+        else
+            if strcmpi(opt{2},'pwd')
+                ad.control.dirs.lastSnapshot = pwd;
+            end
+            if exist(opt{2},'dir')
+                ad.control.dirs.lastSnapshot = opt{2};
             end
         end
     otherwise

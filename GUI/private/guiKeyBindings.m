@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % (c) 2011-13, Till Biskup
-% 2013-02-04
+% 2013-02-24
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -89,6 +89,12 @@ try
                     end
                     return;
                 case '8'
+                    status = switchMainPanel('Internal');
+                    if status
+                        % Something went wrong...
+                        trEPRmsg('Problems with switching panels.',...
+                            'error');
+                    end
                     return;
                 case '9'
                     status = switchMainPanel('Configure');

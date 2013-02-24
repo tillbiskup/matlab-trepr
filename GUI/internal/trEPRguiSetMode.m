@@ -81,6 +81,8 @@ switch lower(mode)
     case {'none','n'}
         GUImode = 'None';
         set(gh.command_panel_edit,'Enable','inactive');
+        set(gh.command_panel_edit,...
+            'String','Enter command - Ctrl-l / Cmd-l for access');
     case {'scroll','s'}
         GUImode = 'Scroll';
     case {'scale','c'}
@@ -96,6 +98,7 @@ switch lower(mode)
     case {'command','o'}
         GUImode = 'Command';
         set(gh.command_panel_edit,'Enable','on');
+        set(gh.command_panel_edit,'String','');
         uicontrol(gh.command_panel_edit);
     otherwise
         warnings{end+1} = sprintf('Unknown mode "%s"\n',mode);

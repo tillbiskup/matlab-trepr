@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-17
+% 2013-02-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -78,7 +78,7 @@ hpm = uicontrol('Tag','helptopic_popupmenu',...
     '--- Help for Panels ---|',...
     'Load panel|Datasets panel|Slider panel|',...
     'Measure panel|Display panel|Processing panel|',...
-    'Analysis panel|Configure panel'],...
+    'Analysis panel|Internal panel|Configure panel'],...
     'Value',2,...
     'KeyPressFcn',@keypress_Callback,...
     'Callback',@helptext_popupmenu_Callback...
@@ -210,9 +210,12 @@ try
             case 'tbAnalysis'
                 helpText = 'Analysis panel';
                 set(hpm,'Value',helpTopicOffset+7);
+            case 'tbInternal'
+                helpText = 'Internal panel';
+                set(hpm,'Value',helpTopicOffset+8);
             case 'tbConfigure'
                 helpText = 'Configure panel';
-                set(hpm,'Value',helpTopicOffset+8);
+                set(hpm,'Value',helpTopicOffset+9);
             otherwise
                 % That shall never happen
                 st = dbstack;
@@ -220,6 +223,7 @@ try
                     [st.name ' : Unknown panel "' ...
                     get(get(mgh.mainButtonGroup,'SelectedObject'),'Tag')...
                     '"'], 'warning');
+                helpText = 'Welcome';
         end
     else
         helpText = 'Welcome';
@@ -462,6 +466,11 @@ function helptext_selector(helpText)
                 % Read text from file and display it
                 helpTextFile = fullfile(trEPRinfo('dir'),'GUI',...
                     'private','helptexts','main','analysis_panel.html');
+                browser.setCurrentLocation(helpTextFile);
+            case 'Internal panel'
+                % Read text from file and display it
+                helpTextFile = fullfile(trEPRinfo('dir'),'GUI',...
+                    'private','helptexts','main','internal_panel.html');
                 browser.setCurrentLocation(helpTextFile);
             case 'Configure panel'
                 % Read text from file and display it

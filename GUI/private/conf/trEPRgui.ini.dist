@@ -36,11 +36,17 @@ load = pwd
 save = pwd
 savefig = pwd
 export = pwd
+snapshot = pwd
 
 % Configuration of messaging
 [messages]
 display.level = all
 debug.level = all
+
+% Configuration of command line feature (cmd)
+[cmd]
+historysave = false
+historyfile = 
 
 % Configuration for the load panel
 %

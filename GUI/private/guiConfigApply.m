@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % (c) 2011-13, Till Biskup
-% 2013-02-23
+% 2013-02-24
 
 status = 0;
 
@@ -119,6 +119,7 @@ try
             matchConfig = {...
                 'dirs','dirs'; ...
                 'messages','messages'; ...
+                'cmd','cmd'; ...
                 };
             for k=1:length(matchConfig(:,1))
                 if isfield(ad.configuration,matchConfig{k,1})
