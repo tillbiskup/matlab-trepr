@@ -292,11 +292,11 @@ function pushbutton_Callback(~,~,action)
         end
         
 %         % Get appdata of main window
-%         mainWindow = trEPRguiGetWindowHandle();
+        mainWindow = trEPRguiGetWindowHandle();
 %         ad = getappdata(mainWindow);
 %         
-%         % Get handles of main window
-%         gh = guihandles(mainWindow);
+        % Get handles of main window
+        gh = guihandles(mainWindow);
 
         switch lower(action)
             case 'directories'
@@ -305,6 +305,34 @@ function pushbutton_Callback(~,~,action)
                 trEPRgui_helpwindow();
             case 'cmdhelp'
                 trEPRgui_cmd_helpwindow();
+            case 'snapshotsave'
+                fileName = get(gh.internal_panel_snapshot_save_edit,'String');
+                % First try: Open file selection dialogue
+                if isempty(fileName)
+                    buttondown_Callback([],[],'snapshotsave')
+                end
+                % Second try: User cancelled file selection dialogue
+                if isempty(fileName)
+                    return;
+                end
+                [status,warnings] = cmdSnapshot(mainWindow,{'save',fileName});
+                if status
+                    trEPRmsg(warnings,'warning');
+                end
+            case 'snapshotload'
+                fileName = get(gh.internal_panel_snapshot_load_edit,'String');
+                % First try: Open file selection dialogue
+                if isempty(fileName)
+                    buttondown_Callback([],[],'snapshotload');
+                end
+                % Second try: User cancelled file selection dialogue
+                if isempty(fileName)
+                    return;
+                end
+                [status,warnings] = cmdSnapshot(mainWindow,{'load',fileName});
+                if status
+                    trEPRmsg(warnings,'warning');
+                end
             otherwise
                 st = dbstack;
                 trEPRmsg(...
