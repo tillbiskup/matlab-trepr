@@ -99,7 +99,8 @@ switch lower(opt{1})
             % IMPORTANT: The filename should be parsed for bad characters
             % before, especially minus signs and such things seem to be bad
             % with MATLAB.
-            save(fileName,'ad');
+            datetime = datestr(now,30); %#ok<NASGU>
+            save(fileName,'ad','datetime');
             trEPRmsg(['Saved GUI snapshot to file ' fileName],'info');
             return;
         end
