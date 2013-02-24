@@ -33,10 +33,6 @@ set(gh.internal_panel_messaging_display_popupmenu,'Value',...
 set(gh.internal_panel_messaging_debug_popupmenu,'Value',...
     find(strcmpi(debugValues,ad.control.messages.debug.level)));
 
-% Snapshots
-% Set filename in snapshots edit field
-set(gh.internal_panel_snapshot_save_edit,'String',[datestr(now,30) '.mat']);
-
 % Cmd
 % Set save history checkbox
 set(gh.internal_panel_cmd_savehistory_checkbox,...
