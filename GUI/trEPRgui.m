@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-24
+% 2013-02-28
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -1069,6 +1069,7 @@ function zoom_togglebutton_Callback(source,~)
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
         
         if (get(source,'Value'))
             zh = zoom(mainWindow);
@@ -1076,11 +1077,47 @@ function zoom_togglebutton_Callback(source,~)
             set(zh,'Enable','on');
             set(zh,'Motion','both');
             set(zh,'Direction','in');
+            ad.control.axis.zoom.enable = true;
         else
             zh = zoom(mainWindow);
             set(zh,'Enable','off');
             refresh;
+            % Get current x and y limits of main axis
+            currentXLim = get(hPlotAxes,'XLim');
+            currentYLim = get(hPlotAxes,'YLim');
+            switch lower(ad.control.axis.displayType)
+                case '2d plot'
+                    setXLim = [ ad.control.axis.limits.x.min ...
+                        ad.control.axis.limits.x.max];
+                    setYLim = [ ad.control.axis.limits.y.min ...
+                        ad.control.axis.limits.y.max];
+                    ad.control.axis.zoom.x = get(hPlotAxes,'XLim');
+                    ad.control.axis.zoom.y = get(hPlotAxes,'YLim');
+                case '1d along x'
+                    setXLim = [ ad.control.axis.limits.x.min ...
+                        ad.control.axis.limits.x.max];
+                    setYLim = [ ad.control.axis.limits.z.min ...
+                        ad.control.axis.limits.z.max];
+                    ad.control.axis.zoom.x = get(hPlotAxes,'XLim');
+                    ad.control.axis.zoom.z = get(hPlotAxes,'YLim');
+                case '1d along y'
+                    setXLim = [ ad.control.axis.limits.y.min ...
+                        ad.control.axis.limits.y.max];
+                    setYLim = [ ad.control.axis.limits.z.min ...
+                        ad.control.axis.limits.z.max];
+                    ad.control.axis.zoom.y = get(hPlotAxes,'XLim');
+                    ad.control.axis.zoom.z = get(hPlotAxes,'YLim');
+            end
+            if all(currentXLim == setXLim) && all(currentYLim == setYLim)
+                ad.control.axis.zoom.enable = false;
+                ad.control.axis.zoom.x = [0 0];
+                ad.control.axis.zoom.y = [0 0];
+                ad.control.axis.zoom.z = [0 0];
+            else
+                ad.control.axis.zoom.enable = true;
+            end
         end
+        setappdata(mainWindow,'control',ad.control);
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
@@ -1112,6 +1149,12 @@ function fullscale_pushbutton_Callback(~,~)
         set(gh.zoom_togglebutton,'Value',0);
         zh = zoom(mainWindow);
         set(zh,'Enable','off');
+        
+        ad.control.axis.zoom.enable = false;
+        ad.control.axis.zoom.x = [0 0];
+        ad.control.axis.zoom.y = [0 0];
+        ad.control.axis.zoom.z = [0 0];
+        setappdata(mainWindow,'control',ad.control);
         
         %Update main axis
         update_mainAxis();

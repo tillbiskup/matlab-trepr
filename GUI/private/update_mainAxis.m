@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-12, Till Biskup
-% 2012-06-26
+% 2012-06-28
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -113,16 +113,28 @@ switch ad.control.axis.displayType
             ad.control.axis.labels.y.unit));
         % Set limits of axis
         if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
-            xLimits = [ad.control.axis.limits.x.min-1 ad.control.axis.limits.x.max+1];
+            xLimits = [ad.control.axis.limits.x.min-1 ...
+                ad.control.axis.limits.x.max+1];
         else
-            xLimits = [ad.control.axis.limits.x.min ad.control.axis.limits.x.max];
+            xLimits = [ad.control.axis.limits.x.min ...
+                ad.control.axis.limits.x.max];
         end
         if (ad.control.axis.limits.y.min==ad.control.axis.limits.y.max)
-            yLimits = [ad.control.axis.limits.y.min-1 ad.control.axis.limits.y.max+1];
+            yLimits = [ad.control.axis.limits.y.min-1 ...
+                ad.control.axis.limits.y.max+1];
         else
-            yLimits = [ad.control.axis.limits.y.min ad.control.axis.limits.y.max];
+            yLimits = [ad.control.axis.limits.y.min ...
+                ad.control.axis.limits.y.max];
         end
-        set(gca,...
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.x)
+                xLimits = ad.control.axis.zoom.x;
+            end
+            if any(ad.control.axis.zoom.y)
+                yLimits = ad.control.axis.zoom.y;
+            end
+        end
+        set(mainAxes,...
             'XLim',xLimits,...
             'YLim',yLimits...
             );
@@ -348,14 +360,26 @@ switch ad.control.axis.displayType
         end
         % Set limits of axis
         if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
-            xLimits = [ad.control.axis.limits.x.min-1 ad.control.axis.limits.x.max+1];
+            xLimits = [ad.control.axis.limits.x.min-1 ...
+                ad.control.axis.limits.x.max+1];
         else
-            xLimits = [ad.control.axis.limits.x.min ad.control.axis.limits.x.max];
+            xLimits = [ad.control.axis.limits.x.min ...
+                ad.control.axis.limits.x.max];
         end
         if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
-            yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+            yLimits = [ad.control.axis.limits.z.min-1 ...
+                ad.control.axis.limits.z.max+1];
         else
-            yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+            yLimits = [ad.control.axis.limits.z.min ...
+                ad.control.axis.limits.z.max];
+        end
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.x)
+                xLimits = ad.control.axis.zoom.x;
+            end
+            if any(ad.control.axis.zoom.z)
+                yLimits = ad.control.axis.zoom.z;
+            end
         end
         set(mainAxes,...
             'XLim',xLimits,...
@@ -608,14 +632,26 @@ switch ad.control.axis.displayType
         hold(mainAxes,'off');
         % Set limits of axis
         if (ad.control.axis.limits.y.min==ad.control.axis.limits.y.max)
-            xLimits = [ad.control.axis.limits.y.min-1 ad.control.axis.limits.y.max+1];
+            xLimits = [ad.control.axis.limits.y.min-1 ...
+                ad.control.axis.limits.y.max+1];
         else
-            xLimits = [ad.control.axis.limits.y.min ad.control.axis.limits.y.max];
+            xLimits = [ad.control.axis.limits.y.min ...
+                ad.control.axis.limits.y.max];
         end
         if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
-            yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+            yLimits = [ad.control.axis.limits.z.min-1 ...
+                ad.control.axis.limits.z.max+1];
         else
-            yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+            yLimits = [ad.control.axis.limits.z.min ...
+                ad.control.axis.limits.z.max];
+        end
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.y)
+                xLimits = ad.control.axis.zoom.y;
+            end
+            if any(ad.control.axis.zoom.z)
+                yLimits = ad.control.axis.zoom.z;
+            end
         end
         set(mainAxes,...
             'XLim',xLimits,...
