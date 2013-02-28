@@ -15,8 +15,8 @@ function status = trackPointer(varargin)
 %           -4: no datasets displayed
 %            0: successful
 
-% (c) 2011-12, Till Biskup
-% 2012-05-31
+% (c) 2011-13, Till Biskup
+% 2013-02-28
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -286,8 +286,9 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 num2str(valy-...
                 str2double(get(gh.measure_panel_point1_y_unit_edit,'String'))));
         otherwise
+            ad.control.measure.point
             % That shall never happen!
-            disp('trackPointer(): Unrecognised point');
+            disp([mfilename ': Unrecognised point "' ad.control.measure.point '".']);
             return;
     end
 else
