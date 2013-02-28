@@ -428,6 +428,11 @@ function togglebutton_Callback(source,~,action)
                     trEPRguiSetMode('none');
                 end
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
     catch exception
         try
@@ -455,6 +460,11 @@ function pushbutton_Callback(~,~,action)
                 guiMeasure('clear',0);
                 trEPRguiSetMode('none');
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
     catch exception
         try

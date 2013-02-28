@@ -883,9 +883,9 @@ function slider_Callback(source,~,action)
             otherwise
                 st = dbstack;
                 trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
         
         % Update appdata of main window
@@ -932,6 +932,11 @@ function togglebutton_Callback(source,~,action)
                     trEPRguiSetMode('none');
                 end
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
     catch exception
         try
@@ -1090,6 +1095,11 @@ function pushbutton_Callback(source,~,action)
                 update_mainAxis();
                 return;
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
     catch exception
         try
@@ -1201,6 +1211,11 @@ function popupmenu_Callback(source,~,action)
                 
                 update_mainAxis();
             otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
     catch exception
         try

@@ -29,8 +29,8 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
-% (c) 2009-2012, Till Biskup
-% 2012-06-10
+% (c) 2009-2013, Till Biskup
+% 2013-02-28
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -143,9 +143,37 @@ function [content,warnings] = loadFile(filename,varargin)
                         content.data(end+1,:) = reshape(data.data',1,[]);
                         % Parsing the header for the magnetic field and
                         % microwave frequency values
-                        tokens = regexp(data.textdata{2},...
-                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-                            'tokens');
+                        if any(strfind(data.textdata{2},'Gaussmeter'))
+                            tokens = regexp(data.textdata{2},...
+                                'B0 = ([0-9.]*)\s*(\w*),\s* B0\(Gaussmeter\) = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                                'tokens');
+                            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                                str2double(tokens{1}{5});
+                            content.parameters.bridge.MWfrequency.unit = tokens{1}{6};
+                            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                                str2double(tokens{1}{5});
+                            content.parameters.field.calibration.gaussMeter.values(end+1) = str2double(tokens{1}{3});
+                            switch tokens{1}{4}
+                                case 'Gauss'
+                                    content.parameters.field.calibration.gaussMeter.unit = 'G';
+                                otherwise
+                                    warnings{end+1} = struct(...
+                                        'identifier','trEPRspeksimLoad:parseError',...
+                                        'message',sprintf(...
+                                        'Could not recognise unit for magnetic field: ''%s''',...
+                                        tokens{1}{2})...
+                                        ); %#ok<AGROW>
+                            end
+                        else
+                            tokens = regexp(data.textdata{2},...
+                                'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                                'tokens');
+                            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                                str2double(tokens{1}{3});
+                            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                                str2double(tokens{1}{3});
+                            content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+                        end
                         switch tokens{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
@@ -164,9 +192,6 @@ function [content,warnings] = loadFile(filename,varargin)
                                     ); %#ok<AGROW>
                         end
                         content.axes.y.values(end+1) = str2double(tokens{1}{1});
-                        content.parameters.bridge.MWfrequency.value(end+1) = ...
-                            str2double(tokens{1}{3});
-                        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
                     end
                 end
                 % In case we have not loaded anything
@@ -195,9 +220,37 @@ function [content,warnings] = loadFile(filename,varargin)
                         content.data(end+1,:) = reshape(data.data',1,[]);
                         % Parsing the header for the magnetic field and
                         % microwave frequency values
-                        tokens = regexp(data.textdata{2},...
-                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-                            'tokens');
+                        if any(strfind(data.textdata{2},'Gaussmeter'))
+                            tokens = regexp(data.textdata{2},...
+                                'B0 = ([0-9.]*)\s*(\w*),\s* B0\(Gaussmeter\) = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                                'tokens');
+                            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                                str2double(tokens{1}{5});
+                            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                                str2double(tokens{1}{5});
+                            content.parameters.bridge.MWfrequency.unit = tokens{1}{6};
+                            content.parameters.field.calibration.gaussMeter.values(end+1) = str2double(tokens{1}{3});
+                            switch tokens{1}{4}
+                                case 'Gauss'
+                                    content.parameters.field.calibration.gaussMeter.unit = 'G';
+                                otherwise
+                                    warnings{end+1} = struct(...
+                                        'identifier','trEPRspeksimLoad:parseError',...
+                                        'message',sprintf(...
+                                        'Could not recognise unit for magnetic field: ''%s''',...
+                                        tokens{1}{2})...
+                                        ); %#ok<AGROW>
+                            end
+                        else
+                            tokens = regexp(data.textdata{2},...
+                                'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                                'tokens');
+                            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                                str2double(tokens{1}{3});
+                            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                                str2double(tokens{1}{3});
+                            content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+                        end
                         switch tokens{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
@@ -216,9 +269,6 @@ function [content,warnings] = loadFile(filename,varargin)
                                     ); %#ok<AGROW>
                         end
                         content.axes.y.values(end+1) = str2double(tokens{1}{1});
-                        content.parameters.bridge.MWfrequency.value(end+1) = ...
-                            str2double(tokens{1}{3});
-                        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
                     end
                 end
                 % In case we have not loaded anything
@@ -253,9 +303,37 @@ function [content,warnings] = loadFile(filename,varargin)
         data = importdata(filename,' ',5);
         content.data = reshape(data.data',1,[]);
         content.header = data.textdata;
-        tokens = regexp(data.textdata{2},...
-            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-            'tokens');
+        if any(strfind(data.textdata{2},'Gaussmeter'))
+            tokens = regexp(data.textdata{2},...
+                'B0 = ([0-9.]*)\s*(\w*),\s* B0\(Gaussmeter\) = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                'tokens');
+            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                str2double(tokens{1}{5});
+            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                str2double(tokens{1}{5});
+            content.parameters.bridge.MWfrequency.unit = tokens{1}{6};
+            content.parameters.field.calibration.gaussMeter.values(end+1) = str2double(tokens{1}{3});
+            switch tokens{1}{4}
+                case 'Gauss'
+                    content.parameters.field.calibration.gaussMeter.unit = 'G';
+                otherwise
+                    warnings{end+1} = struct(...
+                        'identifier','trEPRspeksimLoad:parseError',...
+                        'message',sprintf(...
+                        'Could not recognise unit for magnetic field: ''%s''',...
+                        tokens{1}{2})...
+                        ); %#ok<AGROW>
+            end
+        else
+            tokens = regexp(data.textdata{2},...
+                'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                'tokens');
+            content.parameters.bridge.MWfrequency.value(end+1) = ...
+                str2double(tokens{1}{3});
+            content.parameters.bridge.MWfrequency.values(end+1) = ...
+                str2double(tokens{1}{3});
+            content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+        end
         switch tokens{1}{2}
             case 'Gauss'
                 content.axes.y.unit = 'G';
@@ -274,9 +352,6 @@ function [content,warnings] = loadFile(filename,varargin)
         content.parameters.field.stop.value = str2double(tokens{1}{1});
         content.parameters.field.step.value = 0;
         content.axes.y.values = str2double(tokens{1}{1});
-        content.parameters.bridge.MWfrequency.value = ...
-            str2double(tokens{1}{3});
-        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
     end
     
     % Assign other parameters, as far as possible
