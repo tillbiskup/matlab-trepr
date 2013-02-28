@@ -452,6 +452,7 @@ function pushbutton_Callback(~,~,action)
     try
         switch lower(action)
             case 'clear'
+                guiMeasure('clear',0);
                 trEPRguiSetMode('none');
             otherwise
         end
