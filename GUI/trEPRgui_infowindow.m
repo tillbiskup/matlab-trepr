@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-13, Till Biskup
-% 2013-02-26
+% 2013-03-01
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3459,7 +3459,7 @@ function parameter_edit_Callback(source,~,value)
         % If fieldValue is not NaN after conversion to numeric, 
         % we are dealing with a number and can replace the comma
         if min(size(fieldValue)) == 1 && ...
-            ~isnan(str2double(strrep(fieldValue,',','.')))
+            ~any(isnan(str2double(strrep(fieldValue,',','.'))))
             fieldValue = strrep(fieldValue,',','.');
         end
         
