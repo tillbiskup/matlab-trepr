@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-22
+% 2013-03-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1712,13 +1712,17 @@ function edit_Callback(source,~,action)
             return;
         end
         
+        value = trEPRguiSanitiseNumericInput(get(source,'String'));
+        if isnan(value)
+            update_displayPanel();
+            return;
+        end
+        
         switch action
             case 'zeroLineWidth'
-                ad.control.axis.grid.zero.width = ...
-                    str2double(strrep(get(source,'String'),',','.'));
+                ad.control.axis.grid.zero.width = value;
             case 'markerSize'
-                ad.data{active}.line.marker.size = ...
-                    str2double(strrep(get(source,'String'),',','.'));
+                ad.data{active}.line.marker.size = value;
             otherwise
                 st = dbstack;
                 trEPRmsg(...
@@ -1948,29 +1952,20 @@ function pushbutton_Callback(~,~,action)
     end
 end
 
-function axislabels_edit_Callback(source,~,label)
+function axislabels_edit_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
-        switch label
-            case 'xmeasure'
-                ad.control.axis.labels.x.measure = get(source,'String');
-            case 'xunit'
-                ad.control.axis.labels.x.unit = get(source,'String');
-            case 'ymeasure'
-                ad.control.axis.labels.y.measure = get(source,'String');
-            case 'yunit'
-                ad.control.axis.labels.y.unit = get(source,'String');
-            case 'zmeasure'
-                ad.control.axis.labels.z.measure = get(source,'String');
-            case 'zunit'
-                ad.control.axis.labels.z.unit = get(source,'String');
+        switch lower(action)
+            case {'xmeasure','xunit','ymeasure','yunit','zmeasure','zunit'}
+                ad.control.axis.labels.(action(1)).(action(2:end)) = ...
+                    get(source,'String');
             otherwise
                 st = dbstack;
                 trEPRmsg(...
-                    [st.name ' : unknown axis label "' label '"'],...
+                    [st.name ' : unknown action "' action '"'],...
                     'warning');
                 return;
         end
@@ -2069,49 +2064,27 @@ function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
     end
 end
 
-function axislimits_edit_Callback(source,~,limit)
+function axislimits_edit_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
-        switch limit
-            case 'xmin'
-                ad.control.axis.limits.x.min = str2double(get(source,'String'));
-            case 'xmax'
+        value = trEPRguiSanitiseNumericInput(get(source,'String'));
+        if isnan(value)
+            update_displayPanel();
+            return;
+        end
+        
+        switch lower(action)
+            case {'xmin','ymin','zmin'}
+                ad.control.axis.limits.(action(1)).(action(2:end)) = value;
+            case {'xmax','ymax','zmax'}
                 % Test whether value is larger than min for same axis
-                if (str2double(get(source,'String')) > ad.control.axis.limits.x.min)
-                    ad.control.axis.limits.x.max = str2double(get(source,'String'));
+                if (value > ad.control.axis.limits.(action(1)).min)
+                    ad.control.axis.limits.(action(1)).max = value;
                 else
-                    set(source,'String',num2str(ad.control.axis.limits.x.max));
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' : Upper limit of an axis must be '...
-                        'always bigger than lower limit'],'warning');
-                    return;
-                end
-            case 'ymin'
-                ad.control.axis.limits.y.min = str2double(get(source,'String'));
-            case 'ymax'
-                % Test whether value is larger than min for same axis
-                if (str2double(get(source,'String')) > ad.control.axis.limits.y.min)
-                    ad.control.axis.limits.y.max = str2double(get(source,'String'));
-                else
-                    set(source,'String',num2str(ad.control.axis.limits.y.max));
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' : Upper limit of an axis must be '...
-                        'always bigger than lower limit'],'warning');
-                    return;
-                end
-            case 'zmin'
-                ad.control.axis.limits.z.min = str2double(get(source,'String'));
-            case 'zmax'
-                % Test whether value is larger than min for same axis
-                if (str2double(get(source,'String')) > ad.control.axis.limits.z.min)
-                    ad.control.axis.limits.z.max = str2double(get(source,'String'));
-                else
-                    set(source,'String',num2str(ad.control.axis.limits.z.max));
+                    update_displayPanel();
                     st = dbstack;
                     trEPRmsg(...
                         [st.name ' : Upper limit of an axis must be '...
@@ -2121,14 +2094,17 @@ function axislimits_edit_Callback(source,~,limit)
             otherwise
                 st = dbstack;
                 trEPRmsg(...
-                    [st.name ' : unknown axis limit "' limit '"'],...
+                    [st.name ' : unknown action "' action '"'],...
                     'warning');
                 return;
         end
         
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
-        
+
+        %Update display panel
+        update_displayPanel();
+
         %Update main axis
         update_mainAxis();
     catch exception
