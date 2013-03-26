@@ -205,7 +205,7 @@ try
         data{masterId}.axes.y.unit;
     
     % Write new field values into parameter structure
-    if strcmp(accData.axes.x.measure,'field')
+    if strcmp(accData.axes.x.measure,'magnetic field')
             accData.parameters.field.start.value = ...
                 accData.axes.x.values(1);
             accData.parameters.field.start.unit = ...
@@ -218,7 +218,7 @@ try
                 accData.axes.x.values(2) - accData.axes.x.values(1);
             accData.parameters.field.step.unit = ...
                 accData.axes.x.unit;
-    elseif strcmp(accData.axes.y.measure,'field')
+    elseif strcmp(accData.axes.y.measure,'magnetic field')
             accData.parameters.field.start.value = ...
                 accData.axes.y.values(1);
             accData.parameters.field.start.unit = ...
@@ -228,7 +228,7 @@ try
             accData.parameters.field.stop.unit = ...
                 accData.axes.y.unit;
             accData.parameters.field.step.value = ...
-                accData.axes.y.values(2) - accData.axes.x.values(1);
+                accData.axes.y.values(2) - accData.axes.y.values(1);
             accData.parameters.field.step.unit = ...
                 accData.axes.y.unit;
     end
