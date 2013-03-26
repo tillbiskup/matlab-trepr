@@ -103,6 +103,7 @@ try
     % Set fields that can be taken from master dataset
     accData.line = data{masterId}.line;
     accData.parameters = data{masterId}.parameters;
+    accData.sample = data{masterId}.sample;
     accData.display.position = data{masterId}.display.position;
     
     % Check for axes steppings and handle interpolation accordingly.
