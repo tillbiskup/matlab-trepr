@@ -16,8 +16,8 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              used for the trEPRgui_ACCwindow
 %              a copy is copied to the history.info field
 
-% (c) 2011, Till Biskup
-% 2011-07-04
+% (c) 2011-13, Till Biskup, Bernd Paulus
+% 2013-03-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -203,6 +203,35 @@ try
         data{masterId}.axes.y.measure;
     accData.axes.y.unit = ...
         data{masterId}.axes.y.unit;
+    
+    % Write new field values into parameter structure
+    if strcmp(accData.axes.x.measure,'field')
+            accData.parameters.field.start.value = ...
+                accData.axes.x.values(1);
+            accData.parameters.field.start.unit = ...
+                accData.axes.x.unit;
+            accData.parameters.field.stop.value = ...
+                accData.axes.x.values(end);
+            accData.parameters.field.stop.unit = ...
+                accData.axes.x.unit;
+            accData.parameters.field.step.value = ...
+                accData.axes.x.values(2) - accData.axes.x.values(1);
+            accData.parameters.field.step.unit = ...
+                accData.axes.x.unit;
+    elseif strcmp(accData.axes.y.measure,'field')
+            accData.parameters.field.start.value = ...
+                accData.axes.y.values(1);
+            accData.parameters.field.start.unit = ...
+                accData.axes.y.unit;
+            accData.parameters.field.stop.value = ...
+                accData.axes.y.values(end);
+            accData.parameters.field.stop.unit = ...
+                accData.axes.y.unit;
+            accData.parameters.field.step.value = ...
+                accData.axes.y.values(2) - accData.axes.x.values(1);
+            accData.parameters.field.step.unit = ...
+                accData.axes.y.unit;
+    end
     
     % Preallocate accData.data space 
     % (Here, make it a 3D matrix. Makes life much more easy for summing)
