@@ -29,7 +29,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %                    Character used for the assignment of values to keys
 %                    Default: =
 %
-%   blockStartChar - char
+%   blockStartChar - char^
 %                    Character used for starting a block
 %                    Default: [
 %
@@ -39,7 +39,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 % See also: trEPRiniFileWrite
 
 % (c) 2008-13, Till Biskup, Bernd Paulus
-% 2013-03-22
+% 2013-04-01
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -158,8 +158,8 @@ function struct = setCascadedField(struct,fieldName,value,typeConversion)
             % In case of cell array adjust fieldName
             fieldName = fieldName(1:min(curlies));
             if typeConversion && regexp('[','[\[0-9.]?') && ...
-                    ~isempty(str2num(value))
-                struct.(fieldName){cellind} = str2num(value);
+                    ~isempty(str2num(value)) %#ok<ST2NM>
+                struct.(fieldName){cellind} = str2num(value); %#ok<ST2NM>
             else
                 struct.(fieldName){cellind} = value;
             end
@@ -169,8 +169,8 @@ function struct = setCascadedField(struct,fieldName,value,typeConversion)
             end
         else
             if typeConversion && regexp('[','[\[0-9.]?') && ...
-                    ~isempty(str2num(value))
-                struct.(fieldName) = str2num(value);
+                    ~isempty(str2num(value)) %#ok<ST2NM>
+                struct.(fieldName) = str2num(value); %#ok<ST2NM>
             else
                 struct.(fieldName) = value;
             end
