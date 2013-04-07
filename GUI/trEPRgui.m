@@ -752,10 +752,9 @@ end
 
 % Set directories
 dirs = fieldnames(ad.control.dirs);
+% Parse directory strings using "trEPRparseDir"
 for k=1:length(dirs)
-    if any(strcmpi(ad.control.dirs.(dirs{k}),{'pwd',''}))
-        ad.control.dirs.(dirs{k}) = pwd;
-    end
+    ad.control.dirs.(dirs{k}) = trEPRparseDir(ad.control.dirs.(dirs{k}));
 end
 setappdata(hMainFigure,'control',ad.control);
 
@@ -787,7 +786,22 @@ if isfield(ad.configuration,'start')
     end
 end
 
+% Check for saved history
+if exist(trEPRparseDir(ad.control.cmd.historyfile),'file')
+    ad.control.cmd.history = ...
+        textFileRead(trEPRparseDir(ad.control.cmd.historyfile));
+end
 
+% Check whether to save history -- and if so, write time stamp
+if ad.control.cmd.historysave
+    timeStamp = ['%-- ' datestr(now,'yyyy-mm-dd HH:MM') ' --%'];
+    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(timeStamp);
+    if histsavestat
+        trEPRmsg(histsavewarn,'warn');
+    end
+end
+
+setappdata(hMainFigure,'control',ad.control);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks

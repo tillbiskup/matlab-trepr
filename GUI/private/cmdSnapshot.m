@@ -22,7 +22,7 @@ function [status,warnings] = cmdSnapshot(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-24
+% 2013-04-07
 
 status = 0;
 warnings = cell(0);
@@ -74,10 +74,27 @@ switch lower(opt{1})
                 fileName = opt{2};
             end
             AD = load(fileName);
-            % IMPORTANT: For now just rudely overwrite existing data. That
-            % is highly risky and should definitely be changed in the
-            % future.
+            % Simple test: Check whether version of appdata is identical,
+            % otherwise warn user and let him decide.
+            if ~strcmp(ad.format.name,AD.ad.format.name) ...
+                    || ~strcmp(ad.format.version,AD.ad.format.version)
+                qstring = sprintf(['The format of the snapshot you try to'...
+                    ' load appears to be different from the one the'...
+                    ' toolbox currently uses.\n'... 
+                    'Do you really want to continue? If so, you do it'...
+                    'on your own risk!']);
+                button = questdlg(qstring,'Problem loading Snapshot',...
+                    'Yes','No','No');
+                switch lower(button)
+                    case 'yes'
+                    otherwise
+                        trEPRmsg('Loading GUI snapshot aborted by user','info');
+                        return;
+                end
+            end
             appdataFields = fieldnames(AD.ad);
+            % Remove field "UsedByGUIData_m" to prevent problems
+            appdataFields((strcmpi(appdataFields,'UsedByGUIData_m'))) = [];
             for k=1:length(appdataFields)
                 setappdata(handle,appdataFields{k},AD.ad.(appdataFields{k}));
             end

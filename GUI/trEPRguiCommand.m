@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-19
+% 2013-04-07
 
 status = 0;
 warnings = cell(0);
@@ -55,6 +55,12 @@ if isempty(command)
     return;
 end
 
+if strncmp(command,'%',1)
+    warnings{end+1} = 'Command is a comment.';
+    status = -3;
+    return;
+end
+
 % Get appdata from mainwindow
 ad = getappdata(mainWindow);
 % % Get handles from main GUI
@@ -64,6 +70,14 @@ ad = getappdata(mainWindow);
 ad.control.cmd.history{end+1} = command;
 ad.control.cmd.historypos = length(ad.control.cmd.history);
 setappdata(mainWindow,'control',ad.control);
+
+% Check whether to save history
+if ad.control.cmd.historysave
+    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(command);
+    if histsavestat
+        trEPRmsg(histsavewarn,'warn');
+    end
+end
 
 % For future use: parse command, split it at spaces, use first part as
 % command, all other parts as options

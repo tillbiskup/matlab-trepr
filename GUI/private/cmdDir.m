@@ -22,7 +22,7 @@ function [status,warnings] = cmdDir(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-24
+% 2013-04-07
 
 status = 0;
 warnings = cell(0);
@@ -67,9 +67,7 @@ switch lower(opt{1})
             trEPRmsg(['Load dir: ' ad.control.dirs.lastLoad],'info');
             return;
         else
-            if strcmpi(opt{2},'pwd')
-                ad.control.dirs.lastLoad = pwd;
-            end
+            opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastLoad = opt{2};
             end
@@ -79,9 +77,7 @@ switch lower(opt{1})
             trEPRmsg(['Save dir: ' ad.control.dirs.lastSave],'info');
             return;
         else
-            if strcmpi(opt{2},'pwd')
-                ad.control.dirs.lastSave = pwd;
-            end
+            opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastSave = opt{2};
             end
@@ -91,9 +87,7 @@ switch lower(opt{1})
             trEPRmsg(['Save figure dir: ' ad.control.dirs.lastFigSave],'info');
             return;
         else
-            if strcmpi(opt{2},'pwd')
-                ad.control.dirs.lastFigSave = pwd;
-            end
+            opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastFigSave = opt{2};
             end
@@ -103,9 +97,7 @@ switch lower(opt{1})
             trEPRmsg(['Export dir: ' ad.control.dirs.lastExport],'info');
             return;
         else
-            if strcmpi(opt{2},'pwd')
-                ad.control.dirs.lastExport = pwd;
-            end
+            opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastExport = opt{2};
             end
@@ -115,9 +107,7 @@ switch lower(opt{1})
             trEPRmsg(['Snapshot dir: ' ad.control.dirs.lastSnapshot],'info');
             return;
         else
-            if strcmpi(opt{2},'pwd')
-                ad.control.dirs.lastSnapshot = pwd;
-            end
+            opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastSnapshot = opt{2};
             end

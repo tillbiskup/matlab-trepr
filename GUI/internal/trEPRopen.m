@@ -52,10 +52,6 @@ end
 % If FileName is not a cell string, convert it into a cell string
 if ~isa(filename,'cell')
     filename = cellstr(filename);
-    %             tmp = FileName;
-    %             FileName = cell(1);
-    %             FileName{1} = tmp;
-    %             clear tmp;
 end
 
 % Open trEPRgui
@@ -64,8 +60,20 @@ h = trEPRgui;
 PWD = pwd;
 try
     cd(fullfile(trEPRinfo('dir'),'GUI','private'));
-    cmdLoad(h,filename);
-    cmdShow(h,cell(0));
+    [loadStatus,loadWarnings] = cmdLoad(h,filename);
+    if loadStatus
+        disp(loadWarnings)
+    else
+        cmdShow(h,cell(0));
+        % Tidy up and close trEPRbusyWindow telling the user that the file has
+        % been loaded successfully...
+        hBusyWindow = findobj('Tag','trEPRbusyWindow');
+        if ~isempty(hBusyWindow)
+            for k=1:length(hBusyWindow)
+                close(hBusyWindow(k));
+            end
+        end
+    end
     cd(PWD);
 catch exception
     cd(PWD);

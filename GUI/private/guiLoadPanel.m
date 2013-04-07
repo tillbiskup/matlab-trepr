@@ -261,10 +261,6 @@ function load_pushbutton_Callback(~,~)
         % If FileName is not a cell string, convert it into a cell string
         if ~isa(FileName,'cell')
             FileName = cellstr(FileName);
-%             tmp = FileName;
-%             FileName = cell(1);
-%             FileName{1} = tmp;
-%             clear tmp;
         end
         
         cmdLoad(mainWindow,FileName);

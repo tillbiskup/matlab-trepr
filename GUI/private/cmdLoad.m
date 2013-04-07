@@ -16,7 +16,8 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %              0: command successfully performed
 %             -1: GUI window found
 %             -2: missing options
-%             -3: some other problems
+%             -3: Failed loading file(s)
+%             -4: some other problems
 %
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
@@ -148,6 +149,8 @@ end
 
 if isempty(data)
     trEPRbusyWindow('stop','Trying to load spectra...<br /><b>failed</b>.');
+    status = -4;
+    warnings{end+1} = 'Failed loading file(s)';
     return;
 end
 

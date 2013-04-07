@@ -1,6 +1,6 @@
 % Sample configuration file for the trEPRgui function of the trEPR toolbox
 %
-% (c) 2012, Till Biskup <till@till-biskup.de>
+% (c) 2012-13, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
 % configuration in the file "trEPRgui.ini" in the same directory.
@@ -32,11 +32,11 @@ statuswindow = 0
 %
 % You may use "pwd" here instead of a full directory
 [dirs]
-load = pwd
-save = pwd
-savefig = pwd
-export = pwd
-snapshot = pwd
+lastLoad = pwd
+lastSave = pwd
+lastFigSave = pwd
+lastExport = pwd
+lastSnapshot = pwd
 
 % Configuration of messaging
 [messages]
@@ -46,7 +46,7 @@ debug.level = all
 % Configuration of command line feature (cmd)
 [cmd]
 historysave = false
-historyfile = 
+historyfile = ~/.trepr/history
 
 % Configuration for the load panel
 %

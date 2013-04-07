@@ -39,7 +39,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 % See also: trEPRiniFileWrite
 
 % (c) 2008-13, Till Biskup, Bernd Paulus
-% 2013-04-01
+% 2013-04-07
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -121,7 +121,8 @@ for k=1:length(iniFileContents)
                         ['WARNING: Field ''%s.%s'' already exists'...
                         ' and will get overwritten.\n\toriginal '...
                         'value: ''%s''\n\tnew value     : ''%s''\n'],...
-                        blockname,key,oldFieldValue,val);
+                        blockname,names.key,...
+                        data.(blockname).(names.key),names.val);
                 end
             end
             %data.(blockname).(strtrim(names.key)) = strtrim(names.val);

@@ -8,8 +8,8 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-12, Till Biskup
-% 2012-06-28
+% (c) 2011-13, Till Biskup
+% 2013-04-07
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -23,6 +23,20 @@ gh = guidata(mainWindow);
 
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
+
+% Get appdata from main GUI
+ad = getappdata(mainWindow);
+
+% Set current axes to the main axes of main GUI
+if (nargin > 0) && ishandle(varargin{1})
+    mainAxes = newplot(varargin{1});
+else
+    mainAxes = gh.mainAxis;
+    set(mainWindow,'CurrentAxes',gh.mainAxis);
+end
+
+% IMPORTANT: Set main axis to active axis
+axes(mainAxes);
 
 % Change enable status of pushbuttons and other elements
 mainAxisChildren = findobj(...
@@ -43,17 +57,6 @@ end
 % Set min and max for plots - internal function
 setMinMax();
 
-% Get appdata from main GUI
-ad = getappdata(mainWindow);
-
-% Set current axes to the main axes of main GUI
-if (nargin > 0) && ishandle(varargin{1})
-    mainAxes = newplot(varargin{1});
-else
-    mainAxes = gh.mainAxis;
-    set(mainWindow,'CurrentAxes',gh.mainAxis);
-end
-
 % Just to be on the save side, check whether we have a currently active
 % spectrum
 if ~(ad.control.spectra.active)
@@ -62,9 +65,6 @@ if ~(ad.control.spectra.active)
         [st.name ' : No active spectrum'],'warning');
     return;
 end
-
-% IMPORTANT: Set main axis to active axis
-axes(mainAxes);
 
 % For shorter and easier to read code:
 active = ad.control.spectra.active;

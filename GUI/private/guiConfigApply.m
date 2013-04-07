@@ -124,9 +124,11 @@ try
             for k=1:length(matchConfig(:,1))
                 if isfield(ad.configuration,matchConfig{k,1})
                     ad.control.(matchConfig{k,2}) = ...
-                        ad.configuration.(matchConfig{k,1});
+                        structcopy(ad.control.(matchConfig{k,2}), ...
+                        ad.configuration.(matchConfig{k,1}));
                 end
             end
+            setappdata(handle,'control',ad.control);
         otherwise
             return;
     end
