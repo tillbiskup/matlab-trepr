@@ -29,7 +29,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %                    Character used for the assignment of values to keys
 %                    Default: =
 %
-%   blockStartChar - char
+%   blockStartChar - char^
 %                    Character used for starting a block
 %                    Default: [
 %
@@ -38,8 +38,8 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %
 % See also: trEPRiniFileWrite
 
-% (c) 2008-12, Till Biskup
-% 2012-04-22
+% (c) 2008-13, Till Biskup, Bernd Paulus
+% 2013-04-07
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -110,7 +110,7 @@ for k=1:length(iniFileContents)
             blockname = iniFileContents{k}(2:end-1);
         else
             [names] = regexp(iniFileContents{k},...
-                ['(?<key>[a-zA-Z0-9._-]+)\s*' assignmentChar '\s*(?<val>.*)'],...
+                ['(?<key>[a-zA-Z0-9._-{}]+)\s*' assignmentChar '\s*(?<val>.*)'],...
                 'names');
             if isfield(data,blockname)
                 if isfield(data.(blockname),names.key)
@@ -121,7 +121,8 @@ for k=1:length(iniFileContents)
                         ['WARNING: Field ''%s.%s'' already exists'...
                         ' and will get overwritten.\n\toriginal '...
                         'value: ''%s''\n\tnew value     : ''%s''\n'],...
-                        blockname,key,oldFieldValue,val);
+                        blockname,names.key,...
+                        data.(blockname).(names.key),names.val);
                 end
             end
             %data.(blockname).(strtrim(names.key)) = strtrim(names.val);
@@ -141,26 +142,78 @@ end % end of main function
 function struct = setCascadedField(struct,fieldName,value,typeConversion)
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
+    % Get number of "{" in fieldName
+    curlies = strfind(fieldName,'{');
+    currentIsCell = false;
+    % if target field is cell array
+    if ~isempty(curlies)
+        % ... get index of first cell array call (if there's more than one)
+        cellind = str2double(...
+            fieldName(...
+                regexp(fieldName,'{','once')+1 : ...
+                regexp(fieldName,'}','once')-1 ) );
+    end
+    % If there are no ".", we have the target field and can write
     if isempty(nDots)
-        if typeConversion && regexp('[','[\[0-9.]?') && ...
-                ~isempty(str2num(value))
-            struct.(fieldName) = str2num(value);
+        if ~isempty(curlies)
+            % In case of cell array adjust fieldName
+            fieldName = fieldName(1:min(curlies));
+            if typeConversion && regexp('[','[\[0-9.]?') && ...
+                    ~isempty(str2num(value)) %#ok<ST2NM>
+                struct.(fieldName){cellind} = str2num(value); %#ok<ST2NM>
+            else
+                struct.(fieldName){cellind} = value;
+            end
+            % Handle special case of empty vector - convert into numeric
+            if strcmpi(value,'[]') && typeConversion
+                struct.(fieldName){cellind} = [];
+            end
         else
-            struct.(fieldName) = value;
+            if typeConversion && regexp('[','[\[0-9.]?') && ...
+                    ~isempty(str2num(value)) %#ok<ST2NM>
+                struct.(fieldName) = str2num(value); %#ok<ST2NM>
+            else
+                struct.(fieldName) = value;
+            end
+            % Handle special case of empty vector - convert into numeric
+            if strcmpi(value,'[]') && typeConversion
+                struct.(fieldName) = [];
+            end
         end
-        % Handle special case of empty vector - convert into numeric
-        if strcmpi(value,'[]') && typeConversion
-            struct.(fieldName) = [];
-        end
+    % If there are still ".", we need to look further into the struct
     else
+        % In case of cell array adjust fieldName
+        if ~isempty(curlies) && min(curlies) < nDots(1)
+            fieldName(min(curlies):nDots(1)-1) = [];
+            % Don't forget to refresh nDots
+            nDots = strfind(fieldName,'.');
+            % Set logical switch
+            currentIsCell = true;
+        end
+        % If fieldName is not a field of struct, remove it
         if ~isfield(struct,fieldName(1:nDots(1)-1))
             struct.(fieldName(1:nDots(1)-1)) = [];
         end
-        innerstruct = struct.(fieldName(1:nDots(1)-1));
+        % Get content of the next field
+        if currentIsCell
+            % If the field is empty, allocate as cell
+            if isempty(struct.(fieldName(1:nDots(1)-1)))
+                struct.(fieldName(1:nDots(1)-1)) = cell(1);
+            end
+            innerstruct = struct.(fieldName(1:nDots(1)-1)){cellind};
+        else
+            innerstruct = struct.(fieldName(1:nDots(1)-1));
+        end
+        % ... and call this function again
         innerstruct = setCascadedField(...
             innerstruct,...
             fieldName(nDots(1)+1:end),...
             value,typeConversion);
-        struct.(fieldName(1:nDots(1)-1)) = innerstruct;
+        % Write result to output
+        if currentIsCell
+            struct.(fieldName(1:nDots(1)-1)){cellind} = innerstruct;
+        else
+            struct.(fieldName(1:nDots(1)-1)) = innerstruct;
+        end
     end
 end

@@ -30,7 +30,7 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
 % (c) 2012-13, Till Biskup
-% 2013-02-23
+% 2013-02-26
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -437,7 +437,11 @@ for k=1:length(blockLines)
     % Fill parameters structure
     if ~isempty(blockLines{k}{1}) % Prevent empty lines being parsed
         % Remove comments
-        commentCharPos = regexp(blockLines{k}{2},['\s' commentChar],'start');
+        commentCharPos = regexp(blockLines{k}{2},['  ' commentChar],'start');
+        if ~isempty(commentCharPos)
+            blockLines{k}{2} = blockLines{k}{2}(1:commentCharPos);
+        end
+        commentCharPos = regexp(blockLines{k}{2},['\t' commentChar],'start');
         if ~isempty(commentCharPos)
             blockLines{k}{2} = blockLines{k}{2}(1:commentCharPos);
         end

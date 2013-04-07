@@ -7,7 +7,7 @@ function handle = guiProcessingPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-17
+% 2013-03-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -26,18 +26,6 @@ handle = uipanel('Tag','processing_panel',...
 
 % Create the "Processing" panel
 handle_size = get(handle,'Position');
-% uicontrol('Tag','panel_processing_description',...
-%     'Style','text',...
-%     'Parent',handle,...
-%     'BackgroundColor',defaultBackground,...
-%     'FontUnit','Pixel','Fontsize',12,...
-%     'Units','Pixels',...
-%     'HorizontalAlignment','Left',...
-%     'FontUnit','Pixel','Fontsize',12,...
-%     'FontAngle','oblique',...
-%     'Position',[10 handle_size(4)-60 handle_size(3)-20 30],...
-%     'String',{'Diverse data processing functions, such as filters, compensations, ...'}...
-%     );
 
 % Create buttongroup to switch between subpanels (pages)
 hpbg = uibuttongroup('Tag','processing_panel_pages_buttongroup',...
@@ -504,11 +492,6 @@ function pushbutton_Callback(~,~,action)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        % If no dataset is selected
-        if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
-            return;
-        end
-        
         active = ad.control.spectra.active;
         
         if isempty(active) || ~active
@@ -716,13 +699,10 @@ function edit_Callback(source,~,action)
         if isempty(active) || ~active
             return;
         end
-        
-        % Get value of edit field and replace comma with dot
-        value = str2double(strrep(get(source,'String'),',','.'));
 
         % If value is empty or NaN after conversion to numeric, restore
         % previous entry and return
-        if (isempty(value) || isnan(value))
+        if isempty(get(source,'String'))
             % Update slider panel
             update_processingPanel();
             return;
@@ -737,20 +717,13 @@ function edit_Callback(source,~,action)
        
         switch action
             case 'avg_xindex'
-                % Fix values: only integers >= 1
-                if (str2double(get(source,'String')) < 1) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String','1');
-                elseif (str2double(get(source,'String')) > x)
-                    set(source,'String',num2str(x));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String')))));
+                value = trEPRguiSanitiseNumericInput(...
+                    get(source,'String'),1:x,'map',true);
+                if isnan(value)
+                    update_processingPanel();
+                    return;
                 end
-                
-                ad.data{active}.display.smoothing.x.value = ...
-                    str2double(get(source,'String'));
+                ad.data{active}.display.smoothing.x.value = value;
                 ad.data{active}.display.smoothing.x.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             case 'avg_xunit'
@@ -764,43 +737,26 @@ function edit_Callback(source,~,action)
                 
                 % Get "atomic" value
                 atomic = x(2)-x(1);
-                
-                % Fix values: only those in range of the axis are allowed
-                if (str2double(get(source,'String')) < atomic) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String',num2str(atomic));
-                elseif (str2double(get(source,'String')) > (atomic*length(x)))
-                    set(source,'String',num2str(atomic*length(x)));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
-                        );
+
+                vector = atomic:atomic:atomic*length(x);
+                value = trEPRguiSanitiseNumericInput(...
+                    get(source,'String'),vector,'map',true);
+                if isnan(value)
+                    update_processingPanel();
+                    return;
                 end
-                
-                set(gh.processing_panel_average_x_points_edit,...
-                    'String',...
-                    num2str(round(str2double(get(source,'String'))/atomic))...
-                    );
-                
                 ad.data{active}.display.smoothing.x.value = ...
-                    round(str2double(get(source,'String'))/atomic);
+                    find(vector==value);
                 ad.data{active}.display.smoothing.x.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             case 'avg_yindex'
-                if (str2double(get(source,'String')) < 1) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String','1');
-                elseif (str2double(get(source,'String')) > y)
-                    set(source,'String',num2str(x));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String')))));
+                value = trEPRguiSanitiseNumericInput(...
+                    get(source,'String'),1:y,'map',true);
+                if isnan(value)
+                    update_processingPanel();
+                    return;
                 end
-                
-                ad.data{active}.display.smoothing.y.value = ...
-                    str2double(get(source,'String'));
+                ad.data{active}.display.smoothing.y.value = value;
                 ad.data{active}.display.smoothing.y.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             case 'avg_yunit'
@@ -815,29 +771,24 @@ function edit_Callback(source,~,action)
                 % Get "atomic" value
                 atomic = y(2)-y(1);
                 
-                % Fix values: only those in range of the axis are allowed
-                if (str2double(get(source,'String')) < atomic) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String',num2str(atomic));
-                elseif (str2double(get(source,'String')) > (atomic*length(y)))
-                    set(source,'String',num2str(atomic*length(y)));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
-                        );
+                vector = atomic:atomic:atomic*length(y);
+                value = trEPRguiSanitiseNumericInput(...
+                    get(source,'String'),vector,'map',true);
+                if isnan(value)
+                    update_processingPanel();
+                    return;
                 end
-                
-                set(gh.processing_panel_average_y_points_edit,...
-                    'String',...
-                    num2str(round(str2double(get(source,'String'))/atomic))...
-                    );
-                
                 ad.data{active}.display.smoothing.y.value = ...
-                    round(str2double(get(source,'String'))/atomic);
+                    find(vector==value);
                 ad.data{active}.display.smoothing.y.filterfun = ...
                     sprintf('trEPRfilter_%s',filterType);
             case 'scale'
+                value = trEPRguiSanitiseNumericInput(get(source,'String'));
+                if isnan(value)
+                    set(source,'String','1');
+%                     update_processingPanel();
+                    return;
+                end
                 set(source,'String',num2str(value));
                 pushbutton_Callback([],[],'scale');
                 return;

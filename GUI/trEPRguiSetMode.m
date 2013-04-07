@@ -25,7 +25,7 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-23
+% 2013-02-28
 
 status = 0;
 warnings = cell(0);
@@ -80,7 +80,11 @@ end
 switch lower(mode)
     case {'none','n'}
         GUImode = 'None';
+        guiZoom('off');
+        guiMeasure('off',0);
         set(gh.command_panel_edit,'Enable','inactive');
+        set(gh.command_panel_edit,...
+            'String','Enter command - Ctrl-l / Cmd-l for access');
     case {'scroll','s'}
         GUImode = 'Scroll';
     case {'scale','c'}
@@ -88,19 +92,26 @@ switch lower(mode)
     case {'displace','d'}
         GUImode = 'Displace';
     case {'zoom','z'}
+        guiZoom('on');
         GUImode = 'Zoom';
     case {'measure','m'}
+        guiMeasure('on',2);
         GUImode = 'Measure';
     case {'pick','p'}
+        guiMeasure('on',1);
         GUImode = 'Pick';
     case {'command','o'}
         GUImode = 'Command';
         set(gh.command_panel_edit,'Enable','on');
+        set(gh.command_panel_edit,'String','');
         uicontrol(gh.command_panel_edit);
     otherwise
         warnings{end+1} = sprintf('Unknown mode "%s"\n',mode);
         status = -3;
 end
+
+% Get appdata again
+ad = getappdata(mainWindow);
 
 % Set mode in main GUI window
 ad.control.mode = GUImode;

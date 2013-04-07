@@ -8,8 +8,8 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-04-07
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -23,6 +23,20 @@ gh = guidata(mainWindow);
 
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
+
+% Get appdata from main GUI
+ad = getappdata(mainWindow);
+
+% Set current axes to the main axes of main GUI
+if (nargin > 0) && ishandle(varargin{1})
+    mainAxes = newplot(varargin{1});
+else
+    mainAxes = gh.mainAxis;
+    set(mainWindow,'CurrentAxes',gh.mainAxis);
+end
+
+% IMPORTANT: Set main axis to active axis
+axes(mainAxes);
 
 % Change enable status of pushbuttons and other elements
 mainAxisChildren = findobj(...
@@ -43,17 +57,6 @@ end
 % Set min and max for plots - internal function
 setMinMax();
 
-% Get appdata from main GUI
-ad = getappdata(mainWindow);
-
-% Set current axes to the main axes of main GUI
-if (nargin > 0) && ishandle(varargin{1})
-    mainAxes = newplot(varargin{1});
-else
-    mainAxes = gh.mainAxis;
-    set(mainWindow,'CurrentAxes',gh.mainAxis);
-end
-
 % Just to be on the save side, check whether we have a currently active
 % spectrum
 if ~(ad.control.spectra.active)
@@ -62,9 +65,6 @@ if ~(ad.control.spectra.active)
         [st.name ' : No active spectrum'],'warning');
     return;
 end
-
-% IMPORTANT: Set main axis to active axis
-axes(mainAxes);
 
 % For shorter and easier to read code:
 active = ad.control.spectra.active;
@@ -113,16 +113,28 @@ switch ad.control.axis.displayType
             ad.control.axis.labels.y.unit));
         % Set limits of axis
         if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
-            xLimits = [ad.control.axis.limits.x.min-1 ad.control.axis.limits.x.max+1];
+            xLimits = [ad.control.axis.limits.x.min-1 ...
+                ad.control.axis.limits.x.max+1];
         else
-            xLimits = [ad.control.axis.limits.x.min ad.control.axis.limits.x.max];
+            xLimits = [ad.control.axis.limits.x.min ...
+                ad.control.axis.limits.x.max];
         end
         if (ad.control.axis.limits.y.min==ad.control.axis.limits.y.max)
-            yLimits = [ad.control.axis.limits.y.min-1 ad.control.axis.limits.y.max+1];
+            yLimits = [ad.control.axis.limits.y.min-1 ...
+                ad.control.axis.limits.y.max+1];
         else
-            yLimits = [ad.control.axis.limits.y.min ad.control.axis.limits.y.max];
+            yLimits = [ad.control.axis.limits.y.min ...
+                ad.control.axis.limits.y.max];
         end
-        set(gca,...
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.x)
+                xLimits = ad.control.axis.zoom.x;
+            end
+            if any(ad.control.axis.zoom.y)
+                yLimits = ad.control.axis.zoom.y;
+            end
+        end
+        set(mainAxes,...
             'XLim',xLimits,...
             'YLim',yLimits...
             );
@@ -348,14 +360,26 @@ switch ad.control.axis.displayType
         end
         % Set limits of axis
         if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
-            xLimits = [ad.control.axis.limits.x.min-1 ad.control.axis.limits.x.max+1];
+            xLimits = [ad.control.axis.limits.x.min-1 ...
+                ad.control.axis.limits.x.max+1];
         else
-            xLimits = [ad.control.axis.limits.x.min ad.control.axis.limits.x.max];
+            xLimits = [ad.control.axis.limits.x.min ...
+                ad.control.axis.limits.x.max];
         end
         if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
-            yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+            yLimits = [ad.control.axis.limits.z.min-1 ...
+                ad.control.axis.limits.z.max+1];
         else
-            yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+            yLimits = [ad.control.axis.limits.z.min ...
+                ad.control.axis.limits.z.max];
+        end
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.x)
+                xLimits = ad.control.axis.zoom.x;
+            end
+            if any(ad.control.axis.zoom.z)
+                yLimits = ad.control.axis.zoom.z;
+            end
         end
         set(mainAxes,...
             'XLim',xLimits,...
@@ -608,14 +632,26 @@ switch ad.control.axis.displayType
         hold(mainAxes,'off');
         % Set limits of axis
         if (ad.control.axis.limits.y.min==ad.control.axis.limits.y.max)
-            xLimits = [ad.control.axis.limits.y.min-1 ad.control.axis.limits.y.max+1];
+            xLimits = [ad.control.axis.limits.y.min-1 ...
+                ad.control.axis.limits.y.max+1];
         else
-            xLimits = [ad.control.axis.limits.y.min ad.control.axis.limits.y.max];
+            xLimits = [ad.control.axis.limits.y.min ...
+                ad.control.axis.limits.y.max];
         end
         if (ad.control.axis.limits.z.min==ad.control.axis.limits.z.max)
-            yLimits = [ad.control.axis.limits.z.min-1 ad.control.axis.limits.z.max+1];
+            yLimits = [ad.control.axis.limits.z.min-1 ...
+                ad.control.axis.limits.z.max+1];
         else
-            yLimits = [ad.control.axis.limits.z.min ad.control.axis.limits.z.max];
+            yLimits = [ad.control.axis.limits.z.min ...
+                ad.control.axis.limits.z.max];
+        end
+        if ad.control.axis.zoom.enable
+            if any(ad.control.axis.zoom.y)
+                xLimits = ad.control.axis.zoom.y;
+            end
+            if any(ad.control.axis.zoom.z)
+                yLimits = ad.control.axis.zoom.z;
+            end
         end
         set(mainAxes,...
             'XLim',xLimits,...

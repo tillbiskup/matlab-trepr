@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-21
+% 2013-02-28
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -72,10 +72,10 @@ hMainFigure = figure('Tag',mfilename,...
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
 
-setappdata(hMainFigure,'data',ad.data);
-setappdata(hMainFigure,'origdata',ad.origdata);
-setappdata(hMainFigure,'configuration',ad.configuration);
-setappdata(hMainFigure,'control',ad.control);
+appdataFields = fieldnames(ad);
+for k=1:length(appdataFields)
+    setappdata(hMainFigure,appdataFields{k},ad.(appdataFields{k}));
+end
 
 defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
@@ -118,7 +118,7 @@ uicontrol('Tag','vert1_slider',...
     'BackgroundColor',sl1_bgcolor,...
     'TooltipString','Scroll through dataset along second axes',...
     'Enable','off',...
-    'Callback', {@slider_v1_Callback}...
+    'Callback', {@slider_Callback,'scroll'}...
     );
 
 uicontrol('Tag','vert2_slider',...
@@ -129,7 +129,7 @@ uicontrol('Tag','vert2_slider',...
     'BackgroundColor',sl2_bgcolor,...
     'TooltipString','Scale',...
     'Enable','off',...
-    'Callback', {@slider_v2_Callback}...
+    'Callback', {@slider_Callback,'scalev'}...
     );
 
 uicontrol('Tag','vert3_slider',...
@@ -140,7 +140,7 @@ uicontrol('Tag','vert3_slider',...
     'BackgroundColor',sl3_bgcolor,...
     'TooltipString','Displace',...
     'Enable','off',...
-    'Callback', {@slider_v3_Callback}...
+    'Callback', {@slider_Callback,'displacev'}...
     );
 
 uicontrol('Tag','horz1_slider',...
@@ -151,7 +151,7 @@ uicontrol('Tag','horz1_slider',...
     'BackgroundColor',sl2_bgcolor,...
     'TooltipString','Scale',...
     'Enable','off',...
-    'Callback', {@slider_h1_Callback}...
+    'Callback', {@slider_Callback,'scaleh'}...
     );
 
 uicontrol('Tag','horz2_slider',...
@@ -162,7 +162,7 @@ uicontrol('Tag','horz2_slider',...
     'BackgroundColor',sl3_bgcolor,...
     'TooltipString','Displace',...
     'Enable','off',...
-    'Callback', {@slider_h2_Callback}...
+    'Callback', {@slider_Callback,'displaceh'}...
     );
 
 uipanel(...
@@ -211,7 +211,7 @@ uicontrol('Tag','export_button',...
     'TooltipString','Export current display to independent Matlab figure',...
     'pos',[590 0 60 25],...
     'Enable','off',...
-    'Callback',{@export_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'detach'}...
     );
 uicontrol('Tag','reset_button',...
     'Style','pushbutton',...
@@ -222,7 +222,7 @@ uicontrol('Tag','reset_button',...
     'TooltipString','Reset all slider settings to their default values',...
     'pos',[590 25 60 25],...
     'Enable','off',...
-    'Callback',{@reset_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'reset'}...
     );
 uicontrol('Tag','zoom_togglebutton',...
     'Style','togglebutton',...
@@ -233,7 +233,7 @@ uicontrol('Tag','zoom_togglebutton',...
     'TooltipString','Zoom into current axis display',...
     'pos',[600 50 25 25],...
     'Enable','off',...
-    'Callback',{@zoom_togglebutton_Callback}...
+    'Callback',{@togglebutton_Callback,'zoom'}...
     );
 uicontrol('Tag','fullscale_pushbutton',...
     'Style','pushbutton',...
@@ -244,7 +244,7 @@ uicontrol('Tag','fullscale_pushbutton',...
     'TooltipString','Fullscale (reset zoom on main axes)',...
     'pos',[625 50 25 25],...
     'Enable','off',...
-    'Callback',{@fullscale_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'fullscale'}...
     );
 
 % Create (reserve) button list below horizontal sliders
@@ -474,15 +474,14 @@ uicontrol('Tag','tbAnalysis',...
     'pos',[0 0 mainToggleButtonWidth 30],...
     'parent',hbg,...
     'HandleVisibility','off');
-uicontrol('Tag','tbReserve1',...
+uicontrol('Tag','tbInternal',...
     'Style','Toggle',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
-    'String','Reserve',...
-    'TooltipString','',...
+    'String','Internal',...
+    'TooltipString','GUI internals',...
     'pos',[mainToggleButtonWidth 0 mainToggleButtonWidth 30],...
     'parent',hbg,...
-    'Enable','off',...
     'HandleVisibility','off');
 uicontrol('Tag','tbConfigure',...
     'Style','Toggle',...
@@ -529,15 +528,9 @@ try
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 100 mainPanelWidth guiSize(2)-220]);
     
-    uipanel('Tag','reserve_panel',...
-        'parent',hMainFigure,...
-        'Title','Reserve',...
-        'FontUnit','Pixel','Fontsize',12,...
-        'FontWeight','bold',...
-        'BackgroundColor',defaultBackground,...
-        'Visible','off',...
-        'Units','pixels',...
-        'Position',[guiSize(1)-mainPanelWidth-20 100 mainPanelWidth guiSize(2)-220]);
+    guiInternalPanel(...
+        hMainFigure,...
+        [guiSize(1)-mainPanelWidth-20 100 mainPanelWidth guiSize(2)-220]);
     
     guiConfigurePanel(...
         hMainFigure,...
@@ -564,7 +557,7 @@ uicontrol('Tag','displaytype_popupmenu',...
     'Units','Pixels',...
     'Position',[10 10 mainPanelWidth-120 20],...
     'String','2D plot|1D along x|1D along y',...
-    'Callback', {@displaytype_popupmenu_Callback}...
+    'Callback', {@popupmenu_Callback,'displaytype'}...
     );
 uicontrol('Tag','previous_pushbutton',...
     'Style','pushbutton',...
@@ -576,7 +569,7 @@ uicontrol('Tag','previous_pushbutton',...
     'FontWeight','normal',...
     'String','<<',...
     'TooltipString','Show previous spectrum',...
-    'Callback',{@previous_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'previous'}...
     );
 uicontrol('Tag','next_pushbutton',...
     'Style','pushbutton',...
@@ -588,7 +581,7 @@ uicontrol('Tag','next_pushbutton',...
     'FontWeight','normal',...
     'String','>>',...
     'TooltipString','Show next spectrum',...
-    'Callback',{@next_pushbutton_Callback}...
+    'Callback',{@pushbutton_Callback,'next'}...
     );
 
 % Add command panel for script command functionality
@@ -759,10 +752,9 @@ end
 
 % Set directories
 dirs = fieldnames(ad.control.dirs);
+% Parse directory strings using "trEPRparseDir"
 for k=1:length(dirs)
-    if any(strcmpi(ad.control.dirs.(dirs{k}),{'pwd',''}))
-        ad.control.dirs.(dirs{k}) = pwd;
-    end
+    ad.control.dirs.(dirs{k}) = trEPRparseDir(ad.control.dirs.(dirs{k}));
 end
 setappdata(hMainFigure,'control',ad.control);
 
@@ -794,32 +786,120 @@ if isfield(ad.configuration,'start')
     end
 end
 
+% Check for saved history
+if exist(trEPRparseDir(ad.control.cmd.historyfile),'file')
+    ad.control.cmd.history = ...
+        textFileRead(trEPRparseDir(ad.control.cmd.historyfile));
+end
 
+% Check whether to save history -- and if so, write time stamp
+if ad.control.cmd.historysave
+    timeStamp = ['%-- ' datestr(now,'yyyy-mm-dd HH:MM') ' --%'];
+    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(timeStamp);
+    if histsavestat
+        trEPRmsg(histsavewarn,'warn');
+    end
+end
+
+setappdata(hMainFigure,'control',ad.control);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function slider_v1_Callback(source,~)
+function slider_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
+
+        guiZoom('off');
+        
+        active = ad.control.spectra.active;
         
         % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '1D along x'
-                ad.data{ad.control.spectra.active}.display.position.y = ...
-                    int16(get(source,'Value'));
-            case '1D along y'
-                ad.data{ad.control.spectra.active}.display.position.x = ...
-                    int16(get(source,'Value'));
+        switch lower(action)
+            case 'scroll'
+                switch lower(ad.control.axis.displayType)
+                    case '2d plot'
+                        return;
+                    case '1d along x'
+                        ad.data{active}.display.position.y = ...
+                            int16(get(source,'Value'));
+                    case '1d along y'
+                        ad.data{active}.display.position.x = ...
+                            int16(get(source,'Value'));
+                end
+            case 'displaceh'
+                switch ad.control.axis.displayType
+                    case {'2D plot','1D along x'}
+                        ad.data{active}.display.displacement.x = ...
+                            get(source,'Value');
+                    case '1D along y'
+                        ad.data{active}.display.displacement.y = ...
+                            get(source,'Value');
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : ' ...
+                            'Display type "' ad.control.axis.displayType '" '...
+                            'currently unsupported'],'warning');
+                end
+            case 'displacev'
+                switch ad.control.axis.displayType
+                    case '2D plot'
+                        ad.data{active}.display.displacement.y = ...
+                            get(source,'Value');
+                    case {'1D along x','1D along y'}
+                        ad.data{active}.display.displacement.z = ...
+                            get(source,'Value');
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' :' ...
+                            'Display type "' ad.control.axis.displayType '" '...
+                            'currently unsupported'],'warning');
+                end
+            case 'scaleh'
+                % Convert slider value to scaling factor
+                if (get(source,'Value') > 0)
+                    scalingFactor = get(source,'Value')+1;
+                else
+                    scalingFactor = 1/(abs(get(source,'Value'))+1);
+                end
+                
+                % Depending on display type settings
+                switch ad.control.axis.displayType
+                    case {'2D plot','1D along x'}
+                        ad.data{active}.display.scaling.x = scalingFactor;
+                    case '1D along y'
+                        ad.data{active}.display.scaling.y = scalingFactor;
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' :' ...
+                            'Display type "' ad.control.axis.displayType '" '...
+                            'currently unsupported'],'warning');
+                end
+            case 'scalev'
+                % Convert slider value to scaling factor
+                if (get(source,'Value') > 0)
+                    scalingFactor = get(source,'Value')+1;
+                else
+                    scalingFactor = 1/(abs(get(source,'Value'))+1);
+                end
+                switch lower(ad.control.axis.displayType)
+                    case '2d plot'
+                        ad.data{active}.display.scaling.y = scalingFactor;
+                    case {'1d along x','1d along y'}
+                        ad.data{active}.display.scaling.z = scalingFactor;
+                end
             otherwise
                 st = dbstack;
                 trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
         
         % Update appdata of main window
@@ -849,279 +929,29 @@ function slider_v1_Callback(source,~)
     end
 end
 
-function slider_v2_Callback(source,~)
+function togglebutton_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
-        
-        % Convert slider value to scaling factor
-        if (get(source,'Value') > 0)
-            scalingFactor = get(source,'Value')+1;
-        else
-            scalingFactor = 1/(abs(get(source,'Value'))+1);
-        end
-        
-        % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '2D plot'
-                ad.data{ad.control.spectra.active}.display.scaling.y = ...
-                    scalingFactor;
-            case '1D along x'
-                ad.data{ad.control.spectra.active}.display.scaling.z = ...
-                    scalingFactor;
-            case '1D along y'
-                ad.data{ad.control.spectra.active}.display.scaling.z = ...
-                    scalingFactor;
-            otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function slider_v3_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '2D plot'
-                ad.data{ad.control.spectra.active}.display.displacement.y = ...
-                    get(source,'Value');
-            case '1D along x'
-                ad.data{ad.control.spectra.active}.display.displacement.z = ...
-                    get(source,'Value');
-            case '1D along y'
-                ad.data{ad.control.spectra.active}.display.displacement.z = ...
-                    get(source,'Value');
-            otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function slider_h1_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        % Convert slider value to scaling factor
-        if (get(source,'Value') > 0)
-            scalingFactor = get(source,'Value')+1;
-        else
-            scalingFactor = 1/(abs(get(source,'Value'))+1);
-        end
-        
-        % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '2D plot'
-                ad.data{ad.control.spectra.active}.display.scaling.x = ...
-                    scalingFactor;
-            case '1D along x'
-                ad.data{ad.control.spectra.active}.display.scaling.x = ...
-                    scalingFactor;
-            case '1D along y'
-                ad.data{ad.control.spectra.active}.display.scaling.y = ...
-                    scalingFactor;
-            otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function slider_h2_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '2D plot'
-                ad.data{ad.control.spectra.active}.display.displacement.x = ...
-                    get(source,'Value');
-            case '1D along x'
-                ad.data{ad.control.spectra.active}.display.displacement.x = ...
-                    get(source,'Value');
-            case '1D along y'
-                ad.data{ad.control.spectra.active}.display.displacement.y = ...
-                    get(source,'Value');
-            otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : ' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function zoom_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        if (get(source,'Value'))
-            zh = zoom(mainWindow);
-            % set(zh,'UIContextMenu',handles.axisToolsContextMenu);
-            set(zh,'Enable','on');
-            set(zh,'Motion','both');
-            set(zh,'Direction','in');
-        else
-            zh = zoom(mainWindow);
-            set(zh,'Enable','off');
-            refresh;
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function fullscale_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
         gh = guihandles(mainWindow);
         
-        set(gh.zoom_togglebutton,'Value',0);
-        zh = zoom(mainWindow);
-        set(zh,'Enable','off');
-        
-        %Update main axis
-        update_mainAxis();
+        switch lower(action)
+            case 'zoom'
+                if (get(source,'Value'))
+                    guiZoom('on');
+                    trEPRguiSetMode('zoom');
+                else
+                    guiZoom('off');
+                    trEPRguiSetMode('none');
+                end
+            otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
+        end
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
@@ -1141,59 +971,150 @@ function fullscale_pushbutton_Callback(~,~)
     end
 end
 
-function reset_pushbutton_Callback(source,~)
+function pushbutton_Callback(source,~,action)
     try
-        if (get(source,'Value') == 0) || (isempty(ad.control.spectra.active))
-            return;
-        end
-        
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
-        % Reset displacement and scaling for current spectrum
-        ad.data{ad.control.spectra.active}.display.displacement.x = 0;
-        ad.data{ad.control.spectra.active}.display.displacement.y = 0;
-        ad.data{ad.control.spectra.active}.display.displacement.z = 0;
-        
-        ad.data{ad.control.spectra.active}.display.scaling.x = 1;
-        ad.data{ad.control.spectra.active}.display.scaling.y = 1;
-        ad.data{ad.control.spectra.active}.display.scaling.z = 1;
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
+        active = ad.control.spectra.active;
 
-function export_pushbutton_Callback(~,~)
-    try
-        % Open new figure window
-        newFig = figure();
-        
-        % Plot into new figure window
-        update_mainAxis(newFig);
+        switch lower(action)
+            case 'fullscale'
+                guiZoom('reset');
+                trEPRguiSetMode('none');
+                return;
+            case 'reset'
+                if (get(source,'Value') == 0) || ~active || isempty(active)
+                    return;
+                end
+                                
+                % Reset displacement and scaling for current spectrum
+                ad.data{active}.display.displacement.x = 0;
+                ad.data{active}.display.displacement.y = 0;
+                ad.data{active}.display.displacement.z = 0;
+                
+                ad.data{active}.display.scaling.x = 1;
+                ad.data{active}.display.scaling.y = 1;
+                ad.data{active}.display.scaling.z = 1;
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'data',ad.data);
+                
+                % Update slider panel
+                update_sliderPanel();
+                
+                %Update main axis
+                update_mainAxis();
+                return;
+            case 'detach'
+                % Open new figure window
+                newFig = figure();
+                
+                % Plot into new figure window
+                update_mainAxis(newFig);
+                return;
+            case 'next'
+                % This shall never happen, as the element should not be active in
+                % this case
+                if (length(ad.control.spectra.visible) < 2)
+                    return;
+                end
+                
+                if(active == ad.control.spectra.visible(end))
+                    ad.control.spectra.active = ad.control.spectra.visible(1);
+                else
+                    ad.control.spectra.active = ad.control.spectra.visible(...
+                        find(ad.control.spectra.visible==active)+1);
+                end
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = sprintf(...
+                    'Dataset %i (%s) made active',...
+                    ad.control.spectra.active,...
+                    ad.data{ad.control.spectra.active}.label);
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                trEPRmsg(msgStr,'info');
+                clear msgStr;
+                
+                % Update processing panel
+                update_processingPanel();
+                
+                % Update slider panel
+                update_sliderPanel();
+                
+                % Update display panel
+                update_displayPanel();
+                
+                % Update visible spectra listboxes (in diverse panels!)
+                update_visibleSpectra();
+                
+                %Update main axis
+                update_mainAxis();
+                return;
+            case 'previous'
+                % This shall never happen, as the element should not be active in this
+                % case
+                if (length(ad.control.spectra.visible) < 2)
+                    return;
+                end
+                
+                if (active == ad.control.spectra.visible(1))
+                    ad.control.spectra.active = ad.control.spectra.visible(end);
+                else
+                    ad.control.spectra.active = ad.control.spectra.visible(...
+                        find(ad.control.spectra.visible==active)-1);
+                end
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = sprintf(...
+                    'Dataset %i (%s) made active',...
+                    ad.control.spectra.active,...
+                    ad.data{active}.label);
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                trEPRmsg(msgStr,'info');
+                clear msgStr;
+                
+                % Update processing panel
+                update_processingPanel();
+                
+                % Update slider panel
+                update_sliderPanel();
+                
+                % Update display panel
+                update_displayPanel();
+                
+                % Update visible spectra listboxes (in diverse panels!)
+                update_visibleSpectra();
+                
+                %Update main axis
+                update_mainAxis();
+                return;
+            otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
+        end
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
@@ -1287,160 +1208,29 @@ function keyBindings(src,evt)
     end
 end
 
-function displaytype_popupmenu_Callback(source,~)
+function popupmenu_Callback(source,~,action)
     try
         % Get appdata of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
-        displayTypes = cellstr(get(source,'String'));
-        displayType = displayTypes{get(source,'Value')};
-        ad.control.axis.displayType = displayType;
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
+        switch lower(action)
+            case 'displaytype'
+                displayTypes = cellstr(get(source,'String'));
+                displayType = displayTypes{get(source,'Value')};
+                ad.control.axis.displayType = displayType;
+                
+                % Update appdata of main window
+                setappdata(mainWindow,'control',ad.control);
+                
+                update_mainAxis();
+            otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
         end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function previous_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % This shall never happen, as the element should not be active in this
-        % case
-        if (length(ad.control.spectra.visible) < 2)
-            return;
-        end
-        
-        if (ad.control.spectra.active == ad.control.spectra.visible(1))
-            ad.control.spectra.active = ad.control.spectra.visible(end);
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(...
-                find(ad.control.spectra.visible==ad.control.spectra.active)-1);
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Dataset %i (%s) made active',...
-            ad.control.spectra.active,...
-            ad.data{ad.control.spectra.active}.label);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr,'info');
-        clear msgStr;
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update display panel
-        update_displayPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-function next_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % This shall never happen, as the element should not be active in
-        % this case
-        if (length(ad.control.spectra.visible) < 2)
-            return;
-        end
-        
-        if(ad.control.spectra.active == ad.control.spectra.visible(end))
-            ad.control.spectra.active = ad.control.spectra.visible(1);
-        else
-            ad.control.spectra.active = ad.control.spectra.visible(...
-                find(ad.control.spectra.visible==ad.control.spectra.active)+1);
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Dataset %i (%s) made active',...
-            ad.control.spectra.active,...
-            ad.data{ad.control.spectra.active}.label);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr,'info');
-        clear msgStr;
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update display panel
-        update_displayPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
     catch exception
         try
             msgStr = ['An exception occurred in ' ...

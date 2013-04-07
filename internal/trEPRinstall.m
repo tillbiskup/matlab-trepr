@@ -9,8 +9,10 @@ function status = trEPRinstall()
 %               Empty if everything went fine, otherwise contains message.
 %
 
-% (c) 2012, Till Biskup
-% 2012-10-02
+% (c) 2012-13, Till Biskup
+% 2013-04-07
+
+status = '';
 
 % There are several tasks a good installation program should perform:
 %
@@ -51,7 +53,11 @@ if isempty(reply)
     reply = 'Y';
 end
 if ~strcmpi(reply,'y')
-    fprintf('\nInstallation aborted... good-bye.\n\n');
+    if installed
+        fprintf('\nUpdate aborted... good-bye.\n\n');
+    else
+        fprintf('\nInstallation aborted... good-bye.\n\n');
+    end
     return;
 end
 
@@ -111,6 +117,24 @@ if installed
         end
         fprintf('\ndone.\n');
     end
+end
+
+%-------------------------------------------------------------------------
+% CHECK FOR CONFIGURATION DIRECTORY
+confDir = trEPRparseDir('~/.trepr');
+if ~exist(confDir,'dir')
+    try
+        fprintf('\nCreating local config directory... ');
+        mkdir(confDir);
+        fprintf('done.\n');
+    catch exception
+        status = exception.message;
+        fprintf('failed!\n');
+    end
+end
+snapshotDir = trEPRparseDir(fullfile(confDir,'snapshots'));
+if ~exist(snapshotDir,'dir')
+    mkdir(snapshotDir);
 end
 
 fprintf('\nCongratulations! The trEPR Toolbox has been ')
