@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2013, Till Biskup
-% 2013-02-23
+% 2013-04-07
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -287,6 +287,9 @@ end
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
 function [content,warnings] = loadFile(filename)
+    content = [];
+    warnings = cell(0);
+
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
@@ -430,6 +433,8 @@ end
 % --- Sequentially read all files in a directory provided their name does
 % not start with a dot and it is a 'real' file and no directory
 function [content,warnings] = loadDir(dirname,varargin)
+    content = [];
+    warnings = cell(0);
     
     % Get names of files in the directory and remove all files whose name
     % starts with a "." and all directories. The names are stored as a cell
@@ -471,6 +476,9 @@ end
 % --- load files, combine them and return struct with the content of the
 % file together with the filename and possibly more info
 function [content,warnings] = combineFile(filename)
+    content = [];
+    warnings = cell(0);
+
     % Set struct containing all ASCII filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
@@ -481,6 +489,10 @@ function [content,warnings] = combineFile(filename)
     
     % open file
     fid = fopen(filename{1});
+    if fid < 0
+        warnings{end+1} = 'Could not open file.';
+        return;
+    end
     
     % Initialize switch resembling binary or ascii data
     isBinary = logical(false);
