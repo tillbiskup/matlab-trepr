@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-28
+% 2013-04-07
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
