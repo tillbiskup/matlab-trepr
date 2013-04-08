@@ -3,8 +3,8 @@ function varargout = trEPRgui_bugreportwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
-% (c) 2011-12, Till Biskup
-% 2012-06-28
+% (c) 2011-13, Till Biskup
+% 2013-04-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -298,7 +298,14 @@ function startBrowser(url)
     if any(strfind(platform,'Windows'))
         dos(['start ' url]);
     else
-        web(url,'-browser');
+        webstat = web(url,'-browser');
+        switch webstat
+            case 1
+                trEPRmsg('Could not find system browser','warning');
+            case 2
+                trEPRmsg('Could not launch system browser','warning');
+            otherwise
+        end 
     end
 end
 
