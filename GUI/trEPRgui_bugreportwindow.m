@@ -1,10 +1,10 @@
-function varargout = trEPRgui_bugreportwindow(varargin)
+function trEPRgui_bugreportwindow(varargin)
 % TREPRGUI Brief description of GUI.
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
 % (c) 2011-13, Till Biskup
-% 2013-04-07
+% 2013-04-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -33,7 +33,7 @@ if (singleton)
 end
 
 % Set some basic variables
-bugZillaUrl = 'https://r3c.de/bugs/till/';
+%bugZillaUrl = 'https://r3c.de/bugs/till/';
 bugZillaBugReportUrl = ...
     'https://r3c.de/bugs/till/enter_bug.cgi?product=trEPR%20toolbox';
 
@@ -252,8 +252,8 @@ function button_Callback(varargin)
                 msgbox(msgText,'Cannot write file','error'); 
                 return;
             end
-            for k=1:length(report)
-                fprintf(fid,'%s\n',report{k});
+            for m=1:length(report)
+                fprintf(fid,'%s\n',report{m});
             end
             fclose(fid);
         case 'close'
