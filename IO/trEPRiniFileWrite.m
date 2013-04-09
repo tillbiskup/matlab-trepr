@@ -43,8 +43,8 @@ function [ warnings ] = trEPRiniFileWrite ( fileName, data, varargin )
 %
 % See also: trEPRiniFileRead
 
-% (c) 2008-13, Till Biskup
-% 2013-02-17
+% (c) 2008-13, Till Biskup, Bernd Paulus
+% 2013-04-09
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -121,14 +121,23 @@ for k = 1 : length(blockNames)
     fprintf(fh,'\n[%s]\n',blockNames{k});
     fieldNames = fieldnames(data.(blockNames{k}));
     
+    % Loop through all fields in blockNames{k}
     for m = 1 : length(fieldNames)
+        % if field is a structure array
         if isstruct(data.(blockNames{k}).(fieldNames{m}))
+            % use nested function to set value
             traverse(data.(blockNames{k}).(fieldNames{m}),fieldNames{m},...
                 assignmentChar,fh,precision);
+        % if field is a cell array
+        elseif iscell(data.(blockNames{k}).(fieldNames{m}))
+            % use nested function to set value
+            traverseCell(data.(blockNames{k}).(fieldNames{m}),...
+                fieldNames{m},assignmentChar,fh,precision);
+        % in every other case, set value
         else
             fieldValue = data.(blockNames{k}).(fieldNames{m});
-            % in case the value is not a string, but numeric
-            if isnumeric(fieldValue)
+            % in case the value is not a string, but numeric or logical
+            if isnumeric(fieldValue) || islogical(fieldValue)
                 fieldValue = num2str(fieldValue,precision);
             end
             fprintf(fh,'%s%s %s\n',fieldNames{m},assignmentChar,fieldValue);
@@ -156,23 +165,72 @@ function traverse(structure,parent,assignmentChar,fileHandle,precision)
 
 fieldNames = fieldnames(structure);
 for k=1:length(fieldNames)
+    % if field is a structure array
     if isstruct(structure.(fieldNames{k}))
+        % call this function again
         traverse(...
             structure.(fieldNames{k}),[parent '.' fieldNames{k}],...
             assignmentChar,fileHandle,precision);
+    % if field is a cell array
+    elseif iscell(structure.(fieldNames{k}))
+        % call nested function for cells
+        traverseCell(...
+            structure.(fieldNames{k}),[parent '.' fieldNames{k}],...
+            assignmentChar,fileHandle,precision);
     else
-        field = sprintf('%s.%s',parent,fieldNames{k});
-        if isnumeric(structure.(fieldNames{k}))
+%         field = sprintf('%s.%s',parent,fieldNames{k});
+        if isnumeric(structure.(fieldNames{k})) || ...
+                islogical(structure.(fieldNames{k})) 
             value = num2str(structure.(fieldNames{k}),precision);
-            fprintf(fileHandle,'%s.%s%s %s\n',...
-                parent,fieldNames{k},assignmentChar,...
-                num2str(structure.(fieldNames{k}),precision));
+%             fprintf(fileHandle,'%s.%s%s %s\n',...
+%                 parent,fieldNames{k},assignmentChar,...
+%                 num2str(structure.(fieldNames{k}),precision));
         elseif ischar(structure.(fieldNames{k}))
             value = structure.(fieldNames{k});
-            fprintf(fileHandle,'%s.%s%s %s\n',...
-                parent,fieldNames{k},assignmentChar,...
-                structure.(fieldNames{k}));
+%             fprintf(fileHandle,'%s.%s%s %s\n',...
+%                 parent,fieldNames{k},assignmentChar,...
+%                 structure.(fieldNames{k}));
         end
+        fprintf(fileHandle,'%s.%s%s %s\n',...
+            parent,fieldNames{k},assignmentChar,value);...
+%             num2str(structure.(fieldNames{k}),precision));
+    end
+end
+
+end
+
+function traverseCell(cellArray,parent,assignmentChar,fileHandle,precision)
+
+for ica=1:length(cellArray)
+    % if cell is a structure array
+    if isstruct(cellArray{ica})
+        % call nested function for structs
+        traverse(...
+            cellArray{ica},[parent '{' num2str(ica) '}'],...
+            assignmentChar,fileHandle,precision);
+    % if cell is a cell array
+    elseif iscell(cellArray{ica})
+        % call this function again
+        traverseCell(...
+            cellArray{ica},[parent '.{' num2str(ica) '}'],...
+            assignmentChar,fileHandle,precision);
+    else
+%         field = sprintf('%s.%s',parent,fieldNames{k});
+        if isnumeric(cellArray{ica}) || ...
+                islogical(cellArray{ica}) 
+            value = num2str(cellArray{ica},precision);
+%             fprintf(fileHandle,'%s.%s%s %s\n',...
+%                 parent,fieldNames{k},assignmentChar,...
+%                 num2str(structure.(fieldNames{k}),precision));
+        elseif ischar(cellArray{ica})
+            value = cellArray{ica};
+%             fprintf(fileHandle,'%s.%s%s %s\n',...
+%                 parent,fieldNames{k},assignmentChar,...
+%                 structure.(fieldNames{k}));
+        end
+        fprintf(fileHandle,'%s{%i}%s %s\n',...
+            parent,ica,assignmentChar,value);...
+%             num2str(structure.(fieldNames{k}),precision));
     end
 end
 
