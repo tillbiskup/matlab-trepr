@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-04-07
+% 2013-04-11
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -20,9 +20,6 @@ end
 
 % Get handles from main window
 gh = guidata(mainWindow);
-
-% Get appdata from main GUI
-ad = getappdata(mainWindow);
 
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
@@ -56,6 +53,9 @@ end
 
 % Set min and max for plots - internal function
 setMinMax();
+
+% Get appdata from main GUI
+ad = getappdata(mainWindow);
 
 % Just to be on the save side, check whether we have a currently active
 % spectrum
