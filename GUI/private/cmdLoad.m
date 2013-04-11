@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-04-02
+% 2013-04-11
 
 status = 0;
 warnings = cell(0);
@@ -100,12 +100,15 @@ if ~isempty(warnings)
     % Add warnings to status messages
     msgStr = cell(0);
     msgStr{end+1} = 'Some warnings occurred when trying to load ';
+    if isa(FileName,'cell')
+        FileName = char(FileName);
+    end
     msgStr{end+1} = FileName;
     for k=1:length(warnings)
         if length(warnings{k})>1
             for m=1:length(warnings{k})
-                msgStr{end+1} = warnings{k}{m}.identifier; %#ok<AGROW>
-                msgStr{end+1} = warnings{k}{m}.message; %#ok<AGROW>
+                msgStr{end+1} = ['Identifier: ' warnings{k}{m}.identifier]; %#ok<AGROW>
+                msgStr{end+1} = ['Message:    ' warnings{k}{m}.message]; %#ok<AGROW>
             end
         else
             msgStr{end+1} = warnings{k}.identifier; %#ok<AGROW>
