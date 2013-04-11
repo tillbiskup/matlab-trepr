@@ -55,9 +55,14 @@ try
     end
     
     % Try to load and append configuration
-    conf = trEPRiniFileRead(confFile,'typeConversion',true);
-    if isempty(conf)
-        return;
+    try
+        conf = trEPRiniFileRead(confFile,'typeConversion',true);
+        if isempty(conf)
+            return;
+        end
+    catch exception
+        % If this happens, something probably more serious went wrong...
+        throw(exception);
     end
 
 catch exception
