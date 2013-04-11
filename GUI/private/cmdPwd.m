@@ -22,7 +22,7 @@ function [status,warnings] = cmdPwd(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-23
+% 2013-04-11
 
 status = 0;
 warnings = cell(0);
@@ -61,6 +61,7 @@ if isempty(opt)
         ['Save:        ' ad.control.dirs.lastSave] ...
         ['Figure save: ' ad.control.dirs.lastFigSave] ...
         ['Export:      ' ad.control.dirs.lastExport] ...
+        ['Snapshot:    ' ad.control.dirs.lastSnapshot] ...
         };
     trEPRmsg(message,'info');
     return;
@@ -70,17 +71,20 @@ switch lower(opt{1})
     case 'gui'
         trEPRgui_setdirectorieswindow();
         return;
-    case {'load','loaddir'}
+    case {'l','load','loaddir'}
         trEPRmsg(['Load dir: ' ad.control.dirs.lastLoad],'info');
         return;
-    case {'save','savedir'}
-        trEPRmsg(['Load dir: ' ad.control.dirs.lastSave],'info');
+    case {'s','save','savedir'}
+        trEPRmsg(['Save dir: ' ad.control.dirs.lastSave],'info');
         return;
-    case {'savefig','savefigdir','figsave','figsavedir','fig','figdir'}
-        trEPRmsg(['Load dir: ' ad.control.dirs.lastFigSave],'info');
+    case {'sf','savefig','savefigdir','figsave','figsavedir','fig','figdir'}
+        trEPRmsg(['Figure save dir: ' ad.control.dirs.lastFigSave],'info');
         return;
-    case {'export','exportdir'}
-        trEPRmsg(['Load dir: ' ad.control.dirs.lastExport],'info');
+    case {'e','export','exportdir'}
+        trEPRmsg(['Export dir: ' ad.control.dirs.lastExport],'info');
+        return;
+    case {'ss','snapshot','snapshotdir'}
+        trEPRmsg(['Snapshot dir: ' ad.control.dirs.lastExport],'info');
         return;
     otherwise
         trEPRmsg(['Command ' lower(cmd) ': option ' lower(opt{1}) ...

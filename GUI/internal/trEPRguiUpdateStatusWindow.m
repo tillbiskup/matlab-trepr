@@ -12,7 +12,7 @@ function status = trEPRguiUpdateStatusWindow(statusmessages)
 %   the last (i.e., most current) line of the status window is visible.
 
 % (c) 2011-13, Till Biskup
-% 2013-04-07
+% 2013-04-11
 
 % Is there currently a trEPRgui_statuswindow object?
 statuswindow = trEPRguiGetWindowHandle('trEPRgui_statuswindow');
@@ -24,6 +24,9 @@ end
 % Get handle for textdisplay
 handles = guidata(statuswindow);
 textdisplay = handles.status_text;
+
+% Update status display
+set(textdisplay,'String',statusmessages);
 
 % Display always the last (i.e., most current) line
 % uses findjobj from Yair Altman
@@ -40,9 +43,6 @@ jEdit.setCaretPosition(jEdit.getDocument.getLength);
 % 
 % statusmessages = cellfun(@(x)sprintf('<div><tt>%s</tt></div>',x),...
 %     statusmessages,'UniformOutput',false);
-
-% Update status display
-set(textdisplay,'String',statusmessages);
 
 status = 0;
 
