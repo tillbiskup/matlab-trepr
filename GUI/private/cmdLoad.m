@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-04-11
+% 2013-04-12
 
 status = 0;
 warnings = cell(0);
@@ -81,6 +81,13 @@ end
 [path,name,ext] = fileparts(FileName{1});
 if isempty(path)
     FileName = fullfile(ad.control.dirs.lastLoad,[name ext]);
+end
+
+% FileName is always a cell, as it comes from opt
+% To prevent problems with trEPRload, check whether it is a one-element
+% cell array and if so, convert it.
+if iscell(FileName) && length(FileName) == 1
+    FileName = FileName{1};
 end
 
 % Adding status line
