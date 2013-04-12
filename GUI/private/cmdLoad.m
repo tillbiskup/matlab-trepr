@@ -78,6 +78,11 @@ else
     loadInfoFile = false;
 end
 
+[path,name,ext] = fileparts(FileName{1});
+if isempty(path)
+    FileName = fullfile(ad.control.dirs.lastLoad,[name ext]);
+end
+
 % Adding status line
 trEPRmsg([{'Calling trEPRload and trying to load:'} FileName],'info');
 
