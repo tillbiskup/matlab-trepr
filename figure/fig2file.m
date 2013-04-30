@@ -34,8 +34,8 @@ function status = fig2file(figHandle,fileName,varargin)
 %                'fig2file.ini' that is in the same directory as fig2file.m
 %
 
-% (c) 2011-12, Till Biskup
-% 2012-11-12
+% (c) 2011-13, Till Biskup
+% 2013-04-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -59,7 +59,7 @@ try
     % Read configuration for export formats (geometries) from ini file
     exportFormatsConfigFile = [mfilename('full') '.ini'];
     exportFormats = ...
-        TAiniFileRead(exportFormatsConfigFile,'typeConversion',false);
+        trEPRiniFileRead(exportFormatsConfigFile,'typeConversion',false);
 
     % Set export format only in case of not having "fig" as fileType
     if ~strcmpi(fileType,'fig')
