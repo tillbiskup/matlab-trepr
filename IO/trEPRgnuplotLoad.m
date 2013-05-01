@@ -29,8 +29,8 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
-% (c) 2009-2012, Till Biskup
-% 2012-06-07
+% (c) 2009-2013, Till Biskup
+% 2013-05-01
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -135,17 +135,16 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
                             checkFileFormat(fileNames(k).name)
-                        data = importdata(fileNames(k).name,' ',3);
+                        data = importdata(fileNames(k).name,'\t',7);
                         % Header of first file goes to header
                         if isempty(content.header)
                             content.header = data.textdata;
                         end                        
                         content.data(end+1,:) = data.data(:,2);
-                        tokens = regexp(...
-                            data.textdata{2},...
-                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                        B0tok = regexp(...
+                            data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)',...
                             'tokens');
-                        switch tokens{1}{2}
+                        switch B0tok{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
                                 content.parameters.field.start.unit = ...
@@ -159,14 +158,17 @@ function [content,warnings] = loadFile(filename,varargin)
                                     'identifier','trEPRgnuplotLoad:parseError',...
                                     'message',sprintf(...
                                     'Could not recognise unit for magnetic field: ''%s''',...
-                                    tokens{1}{2})...
+                                    B0tok{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        mwtok = regexp(...
+                            data.textdata{3},'mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
                         content.parameters.bridge.MWfrequency.value(end+1) = ...
-                            str2double(tokens{1}{3});
+                            str2double(mwtok{1}{1});
                         content.parameters.bridge.MWfrequency.unit = ...
-                            tokens{1}{4};
+                            mwtok{1}{2};
                     end
                 end
                 
@@ -188,17 +190,16 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
                             checkFileFormat(filename{k})
-                        data = importdata(filename{k},' ',3);
+                        data = importdata(filename{k},'\t',7);
                         % Header of first file goes to header
                         if isempty(content.header)
                             content.header = data.textdata;
                         end                        
                         content.data(end+1,:) = data.data(:,2);
-                        tokens = regexp(...
-                            data.textdata{2},...
-                            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
+                        B0tok = regexp(...
+                            data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)',...
                             'tokens');
-                        switch tokens{1}{2}
+                        switch B0tok{1}{2}
                             case 'Gauss'
                                 content.axes.y.unit = 'G';
                                 content.parameters.field.start.unit = ...
@@ -212,14 +213,17 @@ function [content,warnings] = loadFile(filename,varargin)
                                     'identifier','trEPRgnuplotLoad:parseError',...
                                     'message',sprintf(...
                                     'Could not recognise unit for magnetic field: ''%s''',...
-                                    tokens{1}{2})...
+                                    B0tok{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        mwtok = regexp(...
+                            data.textdata{3},'mw = ([0-9.]*)\s*(\w*)',...
+                            'tokens');
                         content.parameters.bridge.MWfrequency.value(end+1) = ...
-                            str2double(tokens{1}{3});
+                            str2double(mwtok{1}{1});
                         content.parameters.bridge.MWfrequency.unit = ...
-                            tokens{1}{4};
+                            mwtok{1}{1};
                     end
                 end
                 
@@ -250,13 +254,11 @@ function [content,warnings] = loadFile(filename,varargin)
             return
         end
 
-        data = importdata(filename,' ',3);
+        data = importdata(filename,'\t',7);
         content.header = data.textdata;
         content.data = data.data(:,2)';
-        tokens = regexp(data.textdata{2},...
-            'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-            'tokens');
-        switch tokens{1}{2}
+        B0tok = regexp(data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)','tokens');
+        switch B0tok{1}{2}
             case 'Gauss'
                 content.axes.y.unit = 'G';
                 content.parameters.field.start.unit = content.axes.y.unit;
@@ -267,26 +269,24 @@ function [content,warnings] = loadFile(filename,varargin)
                     'identifier','trEPRspeksimLoad:parseError',...
                     'message',sprintf(...
                     'Could not recognise unit for magnetic field: ''%s''',...
-                    tokens{1}{2})...
+                    B0tok{1}{2})...
                     );
         end
-        content.parameters.field.start.value = str2double(tokens{1}{1});
-        content.parameters.field.stop.value = str2double(tokens{1}{1});
+        content.parameters.field.start.value = str2double(B0tok{1}{1});
+        content.parameters.field.stop.value = str2double(B0tok{1}{1});
         content.parameters.field.step.value = 0;
-        content.axes.y.values = str2double(tokens{1}{1});
+        content.axes.y.values = str2double(B0tok{1}{1});
+        mwtok = regexp(data.textdata{3},'mw = ([0-9.]*)\s*(\w*)','tokens');
         content.parameters.bridge.MWfrequency.value = ...
-            str2double(tokens{1}{3});
-        content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+            str2double(mwtok{1}{1});
+        content.parameters.bridge.MWfrequency.unit = mwtok{1}{2};
     end
     
     % Assign other parameters, as far as possible
 
     % Parse field and MW frequency values
-    tokens = regexp(...
-        content.header{2},...
-        'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
-        'tokens');
-    switch tokens{1}{2}
+    B0tok = regexp(data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)','tokens');
+    switch B0tok{1}{2}
         case 'Gauss'
             content.axes.y.unit = 'G';
         otherwise
@@ -294,11 +294,14 @@ function [content,warnings] = loadFile(filename,varargin)
                 'identifier','trEPRgnuplotLoad:parseError',...
                 'message',sprintf(...
                 'Could not recognise unit for magnetic field: ''%s''',...
-                tokens{1}{2})...
+                B0tok{1}{2})...
                 );
     end
     content.axes.y.measure = 'magnetic field';
-    content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+    mwtok = regexp(data.textdata{3},'mw = ([0-9.]*)\s*(\w*)','tokens');
+    content.parameters.bridge.MWfrequency.value = ...
+        str2double(mwtok{1}{1});
+    content.parameters.bridge.MWfrequency.unit = mwtok{1}{2};
     
     content.parameters.transient.points = length(data.data(:,1));
     content.parameters.transient.length.value = ...
@@ -321,7 +324,7 @@ function [content,warnings] = loadFile(filename,varargin)
     content.parameters.transient.length.unit = content.axes.x.unit;
     
     % Get label string from third line of file/header
-    content.label = strtrim(content.header{3}(3:end));
+    content.label = strtrim(content.header{6}(3:end));
 end
 
 % --- Check whether the file is in Freiburg gnuplot format
