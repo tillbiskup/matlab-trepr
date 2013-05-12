@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2013, Till Biskup
-% 2013-04-11
+% 2013-05-12
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -107,11 +107,13 @@ elseif isstruct(filename) && isfield(filename,'name')
     % That might be the case if the user uses "dir" as input for the
     % filenames, as this returns a structure with fields as "name"
     % Convert struct to cell
-    filenames = cell(length(filename),1);
     l = 1;
     for k = 1:length(filename)
-        if ~strcmp(filename(k).name,'.') && ~strcmp(filename(k).name,'..')
-            filenames{l} = filename(k).name;
+        if ~strcmp(filename(k).name,'.') && ...
+                ~strcmp(filename(k).name,'..') && ...
+                ~strcmp(filename(k).name(1),'.') && ...
+                ~strcmp(filename(k).name(end),'~')
+            filenames{l} = filename(k).name; %#ok<AGROW>
             l=l+1;
         end
     end
@@ -443,12 +445,14 @@ function [content,warnings] = loadDir(dirname,varargin)
     % starts with a "." and all directories. The names are stored as a cell
     % array in 'filesInDir'.
     allFilesInDir = dir(dirname);
-    filesInDir = ...
-        cell(length(allFilesInDir)-length(find([allFilesInDir.isdir])),1);
+%     filesInDir = ...
+%         cell(length(allFilesInDir)-length(find([allFilesInDir.isdir])),1);
     l = 1;
     for k=1:length(allFilesInDir)
-        if ~allFilesInDir(k).isdir
-            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
+        if ~allFilesInDir(k).isdir && ...
+                ~strcmp(allFilesInDir(k).name(1),'.') && ...
+                ~strcmp(allFilesInDir(k).name(end),'~')
+            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name); %#ok<AGROW>
             l=l+1;
         end
     end

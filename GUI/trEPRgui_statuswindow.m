@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % (c) 2011-13, Till Biskup
-% 2013-05-01
+% 2013-05-12
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -79,7 +79,7 @@ guidata(hMainFigure,guihandles);
 guiConfigApply(mfilename);
 
 % Set fomt size depending on OS (12 pt seems a bit huge with linux)
-if isunix
+if isunix && ~ismac
     set(textdisplay,'FontSize',10);
 end
 

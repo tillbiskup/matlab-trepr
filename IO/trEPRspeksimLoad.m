@@ -30,7 +30,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2013, Till Biskup
-% 2013-02-28
+% 2013-05-12
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -70,7 +70,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
                     [content,warnings] = loadFile(filename,'all');
                     % assign output argument
                     if ~nargout
-                        % of no output argument is given, assign content to
+                        % If no output argument is given, assign content to
                         % a variable in the workspace with the same name as
                         % the file
                         [~, name, ext] = fileparts(filename);
@@ -134,6 +134,8 @@ function [content,warnings] = loadFile(filename,varargin)
                 fileNames = dir(sprintf('%s.*',filename));
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
+                            ~strcmp(fileNames(k).name(end),'~') && ...
+                            ~strcmp(filename{k}(1),'.') && ...
                             checkFileFormat(fileNames(k).name)
                         data = importdata(fileNames(k).name,' ',5);
                         % Header of first file goes to header
@@ -211,6 +213,8 @@ function [content,warnings] = loadFile(filename,varargin)
                 % This is used in case filename is a cell array of file names
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
+                            ~strcmp(filename{k}(end),'~') && ...
+                            ~strcmp(filename{k}(1),'.') && ...
                             checkFileFormat(filename{k})
                         data = importdata(filename{k},' ',5);
                         % Header of first file goes to header
@@ -322,7 +326,7 @@ function [content,warnings] = loadFile(filename,varargin)
                         'message',sprintf(...
                         'Could not recognise unit for magnetic field: ''%s''',...
                         tokens{1}{2})...
-                        ); %#ok<AGROW>
+                        );
             end
         else
             tokens = regexp(data.textdata{2},...
@@ -382,6 +386,17 @@ function [content,warnings] = loadFile(filename,varargin)
     
     % Get label string from third line of file/header
     content.label = strtrim(content.header{3});
+    
+    % Check for correct values in Gaussmeter readout, and delete values if
+    % necessary, to avoid errors later on
+    if ~isempty(content.parameters.field.calibration.gaussMeter.values)
+        % For convenience and shorter lines
+        gmvals = content.parameters.field.calibration.gaussMeter.values;
+        if min(gmvals) < 0 || min(gmvals(2:end)-gmvals(1:end-1)) <= 0
+            content.parameters.field.calibration.gaussMeter.values = [];
+            warnings{end+1} = 'Gaussmeter values deleted due to errors'; 
+        end     
+    end
 end
 
 % --- Check whether the file is in speksim format
