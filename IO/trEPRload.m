@@ -107,16 +107,19 @@ elseif isstruct(filename) && isfield(filename,'name')
     % That might be the case if the user uses "dir" as input for the
     % filenames, as this returns a structure with fields as "name"
     % Convert struct to cell
+    filenames = cell(length(filename));
     l = 1;
     for k = 1:length(filename)
         if ~strcmp(filename(k).name,'.') && ...
                 ~strcmp(filename(k).name,'..') && ...
                 ~strcmp(filename(k).name(1),'.') && ...
                 ~strcmp(filename(k).name(end),'~')
-            filenames{l} = filename(k).name; %#ok<AGROW>
+            filenames{l} = filename(k).name;
             l=l+1;
         end
     end
+    % Remove empty entries from cell array
+    filenames(cellfun('isempty',filenames)) = [];
     if p.Results.combine
         [content,warnings] = combineFile(filenames);
     else
@@ -445,17 +448,18 @@ function [content,warnings] = loadDir(dirname,varargin)
     % starts with a "." and all directories. The names are stored as a cell
     % array in 'filesInDir'.
     allFilesInDir = dir(dirname);
-%     filesInDir = ...
-%         cell(length(allFilesInDir)-length(find([allFilesInDir.isdir])),1);
+    filesInDir = cell(length(allFilesInDir));
     l = 1;
     for k=1:length(allFilesInDir)
         if ~allFilesInDir(k).isdir && ...
                 ~strcmp(allFilesInDir(k).name(1),'.') && ...
                 ~strcmp(allFilesInDir(k).name(end),'~')
-            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name); %#ok<AGROW>
+            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
             l=l+1;
         end
     end
+    % Remove empty entries from cell array
+    filesInDir(cellfun('isempty',filesInDir)) = [];
     
     % If there are still files in the directory after removing all dot
     % files and directories, try to read every single file
