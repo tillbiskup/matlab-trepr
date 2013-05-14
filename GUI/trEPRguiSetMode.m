@@ -25,7 +25,7 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-28
+% 2013-05-14
 
 status = 0;
 warnings = cell(0);
@@ -86,21 +86,32 @@ switch lower(mode)
         set(gh.command_panel_edit,...
             'String','Enter command - Ctrl-l / Cmd-l for access');
     case {'scroll','s'}
+        guiZoom('off');
+        guiMeasure('off',0);
         GUImode = 'Scroll';
     case {'scale','c'}
+        guiZoom('off');
+        guiMeasure('off',0);
         GUImode = 'Scale';
     case {'displace','d'}
+        guiZoom('off');
+        guiMeasure('off',0);
         GUImode = 'Displace';
     case {'zoom','z'}
+        guiMeasure('off',0);
         guiZoom('on');
         GUImode = 'Zoom';
     case {'measure','m'}
+        guiZoom('off');
         guiMeasure('on',2);
         GUImode = 'Measure';
     case {'pick','p'}
+        guiZoom('off');
         guiMeasure('on',1);
         GUImode = 'Pick';
     case {'command','o'}
+        guiZoom('off');
+        guiMeasure('off',0);
         GUImode = 'Command';
         set(gh.command_panel_edit,'Enable','on');
         set(gh.command_panel_edit,'String','');

@@ -81,7 +81,10 @@ try
             % Reset pointer callback functions
             set(mainWindow,'WindowButtonMotionFcn','');
             set(mainWindow,'WindowButtonDownFcn','');
-                    
+            
+            % Reset pointer
+            set(mainWindow,'Pointer','arrow');
+            
             % Update display - REALLY NECESSARY?
             refresh;
             return;
