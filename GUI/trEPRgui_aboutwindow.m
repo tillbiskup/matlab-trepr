@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-18
+% 2013-05-19
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -32,7 +32,7 @@ toolboxNameString = 'trEPR Toolbox';
 versionString = ...
     sprintf('v.%s (%s)',info.version.Version,info.version.Date);
 copyrightInfo = {...
-    sprintf('(c) 2005-12, %s, <%s>',info.maintainer.name,info.maintainer.email)...
+    sprintf('(c) 2005-13, %s, <%s>',info.maintainer.name,info.maintainer.email)...
 %     ''...
 %     sprintf('%s',info.url)...
     };
@@ -63,11 +63,11 @@ javacomponent(jLabel,[20 guiPosition(4)-128-20 128 128],hMainFigure);
 
 % Set length of scrolling panel depending on the platform
 if any(strfind(platform,'Linux'))
-    scrollPanelHeight = guiPosition(4)+2300;
+    scrollPanelHeight = guiPosition(4)+2400;
 elseif any(strfind(platform,'Windows'))
-    scrollPanelHeight = guiPosition(4)+2080;
+    scrollPanelHeight = guiPosition(4)+2180;
 else % In case we are on a Mac
-    scrollPanelHeight = guiPosition(4)+2500;
+    scrollPanelHeight = guiPosition(4)+2625;
 end
 
 hPanel = uipanel('Parent',hMainFigure,...

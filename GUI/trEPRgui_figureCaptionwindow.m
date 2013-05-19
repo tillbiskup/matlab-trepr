@@ -260,22 +260,14 @@ function pushbutton_Callback(~,~,action)
                 [captionFileName,pathName] = uiputfile(...
                     sprintf('*%s',captionFileExtension),...
                     'Get filename to save figure caption to',...
-                    '');
+                    captionFileName);
                 % If user aborts process, return
                 if captionFileName == 0
                     return;
                 end
                 % Create filename with full path
-                captionFileName = fullfile(pathName,captionFileName);
-            case 'load'
-                fileNames = get(gh.filelist_panel_listbox,'String');
-                [status,warnings] = cmdSnapshot(mainGUIHandle,...
-                    {'load',fullfile(admain.control.dirs.lastSnapshot,...
-                    char(fileNames(get(gh.filelist_panel_listbox,'Value'))))});
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
-                figure(hMainFigure);
+                [~,fileName,~] = fileparts(captionFileName);
+                captionFileName = fullfile(pathName,fileName);
             case 'save'
                 saveCaption();
                 closeGUI('','','saved');
