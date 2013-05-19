@@ -67,6 +67,12 @@ BGC = 0
 labels = 1
 format = automatic 
 
+% Configuration of the sliders
+[slider]
+displacement.x.factor = 1
+displacement.y.factor = 1
+displacement.z.factor = 10
+
 % Configuration for the measure panel
 [measure]
 setslider = 1

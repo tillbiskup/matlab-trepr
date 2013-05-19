@@ -17,7 +17,7 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              a copy is copied to the history.info field
 
 % (c) 2011-13, Till Biskup, Bernd Paulus
-% 2013-03-26
+% 2013-05-19
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -396,6 +396,10 @@ try
     % information about the accumulated datasets as well
     history.parameters = parameters;
     history.parameters = rmfield(history.parameters,'datasets');
+    % Prevent data from being saved into history parameters record
+    if isfield(history.parameters,'data')
+        history.parameters = rmfield(history.parameters,'data');
+    end
     for k=1:length(data)
         % Assemble structure that holds all necessary information about the
         % accumulated datasets

@@ -35,7 +35,25 @@ function status = fig2file(figHandle,fileName,varargin)
 %
 
 % (c) 2011-13, Till Biskup
-% 2013-04-30
+% 2013-05-15
+
+% If called without arguments, print help and list of formats
+if ~nargin
+    help fig2file;
+    try
+        % Read configuration for export formats (geometries) from ini file
+        exportFormatsConfigFile = [mfilename('full') '.ini'];
+        exportFormats = ...
+            trEPRiniFileRead(exportFormatsConfigFile,'typeConversion',false);
+        fprintf('  Export formats (from "%s")\n\n',[mfilename '.ini']);
+        formats = fieldnames(exportFormats);
+        cellfun(@(x)fprintf('\t%s\n',x),formats);
+    catch exception
+        disp('An error occurred when trying to read the INI file:');
+        throw(exception);
+    end
+    return;
+end
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -111,9 +129,11 @@ try
                 axisHandle = findobj(allchild(figHandle),'type','axes',...
                     '-not','tag','legend');
                 if ~isempty(axisHandle)
-                    oldParams.(fieldNames{k}) = get(axisHandle,fieldNames{k});
-                    set(axisHandle,fieldNames{k},...
-                        exportFormats.(exportFormat).(fieldNames{k}));
+                    for m=1:length(axisHandle)
+                        oldParams.(fieldNames{k}) = get(axisHandle(m),fieldNames{k});
+                        set(axisHandle(m),fieldNames{k},...
+                            exportFormats.(exportFormat).(fieldNames{k}));
+                    end
                 end
                 % Try to get text handles that are child of axes
                 for hidx=1:length(axisHandle)
@@ -135,15 +155,26 @@ try
         axisHandle = findobj(allchild(figHandle),'type','axes',...
             '-not','tag','legend');
         if ~isempty(axisHandle)
-            oldAxisUnits = get(axisHandle,'Unit');
-            oldAxisPosition = get(axisHandle,'Position');
-            set(axisHandle,'Unit',exportFormats.(exportFormat).PaperUnits);
-            tightInset = get(axisHandle,'TightInset');
-            axisPosition = exportFormats.(exportFormat).PaperPosition;
-            axisPosition(1:2) = tightInset(1:2);
-            axisPosition(3) = axisPosition(3)-sum(tightInset([1,3]));
-            axisPosition(4) = axisPosition(4)-sum(tightInset([2,4]));
-            set(axisHandle,'Position',axisPosition);
+            if length(axisHandle) == 1
+                oldAxisUnits = get(axisHandle,'Unit');
+                oldAxisPosition = get(axisHandle,'Position');
+                set(axisHandle,'Unit',exportFormats.(exportFormat).PaperUnits);
+                tightInset = get(axisHandle,'TightInset');
+                axisPosition = exportFormats.(exportFormat).PaperPosition;
+                axisPosition(1:2) = tightInset(1:2);
+                axisPosition(3) = axisPosition(3)-sum(tightInset([1,3]));
+                axisPosition(4) = axisPosition(4)-sum(tightInset([2,4]));
+                set(axisHandle,'Position',axisPosition);
+            else
+                oldAxisPosition = cell(length(axisHandle));
+                for k=1:length(axisHandle)
+                    oldAxisUnits = get(axisHandle(k),'Unit');
+                    oldAxisPosition{k} = get(axisHandle(k),'Position');
+                    set(axisHandle(k),'Unit',exportFormats.(exportFormat).PaperUnits);
+                end
+                % TODO: Handle subplots properly
+                axis(axisHandle,'auto','fill');
+            end
         end
     end
     
@@ -185,8 +216,10 @@ try
                 axisHandle = findobj(allchild(figHandle),'type','axes',...
                     '-not','tag','legend');
                 if ~isempty(axisHandle)
-                    set(axisHandle,fieldNames{k},...
-                        oldParams.(fieldNames{k}));
+                    for m=1:length(axisHandle)
+                        set(axisHandle(m),fieldNames{k},...
+                            oldParams.(fieldNames{k}));
+                    end
                 end                    
                 % Try to get text handles that are child of axes
                 for hidx=1:length(axisHandle)
@@ -204,8 +237,15 @@ try
         axisHandle = findobj(allchild(figHandle),'type','axes',...
             '-not','tag','legend');
         if ~isempty(axisHandle)
-            set(axisHandle,'Unit',oldAxisUnits);
-            set(axisHandle,'Position',oldAxisPosition);
+            if length(axisHandle) == 1
+                set(axisHandle,'Unit',oldAxisUnits);
+                set(axisHandle,'Position',oldAxisPosition);
+            else
+                for k=1:length(axisHandle)
+                    set(axisHandle(k),'Unit',oldAxisUnits);
+                    set(axisHandle(k),'Position',oldAxisPosition{k});
+                end
+            end
         end
     end
     

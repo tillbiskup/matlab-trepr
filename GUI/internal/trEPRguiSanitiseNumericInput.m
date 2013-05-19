@@ -37,9 +37,13 @@ function [value,status,warnings] = trEPRguiSanitiseNumericInput(value,varargin)
 %  map      - boolean
 %             Whether to map value to elements of vector.
 %             Default: false
+%
+%  index    - boolean
+%             Whether to return index to matching value of vector.
+%             Default: false
 
 % (c) 2013, Till Biskup
-% 2013-03-02
+% 2013-05-18
 
 status = 0;
 warnings = cell(0);
@@ -61,6 +65,7 @@ p.addOptional('vector',[],@(x)isvector(x));
 p.addParamValue('round',false, @(x)islogical(x));
 p.addParamValue('interp',false, @(x)islogical(x));
 p.addParamValue('map',false, @(x)islogical(x));
+p.addParamValue('index',false, @(x)islogical(x));
 p.parse(value,varargin{:});
 
 vector = p.Results.vector;
@@ -107,8 +112,11 @@ if ~isempty(vector)
     end
     
     % Handle mapping of value to vector
-    if any([p.Results.map,p.Results.interp])
+    if any([p.Results.map,p.Results.interp,p.Results.index])
         value = vector(interp1(vector,1:length(vector),value,'nearest'));
+        if p.Results.index
+            value = find(vector==value);
+        end
     end
 end
 

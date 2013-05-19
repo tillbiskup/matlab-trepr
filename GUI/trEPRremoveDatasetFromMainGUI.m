@@ -12,8 +12,8 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2012-05-19
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -45,10 +45,13 @@ try
     % Cell array for labels of removed datasets
     removedDatasetsLabels = cell(0);
     
+    % Ensure datasets are in descending order
+    dataset = sort(dataset,'descend');
+        
     % Remove dataset(s) from main GUI
-    for k=length(dataset):-1:1
+    for k=1:length(dataset)
         if ~p.Results.force
-            if ~any(ad.control.spectra.modified==dataset)
+            if ~any(ad.control.spectra.modified==dataset(k))
                 removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
                 ad.data(dataset(k)) = [];
                 ad.origdata(dataset(k)) = [];

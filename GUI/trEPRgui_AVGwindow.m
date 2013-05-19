@@ -6,8 +6,8 @@ function varargout = trEPRgui_AVGwindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011-12, Till Biskup
-% 2012-09-26
+% (c) 2011-13, Till Biskup
+% 2013-05-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1240,11 +1240,10 @@ function area_edit_Callback(source,~,position)
             return;
         end
         
-        value = str2double(strrep(get(source,'String'),',','.'));
+        value = get(source,'String');
         
-        % If value is empty or NaN after conversion to numeric, restore
-        % previous entry and return
-        if (isempty(value) || isnan(value))
+        % If value is empty, restore previous entry and return
+        if isempty(value)
             % Update slider panel
             updateAveragePanel();
             return;
@@ -1285,13 +1284,7 @@ function area_edit_Callback(source,~,position)
         
         switch position
             case 'startindex'
-                value = round(value);
-                if (value > length(dim)) 
-                    value = length(dim); 
-                end
-                if (value < 1) 
-                    value = 1; 
-                end
+                value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
                 ad.data{active}.avg.start = value;
                 % Set stop value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
@@ -1309,18 +1302,8 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'startunit'
-                if (value < dim(1)) 
-                    value = dim(1); 
-                end
-                if (value > dim(end)) 
-                    value = dim(end); 
-                end
                 ad.data{active}.avg.start = ...
-                    interp1(...
-                    dim,1:length(dim),...
-                    value,...
-                    'nearest'...
-                    );
+                    trEPRguiSanitiseNumericInput(value,dim,'index',true);
                 % Set stop value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
                     % Check whether start + delta > length(dim)
@@ -1337,13 +1320,7 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopindex'
-                value = round(value);
-                if (value > length(dim)) 
-                    value = length(dim); 
-                end
-                if (value < 1) 
-                    value = 1; 
-                end
+                value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
                 ad.data{active}.avg.stop = value;
                 % Set start value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
@@ -1361,18 +1338,8 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'stopunit'
-                if (value < dim(1)) 
-                    value = dim(1); 
-                end
-                if (value > dim(end)) 
-                    value = dim(end); 
-                end
                 ad.data{active}.avg.stop = ...
-                    interp1(...
-                    dim,1:length(dim),...
-                    value,...
-                    'nearest'...
-                    );
+                    trEPRguiSanitiseNumericInput(value,dim,'index',true);
                 % Set start value not overlapping
                 if ad.data{active}.avg.start > ad.data{active}.avg.stop
                     % Check whether stop - delta < length(dim)
@@ -1389,13 +1356,7 @@ function area_edit_Callback(source,~,position)
                 ad.data{active}.avg.delta = ...
                     ad.data{active}.avg.stop-ad.data{active}.avg.start;
             case 'deltaindex'
-                value = round(value);
-                if (value > length(dim)) 
-                    value = length(dim); 
-                end
-                if (value < 0) 
-                    value = 0; 
-                end
+                value = trEPRguiSanitiseNumericInput(value,0:length(dim),'round',true);
                 ad.data{active}.avg.delta = value;
                 % Check whether start + delta > length(dim)
                 if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
@@ -1407,19 +1368,10 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             case 'deltaunit'
-                if (value < 0) 
-                    value = 0; 
-                end
-                if (value > dim(end)-dim(1)) 
-                    value = dim(end)-dim(1); 
-                end
+                deltadim = 0+abs(dim(2)-dim(1)):abs(dim(2)-dim(1)):(abs(dim(2)-dim(1))*(length(dim)));
                 ad.data{active}.avg.delta = ...
-                    interp1(...
-                    0+abs(dim(2)-dim(1)):abs(dim(2)-dim(1)):(abs(dim(2)-dim(1))*(length(dim))),...
-                    1:length(dim),...
-                    value,...
-                    'nearest'...
-                    );
+                    trEPRguiSanitiseNumericInput(value,deltadim,...
+                    'index',true);
                 if isnan(ad.data{active}.avg.delta)
                     ad.data{active}.avg.delta = 0;
                 end
@@ -1446,7 +1398,7 @@ function area_edit_Callback(source,~,position)
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
-        
+                
         % Update average panel display
         updateAveragePanel();
 
