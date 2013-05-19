@@ -770,7 +770,8 @@ if isfield(ad.configuration,'start')
     if isfield(ad.configuration.start,'tip') && ...
             ad.configuration.start.tip
         showTips = showTip('File',fullfile(...
-            trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'));
+            trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'),...
+            'ShowTip',ad.configuration.start.tip);
         if ~showTips
             conf = trEPRguiConfigLoad(mfilename);
             conf.start.tip = showTips;

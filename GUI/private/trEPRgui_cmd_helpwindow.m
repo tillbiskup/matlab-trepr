@@ -7,7 +7,7 @@ function varargout = trEPRgui_cmd_helpwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-02-22
+% 2013-05-19
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -24,8 +24,8 @@ if (singleton)
 end
 
 guiPosition = [160,240,850,450];
-% Try to get NetPolarisationwindow GUI position
-mainGUIHandle = trEPRguiGetWindowHandle('trEPRgui');
+% Try to get main GUI position
+mainGUIHandle = trEPRguiGetWindowHandle();
 if ishandle(mainGUIHandle)
     mainGUIPosition = get(mainGUIHandle,'Position');
     guiPosition = [mainGUIPosition(1)+40,mainGUIPosition(2)+150,...
@@ -47,7 +47,6 @@ defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
-% Create (reserve) button list below horizontal sliders
 % Create button group.
 hButtonGroup = uibuttongroup('Tag','buttonGroup',...
     'Parent',hMainFigure,...
