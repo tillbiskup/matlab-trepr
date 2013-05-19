@@ -277,6 +277,22 @@ if exist('content','var') && p.Results.loadInfoFile ...
         else
             warnings{end+1} = ifpwarnings;
         end
+    elseif isfield(content,'file') && isfield(content.file,'name')
+        [fpath,fname,~] = fileparts(content.file.name);
+        infoFileName = fullfile(fpath,[fname '.info']);
+        if exist(infoFileName,'file')
+            [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
+            if isempty(ifpwarnings)
+                content = structcopy(content,parameters);
+                trEPRmsg({'Loaded info file and applied contents to dataset',...
+                    infoFileName},'info');
+            else
+                warnings{end+1} = ifpwarnings;
+            end
+        else
+            warnings{end+1} = struct('identifier','trEPRload:missingInfoFile',...
+                'message','Could not find accompanying info file.');
+        end
     else
         warnings{end+1} = struct('identifier','trEPRload:missingInfoFile',...
             'message','Could not find accompanying info file.');
