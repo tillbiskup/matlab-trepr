@@ -51,3 +51,5 @@ You can switch between the different modes with keyboard shortcuts: "s" for scro
 The status display on the bottom right of the main GUI allows you to have the current toolbox status always under control. It is reset by opening the status window.
 
 You can get help for any command in the command line using the command <tt>?</tt> followed by the command you would get help displayed for.
+
+You can save information along with a figure - with the new Figure Caption GUI. Simply check the box in the display panel.
