@@ -21,7 +21,7 @@ function [fileContents,warnings] = trEPRinfoFileCreate(parameters,varargin)
 % See also: TREPRINFOFILEPARSE, TREPRINFOFILEWRITE
 
 % (c) 2012-13, Till Biskup
-% 2013-02-15
+% 2013-05-19
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -83,7 +83,7 @@ try
     parametersFieldNames = fieldnames(parameters);
     
     if any(strcmpi(parametersFieldNames,'parameters'))
-        parameters = mapToDataStructure(parameters);
+        parameters = mapToDataStructure(parameters,precision);
         parametersFieldNames = fieldnames(parameters);
     end
     
@@ -146,7 +146,7 @@ end
 % dataStructure - Structure containing the fields of the trEPR toolbox data
 %                 structure with mapped information from the input
 %
-function dataStructure = mapToDataStructure(parameters)
+function dataStructure = mapToDataStructure(parameters,precision)
 try
     dataStructure = struct();
     

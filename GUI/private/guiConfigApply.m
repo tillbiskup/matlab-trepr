@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % (c) 2011-13, Till Biskup
-% 2013-02-24
+% 2013-05-19
 
 status = 0;
 
@@ -113,6 +113,11 @@ try
                         set(gh.load_panel_filetype_popupmenu,'Value',k);
                     end
                 end
+            end
+            % Set display panel's settings
+            if isfield(ad.configuration.display,'figsave')
+                set(gh.display_panel_axesexport_includecaption_checkbox,...
+                    'Value',ad.configuration.display.figsave.caption);
             end
             % Generically set a number of configuration settings where we
             % have a direct match

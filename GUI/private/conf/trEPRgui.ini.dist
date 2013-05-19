@@ -95,6 +95,7 @@ legend.FontWeight = normal
 legend.FontAngle = normal
 normalise = none
 highlightactive = 1
+figsave.caption = 1
 export1Dincludeaxis = 1
 display3DoffsetAuto = 1
 thresholdMin = 0
