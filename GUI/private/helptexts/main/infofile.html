@@ -110,113 +110,113 @@
 			Following an example of an info file for a trEPR measurement with the full set of fields and blocks. 
 		</p>
 		
-<code><small>
-trEPR Info file - v. 0.1.4 (2012-10-23)<br />
-<br />
-GENERAL<br />
-Filename:               xband/111013/messung02/messdaten02<br />
-Date:                   2011-10-13<br />
-Time start:             11:05:00<br />
-Time end:               15:50:00<br />
-Operator:               Max Mustermann<br />
-Label:                  xxxCry WT X-Band Peak 2<br />
-Purpose:                Zeit totschlagen<br />
-Spectrometer:           ESP380E<br />
-Software:               Transient, Vers. 0.6<br />
-Runs:                   1<br />
-Shot Repetition Rate:   1 Hz<br />
-<br />
-SAMPLE<br />
-Name:                   xxxCry WT, Peak 2<br />
-Description:            Peak 2 aus der xxxCry WT Expression<br />
-Buffer:                 50 mM Phosphat, 20% Glycerin<br />
-Preparation:            Frisch exprimierte Probe aus Uebernachtanzucht<br />
- wurde entsalzt, aufkonzentriert und mit 5mM K3FeCN6 versetzt.<br />
-Tube:                   2 x 1 x 120 mm<br />
-<br />
-TRANSIENT<br />
-Points:                 5000<br />
-Length:                 10 us<br />
-Trigger Position:       500        % Wichtig zur Kompatibilitaet mit Berlin<br />
-<br />
-MAGNETIC FIELD<br />
-Start:                  339.00 mT<br />
-Stop:                   351.00 mT<br />
-Step:                   0.02 mT<br />
-Sequence:               up | down | stochastic | outward | inward <br />
-Controller:             Bruker BH-15<br />
-Power supply:           xxx<br />
-<br />
-BACKGROUND<br />
-Field:                  300.0 mT<br />
-Occurrence:             10<br />
-Polarisation:           absorptive<br />
-<br />
-BRIDGE<br />
-Model:                  Bruker xxx<br />
-Attenuation:            20 dB<br />
-Power:                  2.01 mW<br />
-Detection:              diode | mixer<br />
-Frequency counter:      HP xxxx<br />
-MW frequency:           9.6657 GHz<br />
-<br />
-VIDEO AMPLIFIER<br />
-Bandwidth:              25 MHz<br />
-Amplification:          42 dB<br />
-<br />
-RECORDER<br />
-Model:                  LeCroy Waverunner xxx<br />
-Averages:               15<br />
-Time base:              2 ns<br />
-Bandwidth:              xx MHz<br />
-Pretrigger:             1.001 us<br />
-Coupling:               AC | DC<br />
-Impedance:              xx MOhm<br />
-Sensitivity:            xx mV<br />
-<br />
-PROBEHEAD<br />
-Type:                   dielectric | split ring 3 mm | cylindrical | ...<br />
-Model:                  Bruker ER 4118X-MD5<br />
-Coupling:               critical | overcoupled<br />
-<br />
-PUMP<br />
-Type:                   Laser mit Glasfaser<br />
-Model:                  GCR 190-15<br />
-Wavelength:             460 nm<br />
-Power:                  1 mJ<br />
-Repetition rate:        15 Hz<br />
-Tunable type:           OPO | dye laser<br />
-Tunable model:          OPTA BBO VIS/IR<br />
-Tunable dye:            <br />
-Tunable position:       11450<br />
-<br />
-TEMPERATURE<br />
-Temperature:            270 K<br />
-Controller:             Oxford ITC 503<br />
-Cryostat:               Oxford irgendwas<br />
-Cryogen:                N2 | He<br />
-<br />
-FIELD CALIBRATION<br />
-Gaussmeter:            <br /> 
-Method:                 Standard | StartEnd  % Wichtig als "Schalter" beim Parsen<br />
-Standard:               LiLiF<br />
-Signal field:           3448.99 G       % Felder fuer Freiburg<br />
-MW Frequency:           9.666147 GHz<br />
-Deviation:              0.18 G<br />
-Calibration start:      x.xx G          % Felder fuer Berlin (optional)<br />
-Calibration end:        x.xx G<br />
-<br />
-FREQUENCY CALIBRATION                   % Nur fuer Berlin<br />
-Start:                  x.xxxx GHz<br />
-End:                    x.xxxx GHz<br />
-<br />
-COMMENT<br />
-<br />
-Und hier gibt's ein bisschen Freitextkommentar - aber bitte OHNE Umlaute und andere<br /> Sonderzeichen!<br />
-z.B.<br />
-Abweichung GM-HS waehrend Messung ca. 1,1 G. Nach 480 Transienten waren<br />
-Kopplung und Frequenz abgedriftet. Sie wurden nachjustiert bei 3499,2 G.<br />
-</small></code>
+<pre>
+trEPR Info file - v. 0.1.4 (2012-10-23)
+
+GENERAL
+Filename:               xband/111013/messung02/messdaten02
+Date:                   2011-10-13
+Time start:             11:05:00
+Time end:               15:50:00
+Operator:               Max Mustermann
+Label:                  xxxCry WT X-Band Peak 2
+Purpose:                Zeit totschlagen
+Spectrometer:           ESP380E
+Software:               Transient, Vers. 0.6
+Runs:                   1
+Shot Repetition Rate:   1 Hz
+
+SAMPLE
+Name:                   xxxCry WT, Peak 2
+Description:            Peak 2 aus der xxxCry WT Expression
+Buffer:                 50 mM Phosphat, 20% Glycerin
+Preparation:            Frisch exprimierte Probe aus Uebernachtanzucht
+ wurde entsalzt, aufkonzentriert und mit 5mM K3FeCN6 versetzt.
+Tube:                   2 x 1 x 120 mm
+
+TRANSIENT
+Points:                 5000
+Length:                 10 us
+Trigger Position:       500        % Wichtig zur Kompatibilitaet mit Berlin
+
+MAGNETIC FIELD
+Start:                  339.00 mT
+Stop:                   351.00 mT
+Step:                   0.02 mT
+Sequence:               up | down | stochastic | outward | inward 
+Controller:             Bruker BH-15
+Power supply:           xxx
+
+BACKGROUND
+Field:                  300.0 mT
+Occurrence:             10
+Polarisation:           absorptive
+
+BRIDGE
+Model:                  Bruker xxx
+Attenuation:            20 dB
+Power:                  2.01 mW
+Detection:              diode | mixer
+Frequency counter:      HP xxxx
+MW frequency:           9.6657 GHz
+
+VIDEO AMPLIFIER
+Bandwidth:              25 MHz
+Amplification:          42 dB
+
+RECORDER
+Model:                  LeCroy Waverunner xxx
+Averages:               15
+Time base:              2 ns
+Bandwidth:              xx MHz
+Pretrigger:             1.001 us
+Coupling:               AC | DC
+Impedance:              xx MOhm
+Sensitivity:            xx mV
+
+PROBEHEAD
+Type:                   dielectric | split ring 3 mm | cylindrical | ...
+Model:                  Bruker ER 4118X-MD5
+Coupling:               critical | overcoupled
+
+PUMP
+Type:                   Laser mit Glasfaser
+Model:                  GCR 190-15
+Wavelength:             460 nm
+Power:                  1 mJ
+Repetition rate:        15 Hz
+Tunable type:           OPO | dye laser
+Tunable model:          OPTA BBO VIS/IR
+Tunable dye:            
+Tunable position:       11450
+
+TEMPERATURE
+Temperature:            270 K
+Controller:             Oxford ITC 503
+Cryostat:               Oxford irgendwas
+Cryogen:                N2 | He
+
+FIELD CALIBRATION
+Gaussmeter:             
+Method:                 Standard | StartEnd  % Wichtig als "Schalter" beim Parsen
+Standard:               LiLiF
+Signal field:           3448.99 G       % Felder fuer Freiburg
+MW Frequency:           9.666147 GHz
+Deviation:              0.18 G
+Calibration start:      x.xx G          % Felder fuer Berlin (optional)
+Calibration end:        x.xx G
+
+FREQUENCY CALIBRATION                   % Nur fuer Berlin
+Start:                  x.xxxx GHz
+End:                    x.xxxx GHz
+
+COMMENT
+
+Und hier gibt's ein bisschen Freitextkommentar - aber bitte OHNE Umlaute und andere Sonderzeichen!
+z.B.
+Abweichung GM-HS waehrend Messung ca. 1,1 G. Nach 480 Transienten waren
+Kopplung und Frequenz abgedriftet. Sie wurden nachjustiert bei 3499,2 G.
+</pre>
 		
 		<div class="footnotes">
 		<p>

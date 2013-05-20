@@ -21,7 +21,7 @@
 		<p>
 			In the following, the probably less obvious aspects of data processing and analysis will be highlighted and key concepts introduced (but not yet fully implemented) with the trEPR GUI/toolbox described.
 		</p>
-		<h2>Metadata</h2>
+		<h2>Metadata: Storing necessary information</h2>
 		<p>
 			A dataset not only consists of a "list" of numbers that represent the actual data, but as well, and not less important, of a list of additional information, including, but not restricted to, the measurement setup used, the typical device parameters, details about the sample, ...
 		</p>
@@ -34,7 +34,10 @@
 		<p>
 			As the GUI save function saves the complete dataset record with its full structure to an XML file (compressed in a ZIP container), it retains the full information provided for a single dataset.
 		</p>
-		<h2>History</h2>
+		<p>
+			One key concept for handling metadata is the <a href="infofile.html">info file</a> concept detailed on its own <a href="infofile.html">help page</a>.
+		</p>
+		<h2>History: Keeping track of data processing</h2>
 		<p>
 			Closely related to the metadata, the "history" of a dataset, namely the list of operations performed during processing and analysis, is of high importance.
 		</p>
@@ -44,9 +47,25 @@
 		<p>
 			The <a href="matlab:trEPRgui_infowindow()">Info GUI</a> has a "history browser" implemented providing the user with a convenient interface to explore the complete set of operations performed on a given dataset.
 		</p>
-		<h2>Status window</h2>
+		<h2>Status window: Stay tuned</h2>
 		<p>
 			To keep track of what the GUI is currently doing, a "status window" has been added (press the <key>F10</key> key or the <key>Status</key> button below the axis of the main GUI). Therein, all operations and some additional information are listed, each with a "time stamp" for convenient assignment.
+		</p>
+		<h2>Configuration: A toolbox as you like</h2>
+		<p>
+			Different people have different ways of performing the same tasks and yielding similar results. Therefore, the toolbox allows you to configure its behaviour (not yet in every detail, but already quite a bit). Configuration includes things as:
+		</p>
+		<ul>
+			<li>Window positions (partly implemented)</li>
+			<li>Status of check boxes</li>
+			<li>Display of welcome panel and tips of the day</li>
+			<li>Display settings (extensive options)</li>
+		</ul>
+		<p>
+			Furthermore, most of the additional GUI windows come with their own configuration file.
+		</p>
+		<p>
+			A more complete overview over the possibilities of the configuration gives the <a href="configure_panel.html">help for the configure panel</a>.
 		</p>
 		<div class="footer">
 		<p class="copyright">
