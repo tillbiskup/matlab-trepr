@@ -53,3 +53,5 @@ The status display on the bottom right of the main GUI allows you to have the cu
 You can get help for any command in the command line using the command <tt>?</tt> followed by the command you would get help displayed for.
 
 You can save information along with a figure - with the new Figure Caption GUI. Simply check the box in the display panel.
+
+You can open a .tez file from within Matlab(tm) by simply double-clicking on the file. This will start the trEPR GUI if necessary and display the file.

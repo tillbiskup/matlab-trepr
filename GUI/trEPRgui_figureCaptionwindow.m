@@ -7,7 +7,7 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-05-19
+% 2013-05-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -250,9 +250,6 @@ function pushbutton_Callback(~,~,action)
         if isempty(action)
             return;
         end
-        
-        gh = guihandles(hMainFigure);
-        admain = getappdata(mainGUIHandle);
         
         switch lower(action)
             case 'chfilename'
