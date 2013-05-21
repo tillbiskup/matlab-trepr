@@ -9,7 +9,7 @@ function varargout = showTip(varargin)
 % See also msgbox
 
 % (c) 2012, Till Biskup
-% 2012-04-20
+% 2012-05-21
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','showTip');
@@ -26,7 +26,7 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 p.addParamValue('Position', [115 300], @(x)isnumeric(x));
 p.addParamValue('File','',@(x)ischar(x));
-p.addParamValue('ShowTip',false,@(x)islogical(x));
+p.addParamValue('ShowTip',false,@(x)islogical(x) || isnumeric(x));
 p.CaseSensitive = false; % Disable case-sensitive parsing
 p.parse(varargin{:});
 
