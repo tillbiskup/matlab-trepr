@@ -7,7 +7,7 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-05-21
+% 2013-06-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -216,7 +216,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Cmd history window opened.','info');
+    trEPRmsg('Figure Caption window opened.','info');
     
     if (nargout == 1)
         varargout{1} = hMainFigure;

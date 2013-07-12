@@ -31,14 +31,14 @@ end
 
 k=1;
 while 1
-    tline = fgetl(fid);
-    if ~ischar(tline)
+    if feof(fid)
         break
     end
+    %tline = fgetl(fid);
     if parser.Results.LineNumbers
-        text{k} = sprintf('%i: %s',k,tline);
+        text{k} = sprintf('%i: %s',k,fgetl(fid));
     else
-        text{k} = tline;
+        text{k} = fgetl(fid);
     end
     k=k+1;
 end

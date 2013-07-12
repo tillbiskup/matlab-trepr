@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-04-07
+% 2013-07-12
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -771,7 +771,7 @@ if isfield(ad.configuration,'start')
             ad.configuration.start.tip
         showTips = showTip('File',fullfile(...
             trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'),...
-            'ShowTip',ad.configuration.start.tip);
+            'ShowTip',logical(ad.configuration.start.tip));
         if ~showTips
             conf = trEPRguiConfigLoad(mfilename);
             conf.start.tip = showTips;
