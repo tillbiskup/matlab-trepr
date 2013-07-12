@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-05-19
+% 2013-07-12
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -60,9 +60,11 @@ ad = getappdata(mainWindow);
 % Just to be on the save side, check whether we have a currently active
 % spectrum
 if ~(ad.control.spectra.active)
+    % Set title to empty string
+    title('');
     st = dbstack;
     trEPRmsg(...
-        [st.name ' : No active spectrum'],'warning');
+        [st.name ' : No active spectrum'],'info');
     return;
 end
 
@@ -706,6 +708,9 @@ switch ad.control.axis.displayType
             ad.control.axis.displayType '"'],'warning');
         return;
 end
+
+% Set title (label of currently active dataset)
+title(['Active dataset: ' strrep(ad.data{active}.label,'_','\_')]);
 
 % Set grid
 set(gca,'XGrid',ad.control.axis.grid.x);
