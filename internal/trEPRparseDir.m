@@ -3,7 +3,7 @@ function dir = trEPRparseDir(dir)
 % "pwd" and "~".
 
 % (c) 2013, Till Biskup
-% 2013-04-07
+% 2013-07-15
 
 if any(strcmpi(dir,{'pwd',''}))
     dir = pwd;
@@ -15,7 +15,6 @@ if strncmp(dir,'~',1)
         userdir = getenv('HOME');
     end
     dir = [ userdir dir(2:end) ];
-    clear tmp;
 end
 
 end

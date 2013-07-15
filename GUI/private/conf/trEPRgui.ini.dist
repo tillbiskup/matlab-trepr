@@ -36,7 +36,7 @@ lastLoad = pwd
 lastSave = pwd
 lastFigSave = pwd
 lastExport = pwd
-lastSnapshot = pwd
+lastSnapshot = ~/.trepr/snapshots
 
 % Configuration of messaging
 [messages]
