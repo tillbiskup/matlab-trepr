@@ -1,4 +1,4 @@
-function status = trEPRinstall()
+function varargout = trEPRinstall()
 % TREPRINSTALL Installing the trEPR Toolbox on your system
 %
 % Usage
@@ -10,9 +10,9 @@ function status = trEPRinstall()
 %
 
 % (c) 2012-13, Till Biskup
-% 2013-04-07
+% 2013-07-16
 
-status = '';
+status = 0;
 
 % There are several tasks a good installation program should perform:
 %
@@ -148,6 +148,11 @@ fprintf('Please, find below a bit of information about the current install.\n\n'
 
 trEPRinfo;
 fprintf('\n');
+
+if nargout
+    varargout{1} = status;
+end
+
 
 end
 
