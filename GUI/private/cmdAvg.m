@@ -22,7 +22,7 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-07-18
+% 2013-07-30
 
 status = 0;
 warnings = cell(0);
@@ -144,12 +144,12 @@ if ~isempty(opt)
         return;
     end
     % In case we have additional options, this should be a label
+    % As labels are allowed to contain spaces, reconcatenate the remaining
+    % options.
     if length(opt) > 2
-        avg.label = opt{3};
+        avg.label = strtrim(sprintf('%s ',opt{3:end}));
     end
-    
-    structdisp(avg);
-    
+        
     % Perform actual averaging
     avgData = trEPRAVG(ad.data{active},avg);
     
