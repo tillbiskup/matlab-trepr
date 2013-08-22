@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-13, Till Biskup
-% 2013-07-12
+% 2013-08-21
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -1254,6 +1254,10 @@ end
 function command_Callback(source,~)
     try
         [status,warning] = trEPRguiCommand(get(source,'String'));
+        % In case that the command ended the GUI, check for its existence
+        if isempty(trEPRguiGetWindowHandle)
+            return;
+        end
         if status
             trEPRmsg(warning,'warning');
         end
