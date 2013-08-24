@@ -1,4 +1,4 @@
-function varargout = trEPRPOC (data, triggerPosition, varargin)
+function varargout = trEPRPOC (data, varargin)
 % TREPRPOC Pretrigger offset compensation of trEPR data.
 %   Compensating large-scale oscillations and drifts that affect both the
 %   signal part and the pretrigger part (dark signal before laser pulse) of
@@ -6,13 +6,25 @@ function varargout = trEPRPOC (data, triggerPosition, varargin)
 %   pretrigger part from the whole time profile.
 %
 % Usage
+%   data = trEPRPOC(data)
 %   data = trEPRPOC(data,triggerPosition)
 %   data = trEPRPOC(data,triggerPosition,cutRight)
 %
-% data            - matrix
+% data            - matrix | struct
 %                   dataset to operate on
+%                   Either the numerical matrix with data or a struct
+%                   complying with the trEPR toolbox datastructure and,
+%                   e.g., loaded with the function trEPRload.
+%
+%                   In case of a structure as input argument, the output
+%                   will be a structure as well.
+%
 % triggerPosition - scalar
 %                   index in time direction of the (laser) trigger (t=0)
+%
+%                   In case a structure is used as first input argument,
+%                   this value gets silently ignored.
+%
 % cutRight        - scalar
 %                   time points subtracted from triggerPosition (such as
 %                   not to interfere with signals with a very sharp signal
@@ -24,8 +36,8 @@ function varargout = trEPRPOC (data, triggerPosition, varargin)
 %
 % See also: trEPRBGC
 
-% (c) 2010-12, Till Biskup
-% 2012-06-10
+% (c) 2010-13, Till Biskup
+% 2013-08-24
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -33,11 +45,32 @@ p.FunctionName = mfilename; % Function name to be included in error messages
 p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
-p.addRequired('data', @(x)isnumeric(x) && ~isscalar(x));
-p.addRequired('triggerPosition', @isscalar);
-%p.addOptional('parameters','',@isstruct);
+p.addRequired('data', @(x)(isnumeric(x) && ~isscalar(x)) || isstruct(x));
+p.addOptional('triggerPosition',[],@isscalar);
 p.addParamValue('cutRight',5,@isscalar);
-p.parse(data,triggerPosition,varargin{:});
+p.parse(data,varargin{:});
+
+% Assign output parameter(s)
+if nargout
+    varargout{1:nargout} = [];
+end
+
+% Check whether we have numeric data or a struct as first input argument
+if isstruct(data)
+    dataset = data;
+    data = dataset.data;
+    triggerPosition = dataset.parameters.transient.triggerPosition;
+end
+
+% Handle optional parameter "triggerPosition"
+if ~exist('triggerPosition','var')
+    if isempty(p.Results.triggerPosition)
+        disp(['(EE) ' mfilename ': Could not determine trigger position.']);
+        return;
+    else
+        triggerPosition = p.Results.triggerPosition;
+    end
+end
 
 % Determine the dimensionality of the data (1D or 2D)
 [rows, cols] = size(data);
@@ -68,5 +101,11 @@ else
 end
     
 % Assign output parameter
-varargout{1} = data;
-    
+if exist('dataset','var')
+    dataset.data = data;
+    varargout{1} = dataset;
+else
+    varargout{1} = data;
+end
+
+end
