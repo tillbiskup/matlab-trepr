@@ -22,7 +22,7 @@ function [status,warnings] = cmdProc(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-04-11
+% 2013-08-24
 
 status = 0;
 warnings = cell(0);
@@ -64,6 +64,7 @@ if ~isempty(opt)
                 numDataset = ad.control.spectra.active;
             end
             guiProcessingPOC(numDataset);
+            update_visibleSpectra();
         case {'bgc','background'}
             % If we have a second option and this second option is numeric
             if length(opt) > 1 && isa(opt{2},'numeric')
@@ -72,6 +73,7 @@ if ~isempty(opt)
                 numDataset = ad.control.spectra.active;
             end
             guiProcessingBGC(numDataset);
+            update_visibleSpectra();
         case {'blc','baseline'}
             trEPRgui_BLCwindow();
         case {'acc','accumulate'}

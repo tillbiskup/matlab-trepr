@@ -4,8 +4,8 @@ function guiProcessingBGC(datasetnum)
 %
 % Normally only called from within the trEPR GUI.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-27
+% (c) 2011-13, Till Biskup
+% 2013-08-24
 
 method = 'trEPRBGC';
 fun = str2func(method);
@@ -33,7 +33,7 @@ ad.data{datasetnum}.data = ...
 
 
 % Add modified spectrum to list of modified spectra
-if isempty(ad.control.spectra.modified==datasetnum)
+if ~any(ad.control.spectra.modified==datasetnum)
     ad.control.spectra.modified = [...
         ad.control.spectra.modified ...
         datasetnum];

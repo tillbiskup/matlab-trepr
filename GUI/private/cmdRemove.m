@@ -22,7 +22,7 @@ function [status,warnings] = cmdRemove(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-05-19
+% 2013-08-24
 
 status = 0;
 warnings = cell(0);
@@ -35,7 +35,6 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('handle', @(x)ishandle(x));
 p.addRequired('opt', @(x)iscell(x));
-%p.addOptional('opt',cell(0),@(x)iscell(x));
 p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
@@ -114,6 +113,19 @@ try
                 trEPRremoveDatasetFromMainGUI(datasets);
             end
             return;
+        case 'force'
+            if active
+                % Get selected item of listbox
+                selected = get(gh.data_panel_visible_listbox,'Value');
+                
+                % Get id of selected spectrum
+                selectedId = ad.control.spectra.visible(selected);
+                
+                trEPRremoveDatasetFromMainGUI(selectedId,'force',true);
+                return;
+            else
+                return;
+            end
         otherwise
             status = -3;
             warnings{end+1} = ['Option ' opt{1} ' not understood.'];
