@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-04-12
+% 2013-08-24
 
 status = 0;
 warnings = cell(0);
@@ -315,6 +315,5 @@ if get(gh.load_panel_axislabels_checkbox,'Value')
     end
     setappdata(mainWindow,'control',ad.control);
 end
-
 
 end

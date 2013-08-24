@@ -22,7 +22,7 @@ function [status,warnings] = cmdShow(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-06
+% 2013-08-24
 
 status = 0;
 warnings = cell(0);
@@ -110,6 +110,9 @@ if isempty(opt)
         
         %Update main axis
         update_mainAxis();
+        return;
+    else
+        trEPRmsg('No invisible spectra to make visible.','debug');
         return;
     end
 end

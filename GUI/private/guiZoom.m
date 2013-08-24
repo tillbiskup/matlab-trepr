@@ -6,7 +6,7 @@ function guiZoom(action)
 %                 Action to be performed: on|off|reset
 
 % (c) 2013, Till Biskup
-% 2013-02-28
+% 2013-08-24
 
 try
     % Get appdata of main window
@@ -64,8 +64,10 @@ try
                 ad.control.axis.zoom.x = [0 0];
                 ad.control.axis.zoom.y = [0 0];
                 ad.control.axis.zoom.z = [0 0];
-            else
+            elseif ad.control.spectra.active
                 ad.control.axis.zoom.enable = true;
+            else
+                ad.control.axis.zoom.enable = false;
             end
         case 'reset'
             set(gh.zoom_togglebutton,'Value',0);
