@@ -65,14 +65,16 @@ ad = getappdata(handle);
 % For convenience and shorter lines
 active = ad.control.spectra.active;
 
+data = getData(ad.data{active});
+
 if ~active
     warnings{end+1} = ['Command "' lower(cmd) '" needs an active dataset.'];
     return;
 end
 switch lower(opt{1}(1:3))
     case 'min'
-        [~,ximin] = min(min(ad.data{active}.data));
-        [~,yimin] = min(ad.data{active}.data(:,ximin));
+        [~,ximin] = min(min(data));
+        [~,yimin] = min(data(:,ximin));
         ad.data{active}.display.position.x = ximin;
         ad.data{active}.display.position.y = yimin;
         
@@ -86,8 +88,8 @@ switch lower(opt{1}(1:3))
         update_mainAxis();
         return;
     case 'max'
-        [~,ximax] = max(max(ad.data{active}.data));
-        [~,yimax] = max(ad.data{active}.data(:,ximax));
+        [~,ximax] = max(max(data));
+        [~,yimax] = max(data(:,ximax));
         ad.data{active}.display.position.x = ximax;
         ad.data{active}.display.position.y = yimax;
         

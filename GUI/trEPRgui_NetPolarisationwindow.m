@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-02-17
+% 2013-08-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2212,7 +2212,7 @@ function updateAnalysisPanel()
         end
         
         % Set pretrigger statistics subpanel fields
-        NP = sum(ad.data{active}.data);
+        NP = sum(getData(ad.data{active}));
         PTNP = NP(1:find(ad.data{active}.axes.x.values>0,1)-1);
         
         NP = NP(find(ad.data{active}.axes.x.values>0,1):end);
@@ -2578,9 +2578,11 @@ function updateAxes(varargin)
         % IMPORTANT: Set main axis to active axis
         axes(mainAxes); %#ok<MAXES>
 
-        % Get magnetic field
-        [~,t] = size(ad.data{active}.data);
-        t = linspace(1,t,t);
+        % Get data
+        data = getData(ad.data{active});
+        
+        % Get time axis
+        t = linspace(1,size(data,2),size(data,2));
         if (isfield(ad.data{active},'axes') ...
                 && isfield(ad.data{active}.axes,'x') ...
                 && isfield(ad.data{active}.axes.x,'values') ...
@@ -2588,7 +2590,7 @@ function updateAxes(varargin)
             t = ad.data{active}.axes.x.values;
         end
         % Get net polarisation
-        NP = sum(ad.data{active}.data);
+        NP = sum(data);
         PTNP = NP(1:find(ad.data{active}.axes.x.values>0,1)-1);
 
         % Do the actual plotting

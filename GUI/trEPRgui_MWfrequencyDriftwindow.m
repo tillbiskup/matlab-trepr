@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2012-13, Till Biskup
-% 2013-02-23
+% 2013-08-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2210,9 +2210,11 @@ function updateAxes(varargin)
         % IMPORTANT: Set main axis to active axis
         axes(mainAxes); %#ok<MAXES>
 
+        % Get data
+        data = getData(ad.data{active});
+        
         % Get magnetic field
-        [B0,~] = size(ad.data{active}.data);
-        B0 = linspace(1,B0,B0);
+        B0 = linspace(1,size(data,1),size(data,1));
         if (isfield(ad.data{active},'axes') ...
                 && isfield(ad.data{active}.axes,'y') ...
                 && isfield(ad.data{active}.axes.y,'values') ...

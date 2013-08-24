@@ -19,7 +19,7 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %              Empty if everything went well, otherwise contains message.
 
 % (c) 2013, Till Biskup
-% 2013-02-17
+% 2013-08-24
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -59,8 +59,8 @@ try
                 if isfield(data{k}.display.displacement,'z')
                     data{k}.data = data{k}.data + ...
                         data{k}.display.displacement.z;
-                    if isfield(data{k},'dataMFon')
-                        data{k}.dataMFon = data{k}.dataMFon + ...
+                    if isfield(data{k},'calculated')
+                        data{k}.calculated = data{k}.calculated + ...
                             data{k}.display.displacement.z;
                     end
                 end
@@ -72,8 +72,8 @@ try
                 if isfield(data{k}.display.scaling,'z')
                     data{k}.data = data{k}.data * ...
                         data{k}.display.scaling.z;
-                    if isfield(data{k},'dataMFon')
-                        data{k}.dataMFon = data{k}.dataMFon * ...
+                    if isfield(data{k},'calculated')
+                        data{k}.calculated = data{k}.calculated * ...
                             data{k}.display.scaling.z;
                     end
                 end
@@ -92,10 +92,10 @@ try
                             data{k}.data(l,:),...
                             data{k}.display.smoothing.x.value);
                     end
-                    if isfield(data{k},'dataMFon')
+                    if isfield(data{k},'calculated')
                         for l=1:dimy
-                            data{k}.dataMFon(l,:) = filterfun(...
-                                data{k}.dataMFon(l,:),...
+                            data{k}.calculated(l,:) = filterfun(...
+                                data{k}.calculated(l,:),...
                                 data{k}.display.smoothing.x.value);
                         end
                     end
@@ -109,10 +109,10 @@ try
                             data{k}.data(:,l),...
                             data{k}.display.smoothing.y.value);
                     end
-                    if isfield(data{k},'dataMFon')
+                    if isfield(data{k},'calculated')
                         for l=1:dimx
-                            data{k}.dataMFon(:,l) = filterfun(...
-                                data{k}.dataMFon(:,l),...
+                            data{k}.calculated(:,l) = filterfun(...
+                                data{k}.calculated(:,l),...
                                 data{k}.display.smoothing.y.value);
                         end
                     end
@@ -128,20 +128,20 @@ try
     switch operation
         case 'addition'
             resdata.data = data{1}.data + data{2}.data;
-            if isfield(data{1},'dataMFon')
-                if isfield(data{2},'dataMFon')
-                    resdata.dataMFon = data{1}.dataMFon + data{2}.dataMFon;
+            if isfield(data{1},'calculated')
+                if isfield(data{2},'calculated')
+                    resdata.calculated = data{1}.calculated + data{2}.calculated;
                 else
-                    resdata.dataMFon = data{1}.dataMFon + data{2}.data;
+                    resdata.calculated = data{1}.calculated + data{2}.data;
                 end
             end
         case 'subtraction'
             resdata.data = data{1}.data - data{2}.data;
-            if isfield(data{1},'dataMFon')
-                if isfield(data{2},'dataMFon')
-                    resdata.dataMFon = data{1}.dataMFon - data{2}.dataMFon;
+            if isfield(data{1},'calculated')
+                if isfield(data{2},'calculated')
+                    resdata.calculated = data{1}.calculated - data{2}.calculated;
                 else
-                    resdata.dataMFon = data{1}.dataMFon - data{2}.data;
+                    resdata.calculated = data{1}.calculated - data{2}.data;
                 end
             end
         case 'scaling'
@@ -158,8 +158,8 @@ try
                 end
             end
             resdata.data = data{1}.data * scalingFactor;
-            if isfield(data{1},'dataMFon')
-                resdata.dataMFon = data{1}.dataMFon * scalingFactor;
+            if isfield(data{1},'calculated')
+                resdata.calculated = data{1}.calculated * scalingFactor;
             end
         otherwise
             warnings = sprintf('Operation "%s" not understood.',operation);
