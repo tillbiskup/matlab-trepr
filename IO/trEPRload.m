@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2013, Till Biskup
-% 2013-05-12
+% 2013-08-24
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -181,7 +181,7 @@ else    % -> if iscell(filename)
             % Check whether it is only a file basename
             if isempty(dir(sprintf('%s.*',filename)))
                 fprintf('%s does not exist...\n',filename);
-            else
+            elseif p.Results.combine
                 % Read all files and combine them
                 files = dir(sprintf('%s.*',filename));
                 filenames = cell(1);
@@ -189,6 +189,23 @@ else    % -> if iscell(filename)
                     filenames{k} = files(k).name;
                 end
                 [content,warnings] = combineFile(filenames);
+                % assign output argument
+                if ~nargout
+                    % of no output argument is given, assign content to
+                    % a variable in the workspace with the same name as
+                    % the file
+                    [~, name, ext] = fileparts(filename);
+                    name = cleanFileName([name ext]);
+                    assignin('base',name,content);
+                    assignin('base','warnings',warnings);
+                else
+                    varargout{1} = content;
+                    varargout{2} = warnings;
+                end
+            else
+                % Read all files and choose the first one to read
+                files = dir(sprintf('%s.*',filename));
+                [content,warnings] = loadFile(files(1).name);
                 % assign output argument
                 if ~nargout
                     % of no output argument is given, assign content to
@@ -314,7 +331,7 @@ function [content,warnings] = loadFile(filename)
     content = [];
     warnings = cell(0);
 
-    % Set struct containing all ASCII filetypes that are recognized by this
+    % Set struct containing all filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
     fileFormats = trEPRiniFileRead([mfilename('fullpath') '.ini']);
