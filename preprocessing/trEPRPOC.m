@@ -73,8 +73,7 @@ if ~exist('triggerPosition','var')
 end
 
 % Determine the dimensionality of the data (1D or 2D)
-[rows, cols] = size(data);
-if min([rows, cols]) == 1
+if min(size(data)) == 1
     vector = logical(true);
 else
     vector = logical(false);

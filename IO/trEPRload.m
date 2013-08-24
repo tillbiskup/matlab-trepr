@@ -205,19 +205,21 @@ else    % -> if iscell(filename)
             else
                 % Read all files and choose the first one to read
                 files = dir(sprintf('%s.*',filename));
-                [content,warnings] = loadFile(files(1).name);
-                % assign output argument
-                if ~nargout
-                    % of no output argument is given, assign content to
-                    % a variable in the workspace with the same name as
-                    % the file
-                    [~, name, ext] = fileparts(filename);
-                    name = cleanFileName([name ext]);
-                    assignin('base',name,content);
-                    assignin('base','warnings',warnings);
-                else
-                    varargout{1} = content;
-                    varargout{2} = warnings;
+                if ~isempty(files)
+                    [content,warnings] = loadFile(files(1).name);
+                    % assign output argument
+                    if ~nargout
+                        % of no output argument is given, assign content to
+                        % a variable in the workspace with the same name as
+                        % the file
+                        [~, name, ext] = fileparts(filename);
+                        name = cleanFileName([name ext]);
+                        assignin('base',name,content);
+                        assignin('base','warnings',warnings);
+                    else
+                        varargout{1} = content;
+                        varargout{2} = warnings;
+                    end
                 end
             end
         case 2
@@ -266,6 +268,13 @@ else    % -> if iscell(filename)
             % If none of the above possibilities match
             fprintf('%s could not be loaded...\n',filename);
     end
+end
+
+if ~exist('content','var') && nargout
+    trEPRmsg('Couldn''t load any data','error');
+    varargout{1} = 0;
+    varargout{2} = [];
+    return;
 end
 
 if isa(content,'cell') && isfield(content{1},'file') && ...
@@ -318,11 +327,6 @@ if exist('content','var') && p.Results.loadInfoFile ...
     varargout{2} = warnings;
 end
     
-if ~exist('content','var') && nargout
-    varargout{1} = 0;
-    varargout{2} = [];
-end
-
 end
 
 % --- load file and return struct with the content of the file together
