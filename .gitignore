@@ -1,0 +1,13 @@
+# Can ignore specific files
+.DS_Store
+bugrepwintester.m
+dependencyReport.m
+
+# Use wildcards as well
+*~
+
+# Ignore configuration
+GUI/private/conf/*.ini
+
+# Ignore modules for now
+modules/sim
