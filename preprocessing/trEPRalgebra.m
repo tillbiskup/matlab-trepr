@@ -5,9 +5,8 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %   data = trEPRalgebra(data,operation);
 %   [data,warnings] = trEPRalgebra(data,operation);
 %
-% data       - struct
-%              Dataset that should (ideally) contain both MFoff and MFon
-%              data
+% data       - cell array
+%              Datasets conforming to the trEPR toolbox data format
 % operation  - string
 %              Operation to be performed on the two datasets.
 %              Currently '+' or '-' and the pendants 'add' and 'subtract',
