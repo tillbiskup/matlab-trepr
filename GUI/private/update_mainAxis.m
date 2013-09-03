@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-08-24
+% 2013-09-03
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -85,6 +85,13 @@ end
 
 % For shorter and easier to read code:
 active = ad.control.spectra.active;
+
+% Set units if only one visible dataset
+if length(ad.control.spectra.visible) == 1
+    ad.control.axis.labels.x.unit = ad.data{active}.axes.x.unit;
+    ad.control.axis.labels.y.unit = ad.data{active}.axes.y.unit;
+    ad.control.axis.labels.z.unit = ad.data{active}.axes.z.unit;
+end
 
 % Plot depending on display type settings
 % Be as robust as possible: if there is no axes, default is indices

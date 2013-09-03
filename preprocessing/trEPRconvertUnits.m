@@ -77,25 +77,27 @@ try
             end
         case 's2us'
             % Check axis labels
-            if strcmpi(data.axes.s.unit,'s')
-                data.axes.y.values = data.axes.x.values * 10e-6;
-                data.axes.y.unit = 'us';
+            if strcmpi(data.axes.x.unit,'s')
+                data.axes.x.values = data.axes.x.values * 10e6;
+                data.axes.x.unit = 'us';
             end
             % Check parameters
-            if strcmpi(data.parameters.field.start.unit,'s')
-                data.parameters.field.start.value = ...
-                    data.parameters.field.start.value * 10e-6;
-                data.parameters.field.start.unit = 'us';
+            if strcmpi(data.parameters.transient.length.unit,'s')
+                data.parameters.transient.length.value = ...
+                    data.parameters.transient.length.value * 10e6;
+                data.parameters.transient.length.unit = 'us';
             end
-            if strcmpi(data.parameters.field.stop.unit,'s')
-                data.parameters.field.stop.value = ...
-                    data.parameters.field.stop.value * 10e-6;
-                data.parameters.field.stop.unit = 'us';
+        case 'us2s'
+            % Check axis labels
+            if strcmpi(data.axes.x.unit,'us')
+                data.axes.x.values = data.axes.x.values * 10e-6;
+                data.axes.x.unit = 's';
             end
-            if strcmpi(data.parameters.field.step.unit,'s')
-                data.parameters.field.step.value = ...
-                    data.parameters.field.step.value * 10e-6;
-                data.parameters.field.step.unit = 'us';
+            % Check parameters
+            if strcmpi(data.parameters.transient.length.unit,'us')
+                data.parameters.transient.length.value = ...
+                    data.parameters.transient.length.value * 10e-6;
+                data.parameters.transient.length.unit = 's';
             end
         otherwise
             trEPRmsg(['Conversion "' conversion '" not understood'],'w');

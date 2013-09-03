@@ -1,5 +1,5 @@
 function [status,warnings] = cmdAvg(handle,opt,varargin)
-% CMDHELP Command line command of the trEPR GUI.
+% CMDAVG Command line command of the trEPR GUI.
 %
 % Usage:
 %   cmdAvg(handle,opt)
@@ -22,7 +22,7 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-07-30
+% 2013-09-03
 
 status = 0;
 warnings = cell(0);
