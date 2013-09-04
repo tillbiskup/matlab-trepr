@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-04-07
+% 2013-09-04
 
 status = 0;
 warnings = cell(0);
@@ -59,6 +59,12 @@ if strncmp(command,'%',1)
     warnings{end+1} = 'Command is a comment.';
     status = -3;
     return;
+end
+
+% If first character is a "?", followed directly by the command name,
+% include space
+if strncmp(command,'?',1) && ~isspace(command(2))
+    command = [command(1) ' ' command(2:end)];
 end
 
 % Get appdata from mainwindow

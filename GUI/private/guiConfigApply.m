@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % (c) 2011-13, Till Biskup
-% 2013-05-19
+% 2013-09-04
 
 status = 0;
 
@@ -91,6 +91,10 @@ try
             if isfield(ad.configuration.load,'infofile')
                 set(gh.load_panel_infofile_checkbox,...
                     'Value',ad.configuration.load.infofile);
+            end
+            if isfield(ad.configuration.load,'unitconversion')
+                set(gh.load_panel_unitconversion_checkbox,...
+                    'Value',ad.configuration.load.unitconversion);
             end
             if isfield(ad.configuration.load,'POC')
                 set(gh.load_panel_preprocessing_offset_checkbox,...

@@ -62,6 +62,7 @@ historyfile = ~/.trepr/history
 combine = 0
 loaddir = 0
 infofile = 0
+unitconversion = 0
 POC = 0
 BGC = 0
 labels = 1

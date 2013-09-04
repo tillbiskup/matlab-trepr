@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-08-24
+% 2013-09-04
 
 status = 0;
 warnings = cell(0);
@@ -277,6 +277,11 @@ if get(gh.load_panel_preprocessing_background_checkbox,'Value')
     for k=1:length(newDataIdx)
         guiProcessingBGC(newDataIdx(k));
     end
+end
+
+% TODO: Include unitConversion here
+if get(gh.load_panel_unitconversion_checkbox,'Value')
+    trEPRmsg('Automatic unit conversion on load not yet implemented...','w');
 end
 
 % Try to load axis labels from file
