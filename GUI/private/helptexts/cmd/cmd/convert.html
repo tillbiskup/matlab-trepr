@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../../help.css" />
+    </head>
+    <body>
+		<h1>convert</h1>
+		<p class="intro">
+			Converting units of axes.
+		</p>
+		<h2>Description</h2>
+		<p>
+			The <tt>convert</tt> command needs at least one option to work.
+		</p>
+		<p>
+			If used with one option, the <tt>convert</tt> command converts the given measure for the currently active dataset. If used with two options, the first option is the dataset number.
+		</p>
+		<h2>Syntax</h2>
+		<p>
+			<tt>convert</tt>
+		</p>
+		<p>
+			<tt>convert [&lt;dataset&gt;] &lt;conversion&gt; </tt>
+		</p>
+		<h3>Options</h3>
+		<p>
+			Currently, the <tt>convert</tt> command takes the following options:
+		</p>
+		<dl>
+			<dt>dataset (OPTIONAL)</dt>
+			<dd>Number of the dataset to perform the conversion for.</dd>
+			<dd>If no number is given (<em>i.e.</em>, the first argument is not a number, but a letter), conversion is done for the currently active dataset.</dd>
+			<dt>&lt;conversion&gt;</dt>
+			<dd>Conversion of units to be performed. Currently, the following conversions are supported (all conversion options are case insensitive):
+				<dl>
+					<dt>G2mT</dt>
+					<dd>Convert G into mT</dd>
+					<dt>mT2G</dt>
+					<dd>Convert mT into G</dd>
+					<dt>us2s</dt>
+					<dd>Convert us into s</dd>
+					<dt>s2us</dt>
+					<dd>Convert us into s</dd>
+				</dl>
+			</dd>
+		</dl>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2013, Till Biskup
+		</p>
+		<p class="lastchange">
+			2013-09-04
+		</p>
+		</div>
+	</body>
+</html>
