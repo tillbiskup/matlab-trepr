@@ -9,15 +9,27 @@ function varargout = trEPRdataStructure(varargin)
 %
 %   <command> - string 
 %               one of 'structure', 'model' or 'check'
-%               'structure' - return (empty) trEPR toolbox data structure
-%               'model' -     return trEPR toolbox data structure with
-%                             field types as values
-%               'check' -     check given structure for compliance with the
-%                             toolbox data structure
+%               'structure'    - return (empty) trEPR toolbox data
+%                                structure
+%               'model'        - return trEPR toolbox data structure with
+%                                field types as values
+%               'check'        - check given structure for compliance with
+%                                the toolbox data structure
+%               'history'      - return history structure for processing
+%                                step of dataset
+%               'historymodel' - return history structure with field types
+%                                as values
+%                                short: 'hmodel'
+%               'historycheck' - check given structure for compliance with
+%                                the toolbox history record structure
+%                                short: 'hcheck'
 %
 %   structure - struct
 %               either empty trEPR toolbox data structure or 
 %               trEPR toolbox data structure with field types as values
+%
+%               In case of a history record, data structure complying with
+%               the history record data structure
 %
 %   missingFields - cell array
 %                   List of fields missing in the structure with respect to
@@ -30,7 +42,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRLOAD.
 
 % (c) 2011-13, Till Biskup
-% 2013-02-28
+% 2013-09-10
 
 if ~nargin && ~nargout
     help trEPRdataStructure
@@ -240,6 +252,7 @@ dataStructure.sample.buffer = cell(0);
 dataStructure.sample.preparation = cell(0);
 dataStructure.header = cell(0);
 dataStructure.comment = cell(0);
+dataStructure.history = cell(0);
 dataStructure.info = struct();
 dataStructure.file = struct(...
     'name','', ...
@@ -248,7 +261,7 @@ dataStructure.file = struct(...
 dataStructure.label = '';
 dataStructure.format = struct(...
     'name','trEPR toolbox', ...
-    'version','1.7' ...
+    'version','1.8' ...
     );
 
 % Create trEPR toolbox data model (structure with field types as values)
@@ -454,6 +467,7 @@ dataModel.sample = struct(...
     );
 dataModel.header = 'iscell';
 dataModel.comment = 'iscell';
+dataModel.history = 'iscell';
 dataModel.info = 'isstruct';
 dataModel.file = struct(...
     'name','ischar', ...
@@ -464,6 +478,46 @@ dataModel.format = struct(...
     'name','ischar', ...
     'version','ischar' ...
     );
+
+% Create history record
+historyStructure = struct(...
+    'date',datestr(now,31),...
+    'method','',...
+    'system',struct(...
+        'username','',...
+        'platform',deblank(platform),...
+        'matlab',version,...
+        'trEPR',trEPRinfo('version')...
+        ),...
+    'parameters',struct(...
+        ),...
+    'info',struct(...
+        )...
+    );
+% Get username of current user
+% In worst case, username is an empty string. So nothing should really rely
+% on it.
+% Windows style
+historyStructure.system.username = getenv('UserName');
+% Unix style
+if isempty(historyStructure.system.username)
+    historyStructure.system.username = getenv('USER'); 
+end
+
+% Create history record data model (structure with field types as values)
+historyModel = struct(...
+    'date','ischar',...
+    'method','ischar',...
+    'system',struct(...
+        'username','ischar',...
+        'platform','ischar',...
+        'matlab','ischar',...
+        'trEPR','ischar'...
+        ),...
+    'parameters','isstruct',...
+    'info','isstruct'...
+    );
+
 
 if nargin && ischar(varargin{1})
     switch lower(varargin{1})
@@ -487,6 +541,46 @@ if nargin && ischar(varargin{1})
             
             [missingFields,wrongType] = ...
                 checkStructure(dataModel,varargin{2},inputname(2));
+
+            if ~isempty(missingFields)
+                fprintf('There are missing fields:\n');
+                for k=1:length(missingFields)
+                    fprintf('  %s\n',char(missingFields{k}));
+                end
+            end
+            if ~isempty(wrongType)
+                fprintf('There are fields with wrong type:\n');
+                for k=1:length(wrongType)
+                    fprintf('  %s\n',char(wrongType{k}));
+                end
+            end
+            if isempty(missingFields) && isempty(wrongType)
+                fprintf('Basic test passed! Structure seems fine...\n');
+            end
+            
+            varargout{1} = missingFields;
+            varargout{2} = wrongType;
+            
+        case {'history','historystructure','hstructure'}
+            if nargout
+                varargout{1} = historyStructure;
+            end
+        case {'historymodel','hmodel'}
+            if nargout
+                varargout{1} = historyModel;
+            end
+        case {'historycheck','hcheck'}
+            if nargin < 2
+                fprintf('No structure to check...\n');
+                return;
+            end
+            if ~isstruct(varargin{2})
+                fprintf('%s has wrong type',inputname(2));
+                return;
+            end
+            
+            [missingFields,wrongType] = ...
+                checkStructure(historyModel,varargin{2},inputname(2));
 
             if ~isempty(missingFields)
                 fprintf('There are missing fields:\n');
