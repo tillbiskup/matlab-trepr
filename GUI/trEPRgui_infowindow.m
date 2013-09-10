@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-13, Till Biskup
-% 2013-03-01
+% 2013-09-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -4724,8 +4724,10 @@ function updateHistoryPanel()
             trEPRhistoryDisplay(ad.data{selectedId}.history{historyId}));
         
         % Set report panel
-        set(gh.history_panel_report_edit,'String',...
-            ad.data{selectedId}.history{historyId}.info);
+        if ischar(ad.data{selectedId}.history{historyId}.info)
+            set(gh.history_panel_report_edit,'String',...
+                ad.data{selectedId}.history{historyId}.info);
+        end
 
     catch exception
         try

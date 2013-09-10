@@ -27,7 +27,7 @@ function varargout = trEPRBGC (data, varargin)
 % See also: trEPRPOC
 
 % (c) 2010-13, Till Biskup
-% 2013-08-24
+% 2013-09-10
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -94,6 +94,12 @@ end
 
 % Assign output parameter
 if exist('dataset','var')
+    % Add record to history
+    dataset.history{end+1} = trEPRdataStructure('history');
+    dataset.history{end}.method = mfilename;
+    dataset.history{end}.parameters = struct(...
+        'numBGprofiles',p.Results.numBGprofiles ...
+        );
     dataset.data = data;
     varargout{1} = dataset;
 else
