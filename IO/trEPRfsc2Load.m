@@ -36,8 +36,8 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
-% (c) 2009-2012, Till Biskup
-% 2012-06-28
+% (c) 2009-2013, Till Biskup
+% 2013-10-03
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -303,6 +303,25 @@ function [content,warnings] = loadFile(filename,parameters)
                 content.parameters.field.start.value,...
                 content.parameters.field.stop.value)...
                 );
+        end
+    end
+    
+    % Check whether MWfrequency has been read from file, and if not, try
+    % again in a manual way...
+    if isempty(content.parameters.bridge.MWfrequency.value)
+        GHzMatch = cellfun(@(x)strfind(x,'GHz'),...
+            content.header,'UniformOutput',false);
+        % Convert into logicals
+        GHzMatch = ~cellfun('isempty',GHzMatch);
+        if any(GHzMatch)
+            % Try to parse and get MWfrequency
+            MWfrequency = str2double(...
+                content.header{find(GHzMatch,1)}(3:...
+                strfind(content.header{find(GHzMatch,1)},'GHz')-1));
+            if ~isnan(MWfrequency)
+                content.parameters.bridge.MWfrequency.value = MWfrequency;
+                content.parameters.bridge.MWfrequency.unit  = 'GHz';
+            end
         end
     end
     
