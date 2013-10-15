@@ -38,6 +38,18 @@ lastFigSave = pwd
 lastExport = pwd
 lastSnapshot = ~/.trepr/snapshots
 
+% Configuration of the behaviour when saving data or figures
+%
+% The default behaviour is to use the filename of the loaded dataset as 
+% basename for suggesting filenames.
+% If you set "useLabel" to 1, the label of the current filename is used
+%
+% The "sanitise" switch controls whether special and whitespace characters 
+% are masked in the new filename.
+[filenames]
+useLabel = 0
+sanitise = 1
+
 % Configuration of messaging
 [messages]
 display.level = all

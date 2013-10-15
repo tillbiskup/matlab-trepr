@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-08-17
+% 2013-10-15
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2942,6 +2942,43 @@ function axesexport_pushbutton_Callback(~,~)
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
+        
+        % Important: First generate filename suggestion and ask user for
+        % filename, then start redrawing the figure in a new figure window.
+        % If the user quits the file selection dialogue box, nothing is
+        % left to close in this case.
+
+        % Get export format
+        figExportFormats = cellstr(...
+            get(gh.display_panel_axesexport_format_popupmenu,'String'));
+        exportFormat = figExportFormats{...
+            get(gh.display_panel_axesexport_format_popupmenu,'Value')};
+
+        % Get file type to save to
+        fileTypes = cellstr(...
+            get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
+        fileType = fileTypes{...
+            get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
+
+        fileNameSuggested = suggestFilename(mainWindow,'Type','figure');
+        
+        % Ask user for file name
+        [fileName,pathName] = uiputfile(...
+            sprintf('*.%s',fileType),...
+            'Get filename to export figure to',...
+            fileNameSuggested);
+        % If user aborts process, return
+        if fileName == 0
+            return;
+        end
+        % Create filename with full path
+        fileName = fullfile(pathName,fileName);
+
+        % set lastFigSave Dir in appdata
+        if exist(pathName,'dirs')
+            ad.control.dirs.lastFigSave = pathName;
+        end
+        setappdata(mainWindow,'control',ad.control);
 
         % Open new figure window
         newFig = figure();
@@ -2956,39 +2993,6 @@ function axesexport_pushbutton_Callback(~,~)
         else
             update_mainAxis(newFig,'notitle');
         end
-
-        % Get export format
-        figExportFormats = cellstr(...
-            get(gh.display_panel_axesexport_format_popupmenu,'String'));
-        exportFormat = figExportFormats{...
-            get(gh.display_panel_axesexport_format_popupmenu,'Value')};
-
-        % Get file type to save to
-        fileTypes = cellstr(...
-            get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
-        fileType = fileTypes{...
-            get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
-        
-        % Generate default file name if possible, be very defensive
-        if ad.control.spectra.visible
-            [~,fileNameSuggested,~] = ...
-                fileparts(ad.data{ad.control.spectra.visible(1)}.file.name);
-        else
-            fileNameSuggested = '';
-        end
-        
-        % Ask user for file name
-        [fileName,pathName] = uiputfile(...
-            sprintf('*.%s',fileType),...
-            'Get filename to export figure to',...
-            fileNameSuggested);
-        % If user aborts process, return
-        if fileName == 0
-            close(newFig);
-            return;
-        end
-        % Create filename with full path
-        fileName = fullfile(pathName,fileName);
         
         % Check whether to open caption GUI
         if get(gh.display_panel_axesexport_includecaption_checkbox,'Value')

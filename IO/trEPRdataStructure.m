@@ -42,7 +42,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRLOAD.
 
 % (c) 2011-13, Till Biskup
-% 2013-09-10
+% 2013-10-03
 
 if ~nargin && ~nargout
     help trEPRdataStructure
@@ -555,7 +555,9 @@ if nargin && ischar(varargin{1})
                 end
             end
             if isempty(missingFields) && isempty(wrongType)
-                fprintf('Basic test passed! Structure seems fine...\n');
+                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
+                    fprintf('Basic test passed! Structure seems fine...\n');
+                end
             end
             
             varargout{1} = missingFields;
@@ -595,7 +597,9 @@ if nargin && ischar(varargin{1})
                 end
             end
             if isempty(missingFields) && isempty(wrongType)
-                fprintf('Basic test passed! Structure seems fine...\n');
+                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
+                    fprintf('Basic test passed! Structure seems fine...\n');
+                end
             end
             
             varargout{1} = missingFields;

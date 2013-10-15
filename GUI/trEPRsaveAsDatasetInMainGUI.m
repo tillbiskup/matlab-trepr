@@ -11,8 +11,8 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-26
+% (c) 2011-13, Till Biskup
+% 2013-10-15
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -44,13 +44,15 @@ try
     ad = getappdata(mainWindow);
     
     % Create default filename
-    [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
-    if ~isempty(ad.control.dirs.lastSave)
-        fpath = ad.control.dirs.lastSave;
-    end
-    if ~strcmp(fext,zipext)
-        ad.data{id}.file.name = fullfile(fpath,[fname zipext]);
-    end
+    filename = suggestFilename(mainWindow,'Type','file');
+    ad.data{id}.file.name = [filename zipext];
+%     [fpath,fname,fext] = fileparts(ad.data{id}.file.name);
+%     if ~isempty(ad.control.dirs.lastSave)
+%         fpath = ad.control.dirs.lastSave;
+%     end
+%     if ~strcmp(fext,zipext)
+%         ad.data{id}.file.name = fullfile(fpath,[fname zipext]);
+%     end
     % Need to test for existing file and in case, change default name
     if (exist(ad.data{id}.file.name,'file'))
         % 1. Check whether name ends with -NNN (where NNN are numbers)
