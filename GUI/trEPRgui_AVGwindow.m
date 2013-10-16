@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2011-13, Till Biskup
-% 2013-05-18
+% 2013-10-16
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -982,12 +982,12 @@ if (mainGuiWindow)
     if (isfield(admain,'data') ~= 0)
         ad.data = admain.data;
         % Add AVG struct to each dataset
-        for l=1:length(ad.data)
-            ad.data{l}.avg.start = 1;
-            ad.data{l}.avg.stop = 1;
-            ad.data{l}.avg.delta = 0;
-            ad.data{l}.avg.label = '';
-            ad.data{l}.avg.dimension = ad.configuration.avg.dimension;
+        for idx=1:length(ad.data)
+            ad.data{idx}.avg.start = 1;
+            ad.data{idx}.avg.stop = 1;
+            ad.data{idx}.avg.delta = 0;
+            ad.data{idx}.avg.label = '';
+            ad.data{idx}.avg.dimension = ad.configuration.avg.dimension;
         end
         setappdata(hMainFigure,'data',ad.data);
         ad.origdata = admain.data;
