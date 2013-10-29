@@ -3043,8 +3043,7 @@ function dataexport_pushbutton_Callback(~,~)
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
             [~,fileNameSuggested,~] = ...
-                fileparts(ad.data{ad.control.spectra.visible(...
-                ad.control.spectra.active)}.file.name);
+                fileparts(ad.data{ad.control.spectra.active}.file.name);
             fileNameSuggested = [fileNameSuggested '-1Dcrosssection'];
         else
             fileNameSuggested = '';
