@@ -6,8 +6,8 @@ function handle = guiAnalysisPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-12, Till Biskup
-% 2012-06-27
+% (c) 2011-13, Till Biskup
+% 2013-10-29
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -225,6 +225,7 @@ function pushbutton_Callback(~,~,action)
                         else
                             trEPRbusyWindow('stop',...
                                 'Trying to export dataset...<br /><b>done</b>.');
+                            trEPRbusyWindow('deletedelayed');
                             msgStr{1} = sprintf('Exported dataset %i to format %s',...
                                 ad.control.spectra.active,exportFormat);
                             msgStr{end+1} = ['Label: ' ...

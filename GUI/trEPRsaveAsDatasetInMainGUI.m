@@ -12,7 +12,7 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-13, Till Biskup
-% 2013-10-16
+% 2013-10-29
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -170,6 +170,7 @@ try
     update_mainAxis();
     
     trEPRbusyWindow('stop','Trying to save spectra...<br /><b>done</b>.');
+    trEPRbusyWindow('deletedelayed');
     status = 0;
     
 catch exception

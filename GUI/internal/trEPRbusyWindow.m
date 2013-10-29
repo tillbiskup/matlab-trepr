@@ -1,15 +1,31 @@
 function varargout = trEPRbusyWindow(varargin)
-% BUSYWINDOW Show window with message and spinning dots
+% TREPRBUSYWINDOW Show window with message and spinning dots using JAVA.
 %
-%       Arguments: action (start, stop, fail, delete)
+% Usage:
+%   trEPRbusyWindow(action);
+%   trEPRbusyWindow(action,description);
+%   trEPRbusyWindow(action,description,<parameter>,<value>);
+%   handle = trEPRbusyWindow(...);
 %
-%       Returns the handle of the window.
+%   action      - string
+%                 one of: start, stop, fail, delete, deletedelayed
+%
+%   description - string
+%                 
+% Additional parameter-value pairs can be passed at the function call.
+% Currently, the following parameters are possible:
+%
+%   position    - vector
+%                 four-element vector determining the window position
 
-% (c) 2012, Till Biskup
-% 2012-08-22
+% (c) 2012-13, Till Biskup
+% 2013-10-29
 
 title = 'Processing...';
 position = [220,350,270,120];
+
+% Delay time for closing window (in seconds)
+closeDelayTime = 2;
 
 description = ['Neque porro quisquam est qui dolorem ipsum '...
     'quia dolor sit amet, consectetur, adipisci velit...'];
@@ -149,6 +165,20 @@ switch action
         jObj.stop;
         clear('jObj');
         delete(hMainFigure);
+    case 'deletedelayed'
+        jObj.stop;
+        clear('jObj');
+        % Set timer to automatically close the busyWindow.
+        % IMPORTANT: Use "StopFcn" for timer that deletes the timer itself
+        closeBusyWindowTimer = timer(...
+            'TimerFcn',sprintf(...
+            'delete(%i)',hMainFigure),...
+            'StartDelay',closeDelayTime,...
+            'TasksToExecute',1,...
+            'Name','busyWindowTimer',...
+            'StopFcn','delete(timerfind(''Name'',''busyWindowTimer''))' ...
+            );
+        start(closeBusyWindowTimer);
     otherwise
 end
 
