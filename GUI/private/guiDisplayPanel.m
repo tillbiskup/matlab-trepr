@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-10-15
+% 2013-10-29
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -3043,7 +3043,8 @@ function dataexport_pushbutton_Callback(~,~)
         % Generate default file name if possible, be very defensive
         if ad.control.spectra.visible
             [~,fileNameSuggested,~] = ...
-                fileparts(ad.data{ad.control.spectra.visible(1)}.file.name);
+                fileparts(ad.data{ad.control.spectra.visible(...
+                ad.control.spectra.active)}.file.name);
             fileNameSuggested = [fileNameSuggested '-1Dcrosssection'];
         else
             fileNameSuggested = '';
