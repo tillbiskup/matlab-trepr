@@ -250,7 +250,17 @@ msgStr = sprintf('%i data set(s) successfully loaded:',length(data));
 trEPRmsg([msgStr fileNames],'info');
 clear msgStr;
 
-trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
+busyWindow = trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');
+
+% Set timer to automatically close the busyWindow.
+% IMPORTANT: Use "StopFcn" for timer that closes the timer itself
+closeBusyWindowTimer = timer(...
+    'TimerFcn',sprintf('close(%i)',busyWindow),...
+    'StartDelay',2,...
+    'TasksToExecute',1,...
+    'StopFcn','clear(''closeBusyWindowTimer'')'...
+    );
+start(closeBusyWindowTimer);
 
 % Get appdata again after making changes to it before
 ad = getappdata(mainWindow);
