@@ -5,7 +5,7 @@ function guiProcessingPOC(datasetnum)
 % Normally only called from within the trEPR GUI.
 
 % (c) 2011-13, Till Biskup
-% 2013-09-10
+% 2013-10-29
 
 method = 'trEPRPOC';
 fun = str2func(method);
@@ -32,8 +32,6 @@ if (isfield(ad.data{datasetnum},'parameters') && ...
 else
     return;
 end
-
-any(ad.control.spectra.modified==datasetnum)
 
 % Add modified spectrum to list of modified spectra
 if ~any(ad.control.spectra.modified==datasetnum)

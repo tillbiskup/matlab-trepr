@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-09-04
+% 2013-10-29
 
 status = 0;
 warnings = cell(0);
@@ -270,6 +270,8 @@ if get(gh.load_panel_preprocessing_offset_checkbox,'Value')
     for k=1:length(newDataIdx)
         guiProcessingPOC(newDataIdx(k));
     end
+    % As guiProcessingPOC changes appdata, reload them
+    ad = getappdata(handle);
 end
 
 % background subtraction
@@ -277,6 +279,8 @@ if get(gh.load_panel_preprocessing_background_checkbox,'Value')
     for k=1:length(newDataIdx)
         guiProcessingBGC(newDataIdx(k));
     end
+    % As guiProcessingBGC changes appdata, reload them
+    ad = getappdata(handle);
 end
 
 % TODO: Include unitConversion here
