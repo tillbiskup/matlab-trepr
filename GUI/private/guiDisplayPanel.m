@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-10-29
+% 2013-11-04
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2961,7 +2961,7 @@ function axesexport_pushbutton_Callback(~,~)
             get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
 
         fileNameSuggested = suggestFilename(mainWindow,'Type','figure');
-        
+
         % Ask user for file name
         [fileName,pathName] = uiputfile(...
             sprintf('*.%s',fileType),...
@@ -2973,9 +2973,9 @@ function axesexport_pushbutton_Callback(~,~)
         end
         % Create filename with full path
         fileName = fullfile(pathName,fileName);
-
+        
         % set lastFigSave Dir in appdata
-        if exist(pathName,'dirs')
+        if exist(pathName,'dir')
             ad.control.dirs.lastFigSave = pathName;
         end
         setappdata(mainWindow,'control',ad.control);
