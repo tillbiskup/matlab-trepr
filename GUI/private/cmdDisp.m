@@ -22,7 +22,7 @@ function [status,warnings] = cmdDisp(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013, Till Biskup
-% 2013-02-21
+% 2013-11-17
 
 status = 0;
 warnings = cell(0);
@@ -221,11 +221,19 @@ switch lower(opt{1})
         end
         switch lower(opt{2})
             case {'none','off'}
-                ad.control.axis.normalisation = 'none';
-            case {'pkpk','peaktopeak','pk2pk','peak2peak'}
-                ad.control.axis.normalisation = 'pkpk';
-            case {'amp','amplitude'}
-                ad.control.axis.normalisation = 'amplitude';
+                ad.control.axis.normalisation.enable = false;
+            case {'pkpk','pk-pk','peaktopeak','pk2pk','peak2peak'}
+                ad.control.axis.normalisation.enable = true;
+                ad.control.axis.normalisation.type = 'pk-pk';
+            case {'area'}
+                ad.control.axis.normalisation.enable = true;
+                ad.control.axis.normalisation = 'area';
+            case {'min','minimum'}
+                ad.control.axis.normalisation.enable = true;
+                ad.control.axis.normalisation = 'min';
+            case {'max','maximum'}
+                ad.control.axis.normalisation.enable = true;
+                ad.control.axis.normalisation = 'max';
             otherwise
                 status = -3;
                 warnings{end+1} = ['Command ' cmd ': Option ' opt{2} ...

@@ -86,15 +86,52 @@ set(...
     num2str(ad.data{active}.display.scaling.z)...
     );
 
-switch ad.control.axis.normalisation
-    case 'pkpk'
-        z = [0 1];
-    case 'amplitude'
-        z(1) = min(min(data/max(max(data))));
-        z(2) = max(max(data/max(max(data))));
-    otherwise
-        z(1) = min(min(data));
-        z(2) = max(max(data));
+if ad.control.axis.normalisation.enable
+    if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+        switch lower(ad.control.axis.normalisation.type)
+            case 'pk-pk'
+                z = [0 1];
+            case 'area'
+                z(1) = min(min(data/...
+                    sum(sum(data))));
+                z(2) = max(max(data/...
+                    sum(sum(data))));
+            case 'max'
+                z(1) = min(min(data/...
+                    max(max(data))));
+                z(2) = max(max(data/...
+                    max(max(data))));
+            case 'min'
+                z(1) = min(min(data/...
+                    min(min(data))));
+                z(2) = max(max(data/...
+                    min(min(data))));
+        end
+    else
+        switch lower(ad.control.axis.normalisation.type)
+            case 'pk-pk'
+                z = [0 1];
+            case 'area'
+                z(1) = min(min(data/...
+                    sum(sum(data))));
+                z(2) = max(max(data/...
+                    sum(sum(data))));
+            case 'max'
+                z(1) = min(min(data/...
+                    max(max(data))));
+                z(2) = max(max(data/...
+                    max(max(data))));
+            case 'min'
+                z(1) = min(min(data/...
+                    min(min(data))));
+                z(2) = max(max(data/...
+                    min(min(data))));
+        end
+    end
+else
+    z(1) = min(min(data));
+    z(2) = max(max(data));
+    
 end
 
 set(...

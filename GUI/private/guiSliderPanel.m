@@ -8,7 +8,7 @@ function handle = guiSliderPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2011-13, Till Biskup
-% 2013-03-02
+% 2013-11-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -439,17 +439,52 @@ function edit_Callback(source,~,action)
                     [get(gh.vert3_slider,'Min'),get(gh.vert3_slider,'Max')]);
                 ad.data{active}.display.displacement.z = value;
             case 'displacement_zunit'
-                switch lower(ad.control.axis.normalisation)
-                    case 'pkpk'
-                        z = [0 1];
-                    case 'amplitude'
-                        z(1) = min(min(ad.data{active}.data/...
-                            max(max(ad.data{ad.active}.data))));
-                        z(2) = max(max(ad.data{active}.data/...
-                            max(max(ad.data{active}.data))));
-                    otherwise
-                        z(1) = min(min(ad.data{active}.data));
-                        z(2) = max(max(ad.data{active}.data));
+                if ad.control.axis.normalisation.enable
+                    if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                z = [0 1];
+                            case 'area'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                            case 'max'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                            case 'min'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                        end
+                    else
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                z = [0 1];
+                            case 'area'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                            case 'max'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                            case 'min'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                        end
+                    end
+                else
+                    z(1) = min(min(ad.data{active}.data));
+                    z(2) = max(max(ad.data{active}.data));
+                    
                 end
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [z(1)-z(2),abs(z(1)-z(2))]);                
@@ -488,17 +523,52 @@ function edit_Callback(source,~,action)
                     (get(gh.vert2_slider,'Max')*2)]);
                 ad.data{active}.display.scaling.z = value;
             case 'scaling_zunit'
-                switch ad.control.axis.normalisation
-                    case 'pkpk'
-                        z = [0 1];
-                    case 'amplitude'
-                        z(1) = min(min(ad.data{ad.control.spectra.active}.data/...
-                            max(max(ad.data{ad.control.spectra.active}.data))));
-                        z(2) = max(max(ad.data{ad.control.spectra.active}.data/...
-                            max(max(ad.data{ad.control.spectra.active}.data))));
-                    otherwise
-                        z(1) = min(min(ad.data{ad.control.spectra.active}.data));
-                        z(2) = max(max(ad.data{ad.control.spectra.active}.data));
+                if ad.control.axis.normalisation.enable
+                    if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                z = [0 1];
+                            case 'area'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                            case 'max'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                            case 'min'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                        end
+                    else
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                z = [0 1];
+                            case 'area'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    sum(sum(ad.data{active}.data))));
+                            case 'max'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    max(max(ad.data{active}.data))));
+                            case 'min'
+                                z(1) = min(min(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                                z(2) = max(max(ad.data{active}.data/...
+                                    min(min(ad.data{active}.data))));
+                        end
+                    end
+                else
+                    z(1) = min(min(ad.data{ad.control.spectra.active}.data));
+                    z(2) = max(max(ad.data{ad.control.spectra.active}.data));
+                    
                 end
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [-(z(2)-z(1))/(get(gh.vert2_slider,'Max')*2),...

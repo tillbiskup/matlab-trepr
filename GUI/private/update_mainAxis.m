@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-09-03
+% 2013-11-17
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -242,11 +242,31 @@ switch ad.control.axis.displayType
                 y = y + ad.data{k}.display.displacement.z;
             end
             % Normalise if necessary
-            switch ad.control.axis.normalisation
-                case 'pkpk'
-                    y = y/(max(max(ad.data{k}.data))-min(min(ad.data{k}.data)));
-                case 'amplitude'
-                    y = y/max(max(ad.data{k}.data));
+            if ad.control.axis.normalisation.enable
+                if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                    switch lower(ad.control.axis.normalisation.type)
+                        case 'pk-pk'
+                            y = y/(max(y)-min(y));
+                        case 'area'
+                            y = y/abs(sum(y));
+                        case 'max'
+                            y = y/max(y);
+                        case 'min'
+                            y = y/abs(min(y));
+                    end
+                else
+                    switch lower(ad.control.axis.normalisation.type)
+                        case 'pk-pk'
+                            y = y/(max(max(ad.data{k}.data))-...
+                                min(min(ad.data{k}.data)));
+                        case 'area'
+                            y = y/abs(sum(sum(ad.data{k}.data)));
+                        case 'max'
+                            y = y/max(max(ad.data{k}.data));
+                        case 'min'
+                            y = y/abs(min(min(ad.data{k}.data)));
+                    end
+                end
             end
             % Apply filter if necessary
             if (ad.data{k}.display.smoothing.x.value > 1)
@@ -319,11 +339,31 @@ switch ad.control.axis.displayType
                     y = y + ad.data{k}.display.displacement.z;
                 end
                 % Normalise if necessary
-                switch ad.control.axis.normalisation
-                    case 'pkpk'
-                        y = y/(max(max(data))-min(min(data)));
-                    case 'amplitude'
-                        y = y/max(max(data));
+                if ad.control.axis.normalisation.enable
+                    if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                y = y/(max(y)-min(y));
+                            case 'area'
+                                y = y/abs(sum(y));
+                            case 'max'
+                                y = y/max(y);
+                            case 'min'
+                                y = y/abs(min(y));
+                        end
+                    else
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                y = y/(max(max(ad.data{k}.data))-...
+                                    min(min(ad.data{k}.data)));
+                            case 'area'
+                                y = y/abs(sum(sum(ad.data{k}.data)));
+                            case 'max'
+                                y = y/max(max(ad.data{k}.data));
+                            case 'min'
+                                y = y/abs(min(min(ad.data{k}.data)));
+                        end
+                    end
                 end
                 % Apply filter if necessary
                 if (ad.data{k}.display.smoothing.x.value > 1)
@@ -509,11 +549,30 @@ switch ad.control.axis.displayType
                 x = x + ad.data{k}.display.displacement.z;
             end
             % Normalise if necessary
-            switch ad.control.axis.normalisation
-                case 'pkpk'
-                    x = x/(max(max(ad.data{k}.data))-min(min(ad.data{k}.data)));
-                case 'amplitude'
-                    x = x/max(max(ad.data{k}.data));
+            if ad.control.axis.normalisation.enable
+                if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                    switch lower(ad.control.axis.normalisation.type)
+                        case 'pk-pk'
+                            x = x/(max(x)-min(x));
+                        case 'area'
+                            x = x/abs(sum(x));
+                        case 'max'
+                            x = x/max(x);
+                        case 'min'
+                            x = x/abs(min(x));
+                    end
+                else
+                    switch lower(ad.control.axis.normalisation.type)
+                        case 'pk-pk'
+                            x = x/(max(max(data))-min(min(data)));
+                        case 'area'
+                            x = x/abs(sum(sum(data)));
+                        case 'max'
+                            x = x/max(max(data));
+                        case 'min'
+                            x = x/abs(min(min(data)));
+                    end
+                end
             end
             % Apply filter if necessary
             if (ad.data{k}.display.smoothing.y.value > 1)
@@ -586,11 +645,31 @@ switch ad.control.axis.displayType
                     x = x + ad.data{k}.display.displacement.z;
                 end
                 % Normalise if necessary
-                switch ad.control.axis.normalisation
-                    case 'pkpk'
-                        x = x/(max(max(ad.data{k}.data))-min(min(ad.data{k}.data)));
-                    case 'amplitude'
-                        x = x/max(max(ad.data{k}.data));
+                if ad.control.axis.normalisation.enable
+                    if strcmpi(ad.control.axis.normalisation.dimension,'1D')
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                x = x/(max(x)-min(x));
+                            case 'area'
+                                x = x/abs(sum(x));
+                            case 'max'
+                                x = x/max(x);
+                            case 'min'
+                                x = x/abs(min(x));
+                        end
+                    else
+                        switch lower(ad.control.axis.normalisation.type)
+                            case 'pk-pk'
+                                x = x/(max(max(ad.data{k}.data))-...
+                                    min(min(ad.data{k}.data)));
+                            case 'area'
+                                x = x/abs(sum(sum(ad.data{k}.data)));
+                            case 'max'
+                                x = x/max(max(ad.data{k}.data));
+                            case 'min'
+                                x = x/abs(min(min(ad.data{k}.data)));
+                        end
+                    end
                 end
                 % Apply filter if necessary
                 if (ad.data{k}.display.smoothing.y.value > 1)
@@ -826,26 +905,71 @@ if (ad.control.axis.limits.auto)
         xmax(k) = x(end);
         ymin(k) = y(1);
         ymax(k) = y(end);
-        switch ad.control.axis.normalisation
-            case 'pkpk'
-                zmin(k) = min(min(...
-                    data/...
-                    (max(max(data))-...
-                    min(min(data)))));
-                zmax(k) = max(max(...
-                    data/...
-                    (max(max(data))-...
-                    min(min(data)))));
-            case 'amplitude'
-                zmin(k) = min(min(data/...
-                    max(max(data))));
-                zmax(k) = max(max(data/...
-                    max(max(data))));
-            otherwise
-                zmin(k) = ...
-                    min(min(data));
-                zmax(k) = ...
-                    max(max(data));
+        if ad.control.axis.normalisation.enable
+            if strcmpi(ad.control.axis.normalisation.dimension,'1d')
+                switch lower(ad.control.axis.displayType)
+                    case '1d along x'
+                        data = data(ad.data{...
+                            ad.control.spectra.visible(k)}.display.position.y,:);
+                    case '1d along y'
+                        data = data(:,ad.data{...
+                            ad.control.spectra.visible(k)}.display.position.x);
+                end
+                switch ad.control.axis.normalisation.type
+                    case 'pk-pk'
+                        zmin(k) = min(min(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                    case 'area'
+                        zmin(k) = min(min(data/...
+                            abs(sum(sum(data)))));
+                        zmax(k) = max(max(data/...
+                            abs(sum(sum(data)))));
+                    case 'max'
+                        zmin(k) = min(min(data/...
+                            max(max(data))));
+                        zmax(k) = max(max(data/...
+                            max(max(data))));
+                    case 'min'
+                        zmin(k) = min(min(data/...
+                            abs(min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            abs(min(min(data)))));
+                end
+            else % This is the 2D case
+                switch ad.control.axis.normalisation.type
+                    case 'pk-pk'
+                        zmin(k) = min(min(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                    case 'area'
+                        zmin(k) = min(min(data/...
+                            abs(sum(sum(data)))));
+                        zmax(k) = max(max(data/...
+                            abs(sum(sum(data)))));
+                    case 'max'
+                        zmin(k) = min(min(data/...
+                            max(max(data))));
+                        zmax(k) = max(max(data/...
+                            max(max(data))));
+                    case 'min'
+                        zmin(k) = min(min(data/...
+                            min(min(data))));
+                        zmax(k) = max(max(data/...
+                            min(min(data))));
+                end
+            end
+        else
+            zmin(k) = ...
+                min(min(data));
+            zmax(k) = ...
+                max(max(data));
         end
     end
     ad.control.axis.limits.x.min = min(xmin);
@@ -868,7 +992,7 @@ else
 %     ad.control.axis.limits.y.max = ...
 %         ad.data{ad.control.spectra.active}.axes.y.values(end);
 %     switch ad.control.axis.normalisation
-%         case 'pkpk'
+%         case 'pk-pk'
 %             ad.control.axis.limits.z.min = ...
 %                 min(min(...
 %                 ad.data{ad.control.spectra.active}.data/...
