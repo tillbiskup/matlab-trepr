@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-11-17
+% 2013-11-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -28,6 +28,9 @@ set(mainWindow,'CurrentAxes',gh.mainAxis);
 
 % Set defaults
 showTitle = true;
+showYTicks = true;
+showYAxis = true;
+showBox = true;
 
 % Check for additional input parameters
 if (nargin > 0)
@@ -37,11 +40,19 @@ if (nargin > 0)
         varargin(1) = [];
     end
     if ~isempty(varargin) && ischar(varargin{1})
-        switch lower(varargin{1})
-            case 'notitle'
-                showTitle = false;
-            otherwise
-                disp(['Optional argument "' varargin{1} '" not understood']);
+        for k=1:2:length(varargin)
+            switch lower(varargin{k})
+                case 'title'
+                    showTitle = varargin{k+1};
+                case 'noyticks'
+                    showYTicks = ~varargin{k+1};
+                case 'noyaxis'
+                    showYAxis = ~varargin{k+1};
+                case 'nobox'
+                    showBox = ~varargin{k+1};
+                otherwise
+                    disp(['Optional argument "' varargin{k} '" not understood']);
+            end
         end
     end
 end
@@ -148,10 +159,12 @@ switch ad.control.axis.displayType
             sprintf('{\\it %s} / %s',...
             ad.control.axis.labels.x.measure,...
             ad.control.axis.labels.x.unit));
-        ylabel(gca,...
-            sprintf('{\\it %s} / %s',...
-            ad.control.axis.labels.y.measure,...
-            ad.control.axis.labels.y.unit));
+        if showYAxis
+            ylabel(gca,...
+                sprintf('{\\it %s} / %s',...
+                ad.control.axis.labels.y.measure,...
+                ad.control.axis.labels.y.unit));
+        end
         % Set limits of axis
         if (ad.control.axis.limits.x.min==ad.control.axis.limits.x.max)
             xLimits = [ad.control.axis.limits.x.min-1 ...
@@ -474,15 +487,17 @@ switch ad.control.axis.displayType
                 ad.control.axis.labels.x.measure,...
                 ad.control.axis.labels.x.unit));
         end
-        if isempty(ad.control.axis.labels.z.unit)
-            ylabel(mainAxes,...
-                sprintf('{\\it %s}',...
-                ad.control.axis.labels.z.measure));
-        else
-            ylabel(mainAxes,...
-                sprintf('{\\it %s} / %s',...
-                ad.control.axis.labels.z.measure,...
-                ad.control.axis.labels.z.unit));
+        if showYAxis
+            if isempty(ad.control.axis.labels.z.unit)
+                ylabel(mainAxes,...
+                    sprintf('{\\it %s}',...
+                    ad.control.axis.labels.z.measure));
+            else
+                ylabel(mainAxes,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.z.measure,...
+                    ad.control.axis.labels.z.unit));
+            end
         end
         % Display legend - internal function
         display_legend(mainAxes);
@@ -779,15 +794,17 @@ switch ad.control.axis.displayType
                 ad.control.axis.labels.y.measure,...
                 ad.control.axis.labels.y.unit));
         end
-        if isempty(ad.control.axis.labels.z.unit)
-            ylabel(mainAxes,...
-                sprintf('{\\it %s}',...
-                ad.control.axis.labels.z.measure));
-        else
-            ylabel(mainAxes,...
-                sprintf('{\\it %s} / %s',...
-                ad.control.axis.labels.z.measure,...
-                ad.control.axis.labels.z.unit));
+        if showYAxis
+            if isempty(ad.control.axis.labels.z.unit)
+                ylabel(mainAxes,...
+                    sprintf('{\\it %s}',...
+                    ad.control.axis.labels.z.measure));
+            else
+                ylabel(mainAxes,...
+                    sprintf('{\\it %s} / %s',...
+                    ad.control.axis.labels.z.measure,...
+                    ad.control.axis.labels.z.unit));
+            end
         end
         % Display legend - internal function
         display_legend(mainAxes);
@@ -812,6 +829,26 @@ if (isequal(ad.control.axis.grid.x,'on'))
 end
 if (isequal(ad.control.axis.grid.y,'on'))
     set(gca,'YMinorGrid',ad.control.axis.grid.minor);
+end
+
+% Set yaxis and yticks according to settings
+if ~showYAxis
+    % No ticks, therefore no tick marks
+    set(gca,'YTick',[]);
+    % Set yaxis color to white to fake nonexisting axis
+    set(gca,'YColor',[1 1 1]);
+    % Remove box
+    set(gca,'Box','off');
+end
+
+if ~showYTicks
+    % No ticks, therefore no tick marks
+    set(gca,'YTick',[]);
+end
+
+if ~showBox
+    % Remove box
+    set(gca,'Box','off');
 end
 
 status = 0;

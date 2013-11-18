@@ -216,12 +216,12 @@ newFig = figure();
 set(newFig,'Visible','off');
 
 % Plot into new figure window
-% Check whether to plot title
-if get(gh.display_panel_axesexport_includetitle_checkbox,'Value')
-    update_mainAxis(newFig);
-else
-    update_mainAxis(newFig,'notitle');
-end
+% Check whether to plot title, yticks, yaxis
+update_mainAxis(newFig,...
+    'title',get(gh.display_panel_axesexport_includetitle_checkbox,'Value'),...
+    'noyticks',get(gh.display_panel_axesexport_removeyticks_checkbox,'Value'),...
+    'noyaxis',get(gh.display_panel_axesexport_removeyaxis_checkbox,'Value'),...
+    'nobox',get(gh.display_panel_axesexport_removebox_checkbox,'Value'));
 
 % Check whether to open caption GUI
 if get(gh.display_panel_axesexport_includecaption_checkbox,'Value')
