@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-11-18
+% 2013-11-27
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -120,6 +120,15 @@ if (isfield(ad.data{active},'axes') ...
         && isfield(ad.data{active}.axes.y,'values') ...
         && not (isempty(ad.data{active}.axes.y.values)))
     y = ad.data{active}.axes.y.values;
+end
+
+% In case we have no axes values, should not happen, but might do...
+% (simulation for example)
+if isempty(x)
+    x=1;
+end
+if isempty(y)
+    y=1;
 end
 
 % Get displacement slider factors from configuration
@@ -339,10 +348,10 @@ switch ad.control.axis.displayType
                 y = data(ad.data{k}.display.position.y,:);
                 % In case that we loaded 1D data...
                 if isscalar(x)
-                    x = [x x+1];
+                    x = [x x+1]; %#ok<AGROW>
                 end
                 if isscalar(y)
-                    y = [y y+1];
+                    y = [y y+1]; %#ok<AGROW>
                 end
                 % Apply displacement if necessary
                 if (ad.data{k}.display.displacement.x ~= 0)
@@ -647,10 +656,10 @@ switch ad.control.axis.displayType
                 x = data(:,ad.data{k}.display.position.x);
                 % In case that we loaded 1D data...
                 if isscalar(x)
-                    x = [x x+1];
+                    x = [x x+1]; %#ok<AGROW>
                 end
                 if isscalar(y)
-                    y = [y y+1];
+                    y = [y y+1]; %#ok<AGROW>
                 end
                 % Apply displacement if necessary
                 if (ad.data{k}.display.displacement.y ~= 0)

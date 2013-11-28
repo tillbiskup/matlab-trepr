@@ -12,7 +12,7 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % (c) 2011-13, Till Biskup
-% 2013-10-29
+% 2013-11-28
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -49,6 +49,7 @@ try
 
     % Need to test for existing file and in case, change default name
     if (exist(ad.data{id}.file.name,'file'))
+        [fpath,fname,~] = fileparts(ad.data{id}.file.name);
         % 1. Check whether name ends with -NNN (where NNN are numbers)
         % 2. existingFiles = dir(sprintf('%s*',filename));
         % 2a. If name ends with -NNN, remove "-NNN" from filename before
