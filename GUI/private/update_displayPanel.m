@@ -7,7 +7,7 @@ function status = update_displayPanel()
 %            0: successfully updated main axis
 
 % (c) 2011-13, Till Biskup
-% 2013-02-22
+% 2013-11-29
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -110,94 +110,314 @@ set(gh.display_panel_zerolinestyle_popupmenu,'Value',zeroLineStyleIndex);
 % Set line settings
 if ad.control.spectra.active
     active = ad.control.spectra.active;
-    % Set colour sample
-    set(gh.display_panel_linecoloursample_text,'BackgroundColor',...
-        ad.data{active}.line.color);
-    set(gh.display_panel_linecoloursample_text,'TooltipString',...
-        num2str(ad.data{active}.line.color));
     
-    % Set line width
-    set(gh.display_panel_linewidth_popupmenu,'Value',...
-        ad.data{active}.line.width);
+    % Make settings depending on the line selected
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
 
-    % Set line style
-    lineStyles = {'-','--',':','-.','none'};
-    lineStyle = ad.data{active}.line.style;
-    for k=1:length(lineStyles)
-        if strcmp(lineStyles{k},lineStyle)
-            lineStyleIndex = k;
-        end
+    % NOTE: For now, not having both line settings at the same level in the
+    %       data structure, we need to duplicate large parts of the code.
+    %       Later on, we could just define the field name within the switch
+    %       statement and run the rest without problem only once - see
+    %       commented parts of the code.
+
+    switch lineType
+        case 'measured'
+            % Set colour sample
+            set(gh.display_panel_linecoloursample_text,'BackgroundColor',...
+                ad.data{active}.line.color);
+            set(gh.display_panel_linecoloursample_text,'TooltipString',...
+                num2str(ad.data{active}.line.color));
+            
+            % Set line width
+            set(gh.display_panel_linewidth_popupmenu,'Value',...
+                ad.data{active}.line.width);
+            
+            % Set line style
+            lineStyles = {'-','--',':','-.','none'};
+            lineStyle = ad.data{active}.line.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
+                end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+            lineMarker = ad.data{active}.line.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
+                end
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.data{active}.line.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'));
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'TootipString','none');
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.data{active}.line.color);
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'TooltipString',num2str(ad.data{active}.line.color));
+                end
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.line.marker.edgeColor);
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'TooltipString',num2str(ad.data{active}.line.marker.edgeColor));
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.data{active}.line.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'));
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'TooltipString','none');
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'TooltipString',num2str(get(gca,'Color')));
+                end
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.line.marker.faceColor);
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'TooltipString',num2str(ad.data{active}.line.marker.faceColor));
+            end
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.data{active}.line.marker.size));
+        case 'calculated'
+            % Set colour sample
+            set(gh.display_panel_linecoloursample_text,'BackgroundColor',...
+                ad.data{active}.display.lines.calculated.color);
+            set(gh.display_panel_linecoloursample_text,'TooltipString',...
+                num2str(ad.data{active}.display.lines.calculated.color));
+            
+            % Set line width
+            set(gh.display_panel_linewidth_popupmenu,'Value',...
+                ad.data{active}.display.lines.calculated.width);
+            
+            % Set line style
+            lineStyles = {'-','--',':','-.','none'};
+            lineStyle = ad.data{active}.display.lines.calculated.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
+                end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+            lineMarker = ad.data{active}.display.lines.calculated.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
+                end
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.data{active}.display.lines.calculated.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'));
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'TootipString','none');
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.data{active}.display.lines.calculated.color);
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'TooltipString',num2str(ad.data{active}.display.lines.calculated.color));
+                end
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.display.lines.calculated.marker.edgeColor);
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'TooltipString',num2str(ad.data{active}.display.lines.calculated.marker.edgeColor));
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.data{active}.display.lines.calculated.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'));
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'TooltipString','none');
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'TooltipString',num2str(get(gca,'Color')));
+                end
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.display.lines.calculated.marker.faceColor);
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'TooltipString',num2str(ad.data{active}.display.lines.calculated.marker.faceColor));
+            end
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.data{active}.display.lines.calculated.marker.size));
+        otherwise
+            st = dbstack;
+            trEPRmsg(...
+                [st.name ' : unknown line type "' lineType '"'],...
+                'warning');
+            return;
     end
-    set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
     
-    % Set line marker type
-    lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
-    lineMarker = ad.data{active}.line.marker.type;
-    for k=1:length(lineMarkers)
-        if strcmp(lineMarkers{k},lineMarker)
-            lineMarkerIndex = k;
-        end
-    end
-    set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-    % Set line marker edge colour
-    lineMarkerEdgeColor = ad.data{active}.line.marker.edgeColor;
-    lineMarkerEdgeColorPopupmenuValues = ...
-        cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-    if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-        set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-            find(strcmpi(lineMarkerEdgeColor,...
-            lineMarkerEdgeColorPopupmenuValues)));
-        switch lineMarkerEdgeColor
-            case 'none'
-                set(gh.display_panel_markeredgecoloursample_text,...
-                    'BackgroundColor',get(mainWindow,'Color'));
-                set(gh.display_panel_markeredgecoloursample_text,...
-                    'TootipString','none');
-            case 'auto'
-                set(gh.display_panel_markeredgecoloursample_text,...
-                    'BackgroundColor',ad.data{active}.line.color);
-                set(gh.display_panel_markeredgecoloursample_text,...
-                    'TooltipString',num2str(ad.data{active}.line.color));
-        end
-    else
-        set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-            find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-        set(gh.display_panel_markeredgecoloursample_text,...
-            'BackgroundColor',ad.data{active}.line.marker.edgeColor);
-        set(gh.display_panel_markeredgecoloursample_text,...
-            'TooltipString',num2str(ad.data{active}.line.marker.edgeColor));
-    end
-    % Set line marker face colour
-    lineMarkerFaceColor = ad.data{active}.line.marker.faceColor;
-    lineMarkerFaceColorPopupmenuValues = ...
-        cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-    if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-        set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-            find(strcmpi(lineMarkerFaceColor,...
-            lineMarkerFaceColorPopupmenuValues)));
-        switch lineMarkerFaceColor
-            case 'none'
-                set(gh.display_panel_markerfacecoloursample_text,...
-                    'BackgroundColor',get(mainWindow,'Color'));
-                set(gh.display_panel_markerfacecoloursample_text,...
-                    'TooltipString','none');
-            case 'auto'
-                set(gh.display_panel_markerfacecoloursample_text,...
-                    'BackgroundColor',get(gca,'Color'));
-                set(gh.display_panel_markerfacecoloursample_text,...
-                    'TooltipString',num2str(get(gca,'Color')));
-        end
-    else
-        set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-            find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-        set(gh.display_panel_markerfacecoloursample_text,...
-            'BackgroundColor',ad.data{active}.line.marker.faceColor);
-        set(gh.display_panel_markerfacecoloursample_text,...
-            'TooltipString',num2str(ad.data{active}.line.marker.faceColor));
-    end
-    % Set line marker size
-    set(gh.display_panel_markersize_edit,'String',...
-        num2str(ad.data{active}.line.marker.size));
+%     switch lineType
+%         case 'measured'
+%             fieldName = 'data';
+%         case 'calculated'
+%             fieldName = 'calculated';
+%         otherwise
+%             st = dbstack;
+%             trEPRmsg(...
+%                 [st.name ' : unknown line type "' lineType '"'],...
+%                 'warning');
+%             return;
+%     end
+%     
+%     % Set colour sample
+%     set(gh.display_panel_linecoloursample_text,'BackgroundColor',...
+%         ad.data{active}.display.lines.(fieldName).color);
+%     set(gh.display_panel_linecoloursample_text,'TooltipString',...
+%         num2str(ad.data{active}.display.lines.(fieldName).color));
+%     
+%     % Set line width
+%     set(gh.display_panel_linewidth_popupmenu,'Value',...
+%         ad.data{active}.display.lines.(fieldName).width);
+% 
+%     % Set line style
+%     lineStyles = {'-','--',':','-.','none'};
+%     lineStyle = ad.data{active}.display.lines.(fieldName).style;
+%     for k=1:length(lineStyles)
+%         if strcmp(lineStyles{k},lineStyle)
+%             lineStyleIndex = k;
+%         end
+%     end
+%     set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+%     
+%     % Set line marker type
+%     lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+%     lineMarker = ad.data{active}.display.lines.(fieldName).marker.type;
+%     for k=1:length(lineMarkers)
+%         if strcmp(lineMarkers{k},lineMarker)
+%             lineMarkerIndex = k;
+%         end
+%     end
+%     set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+%     % Set line marker edge colour
+%     lineMarkerEdgeColor = ...
+%         ad.data{active}.display.lines.(fieldName).marker.edgeColor;
+%     lineMarkerEdgeColorPopupmenuValues = ...
+%         cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+%     if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+%         set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+%             find(strcmpi(lineMarkerEdgeColor,...
+%             lineMarkerEdgeColorPopupmenuValues)));
+%         switch lineMarkerEdgeColor
+%             case 'none'
+%                 set(gh.display_panel_markeredgecoloursample_text,...
+%                     'BackgroundColor',get(mainWindow,'Color'));
+%                 set(gh.display_panel_markeredgecoloursample_text,...
+%                     'TootipString','none');
+%             case 'auto'
+%                 set(gh.display_panel_markeredgecoloursample_text,...
+%                     'BackgroundColor',...
+%                     ad.data{active}.display.lines.(fieldName).color);
+%                 set(gh.display_panel_markeredgecoloursample_text,...
+%                     'TooltipString',...
+%                     num2str(ad.data{active}.display.lines.(fieldName).color));
+%         end
+%     else
+%         set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+%             find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+%         set(gh.display_panel_markeredgecoloursample_text,...
+%             'BackgroundColor',...
+%             ad.data{active}.display.lines.(fieldName).marker.edgeColor);
+%         set(gh.display_panel_markeredgecoloursample_text,...
+%             'TooltipString',...
+%             num2str(ad.data{active}.display.lines.(fieldName).marker.edgeColor));
+%     end
+%     % Set line marker face colour
+%     lineMarkerFaceColor = ...
+%         ad.data{active}.display.lines.(fieldName).marker.faceColor;
+%     lineMarkerFaceColorPopupmenuValues = ...
+%         cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+%     if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+%         set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+%             find(strcmpi(lineMarkerFaceColor,...
+%             lineMarkerFaceColorPopupmenuValues)));
+%         switch lineMarkerFaceColor
+%             case 'none'
+%                 set(gh.display_panel_markerfacecoloursample_text,...
+%                     'BackgroundColor',get(mainWindow,'Color'));
+%                 set(gh.display_panel_markerfacecoloursample_text,...
+%                     'TooltipString','none');
+%             case 'auto'
+%                 set(gh.display_panel_markerfacecoloursample_text,...
+%                     'BackgroundColor',get(gca,'Color'));
+%                 set(gh.display_panel_markerfacecoloursample_text,...
+%                     'TooltipString',num2str(get(gca,'Color')));
+%         end
+%     else
+%         set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+%             find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+%         set(gh.display_panel_markerfacecoloursample_text,...
+%             'BackgroundColor',...
+%             ad.data{active}.display.lines.(fieldName).marker.faceColor);
+%         set(gh.display_panel_markerfacecoloursample_text,...
+%             'TooltipString',...
+%             num2str(ad.data{active}.display.lines.(fieldName).marker.faceColor));
+%     end
+%     % Set line marker size
+%     set(gh.display_panel_markersize_edit,'String',...
+%         num2str(ad.data{active}.display.lines.(fieldName).marker.size));
+    
 end
 
 % Set 3D export panel
