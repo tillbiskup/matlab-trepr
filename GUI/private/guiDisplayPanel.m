@@ -1865,9 +1865,10 @@ function popupmenu_Callback(source,~,action)
             return;
         end
         
-        % Get appdata of main GUI
+        % Get appdata and handles of main GUI
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
 
         values = cellstr(get(source,'String'));
         value = values{get(source,'Value')};
@@ -1879,18 +1880,60 @@ function popupmenu_Callback(source,~,action)
                 % Probably, no action needs to be taken except of the
                 % "update_displayPanel()" after the switch-case statement.
             case 'markerEdgeColour'
-                if strcmpi(value,'colour')
-                    ad.data{active}.line.marker.edgeColor = ...
-                        ad.data{active}.line.color;
-                else
-                    ad.data{active}.line.marker.edgeColor = value;
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        if strcmpi(value,'colour')
+                            ad.data{active}.line.marker.edgeColor = ...
+                                ad.data{active}.line.color;
+                        else
+                            ad.data{active}.line.marker.edgeColor = value;
+                        end
+                    case 'calculated'
+                        if strcmpi(value,'colour')
+                            ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                                ad.data{active}.display.lines.calculated.color;
+                        else
+                            ad.data{active}.display.lines.calculated.marker.edgeColor = value;
+                        end
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
                 end
             case 'markerFaceColour'
-                if strcmpi(value,'colour')
-                    ad.data{active}.line.marker.faceColor = ...
-                        ad.data{active}.line.color;
-                else
-                    ad.data{active}.line.marker.faceColor = value;
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        if strcmpi(value,'colour')
+                            ad.data{active}.line.marker.faceColor = ...
+                                ad.data{active}.line.color;
+                        else
+                            ad.data{active}.line.marker.faceColor = value;
+                        end
+                    case 'calculated'
+                        if strcmpi(value,'colour')
+                            ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                                ad.data{active}.display.lines.calculated.color;
+                        else
+                            ad.data{active}.display.lines.calculated.marker.faceColor = value;
+                        end
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
                 end
             otherwise
                 st = dbstack;
@@ -1929,9 +1972,10 @@ function edit_Callback(source,~,action)
             return;
         end
         
-        % Get appdata of main GUI
+        % Get appdata and handles of main GUI
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
         
         active = ad.control.spectra.active;
         if isempty(active) && ~active
@@ -1948,7 +1992,23 @@ function edit_Callback(source,~,action)
             case 'zeroLineWidth'
                 ad.control.axis.grid.zero.width = value;
             case 'markerSize'
-                ad.data{active}.line.marker.size = value;
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        ad.data{active}.line.marker.size = value;
+                    case 'calculated'
+                        ad.data{active}.display.lines.calculated.marker.size = value;
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
+                end
             otherwise
                 st = dbstack;
                 trEPRmsg(...
@@ -1987,9 +2047,10 @@ function pushbutton_Callback(~,~,action)
             return;
         end
         
-        % Get appdata of main window
+        % Get appdata and handles of main window
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
 
         % Make life easier
         active = ad.control.spectra.active;
@@ -2072,14 +2133,39 @@ function pushbutton_Callback(~,~,action)
                 update_mainAxis();
                 return;
             case 'colourPalette'
-                if ischar(ad.data{active}.line.color)
-                    ad.data{active}.line.color = colors{...
-                        strcmpi(ad.data{active}.line.color,...
-                        colors(:,1)),2};
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        if ischar(ad.data{active}.line.color)
+                            ad.data{active}.line.color = colors{...
+                                strcmpi(ad.data{active}.line.color,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.line.color = uisetcolor(...
+                            ad.data{active}.line.color,...
+                            'Set measured line colour');
+                    case 'calculated'
+                        if ischar(ad.data{active}.display.lines.calculated.color)
+                            ad.data{active}.display.lines.calculated.color = ...
+                                colors{...
+                                strcmpi(ad.data{active}.display.lines.calculated.color,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.display.lines.calculated.color = ...
+                            uisetcolor(...
+                            ad.data{active}.display.lines.calculated.color,...
+                            'Set calculated line colour');
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
                 end
-                ad.data{active}.line.color = uisetcolor(...
-                    ad.data{active}.line.color,...
-                    'Set MFoff line colour');
         
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -2091,14 +2177,39 @@ function pushbutton_Callback(~,~,action)
                 update_mainAxis();
                 return;
             case 'markerEdgeColourPalette'
-                if ischar(ad.data{active}.line.marker.edgeColor)
-                    ad.data{active}.line.marker.edgeColor = colors{...
-                        strcmpi(ad.data{active}.line.marker.edgeColor,...
-                        colors(:,1)),2};
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        if ischar(ad.data{active}.line.marker.edgeColor)
+                            ad.data{active}.line.marker.edgeColor = colors{...
+                                strcmpi(ad.data{active}.line.marker.edgeColor,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.line.marker.edgeColor = uisetcolor(...
+                            ad.data{active}.line.marker.edgeColor,...
+                            'Set line marker edge colour');
+                    case 'calculated'
+                        if ischar(ad.data{active}.display.lines.calculated.marker.edgeColor)
+                            ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                                colors{...
+                                strcmpi(ad.data{active}.display.lines.calculated.marker.edgeColor,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                            uisetcolor(...
+                            ad.data{active}.display.lines.calculated.marker.edgeColor,...
+                            'Set line marker edge colour');
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
                 end
-                ad.data{active}.line.marker.edgeColor = uisetcolor(...
-                    ad.data{active}.line.marker.edgeColor,...
-                    'Set line marker edge colour');
         
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -2110,14 +2221,39 @@ function pushbutton_Callback(~,~,action)
                 update_mainAxis();
                 return;
             case 'markerFaceColourPalette'
-                if ischar(ad.data{active}.line.marker.faceColor)
-                    ad.data{active}.line.marker.faceColor = colors{...
-                        strcmpi(ad.data{active}.line.marker.faceColor,...
-                        colors(:,1)),2};
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        if ischar(ad.data{active}.line.marker.faceColor)
+                            ad.data{active}.line.marker.faceColor = colors{...
+                                strcmpi(ad.data{active}.line.marker.faceColor,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.line.marker.faceColor = uisetcolor(...
+                            ad.data{active}.line.marker.faceColor,...
+                            'Set line marker face colour');
+                    case 'calculated'
+                        if ischar(ad.data{active}.display.lines.calculated.marker.faceColor)
+                            ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                                colors{...
+                                strcmpi(ad.data{active}.display.lines.calculated.marker.faceColor,...
+                                colors(:,1)),2};
+                        end
+                        ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                            uisetcolor(...
+                            ad.data{active}.display.lines.calculated.marker.faceColor,...
+                            'Set line marker face colour');
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
                 end
-                ad.data{active}.line.marker.faceColor = uisetcolor(...
-                    ad.data{active}.line.marker.faceColor,...
-                    'Set line marker face colour');
         
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -2129,10 +2265,30 @@ function pushbutton_Callback(~,~,action)
                 update_mainAxis();
                 return;
             case 'markerDefaults'
-                ad.data{active}.line.marker.type = 'none';
-                ad.data{active}.line.marker.edgeColor = 'auto';
-                ad.data{active}.line.marker.faceColor = 'none';
-                ad.data{active}.line.marker.size = 6;
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        ad.data{active}.line.marker.type = 'none';
+                        ad.data{active}.line.marker.edgeColor = 'auto';
+                        ad.data{active}.line.marker.faceColor = 'none';
+                        ad.data{active}.line.marker.size = 6;
+                    case 'calculated'
+                        ad.data{active}.display.lines.calculated.marker.type = 'none';
+                        ad.data{active}.display.lines.calculated.marker.edgeColor = 'auto';
+                        ad.data{active}.display.lines.calculated.marker.faceColor = 'none';
+                        ad.data{active}.display.lines.calculated.marker.size = 6;
+                    otherwise
+                        st = dbstack;
+                        trEPRmsg(...
+                            [st.name ' : unknown line type "' lineType '"'],...
+                            'warning');
+                        return;
+                end
+                
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
                 
@@ -2996,11 +3152,9 @@ end
 
 function linewidth_popupmenu_Callback(~,~)
     try
-        % Get appdata of main window
+        % Get appdata and handles of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
-
-        % Get handles of main window
         gh = guihandles(mainWindow);
 
         lineWidths = ...
@@ -3009,8 +3163,26 @@ function linewidth_popupmenu_Callback(~,~)
             lineWidths{get(gh.display_panel_linewidth_popupmenu,'Value')};
                 
         if ad.control.spectra.active
-            ad.data{ad.control.spectra.active}.line.width = ...
-                str2double(lineWidth(1));
+            active = ad.control.spectra.active;
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    ad.data{active}.line.width = str2double(lineWidth(1));
+                case 'calculated'
+                    ad.data{active}.display.lines.calculated.width = ...
+                        str2double(lineWidth(1));
+                otherwise
+                    st = dbstack;
+                    trEPRmsg(...
+                        [st.name ' : unknown line type "' lineType '"'],...
+                        'warning');
+                    return;
+            end
+            
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
             % Update main axes
@@ -3037,9 +3209,10 @@ end
 
 function linestyle_popupmenu_Callback(source,~,action)
     try
-        % Get appdata of main window
+        % Get appdata and handles of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
+        gh = guihandles(mainWindow);
 
         lineStyles = ...
             cellstr(get(source,'String'));
@@ -3050,23 +3223,56 @@ function linestyle_popupmenu_Callback(source,~,action)
             case 'line'
                 if ad.control.spectra.active
                     active = ad.control.spectra.active;
-                    switch lineStyle
-                        case 'solid'
-                            ad.data{active}.line.style = '-';
-                        case 'dashed'
-                            ad.data{active}.line.style = '--';
-                        case 'dotted'
-                            ad.data{active}.line.style = ':';
-                        case 'dash-dotted'
-                            ad.data{active}.line.style = '-.';
-                        case 'none'
-                            ad.data{active}.line.style = 'none';
+                    % Make settings depending on the line selected
+                    lineTypes = cellstr(...
+                        get(gh.display_panel_line_popupmenu,'String'));
+                    lineType = lineTypes{...
+                        get(gh.display_panel_line_popupmenu,'Value')};
+                    switch lineType
+                        case 'measured'
+                            switch lineStyle
+                                case 'solid'
+                                    ad.data{active}.line.style = '-';
+                                case 'dashed'
+                                    ad.data{active}.line.style = '--';
+                                case 'dotted'
+                                    ad.data{active}.line.style = ':';
+                                case 'dash-dotted'
+                                    ad.data{active}.line.style = '-.';
+                                case 'none'
+                                    ad.data{active}.line.style = 'none';
+                                otherwise
+                                    % That shall never happen
+                                    st = dbstack;
+                                    trEPRmsg(...
+                                        [st.name ' : unknown line style "' lineStyle '"'],...
+                                        'warning');
+                            end
+                        case 'calculated'
+                            switch lineStyle
+                                case 'solid'
+                                    ad.data{active}.display.lines.calculated.style = '-';
+                                case 'dashed'
+                                    ad.data{active}.display.lines.calculated.style = '--';
+                                case 'dotted'
+                                    ad.data{active}.display.lines.calculated.style = ':';
+                                case 'dash-dotted'
+                                    ad.data{active}.display.lines.calculated.style = '-.';
+                                case 'none'
+                                    ad.data{active}.display.lines.calculated.style = 'none';
+                                otherwise
+                                    % That shall never happen
+                                    st = dbstack;
+                                    trEPRmsg(...
+                                        [st.name ' : unknown line style "' lineStyle '"'],...
+                                        'warning');
+                            end
                         otherwise
-                            % That shall never happen
                             st = dbstack;
                             trEPRmsg(...
-                                [st.name ' : unknown line style "' lineStyle '"'],...
+                                [st.name ' : unknown line type "' lineType '"'],...
                                 'warning');
+                            return;
                     end
                 end
             case 'zeroline'
@@ -3120,11 +3326,9 @@ end
 
 function linemarker_popupmenu_Callback(~,~)
     try
-        % Get appdata of main window
+        % Get appdata and handles of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
-
-        % Get handles of main window
         gh = guihandles(mainWindow);
 
         lineMarkers = ...
@@ -3135,42 +3339,94 @@ function linemarker_popupmenu_Callback(~,~)
         active = ad.control.spectra.active;
                         
         if ad.control.spectra.active
-            switch lineMarker
-                case 'none'
-                    ad.data{active}.line.marker.type = 'none';
-                case 'plus'
-                    ad.data{active}.line.marker.type = '+';
-                case 'circle'
-                    ad.data{active}.line.marker.type = 'o';
-                case 'asterisk'
-                    ad.data{active}.line.marker.type = '*';
-                case 'point'
-                    ad.data{active}.line.marker.type = '.';
-                case 'cross'
-                    ad.data{active}.line.marker.type = 'x';
-                case 'square'
-                    ad.data{active}.line.marker.type = 's';
-                case 'diamond'
-                    ad.data{active}.line.marker.type = 'd';
-                case 'triangle up'
-                    ad.data{active}.line.marker.type = '^';
-                case 'triangle down'
-                    ad.data{active}.line.marker.type = 'v';
-                case 'triangle right'
-                    ad.data{active}.line.marker.type = '<';
-                case 'triangle left'
-                    ad.data{active}.line.marker.type = '>';
-                case 'pentagram'
-                    ad.data{active}.line.marker.type = 'p';
-                case 'hexagram'
-                    ad.data{active}.line.marker.type = 'h';
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    switch lineMarker
+                        case 'none'
+                            ad.data{active}.line.marker.type = 'none';
+                        case 'plus'
+                            ad.data{active}.line.marker.type = '+';
+                        case 'circle'
+                            ad.data{active}.line.marker.type = 'o';
+                        case 'asterisk'
+                            ad.data{active}.line.marker.type = '*';
+                        case 'point'
+                            ad.data{active}.line.marker.type = '.';
+                        case 'cross'
+                            ad.data{active}.line.marker.type = 'x';
+                        case 'square'
+                            ad.data{active}.line.marker.type = 's';
+                        case 'diamond'
+                            ad.data{active}.line.marker.type = 'd';
+                        case 'triangle up'
+                            ad.data{active}.line.marker.type = '^';
+                        case 'triangle down'
+                            ad.data{active}.line.marker.type = 'v';
+                        case 'triangle right'
+                            ad.data{active}.line.marker.type = '<';
+                        case 'triangle left'
+                            ad.data{active}.line.marker.type = '>';
+                        case 'pentagram'
+                            ad.data{active}.line.marker.type = 'p';
+                        case 'hexagram'
+                            ad.data{active}.line.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            st = dbstack;
+                            trEPRmsg(...
+                                [st.name ' : unknown line marker "' lineMarker '"'],...
+                                'warning');
+                    end
+                case 'calculated'
+                    switch lineMarker
+                        case 'none'
+                            ad.data{active}.display.lines.calculated.marker.type = 'none';
+                        case 'plus'
+                            ad.data{active}.display.lines.calculated.marker.type = '+';
+                        case 'circle'
+                            ad.data{active}.display.lines.calculated.marker.type = 'o';
+                        case 'asterisk'
+                            ad.data{active}.display.lines.calculated.marker.type = '*';
+                        case 'point'
+                            ad.data{active}.display.lines.calculated.marker.type = '.';
+                        case 'cross'
+                            ad.data{active}.display.lines.calculated.marker.type = 'x';
+                        case 'square'
+                            ad.data{active}.display.lines.calculated.marker.type = 's';
+                        case 'diamond'
+                            ad.data{active}.display.lines.calculated.marker.type = 'd';
+                        case 'triangle up'
+                            ad.data{active}.display.lines.calculated.marker.type = '^';
+                        case 'triangle down'
+                            ad.data{active}.display.lines.calculated.marker.type = 'v';
+                        case 'triangle right'
+                            ad.data{active}.display.lines.calculated.marker.type = '<';
+                        case 'triangle left'
+                            ad.data{active}.display.lines.calculated.marker.type = '>';
+                        case 'pentagram'
+                            ad.data{active}.display.lines.calculated.marker.type = 'p';
+                        case 'hexagram'
+                            ad.data{active}.display.lines.calculated.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            st = dbstack;
+                            trEPRmsg(...
+                                [st.name ' : unknown line marker "' lineMarker '"'],...
+                                'warning');
+                    end
                 otherwise
-                    % That shall never happen
                     st = dbstack;
                     trEPRmsg(...
-                        [st.name ' : unknown line marker "' lineMarker '"'],...
+                        [st.name ' : unknown line type "' lineType '"'],...
                         'warning');
+                    return;
             end
+            
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
             % Update main axes
