@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % (c) 2009-2013, Till Biskup
-% 2013-08-24
+% 2013-12-13
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -100,8 +100,8 @@ if iscell(filename)
         varargout{1} = content;
         varargout{2} = warnings;
     else
-        varargout{1} = 0;
-        varargout{2} = [];
+        varargout{1} = [];
+        varargout{2} = 'Failed loading data';
     end
 elseif isstruct(filename) && isfield(filename,'name')
     % That might be the case if the user uses "dir" as input for the
@@ -172,8 +172,8 @@ elseif isstruct(filename) && isfield(filename,'name')
         varargout{1} = content;
         varargout{2} = warnings;
     else
-        varargout{1} = 0;
-        varargout{2} = [];
+        varargout{1} = [];
+        varargout{2} = 'Failed loading data';
     end
 else    % -> if iscell(filename)
     switch exist(filename)
@@ -270,10 +270,10 @@ else    % -> if iscell(filename)
     end
 end
 
-if ~exist('content','var') && nargout
+if ~exist('content','var') % && nargout
     trEPRmsg('Couldn''t load any data','error');
-    varargout{1} = 0;
-    varargout{2} = [];
+    varargout{1} = [];
+    varargout{2} = 'Failed loading data';
     return;
 end
 
