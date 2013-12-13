@@ -176,11 +176,14 @@ elseif isstruct(filename) && isfield(filename,'name')
         varargout{2} = 'Failed loading data';
     end
 else    % -> if iscell(filename)
+    warnings = cell(0);
     switch exist(filename)
         case 0
             % Check whether it is only a file basename
             if isempty(dir(sprintf('%s.*',filename)))
-                fprintf('%s does not exist...\n',filename);
+                errMsg = sprintf('"%s" does not exist...',filename);
+                trEPRmsg(errMsg,'error');
+                warnings{end+1} = errMsg;
             elseif p.Results.combine
                 % Read all files and combine them
                 files = dir(sprintf('%s.*',filename));
@@ -272,9 +275,10 @@ end
 
 if ~exist('content','var') % && nargout
     errStr = 'Couldn''t load any data';
+    warnings{end+1} = errStr;
     trEPRmsg(errStr,'error');
     varargout{1} = [];
-    varargout{2} = errStr;
+    varargout{2} = warnings;
     return;
 end
 
