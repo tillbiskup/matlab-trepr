@@ -273,7 +273,7 @@ else    % -> if iscell(filename)
     end
 end
 
-if ~exist('content','var') % && nargout
+if ~exist('content','var') || isempty(content) % && nargout
     errStr = 'Couldn''t load any data';
     warnings{end+1} = errStr;
     trEPRmsg(errStr,'error');
@@ -340,6 +340,13 @@ function [content,warnings] = loadFile(filename)
     content = [];
     warnings = cell(0);
 
+    if isempty(dir(filename))
+        errStr = sprintf('"%s" not found',filename);
+        trEPRmsg(errStr,'error');
+        warnings{end+1} = errStr;
+        return;
+    end
+    
     % Set struct containing all filetypes that are recognized by this
     % function and can be read. This is done by reading in the
     % corresponding ini file trEPRload.ini.
