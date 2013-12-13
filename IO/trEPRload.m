@@ -271,9 +271,10 @@ else    % -> if iscell(filename)
 end
 
 if ~exist('content','var') % && nargout
-    trEPRmsg('Couldn''t load any data','error');
+    errStr = 'Couldn''t load any data';
+    trEPRmsg(errStr,'error');
     varargout{1} = [];
-    varargout{2} = 'Failed loading data';
+    varargout{2} = errStr;
     return;
 end
 
