@@ -29,8 +29,8 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
-% (c) 2009-2013, Till Biskup
-% 2013-05-01
+% (c) 2009-2014, Till Biskup
+% 2014-02-20
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -135,14 +135,16 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(fileNames)
                     if exist(fileNames(k).name,'file') && ...
                             checkFileFormat(fileNames(k).name)
-                        data = importdata(fileNames(k).name,'\t',7);
+                        data = importDataFromFile(fileNames(k).name);
                         % Header of first file goes to header
                         if isempty(content.header)
                             content.header = data.textdata;
                         end                        
                         content.data(end+1,:) = data.data(:,2);
+                        B0line = cellfun(@(x)any(strfind(x,'B0 = ')),...
+                            data.textdata);
                         B0tok = regexp(...
-                            data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)',...
+                            data.textdata{B0line},'B0 = ([0-9.]*)\s*(\w*)',...
                             'tokens');
                         switch B0tok{1}{2}
                             case 'Gauss'
@@ -162,8 +164,10 @@ function [content,warnings] = loadFile(filename,varargin)
                                     ); %#ok<AGROW>
                         end
                         content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        mwline = cellfun(@(x)any(strfind(x,'mw = ')),...
+                            data.textdata);
                         mwtok = regexp(...
-                            data.textdata{3},'mw = ([0-9.]*)\s*(\w*)',...
+                            data.textdata{mwline},'mw = ([0-9.]*)\s*(\w*)',...
                             'tokens');
                         content.parameters.bridge.MWfrequency.value(end+1) = ...
                             str2double(mwtok{1}{1});
@@ -192,14 +196,16 @@ function [content,warnings] = loadFile(filename,varargin)
                 for k = 1 : length(filename)
                     if exist(filename{k},'file') && ...
                             checkFileFormat(filename{k})
-                        data = importdata(filename{k},'\t',7);
+                        data = importDataFromFile(filename{k});
                         % Header of first file goes to header
                         if isempty(content.header)
                             content.header = data.textdata;
                         end                        
                         content.data(end+1,:) = data.data(:,2);
+                        B0line = cellfun(@(x)any(strfind(x,'B0 = ')),...
+                            data.textdata);
                         B0tok = regexp(...
-                            data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)',...
+                            data.textdata{B0line},'B0 = ([0-9.]*)\s*(\w*)',...
                             'tokens');
                         switch B0tok{1}{2}
                             case 'Gauss'
@@ -219,8 +225,10 @@ function [content,warnings] = loadFile(filename,varargin)
                                     ); %#ok<AGROW>
                         end
                         content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        mwline = cellfun(@(x)any(strfind(x,'mw = ')),...
+                            data.textdata);
                         mwtok = regexp(...
-                            data.textdata{3},'mw = ([0-9.]*)\s*(\w*)',...
+                            data.textdata{mwline},'mw = ([0-9.]*)\s*(\w*)',...
                             'tokens');
                         content.parameters.bridge.MWfrequency.value(end+1) = ...
                             str2double(mwtok{1}{1});
@@ -258,10 +266,11 @@ function [content,warnings] = loadFile(filename,varargin)
             return
         end
 
-        data = importdata(filename,'\t',7);
+        data = importDataFromFile(filename);
         content.header = data.textdata;
         content.data = data.data(:,2)';
-        B0tok = regexp(data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)','tokens');
+        B0line = cellfun(@(x)any(strfind(x,'B0 = ')),data.textdata);
+        B0tok = regexp(data.textdata{B0line},'B0 = ([0-9.]*)\s*(\w*)','tokens');
         switch B0tok{1}{2}
             case 'Gauss'
                 content.axes.y.unit = 'G';
@@ -280,7 +289,8 @@ function [content,warnings] = loadFile(filename,varargin)
         content.parameters.field.stop.value = str2double(B0tok{1}{1});
         content.parameters.field.step.value = 0;
         content.axes.y.values = str2double(B0tok{1}{1});
-        mwtok = regexp(data.textdata{3},'mw = ([0-9.]*)\s*(\w*)','tokens');
+        mwline = cellfun(@(x)any(strfind(x,'mw = ')),data.textdata);
+        mwtok = regexp(data.textdata{mwline},'mw = ([0-9.]*)\s*(\w*)','tokens');
         content.parameters.bridge.MWfrequency.value = ...
             str2double(mwtok{1}{1});
         content.parameters.bridge.MWfrequency.unit = mwtok{1}{2};
@@ -328,7 +338,7 @@ function [content,warnings] = loadFile(filename,varargin)
     content.parameters.transient.length.unit = content.axes.x.unit;
     
     % Get label string from third line of file/header
-    content.label = strtrim(content.header{6}(3:end));
+    content.label = strtrim(content.header{3}(3:end));
 end
 
 % --- Check whether the file is in Freiburg gnuplot format
@@ -363,3 +373,10 @@ function cleanName = cleanFileName(filename)
     end
 end
 
+% --- Import data using importdata and performing some checks
+function data = importDataFromFile(filename)
+    data = importdata(filename,'\t',7);
+    if ~isstruct(data)
+        data = importdata(filename,' ',3);
+    end
+end
