@@ -1,4 +1,4 @@
-function plotStacked(x,y,varargin)
+function h = plotStacked(x,y,varargin)
 % PLOTSTACKED Plot several 1D data traces (e.g., slices of 2D data) on top
 % of each other, trying to "compress" the traces as much as possible and
 % using the default Matlab "ColorOrder" and "LineStyleOrder".
@@ -8,6 +8,7 @@ function plotStacked(x,y,varargin)
 %   plotStacked(x,y,'percentage',<scalar>);
 %   plotStacked(x,y,'yTicks',true);
 %   plotStacked(x,y,options);
+%   h = plotStacked(...);
 %
 %   x          - vector
 %                x axis values
@@ -26,6 +27,9 @@ function plotStacked(x,y,varargin)
 %
 %   options    - struct (OPTIONAL)
 %                Structure containing fields for the optional parameters
+%
+%   h          - handle
+%                Handle of plot window
 %                
 % Please note that you can pass optional parameters as a structure with the
 % appropriate fields as well. Field names (as well as the names of the
@@ -43,6 +47,11 @@ function plotStacked(x,y,varargin)
 
 % (c) 2014, Till Biskup
 % 2014-03-01
+
+% Assign output parameter
+if nargout
+    h = [];
+end
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -86,10 +95,14 @@ for delta = 1:length(deltas)
 end
 
 % Quick and dirty multiplot
-plot(repmat(x,1,no1Dtraces),y)
+hh = plot(repmat(x,1,no1Dtraces),y);
 
 if ~p.Results.yTick
     set(gca,'YTick',[]);
+end
+
+if nargout
+    h = hh;
 end
 
 end
