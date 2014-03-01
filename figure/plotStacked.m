@@ -6,6 +6,8 @@ function plotStacked(x,y,varargin)
 % Usage:
 %   plotStacked(x,y);
 %   plotStacked(x,y,'percentage',<scalar>);
+%   plotStacked(x,y,'yTicks',true);
+%   plotStacked(x,y,options);
 %
 %   x          - vector
 %                x axis values
@@ -17,9 +19,17 @@ function plotStacked(x,y,varargin)
 %                Additional spacing between traces as fraction of total
 %                plot height.
 %                Default: 10
+%
+%   yTick      - boolean (OPTIONAL)
+%                Whether to plot y axis ticks
+%                Default: false
+%
+%   options    - struct (OPTIONAL)
+%                Structure containing fields for the optional parameters
 %                
 % Please note that you can pass optional parameters as a structure with the
-% appropriate fields as well. Field names are case insensitive.
+% appropriate fields as well. Field names (as well as the names of the
+% optional parameters) are case insensitive.
 %
 % PLOTSTACKED tries to "compress" the 1D traces as much as possible. If the
 % optional parameter "percentage" is not given, ten percent of the overall
@@ -45,24 +55,20 @@ p.addRequired('y', @(arg)ismatrix(arg) && ~isscalar(arg) ...
     && any(eq(length(x),size(y))));
 % Add optional parameters with default values
 p.addParamValue('percentage',10,@isscalar);
+p.addParamValue('yTick',false,@islogical);
 % Parse input arguments
 p.parse(x,y,varargin{:});
-
-% Define percentage of total y to be added to delta
-percentage = 10;
 
 % Get number of 1D traces
 dimY = size(y);
 no1Dtraces = dimY(dimY~=length(x));
 
+% Ensure that x is a column vector
+x = reshape(x,[],1);
+
 % Ensure that traces are stored in columns
 if size(y,1) ~= length(x)
     y = y';
-end
-
-% Ensure that x is a column vector
-if size(x,1) < size(x,2)
-    x = x';
 end
 
 % Get deltas in y direction
@@ -81,5 +87,9 @@ end
 
 % Quick and dirty multiplot
 plot(repmat(x,1,no1Dtraces),y)
+
+if ~p.Results.yTick
+    set(gca,'YTick',[]);
+end
 
 end
