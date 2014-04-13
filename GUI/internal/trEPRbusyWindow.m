@@ -18,8 +18,8 @@ function varargout = trEPRbusyWindow(varargin)
 %   position    - vector
 %                 four-element vector determining the window position
 
-% (c) 2012-13, Till Biskup
-% 2013-10-29
+% (c) 2012-14, Till Biskup
+% 2014-04-13
 
 title = 'Processing...';
 position = [220,350,270,120];
@@ -234,6 +234,11 @@ varargout{1} = hMainFigure;
     function closeWindow(~,~)
         clear('jObj');
         try
+            timerObject = timerfind('Name','busyWindowTimer');
+            if ~isempty(timerObject)
+                stop(timerObject);
+                delete(timerObject);
+            end
             delete(hMainFigure);
         catch exception
             try
