@@ -19,8 +19,8 @@ function [status,warnings] = trEPRguiRunScript(script,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-04-07
+% (c) 2013-14, Till Biskup
+% 2014-05-02s
 
 status = 0;
 warnings = cell(0);
@@ -49,6 +49,10 @@ if (isempty(mainWindow))
     return;
 end
 
+if isempty(script)
+    script = getFilename;
+end
+
 if isempty(script) || ~exist(script,'file')
     warnings{end+1} = 'Filename empty or file does not exist.';
     status = -3;
@@ -65,6 +69,30 @@ for k=1:length(commands)
             warnings{end+1} = cmdWarn; %#ok<AGROW>
         end
     end
+end
+
+end
+
+
+function fileName = getFilename
+
+mainWindow = trEPRguiGetWindowHandle();
+ad = getappdata(mainWindow);
+
+startDir = ad.control.dirs.lastLoad;
+[fileName,pathName,~] = uigetfile(...
+    '*.*',...
+    'Get filename of script to execute on the trEPR GUI command line (CMD)',...
+    'MultiSelect','off',...
+    startDir...
+    );
+if fileName == 0
+    fileName = '';
+    return;
+end
+% Set path in GUI
+if pathName ~= 0
+    ad.control.dirs.lastLoad = pathName;
 end
 
 end

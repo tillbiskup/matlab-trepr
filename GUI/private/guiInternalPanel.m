@@ -7,7 +7,7 @@ function handle = guiInternalPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % (c) 2013, Till Biskup
-% 2013-05-01
+% 2013-05-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -282,21 +282,7 @@ function pushbutton_Callback(~,~,action)
             case 'cmdhistory'
                 trEPRgui_cmd_historywindow();
             case 'cmdrun'
-                startDir = ad.control.dirs.lastLoad;
-                [fileName,pathName,~] = uigetfile(...
-                    '*.*',...
-                    'Get filename of script to execute on the trEPR GUI command line (CMD)',...
-                    'MultiSelect','off',...
-                    startDir...
-                    );
-                if fileName == 0
-                    return;
-                end
-                % Set path in GUI
-                if pathName ~= 0
-                    ad.control.dirs.lastLoad = pathName;
-                end
-                [status,warnings] = trEPRguiRunScript(fileName);
+                [status,warnings] = trEPRguiRunScript('');
                 if status
                     trEPRmsg(warnings,'warning');
                 end

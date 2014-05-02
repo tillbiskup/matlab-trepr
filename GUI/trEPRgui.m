@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-14, Till Biskup
-% 2014-05-01
+% 2014-05-02
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -630,8 +630,7 @@ uicontrol('Tag','command_panel_execute_pushbutton',...
     'FontWeight','normal',...
     'String','E',...
     'TooltipString','Execute script (opens file selection dialogue box)',...
-    'Enable','off',...
-    'Callback',{@trEPRgui_cmd_historywindow}...
+    'Callback',{@pushbutton_Callback,'executeScript'}...
     );
 
 % Add status panel for displaying some status things
@@ -1154,6 +1153,9 @@ function pushbutton_Callback(source,~,action)
                 
                 %Update main axis
                 update_mainAxis();
+                return;
+            case 'executescript'
+                trEPRguiRunScript('');
                 return;
             otherwise
                 st = dbstack;
