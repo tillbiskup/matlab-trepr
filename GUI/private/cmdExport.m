@@ -21,8 +21,8 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-11-17
+% (c) 2013-14, Till Biskup
+% 2014-05-30
 
 status = 0;
 warnings = cell(0);
@@ -162,23 +162,17 @@ if ~isempty(opt)
     end
     
     % Check for file type
-    typeidx = strncmpi('type=',opt,6);
+    typeidx = strncmpi('type=',opt,4);
     typestr = opt(typeidx);
     % Remove respective entries from opt cell array
     opt(typeidx) = [];
     if ~isempty(typestr)
-        fileType = typestr{1}(8:end);
+        fileType = typestr{1}(6:end);
     end
     
     % Finally, take remaining options as file name
     if ~isempty(opt)
-        if allTraces
-            if_warnings{end+1} = sprintf(...
-                'Command "%s": Single filename with multiple files!',cmd,opt{1});
-            if_status = -3;
-            return;
-        end
-        fileName = strtrim('%s ',opt{:});
+        fileName = strtrim(sprintf('%s ',opt{:}));
     end
 end
 
@@ -201,6 +195,8 @@ if ~exist('fileName','var')
     end
     % Create filename with full path
     fileName = fullfile(pathName,fileName);
+else
+    [pathName,fileName,~] = fileparts(fileName);
 end
 
 % set lastFigSave Dir in appdata
