@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiRunScript(script,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-05-02s
+% 2014-06-02
 
 status = 0;
 warnings = cell(0);
@@ -90,9 +90,11 @@ if fileName == 0
     fileName = '';
     return;
 end
+fileName = fullfile(pathName,fileName);
 % Set path in GUI
 if pathName ~= 0
     ad.control.dirs.lastLoad = pathName;
+    setappdata(mainWindow,'control',ad.control);
 end
 
 end

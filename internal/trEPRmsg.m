@@ -23,8 +23,8 @@ function status = trEPRmsg(message,varargin)
 % NOTE: If there is currently no trEPR GUI window open, the message will
 % get displayed on the Matlab(tm) command line.
 
-% (c) 2011-13, Till Biskup
-% 2013-09-03
+% (c) 2011-14, Till Biskup
+% 2014-06-02
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their
@@ -88,14 +88,23 @@ if ischar(message)
     message = ...
         sprintf('%s(%s) %s',logLevelAbbr,datestr(now,31),message);
 elseif iscell(message)
-    message{1} = ...
-        sprintf('%s(%s) %s',logLevelAbbr,datestr(now,31),message{1});
+    if iscell(message{1})
+        message{1} = ...
+            sprintf('%s(%s) %s',logLevelAbbr,datestr(now,31),char(message{1}));
+    else
+        message{1} = ...
+            sprintf('%s(%s) %s',logLevelAbbr,datestr(now,31),message{1});
+    end
     if (length(message) > 1)
         for k=2:length(message)
-            if iscell(message{k}) && length(message{k}) > 1
-                for m=1:length(message{k})
-                    message{k+m} = ...
-                        sprintf('%s  %s',logLevelAbbr,message{k}{m});
+            if iscell(message{k})
+                if length(message{k}) > 1
+                    for m=1:length(message{k})
+                        message{k+m} = ...
+                            sprintf('%s  %s',logLevelAbbr,message{k}{m});
+                    end
+                else
+                    message{k} = sprintf('%s  %s',logLevelAbbr,char(message{k}));
                 end
             else
                 message{k} = sprintf('%s  %s',logLevelAbbr,message{k});

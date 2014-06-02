@@ -20,7 +20,7 @@
 		</div>
 		<h2>Running scripts</h2>
 		<p>
-			Currently, the only way to run a script is from the "internal" panel of the GUI. There you can load a script file and execute it. In the future, there will appear a <tt>run</tt> command in the command line for this.
+			Currently, the only way to run a script is from the "internal" panel of the GUI or by pressing the button labelled with "E" next to the command line. Thus you can load a script file and execute it. In the future, there will appear a <tt>run</tt> command in the command line for this.
 		</p>
 		<h2>Scripting: A few ideas</h2>
 		<p>
@@ -30,23 +30,30 @@
 		<p>
 			The power of scripting comes in very handy if certain tasks should be performed regularly on a dataset. Here, a well-written (and documented) script can save a lot of time.
 		</p>
+		<h3>Variables in commands</h3>
+		<p>
+			The situation: Many commands need specific options such as labels or file names. This makes it difficult to write generic scripts working with many different datasets.
+		</p>
+		<p>
+			The idea: Variables for fields in a dataset that get parsed and replaced with the respective values during evaluation of the command.
+		</p>
 		<h3>Header of script files</h3>
 		<p>
-			Each script is just a collection of commands known by the CMD feature of the toolbox. Already now, command lines are allowed. That would allow for using a header for each script file making it easier to get an idea what the script was all about, what purpose it serves, etc.
+			Each script is just a collection of commands known by the CMD feature of the toolbox. Already now, comment lines are allowed. That would allow for using a header for each script file making it easier to get an idea what the script was all about, what purpose it serves, etc.
 		</p>
 		<p>
 			Fields for such a header would be a short description, perhaps keywords, an author and a date - and perhaps even more fields. For an idea why this would be useful, see the next section.
 		</p>
 		<h3>GUI for flicking through and loading scripts</h3>
 		<p>
-			The idea: a GUI window similar to what exists already for loading snapshots: A listbox for selecting the script, and for each selected script a few additional informations making it much easier to decide whether this is the correct one.
+			The idea: a GUI window similar to what exists already for loading snapshots: A listbox for selecting the script, and for each selected script a few additional pieces of information making it much easier to decide whether this is the correct one.
 		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2013, Till Biskup
+			&copy; 2013-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2013-07-15
+			2014-05-02
 		</p>
 		</div>
 	</body>

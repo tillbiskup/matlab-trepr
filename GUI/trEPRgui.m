@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % (c) 2011-14, Till Biskup
-% 2014-05-02
+% 2014-06-02
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -1155,7 +1155,10 @@ function pushbutton_Callback(source,~,action)
                 update_mainAxis();
                 return;
             case 'executescript'
-                trEPRguiRunScript('');
+                [~,runScriptWarnings] = trEPRguiRunScript('');
+                if ~isempty(runScriptWarnings)
+                    trEPRmsg(runScriptWarnings,'warning');
+                end
                 return;
             otherwise
                 st = dbstack;
