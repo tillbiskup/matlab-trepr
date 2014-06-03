@@ -7,7 +7,7 @@ function varargout = trEPRgui_cmd_helpwindow(varargin)
 % See also TREPRGUI
 
 % (c) 2013, Till Biskup
-% 2013-05-19
+% 2013-06-03
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -317,8 +317,8 @@ function listbox_Callback(source,~,action)
         
         switch action
             case 'general'
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts','cmd','general',[value '.html']);
+                helpTextFile = fullfile(trEPRinfo('dir'),'GUI','private',...
+                    'helptexts','cmd','general',[lower(value) '.html']);
                 if exist(helpTextFile,'file')
                     % Read text from file and display it
                     browser.setCurrentLocation(helpTextFile);
