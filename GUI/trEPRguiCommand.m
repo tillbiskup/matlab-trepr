@@ -15,15 +15,18 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             -1: no trEPRgui window found
 %             -2: trEPRgui window appdata don't contain necessary fields
 %             -3: some other problems
+%             -4: some other problems
 %
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-11-15
+% (c) 2013-14, Till Biskup
+% 2014-06-03
 
 status = 0;
 warnings = cell(0);
+
+commentCharacter = {'%','#'};
 
 % If called with no input arguments, just display help and exit
 if (nargin==0)
@@ -49,15 +52,16 @@ if (isempty(mainWindow))
     return;
 end
 
+% Handle empty command: issue warning
 if isempty(command)
     warnings{end+1} = 'Command empty.';
     status = -3;
     return;
 end
 
-if strncmp(command,'%',1)
-    warnings{end+1} = 'Command is a comment.';
-    status = -3;
+% Handle comment lines - lines must start with comment character
+if any(strncmp(command,commentCharacter,1))
+    status = -4;
     return;
 end
 
@@ -91,12 +95,26 @@ else
     opt = cell(0);
 end
 
+% Expand variables
+if ~isempty(opt)
+    for optIdx = 1:length(opt)
+        if strncmp(opt{optIdx},'$',1)
+            if isfield(ad.control.cmd.variables,opt{optIdx}(2:end))
+                opt{optIdx} = ad.control.cmd.variables.(opt{optIdx}(2:end));
+            else
+                % DEBUG FOR NOW
+                disp(opt{optIdx}(2:end));
+            end
+        end
+    end
+end
+
 % Assign some important variables for potential use in command assignment
 active = ad.control.spectra.active; %#ok<NASGU>
 
 % For now, just a list of internal commands and their translation into
 % existing commands.
-guiCommands;
+cmdMatch = guiCommands;
 
 % Handle special situations, such as "?"
 switch lower(cmd)
@@ -104,7 +122,7 @@ switch lower(cmd)
         cmd = 'help';
 end
 
-if find(strcmpi(cmdMatch(:,1),cmd)) %#ok<NODEF>
+if find(strcmpi(cmdMatch(:,1),cmd))
     fun = str2func(cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),2});
     if cmdMatch{(strcmpi(cmdMatch(:,1),cmd)),4}
         arguments = cmdMatch((strcmpi(cmdMatch(:,1),cmd)),3);

@@ -196,8 +196,8 @@ try
     % To do that, preassign a few variables
     active = 0; %#ok<NASGU>
     label = ''; %#ok<NASGU>
-    guiCommands;
-    cmds = sort(cmdMatch(:,1)); %#ok<NODEF>
+    cmdMatch = guiCommands;
+    cmds = sort(cmdMatch(:,1));
     % FIX for the time being - should be done properly later, with one file
     % containing all available commands
     % Get commands with regular file name

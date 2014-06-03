@@ -1,8 +1,13 @@
-% Script (NOT a function!) including the assignment of GUI command line
-% commands to Matlab(tm) functions
+function cmdMatch = guiCommands
+% GUICOMMANDS Helper function dealing with the command line of the trEPR
+% GUI and providing assignments of GUI command line commands to Matlab(tm)
+% functions.
+%
+% Usage:
+%   cmdMatch = guiCommands
 
-% (c) 2013, Till Biskup
-% 2013-07-15
+% (c) 2013-14, Till Biskup
+% 2014-06-03
 
 % PLEASE NOTE: All variables from within the context of the calling
 % function (normally, this should be "trEPRguiCommand") are accessible
