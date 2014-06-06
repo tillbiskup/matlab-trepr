@@ -21,8 +21,8 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-09-03
+% (c) 2013-14, Till Biskup
+% 2014-06-04
 
 status = 0;
 warnings = cell(0);
@@ -57,13 +57,6 @@ ad = getappdata(handle);
 % For convenience and shorter lines
 active = ad.control.spectra.active;
 
-% If there is no active dataset, return
-if ~active
-    warnings{end+1} = sprintf('Command "%s": No active dataset.',cmd);
-    status = -3;
-    return;
-end
-
 % Create some structure for AVG parameters
 avg = struct();
 
@@ -83,6 +76,12 @@ if ~isempty(opt)
         opt(1) = [];
     else
         avg.dataset = active;
+        % If there is no active dataset, return
+        if ~active
+            warnings{end+1} = sprintf('Command "%s": No active dataset.',cmd);
+            status = -3;
+            return;
+        end
     end
     % Check for dimension
     if any(strcmpi(opt{1},{'x','y'}))
@@ -98,11 +97,11 @@ if ~isempty(opt)
         % We have a range
         [avg.start.index,conversion1Status] = trEPRguiSanitiseNumericInput(...
             opt{2}(1:strfind(opt{2},':')-1),...
-            ad.data{active}.axes.(avg.dimension).values,...
+            ad.data{avg.dataset}.axes.(avg.dimension).values,...
             'map',true,'index',true);
         [avg.stop.index,conversion2Status] = trEPRguiSanitiseNumericInput(...
             opt{2}(strfind(opt{2},':')+1:end),...
-            ad.data{active}.axes.(avg.dimension).values,...
+            ad.data{avg.dataset}.axes.(avg.dimension).values,...
             'map',true,'index',true);
         if isnan(avg.start.index) || isnan(avg.stop.index) ...
                 || conversion1Status || conversion2Status
@@ -122,11 +121,11 @@ if ~isempty(opt)
         % Transform center;width into start:stop and map to dataset axis
         [avg.start.index,conversion3Status] = trEPRguiSanitiseNumericInput(...
             num2str(center-width/2),...
-            ad.data{active}.axes.(avg.dimension).values,...
+            ad.data{avg.dataset}.axes.(avg.dimension).values,...
             'map',true,'index',true);
         [avg.stop.index,conversion4Status] = trEPRguiSanitiseNumericInput(...
             num2str(center+width/2),...
-            ad.data{active}.axes.(avg.dimension).values,...
+            ad.data{avg.dataset}.axes.(avg.dimension).values,...
             'map',true,'index',true);
         if isnan(avg.start.index) || isnan(avg.stop.index) ...
                 || conversion1Status || conversion2Status ...
@@ -151,7 +150,7 @@ if ~isempty(opt)
     end
         
     % Perform actual averaging
-    avgData = trEPRAVG(ad.data{active},avg);
+    avgData = trEPRAVG(ad.data{avg.dataset},avg);
     
     % Add dataset to main GUI
     status = trEPRappendDatasetToMainGUI(avgData,'modified',true);

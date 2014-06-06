@@ -7,8 +7,8 @@ function status = update_invisibleSpectra()
 %           -1: no tEPRgui_statuswindow found
 %            0: successfully updated panels listing the spectra
 
-% (c) 2011-12, Till Biskup
-% 2012-05-31
+% (c) 2011-14, Till Biskup
+% 2014-06-06
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -31,9 +31,9 @@ inv = ad.control.spectra.invisible;
 labels = cell(0);
 for k=1:length(inv)
     if (find(inv(k)==ad.control.spectra.modified))
-        labels{k} = ['*' ad.data{inv(k)}.label];
+        labels{k} = sprintf('%02.0f: *%s',inv(k),ad.data{inv(k)}.label);
     else
-        labels{k} = ad.data{inv(k)}.label;
+        labels{k} = sprintf('%02.0f: %s',inv(k),ad.data{inv(k)}.label);
     end
 end
 

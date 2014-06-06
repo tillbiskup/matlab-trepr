@@ -21,8 +21,8 @@ function [status,warnings] = cmdShow(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-08-24
+% (c) 2013-14, Till Biskup
+% 2014-06-06
 
 status = 0;
 warnings = cell(0);
@@ -115,47 +115,38 @@ if isempty(opt)
         trEPRmsg('No invisible spectra to make visible.','debug');
         return;
     end
-end
-
-switch lower(opt{1})
-    case 'all'
-        if ~isempty(ad.control.spectra.invisible)
-            % Move to visible
-            ad.control.spectra.visible = [...
-                ad.control.spectra.visible ...
-                ad.control.spectra.invisible ...
-                ];
-            
-            % Delete in invisible
-            ad.control.spectra.invisible = [];
-            
-            % Set active if not done
-            if isempty(active) || (active < 1)
-                ad.control.spectra.active = 1;
-            end
-            
-            % Add status message (mainly for debug reasons)
-            % IMPORTANT: Has to go AFTER setappdata
-            msgStr = cell(0,1);
-            msgStr{end+1} = 'Moved all datasets to visible';
-            invStr = sprintf('%i ',ad.control.spectra.invisible);
-            visStr = sprintf('%i ',ad.control.spectra.visible);
-            msgStr{end+1} = sprintf(...
-                'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-                invStr,visStr,length(ad.data));
-            trEPRmsg(msgStr,'debug');
-            
-            % Update both list boxes
-            update_invisibleSpectra();
-            update_visibleSpectra();
-        end
-                
-        % Unset "onlyActive"
-        ad.control.axis.onlyActive = 0;
-        set(gh.data_panel_showonlyactive_checkbox,'Value',0);
+elseif ~isnan(str2double(opt{1}))
+    if any(ad.control.spectra.invisible==str2double(opt{1}))
+        selected = str2double(opt{1});
+        % Move to visible
+        ad.control.spectra.visible = [...
+            ad.control.spectra.visible ...
+            selected ...
+            ];
+        
+        % Make moved entry active one
+        ad.control.spectra.active = selected;
+        
+        % Delete in invisible
+        ad.control.spectra.invisible(ad.control.spectra.invisible==selected) = [];
         
         % Update appdata of main window
         setappdata(handle,'control',ad.control);
+        
+        % Add status message (mainly for debug reasons)
+        % IMPORTANT: Has to go AFTER setappdata
+        msgStr = cell(0,1);
+        msgStr{end+1} = sprintf(...
+            'Moved dataset %i to visible',...
+            ad.control.spectra.active);
+        msgStr{end+1} = ['Label: ' ...
+            ad.data{ad.control.spectra.active}.label];
+        invStr = sprintf('%i ',ad.control.spectra.invisible);
+        visStr = sprintf('%i ',ad.control.spectra.visible);
+        msgStr{end+1} = sprintf(...
+            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+            invStr,visStr,length(ad.data));
+        trEPRmsg(msgStr,'debug');
         
         % Update both list boxes
         update_invisibleSpectra();
@@ -164,23 +155,88 @@ switch lower(opt{1})
         %Update main axis
         update_mainAxis();
         return;
-    case 'only'
-        switch lower(opt{2})
-            case 'active'
-                ad.control.axis.onlyActive = 1;
-                set(gh.data_panel_showonlyactive_checkbox,'Value',1);
-                setappdata(handle,'control',ad.control);
-                update_mainAxis();
-                return;
-            otherwise
-                status = -3;
-                warnings{end+1} = ['Option ' opt{2} ' not understood.'];
-                return;
-        end
-    otherwise
+    elseif any(ad.control.spectra.visible==str2double(opt{1}))
+        % Make dataset active one
+        ad.control.spectra.active = str2double(opt{1});;
+
+        % Update appdata of main window
+        setappdata(handle,'control',ad.control);
+        
+        %Update GUI
+        update_visibleSpectra();
+        update_mainAxis();
+    else
         status = -3;
-        warnings{end+1} = ['Option ' opt{1} ' not understood.'];
+        warnings{end+1} = ['Dataset ' opt{1} ' not in invisible datasets.'];
         return;
+    end
+else
+    switch lower(opt{1})
+        case 'all'
+            if ~isempty(ad.control.spectra.invisible)
+                % Move to visible
+                ad.control.spectra.visible = [...
+                    ad.control.spectra.visible ...
+                    ad.control.spectra.invisible ...
+                    ];
+                
+                % Delete in invisible
+                ad.control.spectra.invisible = [];
+                
+                % Set active if not done
+                if isempty(active) || (active < 1)
+                    ad.control.spectra.active = 1;
+                end
+                
+                % Add status message (mainly for debug reasons)
+                % IMPORTANT: Has to go AFTER setappdata
+                msgStr = cell(0,1);
+                msgStr{end+1} = 'Moved all datasets to visible';
+                invStr = sprintf('%i ',ad.control.spectra.invisible);
+                visStr = sprintf('%i ',ad.control.spectra.visible);
+                msgStr{end+1} = sprintf(...
+                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+                    invStr,visStr,length(ad.data));
+                trEPRmsg(msgStr,'debug');
+                
+                % Update both list boxes
+                update_invisibleSpectra();
+                update_visibleSpectra();
+            end
+            
+            % Unset "onlyActive"
+            ad.control.axis.onlyActive = 0;
+            set(gh.data_panel_showonlyactive_checkbox,'Value',0);
+            
+            % Update appdata of main window
+            setappdata(handle,'control',ad.control);
+            
+            % Update both list boxes
+            update_invisibleSpectra();
+            update_visibleSpectra();
+            
+            %Update main axis
+            update_mainAxis();
+            return;
+        case 'only'
+            switch lower(opt{2})
+                case 'active'
+                    ad.control.axis.onlyActive = 1;
+                    set(gh.data_panel_showonlyactive_checkbox,'Value',1);
+                    setappdata(handle,'control',ad.control);
+                    update_mainAxis();
+                    return;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['Option ' opt{2} ' not understood.'];
+                    return;
+            end
+        otherwise
+            status = -3;
+            warnings{end+1} = ['Option ' opt{1} ' not understood.'];
+            return;
+    end
 end
+
 end
 

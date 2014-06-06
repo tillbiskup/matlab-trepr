@@ -21,8 +21,8 @@ function varargout = trEPRgui_infowindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011-13, Till Biskup
-% 2013-09-10
+% (c) 2011-14, Till Biskup
+% 2014-06-06
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -4275,9 +4275,11 @@ function updateDatasets()
             labels = cell(0);
             for k=1:length(loaded)
                 if find(ad.control.spectra.unsaved==loaded(k))
-                    labels{k} = ['*' ad.data{loaded(k)}.label];
+                    labels{k} = sprintf('%02.0f: *%s',...
+                        loaded(k),ad.data{loaded(k)}.label);
                 else
-                    labels{k} = ad.data{loaded(k)}.label;
+                    labels{k} = sprintf('%02.0f: %s',...
+                        loaded(k),ad.data{loaded(k)}.label);
                 end
             end
             % Update status display

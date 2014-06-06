@@ -15,13 +15,13 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             -1: no trEPRgui window found
 %             -2: trEPRgui window appdata don't contain necessary fields
 %             -3: some other problems
-%             -4: some other problems
+%             -4: command was a comment line
 %
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-03
+% 2014-06-04
 
 status = 0;
 warnings = cell(0);

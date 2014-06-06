@@ -21,8 +21,8 @@ function [status,warnings] = cmdHide(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-02-06
+% (c) 2013-14, Till Biskup
+% 2014-06-06
 
 status = 0;
 warnings = cell(0);
@@ -95,77 +95,75 @@ if isempty(opt)
         else
             ad.control.spectra.active = ad.control.spectra.visible(selected);
         end
-        
-        % Update appdata of main window
-        setappdata(handle,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Moved dataset %i to invisible',selectedId);
-        msgStr{end+1} = ['Label: ' ...
-            ad.data{selectedId}.label];
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr,'debug');
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
+    end
+elseif strcmpi(opt{1},'all')
+    % If there are no visible datasets, return immediately
+    if isempty(ad.control.spectra.visible)
         return;
     end
-end
-
-switch lower(opt{1})
-    case 'all'
-        % If there are no visible datasets, return immediately
-        if isempty(ad.control.spectra.visible)
-            return;
-        end
+    % Move to invisible
+    ad.control.spectra.invisible = [...
+        ad.control.spectra.invisible ...
+        ad.control.spectra.visible ...
+        ];
+    
+    % Delete in visible
+    ad.control.spectra.visible = [];
+    
+    % Reset active entry
+    ad.control.spectra.active = 0;
+elseif ~isnan(str2double(opt{1}))
+    if any(ad.control.spectra.visible==str2double(opt{1}))
         % Move to invisible
+        selected = str2double(opt{1});
         ad.control.spectra.invisible = [...
             ad.control.spectra.invisible ...
-            ad.control.spectra.visible ...
+            selected ...
             ];
         
         % Delete in visible
-        ad.control.spectra.visible = [];
+        ad.control.spectra.visible(ad.control.spectra.visible==selected) = [];
         
-        % Reset active entry
-        ad.control.spectra.active = 0;
-        
-        % Update appdata of main window
-        setappdata(handle,'control',ad.control);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORTANT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = 'Moved all datasets to invisible';
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr,'debug');
-        
-        % Update both list boxes
-        update_invisibleSpectra();
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-        return;
-    otherwise
+        % Toggle active entry
+        if (selected > length(ad.control.spectra.visible))
+            if (selected == 1)
+                ad.control.spectra.active = 0;
+            else
+                ad.control.spectra.active = ad.control.spectra.visible(end);
+            end
+        end
+    else
         status = -3;
-        warnings{end+1} = ['Option ' opt{1} ' not understood.'];
+        warnings{end+1} = ['Dataset ' opt{1} ' not in visible datasets.'];
         return;
+    end
+else
+    status = -3;
+    warnings{end+1} = ['Option ' opt{1} ' not understood.'];
+    return;
 end
+        
+% Update appdata of main window
+setappdata(handle,'control',ad.control);
+
+% Add status message (mainly for debug reasons)
+% IMPORTANT: Has to go AFTER setappdata
+msgStr = cell(0,1);
+msgStr{end+1} = 'Moved all datasets to invisible';
+invStr = sprintf('%i ',ad.control.spectra.invisible);
+visStr = sprintf('%i ',ad.control.spectra.visible);
+msgStr{end+1} = sprintf(...
+    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
+    invStr,visStr,length(ad.data));
+trEPRmsg(msgStr,'debug');
+
+% Update both list boxes
+update_invisibleSpectra();
+update_visibleSpectra();
+
+%Update main axis
+update_mainAxis();
+return;
+
 end
 
