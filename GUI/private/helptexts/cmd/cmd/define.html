@@ -25,6 +25,9 @@
 		<p>
 			<tt>define &lt;variable&gt;=&lt;value&gt;</tt>
 		</p>
+		<p>
+			<tt>define &lt;variable&gt; = &lt;value&gt;</tt>
+		</p>
 		<h3>Options</h3>
 		<p>
 			Currently, the <tt>define</tt> command takes the following options:
@@ -33,12 +36,18 @@
 			<dt>&lt;variable&gt;=&lt;value&gt;</dt>
 			<dd>Assign the value &lt;value&gt; to the variable &lt;variable&gt;</dd>
 		</dl>
+		<p>
+			You can use as many white characters as you wish within the assignment. Both value and argument are trimmed meaning that they won't contain whitespace characters at their start or end afterwards.
+		</p>
+		<p>
+			<strong>Hint:</strong> Variable definitions may contain variables as well. (You're solely responsible for retaining or loosing overview of the assignments.) In this case it is necessary to surround the variable with spaces for correct parsing.
+		</p>
 		<div class="footer">
 		<p class="copyright">
 			&copy; 2014, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-06-03
+			2014-06-07
 		</p>
 		</div>
 	</body>

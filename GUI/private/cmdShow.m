@@ -22,7 +22,7 @@ function [status,warnings] = cmdShow(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-06
+% 2014-06-07
 
 status = 0;
 warnings = cell(0);
@@ -157,7 +157,7 @@ elseif ~isnan(str2double(opt{1}))
         return;
     elseif any(ad.control.spectra.visible==str2double(opt{1}))
         % Make dataset active one
-        ad.control.spectra.active = str2double(opt{1});;
+        ad.control.spectra.active = str2double(opt{1});
 
         % Update appdata of main window
         setappdata(handle,'control',ad.control);
@@ -173,6 +173,22 @@ elseif ~isnan(str2double(opt{1}))
 else
     switch lower(opt{1})
         case 'all'
+            if length(opt) > 1
+                switch lower(opt{2})
+                    case 'visible'
+                        % Unset "onlyActive"
+                        ad.control.axis.onlyActive = 0;
+                        set(gh.data_panel_showonlyactive_checkbox,'Value',0);
+                        % Update appdata of main window
+                        setappdata(handle,'control',ad.control);
+                        update_mainAxis();
+                        return;
+                    otherwise
+                        status = -3;
+                        warnings{end+1} = ['Option ' opt{2} ' not understood.'];
+                        return;
+                end
+            end
             if ~isempty(ad.control.spectra.invisible)
                 % Move to visible
                 ad.control.spectra.visible = [...
@@ -219,6 +235,11 @@ else
             update_mainAxis();
             return;
         case 'only'
+            if length(opt) < 2
+                status = -3;
+                warnings{end+1} = ['Option "' opt{1} '" needs another option.'];
+                return;
+            end                
             switch lower(opt{2})
                 case 'active'
                     ad.control.axis.onlyActive = 1;

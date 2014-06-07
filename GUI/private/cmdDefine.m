@@ -22,7 +22,7 @@ function [status,warnings] = cmdDefine(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2014, Till Biskup
-% 2014-06-03
+% 2014-06-07
 
 status = 0;
 warnings = cell(0);
@@ -57,21 +57,25 @@ if isempty(opt)
     return;
 end
 
-assignmentParts = regexp(opt{1},'=','split');
+% Concatenate option
+opt = cellfun(@(x)[x ' '],opt,'UniformOutput',false);
+opt = strtrim([opt{:}]);
+
+assignmentParts = strtrim(regexp(opt,'=','split'));
 if length(assignmentParts) == 2
     try
         ad.control.cmd.variables.(assignmentParts{1}) = assignmentParts{2};
     catch %#ok<CTCH>
         trEPRmsg(['Command ' lower(cmd) ': problems with assigning ' ...
-            lower(opt{1}) ' - probably not a valid struct field name'],...
+            assignmentParts{1} ' - probably not a valid struct field name'],...
             'warning');
         return;
     end
     setappdata(handle,'control',ad.control);
 else
     % Issue some warning
-    trEPRmsg(['Command ' lower(cmd) ': option ' lower(opt{1}) ...
-        ' not understood'],'warning');
+    trEPRmsg(['Command ' lower(cmd) ': option "' opt ...
+        '" not understood'],'warning');
     return;
 end
 
