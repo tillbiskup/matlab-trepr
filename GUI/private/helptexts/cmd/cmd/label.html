@@ -13,7 +13,7 @@
 		</p>
 		<h2>Description</h2>
 		<p>
-			The <tt>label</tt> command is used to change the label of the currently active dataset. Alternatively you could double-click with your mouse on the label in any of the list boxes displaying the spectra.
+			The <tt>label</tt> command is used to change the label of a given or the currently active dataset. Alternatively you could double-click with your mouse on the label in any of the list boxes displaying the spectra.
 		</p>
 		<h2>Syntax</h2>
 		<p>
@@ -22,16 +22,25 @@
 		<p>
 			<tt>label &lt;label&gt;</tt>
 		</p>
+		<p>
+			<tt>label [&lt;dataset&gt;] &lt;label&gt;</tt>
+		</p>
 		<h3>Options</h3>
 		<dl>
 			<dt><tt>&lt;label&gt;</tt></dt>
 			<dd>New label for the currently active dataset</dd>
+			<dt><tt>dataset (OPTIONAL)</tt></dt>
+			<dd>Number of the dataset to change the label for</dd>
+		</dl>
+		<p>
+			If <tt>label</tt> is called without option or with just a number, the known window for setting the label interactively is opened.
+		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2013, Till Biskup
+			&copy; 2013-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2013-02-22
+			2014-06-07
 		</p>
 		</div>
 	</body>

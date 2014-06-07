@@ -21,8 +21,8 @@ function [status,warnings] = cmdLabel(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-02-21
+% (c) 2013-14, Till Biskup
+% 2014-06-07
 
 status = 0;
 warnings = cell(0);
@@ -66,8 +66,25 @@ end
 if isempty(opt)
     ad.data{active}.label = trEPRgui_setLabelWindow(ad.data{active}.label);
 else
+    datasetId = active;
+    if ~isnan(str2double(opt{1}))
+        datasetId = str2double(opt{1});
+        % Check if datasetId is possible, otherwise return
+        if datasetId > length(ad.data)
+            warnings{end+1} = sprintf('Dataset "%i" doesn''t exist.',datasetId);
+            status = -3;
+            return;
+        end
+        if length(opt)==1
+            ad.data{datasetId}.label = ...
+                trEPRgui_setLabelWindow(ad.data{datasetId}.label);
+            return;
+        else
+            opt(1) = [];
+        end
+    end
     opt = cellfun(@(x)[x ' '],opt,'UniformOutput',false);
-    ad.data{active}.label = strtrim([opt{:}]);
+    ad.data{datasetId}.label = strtrim([opt{:}]);
 end
 
 setappdata(handle,'data',ad.data);
@@ -76,4 +93,3 @@ update_visibleSpectra();
 update_invisibleSpectra();
 
 end
-
