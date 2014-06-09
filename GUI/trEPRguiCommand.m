@@ -16,12 +16,13 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             -2: trEPRgui window appdata don't contain necessary fields
 %             -3: some other problems
 %             -4: command was a comment line
+%             -5: command was empty
 %
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-04
+% 2014-06-09
 
 status = 0;
 warnings = cell(0);
@@ -35,13 +36,11 @@ if (nargin==0)
 end
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
-
+p = inputParser;            % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Include function name in error messages
+p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+p.StructExpand = true;      % Enable passing arguments in a structure
 p.addRequired('command', @(x)ischar(x));
-%p.addOptional('command','',@(x)ischar(x));
 p.parse(command,varargin{:});
 
 % Is there currently a trEPRgui object?
@@ -52,10 +51,9 @@ if (isempty(mainWindow))
     return;
 end
 
-% Handle empty command: issue warning
+% Handle empty command: ignore
 if isempty(command)
-    warnings{end+1} = 'Command empty.';
-    status = -3;
+    status = -5;
     return;
 end
 
@@ -65,52 +63,17 @@ if any(strncmp(command,commentCharacter,1))
     return;
 end
 
-% Get appdata from mainwindow
-ad = getappdata(mainWindow);
-% % Get handles from main GUI
-% gh = guidata(mainWindow);
-
 % Add command to command history
-ad.control.cmd.history{end+1} = command;
-ad.control.cmd.historypos = length(ad.control.cmd.history);
-setappdata(mainWindow,'control',ad.control);
-
-% Check whether to save history
-if ad.control.cmd.historysave
-    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(command);
-    if histsavestat
-        trEPRmsg(histsavewarn,'warn');
-    end
-end
+addCommandToHistory(command,mainWindow);
 
 % For future use: parse command, split it at spaces, use first part as
 % command, all other parts as options
-input = regexp(command,' ','split');
-cmd = input{1};
-if (length(input) > 1)
-    opt = input(2:end);
-    % Remove empty opts
-    opt = opt(~cellfun('isempty',opt));
-else
-    opt = cell(0);
-end
+[cmd,opt] = parseCommand(command);
 
 % Expand variables
 if ~isempty(opt)
-    for optIdx = 1:length(opt)
-        if strncmp(opt{optIdx},'$',1)
-            if isfield(ad.control.cmd.variables,opt{optIdx}(2:end))
-                opt{optIdx} = ad.control.cmd.variables.(opt{optIdx}(2:end));
-            else
-                % DEBUG FOR NOW
-                disp(opt{optIdx}(2:end));
-            end
-        end
-    end
+    opt = expandVariables(opt,mainWindow);
 end
-
-% Assign some important variables for potential use in command assignment
-active = ad.control.spectra.active; %#ok<NASGU>
 
 % For now, just a list of internal commands and their translation into
 % existing commands.
@@ -148,6 +111,83 @@ else
     disp(cmd);
     if ~isempty(opt)
         celldisp(opt);
+    end
+end
+
+end
+
+function addCommandToHistory(command,mainWindow)
+
+% Get appdata from mainwindow
+ad = getappdata(mainWindow);
+
+% Add command to command history
+ad.control.cmd.history{end+1} = command;
+ad.control.cmd.historypos = length(ad.control.cmd.history);
+setappdata(mainWindow,'control',ad.control);
+
+% Check whether to save history
+if ad.control.cmd.historysave
+    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(command);
+    if histsavestat
+        trEPRmsg(histsavewarn,'warn');
+    end
+end
+
+end
+
+function [cmd,opt] = parseCommand(command)
+
+% For future use: parse command, split it at spaces, use first part as
+% command, all other parts as options
+input = regexp(command,' ','split');
+cmd = input{1};
+if (length(input) > 1)
+    opt = input(2:end);
+    % Remove empty opts
+    opt = opt(~cellfun('isempty',opt));
+else
+    opt = cell(0);
+end
+
+end
+
+function opt = expandVariables(opt,mainWindow)
+
+% Get appdata from mainwindow
+ad = getappdata(mainWindow);
+
+% Expand variables
+for optIdx = 1:length(opt)
+    if strncmp(opt{optIdx},'$',1)
+        % Handle special case that additional index is provided with
+        % variable
+        if any(strfind(opt{optIdx},'#'))
+            parts = regexp(opt{optIdx},'#','split');
+            opt{optIdx} = parts{1};
+            datasetIdx = str2double(parts{2});
+        end
+        if isfield(ad.control.cmd.variables,opt{optIdx}(2:end))
+            opt{optIdx} = ad.control.cmd.variables.(opt{optIdx}(2:end));
+        else
+            switch opt{optIdx}(2:end)
+                case 'current'
+                    opt{optIdx} = ad.control.spectra.active;
+                case 'pwd'
+                    opt{optIdx} = evalin('base','pwd');
+                case 'label'
+                    if exist('datasetIdx','var') && ~isempty(datasetIdx) ...
+                            && datasetIdx <= length(ad.data)
+                        opt{optIdx} = ad.data{datasetIdx}.label;
+                    else
+                        opt{optIdx} = ...
+                            ad.data{ad.control.spectra.active}.label;
+                    end
+                otherwise
+                    % DEBUG FOR NOW
+                    disp(opt{optIdx}(2:end));
+            end
+        end
     end
 end
 

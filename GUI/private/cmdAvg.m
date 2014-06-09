@@ -22,7 +22,7 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-04
+% 2014-06-09
 
 status = 0;
 warnings = cell(0);
@@ -82,6 +82,13 @@ if ~isempty(opt)
             status = -3;
             return;
         end
+    end
+    % Check for dimension of dataset (averaging 1D datasets is impossible)
+    if min(size(ad.data{avg.dataset})) < 2
+        warnings{end+1} = sprintf(...
+            'Command "%s": Cannot average 1D datasets.',cmd);
+        status = -3;
+        return;
     end
     % Check for dimension
     if any(strcmpi(opt{1},{'x','y'}))
@@ -152,11 +159,18 @@ if ~isempty(opt)
     % Perform actual averaging
     avgData = trEPRAVG(ad.data{avg.dataset},avg);
     
+    if isempty(avgData)
+        warnings{end+1} = sprintf(...
+            'Command "%s": Some problems with averaging.',cmd);
+        status = -3;
+        return;
+    end
+    
     % Add dataset to main GUI
     status = trEPRappendDatasetToMainGUI(avgData,'modified',true);
     if status
         warnings{end+1} = sprintf(...
-            'Command "%s": Some problems appending accumulated data.',cmd);
+            'Command "%s": Some problems appending averaged data.',cmd);
         status = -3;
     end
 else

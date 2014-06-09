@@ -12,8 +12,8 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011-13, Till Biskup
-% 2012-05-19
+% (c) 2011-14, Till Biskup
+% 2014-06-09
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -43,7 +43,7 @@ try
     ad = getappdata(mainWindow);
 
     % Cell array for labels of removed datasets
-    removedDatasetsLabels = cell(0);
+    removedDatasetsLabels = cell(length(dataset),1);
     
     % Ensure datasets are in descending order
     dataset = sort(dataset,'descend');
@@ -52,30 +52,7 @@ try
     for k=1:length(dataset)
         if ~p.Results.force
             if ~any(ad.control.spectra.modified==dataset(k))
-                removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
-                ad.data(dataset(k)) = [];
-                ad.origdata(dataset(k)) = [];
-                ad.control.spectra.visible(...
-                    ad.control.spectra.visible==dataset(k)) = [];
-                ad.control.spectra.invisible(...
-                    ad.control.spectra.invisible==dataset(k)) = [];
-                ad.control.spectra.modified(...
-                    ad.control.spectra.modified==dataset(k)) = [];
-                ad.control.spectra.visible(...
-                    ad.control.spectra.visible>dataset(k)) = ...
-                    ad.control.spectra.visible(...
-                    ad.control.spectra.visible>dataset(k)) -1;
-                ad.control.spectra.invisible(...
-                    ad.control.spectra.invisible>dataset(k)) = ...
-                    ad.control.spectra.invisible(...
-                    ad.control.spectra.invisible>dataset(k)) -1;
-                ad.control.spectra.modified(...
-                    ad.control.spectra.modified>dataset(k)) = ...
-                    ad.control.spectra.modified(...
-                    ad.control.spectra.modified>dataset(k)) -1;
-                if ad.control.spectra.active >= dataset(k)
-                    ad.control.spectra.active = ad.control.spectra.active-1;
-                end
+                [removedDatasetsLabels{k},ad] = removeDataset(dataset(k),ad);
             else
                 remove = false;
                 answer = questdlg(...
@@ -101,61 +78,12 @@ try
                     case 'Cancel'
                 end
                 if remove
-                    removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
-                    ad.data(dataset(k)) = [];
-                    ad.origdata(dataset(k)) = [];
-                    ad.control.spectra.visible(...
-                        ad.control.spectra.visible==dataset(k)) = [];
-                    ad.control.spectra.invisible(...
-                        ad.control.spectra.invisible==dataset(k)) = [];
-                    ad.control.spectra.modified(...
-                        ad.control.spectra.modified==dataset(k)) = [];
-                    ad.control.spectra.visible(...
-                        ad.control.spectra.visible>dataset(k)) = ...
-                        ad.control.spectra.visible(...
-                        ad.control.spectra.visible>dataset(k)) -1;
-                    ad.control.spectra.invisible(...
-                        ad.control.spectra.invisible>dataset(k)) = ...
-                        ad.control.spectra.invisible(...
-                        ad.control.spectra.invisible>dataset(k)) -1;
-                    ad.control.spectra.modified(...
-                        ad.control.spectra.modified>dataset(k)) = ...
-                        ad.control.spectra.modified(...
-                        ad.control.spectra.modified>dataset(k)) -1;
-                    if isempty(ad.control.spectra.visible)
-                        ad.control.spectra.active = 0;
-                    elseif ad.control.spectra.active >= dataset(k)
-                        ad.control.spectra.active = ad.control.spectra.active-1;
-                    end
+                    [removedDatasetsLabels{k},ad] = ...
+                        removeDataset(dataset(k),ad);
                 end
             end
         else
-            removedDatasetsLabels{end+1} = ad.data{dataset(k)}.label;
-            ad.data(dataset(k)) = [];
-            ad.origdata(dataset(k)) = [];
-            ad.control.spectra.visible(...
-                ad.control.spectra.visible==dataset(k)) = [];
-            ad.control.spectra.invisible(...
-                ad.control.spectra.invisible==dataset(k)) = [];
-            ad.control.spectra.modified(...
-                ad.control.spectra.modified==dataset(k)) = [];
-            ad.control.spectra.visible(...
-                ad.control.spectra.visible>dataset(k)) = ...
-                ad.control.spectra.visible(...
-                ad.control.spectra.visible>dataset(k)) -1;
-            ad.control.spectra.invisible(...
-                ad.control.spectra.invisible>dataset(k)) = ...
-                ad.control.spectra.invisible(...
-                ad.control.spectra.invisible>dataset(k)) -1;
-            ad.control.spectra.modified(...
-                ad.control.spectra.modified>dataset(k)) = ...
-                ad.control.spectra.modified(...
-                ad.control.spectra.modified>dataset(k)) -1;
-            if isempty(ad.control.spectra.visible)
-                ad.control.spectra.active = 0;
-            elseif ad.control.spectra.active >= dataset(k)
-                ad.control.spectra.active = ad.control.spectra.active-1;
-            end
+            [removedDatasetsLabels{k},ad] = removeDataset(dataset(k),ad);
         end
     end
     
@@ -165,10 +93,10 @@ try
     setappdata(mainWindow,'control',ad.control);
     
     % Adding status line
-    msg = cell(0);
-    msg{end+1} = sprintf('Datasets successfully removed from main GUI');
+    msg = cell(1,length(removedDatasetsLabels)+1);
+    msg{1} = sprintf('Datasets successfully removed from main GUI');
     for k=1:length(removedDatasetsLabels)
-        msg{end+1} = sprintf('  Label: %s',removedDatasetsLabels{k});
+        msg{k+1} = sprintf('  Label: %s',removedDatasetsLabels{k});
     end
     status = trEPRmsg(msg,'info');
     invStr = sprintf('%i ',ad.control.spectra.invisible);
@@ -204,6 +132,42 @@ catch exception
         exception = addCause(exception3, exception);
         throw(exception);
     end
+end
+
+end
+
+function [label,ad] = removeDataset(datasetIdx,ad)
+
+label = ad.data{datasetIdx}.label;
+
+% Remove dataset from data and origdata
+ad.data(datasetIdx) = [];
+ad.origdata(datasetIdx) = [];
+
+% Remove dataset index from visible, invisible, modified
+ad.control.spectra.visible(ad.control.spectra.visible==datasetIdx) = [];
+ad.control.spectra.invisible(ad.control.spectra.invisible==datasetIdx) = [];
+ad.control.spectra.modified(ad.control.spectra.modified==datasetIdx) = [];
+
+% Renumber indices in visible, invisible, modified
+ad.control.spectra.visible(ad.control.spectra.visible>datasetIdx) = ...
+    ad.control.spectra.visible(ad.control.spectra.visible>datasetIdx) -1;
+ad.control.spectra.invisible(ad.control.spectra.invisible>datasetIdx) = ...
+    ad.control.spectra.invisible(ad.control.spectra.invisible>datasetIdx) -1;
+ad.control.spectra.modified(ad.control.spectra.modified>datasetIdx) = ...
+    ad.control.spectra.modified(ad.control.spectra.modified>datasetIdx) -1;
+
+% Handle active dataset
+% Get handles from handle
+gh = guidata(ad.UsedByGUIData_m.trEPRgui);
+visSelected = get(gh.data_panel_visible_listbox,'Value');
+
+if isempty(ad.control.spectra.visible)
+    ad.control.spectra.active = 0;
+elseif visSelected > length(ad.data)
+    ad.control.spectra.active = ad.control.spectra.visible(end);
+else
+    ad.control.spectra.active = ad.control.spectra.visible(visSelected);
 end
 
 end

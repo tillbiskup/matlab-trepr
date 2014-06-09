@@ -27,8 +27,8 @@ function [avgData] = trEPRAVG(data,parameters)
 %              and all usual parameters of a dataset and the parameters
 %              from the averaging in the history.parameters field
 
-% (c) 2011-12, Till Biskup
-% 2012-05-30
+% (c) 2011-14, Till Biskup
+% 2014-06-09
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -39,6 +39,13 @@ p.StructExpand = true; % Enable passing arguments in a structure
 p.addRequired('data', @(x)isstruct(x));
 p.addRequired('parameters', @(x)isstruct(x));
 p.parse(data,parameters);
+
+avgData = struct();
+
+% Check whether we have a twodimensional dataset
+if min(size(data.data)) < 2
+    return;
+end
 
 try
     % As we inherit most of the fields from the original dataset, copy

@@ -22,7 +22,7 @@ function [status,warnings] = cmdHide(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-06
+% 2014-06-09
 
 status = 0;
 warnings = cell(0);
@@ -131,6 +131,9 @@ elseif ~isnan(str2double(opt{1}))
             else
                 ad.control.spectra.active = ad.control.spectra.visible(end);
             end
+        else
+            ad.control.spectra.active = ad.control.spectra.visible(...
+                get(gh.data_panel_visible_listbox,'Value'));
         end
     else
         status = -3;
