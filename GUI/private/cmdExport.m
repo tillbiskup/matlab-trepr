@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-05-30
+% 2014-06-10
 
 status = 0;
 warnings = cell(0);
@@ -172,7 +172,7 @@ if ~isempty(opt)
     
     % Finally, take remaining options as file name
     if ~isempty(opt)
-        fileName = strtrim(sprintf('%s ',opt{:}));
+        fileName = strtrim(sprintf('%s_',opt{:}));
     end
 end
 
@@ -310,7 +310,7 @@ if ~isempty(opt)
             if_status = -3;
             return;
         end
-        fileName = strtrim('%s ',opt{:});
+        fileName = strtrim('%s_',opt{:});
     end
 end
 

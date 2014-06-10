@@ -22,7 +22,7 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-09
+% 2014-06-10
 
 status = 0;
 warnings = cell(0);
@@ -84,7 +84,7 @@ if ~isempty(opt)
         end
     end
     % Check for dimension of dataset (averaging 1D datasets is impossible)
-    if min(size(ad.data{avg.dataset})) < 2
+    if min(size(ad.data{avg.dataset}.data)) < 2
         warnings{end+1} = sprintf(...
             'Command "%s": Cannot average 1D datasets.',cmd);
         status = -3;
