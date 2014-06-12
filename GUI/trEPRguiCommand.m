@@ -171,6 +171,8 @@ for optIdx = 1:length(opt)
             opt{optIdx} = ad.control.cmd.variables.(opt{optIdx}(2:end));
         else
             switch opt{optIdx}(2:end)
+                case {'ndatasets','numberofdatasets'}
+                    opt{optIdx} = length(ad.data);
                 case 'current'
                     opt{optIdx} = ad.control.spectra.active;
                 case 'pwd'

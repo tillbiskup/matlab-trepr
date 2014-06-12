@@ -22,20 +22,19 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-10
+% 2014-06-12
 
 status = 0;
 warnings = cell(0);
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
+p = inputParser;            % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Include function name in error messages
+p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+p.StructExpand = true;      % Enable passing arguments in a structure
 
 p.addRequired('handle', @(x)ishandle(x));
 p.addRequired('opt', @(x)iscell(x));
-%p.addOptional('opt',cell(0),@(x)iscell(x));
 p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
