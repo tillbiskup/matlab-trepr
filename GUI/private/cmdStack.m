@@ -22,7 +22,7 @@ function [status,warnings] = cmdStack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2014, Till Biskup
-% 2014-06-12
+% 2014-06-14
 
 status = 0;
 warnings = cell(0);
@@ -128,6 +128,7 @@ end
 % Set new axis limits
 ad.control.axis.limits.z.max = ...
     max(yValues(end,:)) + sum(deltas) + length(deltas)*additionalDelta;
+ad.control.axis.limits.auto = 0;
 
 % Set appdata
 setappdata(handle,'data',ad.data);
