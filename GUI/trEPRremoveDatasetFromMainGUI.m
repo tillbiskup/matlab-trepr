@@ -13,7 +13,7 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           wrong.
 
 % (c) 2011-14, Till Biskup
-% 2014-06-09
+% 2014-06-24
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -85,12 +85,13 @@ try
         else
             [removedDatasetsLabels{k},ad] = removeDataset(dataset(k),ad);
         end
+        
+        % Write appdata
+        setappdata(mainWindow,'data',ad.data);
+        setappdata(mainWindow,'origdata',ad.data);
+        setappdata(mainWindow,'control',ad.control);
+        
     end
-    
-    % Write appdata
-    setappdata(mainWindow,'data',ad.data);
-    setappdata(mainWindow,'origdata',ad.data);
-    setappdata(mainWindow,'control',ad.control);
     
     % Adding status line
     msg = cell(1,length(removedDatasetsLabels)+1);
@@ -164,7 +165,7 @@ visSelected = get(gh.data_panel_visible_listbox,'Value');
 
 if isempty(ad.control.spectra.visible)
     ad.control.spectra.active = 0;
-elseif visSelected > length(ad.data)
+elseif visSelected > length(ad.control.spectra.visible)
     ad.control.spectra.active = ad.control.spectra.visible(end);
 else
     ad.control.spectra.active = ad.control.spectra.visible(visSelected);

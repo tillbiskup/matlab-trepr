@@ -21,8 +21,8 @@ function [status,warnings] = cmdRemove(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-08-24
+% (c) 2013-14, Till Biskup
+% 2014-06-24
 
 status = 0;
 warnings = cell(0);
@@ -114,7 +114,11 @@ try
             end
             return;
         case 'force'
-            if active
+            if length(opt) > 1
+                opt{1} = opt{2};
+                opt{2} = 'force';
+                [status,warnings] = cmdRemove(handle,opt);
+            elseif active
                 % Get selected item of listbox
                 selected = get(gh.data_panel_visible_listbox,'Value');
                 
