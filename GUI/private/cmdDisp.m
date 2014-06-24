@@ -21,8 +21,8 @@ function [status,warnings] = cmdDisp(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-11-17
+% (c) 2013-14, Till Biskup
+% 2014-06-14
 
 status = 0;
 warnings = cell(0);
@@ -134,7 +134,7 @@ switch lower(opt{1})
             return;
         end
         switch lower(opt{2})
-            case 'none'
+            case {'none','no','off:'}
                 ad.control.axis.legend.location = opt{2};
             case {'auto','best'}
                 ad.control.axis.legend.location = 'Best';

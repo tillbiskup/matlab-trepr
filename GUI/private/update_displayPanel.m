@@ -6,8 +6,8 @@ function status = update_displayPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-13, Till Biskup
-% 2013-11-29
+% (c) 2011-14, Till Biskup
+% 2014-06-14
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -74,6 +74,10 @@ set(gh.display_panel_axislimits_z_min_edit,'String',...
     num2str(ad.control.axis.limits.z.min));
 set(gh.display_panel_axislimits_z_max_edit,'String',...
     num2str(ad.control.axis.limits.z.max));
+
+% Toggle state of axislimits auto checkbox
+set(gh.display_panel_axislimits_auto_checkbox,'Value',...
+    ad.control.axis.limits.auto);
 
 % Toggle state of axislimits edit fields according to "automatic"
 editHandles = findobj(...
