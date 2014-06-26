@@ -201,6 +201,9 @@ switch ad.control.axis.displayType
             'XLim',xLimits,...
             'YLim',yLimits...
             );
+        if ad.control.axis.characteristics
+            trEPRdatasetShowCharacteristics(mainAxes,ad.data{active});
+        end
     case '1D along x' % time profile
         % Enable sliders
         sliderHandles = findobj(...

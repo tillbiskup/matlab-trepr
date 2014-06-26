@@ -22,7 +22,7 @@ function [status,warnings] = cmdSoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2014, Till Biskup
-% 2014-06-25
+% 2014-06-26
 
 status = 0;
 warnings = cell(0);
@@ -100,7 +100,8 @@ else
     end
 end
 
-if soiIndex <= length(ad.data{active}.characteristics.soi)
+if soiIndex <= length(ad.data{active}.characteristics.soi) && ...
+        ~isempty(ad.data{active}.characteristics.soi(soiIndex).coordinates)
     soi = ad.data{active}.characteristics.soi(soiIndex);
 end
 
