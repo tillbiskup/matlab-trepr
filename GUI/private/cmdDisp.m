@@ -22,7 +22,7 @@ function [status,warnings] = cmdDisp(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-14
+% 2014-06-26
 
 status = 0;
 warnings = cell(0);
@@ -302,6 +302,26 @@ switch lower(opt{1})
 %                 case 'off'
 %             end
 %         end
+    case {'characteristics','poi','soi','doi'}
+        if length(opt) < 2
+            if ad.control.axis.characteristics
+                ad.control.axis.characteristics = 0;
+            else
+                ad.control.axis.characteristics = 1;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.characteristics = 1;
+                case 'off'
+                    ad.control.axis.characteristics = 0;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
     otherwise
         return;
 end
