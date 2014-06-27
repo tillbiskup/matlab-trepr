@@ -7,8 +7,8 @@ function guiMeasure(action,nPoints)
 %     nPoints - scalar
 %               Number of points: 1 - pick mode; 2 - measure mode
 
-% (c) 2013, Till Biskup
-% 2013-02-28
+% (c) 2013-14, Till Biskup
+% 2014-06-27
 
 try
     % Get appdata of main window
@@ -23,7 +23,7 @@ try
             switch nPoints
                 case 1
                     % Switch off other togglebutton
-                    set(gh.measure_panel_2points_togglebutton,'Value',0);
+                    set(gh.measure_panel_distance_togglebutton,'Value',0);
                     
                     % Switch zoom mode off
                     zh = zoom(mainWindow);
@@ -40,7 +40,7 @@ try
                     ad.control.measure.point = 1;
                 case 2
                     % Switch off other togglebutton
-                    set(gh.measure_panel_1point_togglebutton,'Value',0);
+                    set(gh.measure_panel_point_togglebutton,'Value',0);
                     
                     % Switch zoom mode off
                     zh = zoom(mainWindow);
@@ -62,19 +62,11 @@ try
             set(mainWindow,'WindowButtonDownFcn',@switchMeasurePointer);
             return;
         case 'off'
-            switch nPoints
-                case 1
-                    % Reset nPoints to measure in appdata
-                    ad.control.measure.nPoints = 0;
-                    % Reset number of point in appdata
-                    ad.control.measure.point = 0;
-                case 2
-                    % Reset nPoints to measure in appdata
-                    ad.control.measure.nPoints = 0;
-                    % Reset number of point in appdata
-                    ad.control.measure.point = 0;
-                otherwise
-            end
+            % Reset nPoints to measure in appdata
+            ad.control.measure.nPoints = 0;
+            % Reset number of point in appdata
+            ad.control.measure.point = 0;
+
             % Update appdata of main window
             setappdata(mainWindow,'control',ad.control);
 
@@ -136,10 +128,11 @@ function clearFields()
         set(gh.measure_panel_distance_y_unit_edit,'String','0');
         
         % Clear fields in data structure of currently active dataset
-        ad.data{ad.control.spectra.active}.display.measure.point(1).index = [];
-        ad.data{ad.control.spectra.active}.display.measure.point(1).unit = [];
-        ad.data{ad.control.spectra.active}.display.measure.point(2).index = [];
-        ad.data{ad.control.spectra.active}.display.measure.point(2).unit = [];
+        active = ad.control.spectra.active;
+        for idx = 1:length(ad.data{active}.display.measure.point)
+            ad.data{active}.display.measure.point(idx).index = [];
+            ad.data{active}.display.measure.point(idx).unit = [];
+        end
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
@@ -171,16 +164,18 @@ function switchMeasurePointer(~,~)
         % Depending on nPoints
         switch ad.control.measure.nPoints
             case 1
-                measureEnd();
                 assignPointsToDataStructure();
+                measureEnd();
+                return;
             case 2
                 % Set number of point in appdata
                 switch ad.control.measure.point
                     case 1
                         ad.control.measure.point = 2;
                     case 2
-                        measureEnd();
                         assignPointsToDataStructure();
+                        measureEnd();
+                        return;
                     otherwise
                         % That shall never happen!
                         st = dbstack;
@@ -243,8 +238,8 @@ function measureEnd()
         set(mainWindow,'Pointer','arrow');
         
         % Switch off togglebuttons
-        set(gh.measure_panel_1point_togglebutton,'Value',0);
-        set(gh.measure_panel_2points_togglebutton,'Value',0);
+        set(gh.measure_panel_point_togglebutton,'Value',0);
+        set(gh.measure_panel_distance_togglebutton,'Value',0);
 
         % Reset GUI mode
         trEPRguiSetMode('none');

@@ -79,6 +79,7 @@ end
 % Current modes are: None, Scroll, sCale, Displace, Zoom, Measure, Pick
 guiZoom('off');
 guiMeasure('off',0);
+
 switch lower(mode)
     case {'none','n'}
         GUImode = 'None';
