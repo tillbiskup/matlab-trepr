@@ -457,6 +457,10 @@ function pushbutton_Callback(~,~,action)
             case 'clear'
                 guiMeasure('clear',0);
                 trEPRguiSetMode('none');
+            case 'poi'
+                cmdPoi(trEPRguiGetWindowHandle,cell(0));
+            case 'doi'
+                cmdDoi(trEPRguiGetWindowHandle,cell(0));
             otherwise
                 st = dbstack;
                 trEPRmsg(...

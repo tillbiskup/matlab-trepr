@@ -6,8 +6,8 @@ function status = update_measurePanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-12, Till Biskup
-% 2012-05-31
+% (c) 2011-14, Till Biskup
+% 2014-06-27
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -55,6 +55,8 @@ else
     set(gh.measure_panel_point1_y_index_edit,'String','0');
     set(gh.measure_panel_point1_x_unit_edit,'String','0');
     set(gh.measure_panel_point1_y_unit_edit,'String','0');
+    
+    set(gh.measure_panel_poi_pushbutton,'Enable','off');
 end
 if isfield(ad.data{active}.display,'measure') && ...
         length(ad.data{active}.display.measure.point) > 1 && ...
@@ -92,6 +94,8 @@ else
     set(gh.measure_panel_distance_y_index_edit,'String','0');
     set(gh.measure_panel_distance_x_unit_edit,'String','0');
     set(gh.measure_panel_distance_y_unit_edit,'String','0');
+
+    set(gh.measure_panel_doi_pushbutton,'Enable','off');
 end
 
 status = 0;

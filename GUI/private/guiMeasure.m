@@ -77,12 +77,16 @@ try
             % Reset pointer
             set(mainWindow,'Pointer','arrow');
             
+            update_measurePanel();
+            
             % Update display - REALLY NECESSARY?
             refresh;
             return;
         case 'clear'
             measureEnd();
             clearFields();
+            
+            update_measurePanel();
             return;
     end
 catch exception
@@ -324,6 +328,15 @@ function assignPointsToDataStructure()
         
         % Update appdata of main window
         setappdata(mainWindow,'data',ad.data);
+
+        % Set POI and DOI if configured to do so
+        % IMPORTANT: Need to do so after data has been updated
+        if (ad.control.measure.setcharacteristics)
+            cmdPoi(trEPRguiGetWindowHandle,cell(0));
+            if (ad.control.measure.nPoints == 2)
+                cmdDoi(trEPRguiGetWindowHandle,cell(0));
+            end
+        end
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
