@@ -81,7 +81,7 @@ cmdMatch = guiCommands;
 
 % Handle special situations, such as "?"
 switch lower(cmd)
-    case '?'
+    case {'?','doc'}
         cmd = 'help';
 end
 

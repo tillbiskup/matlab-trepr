@@ -1,10 +1,10 @@
 function trEPRgui_bugreportwindow(varargin)
-% TREPRGUI Brief description of GUI.
-%          Comments displayed at the command line in response 
-%          to the help command. 
+% TREPRGUI_BUGREPORTWINDOW Helper window collecting information about
+% exception that has been thrown, making it easier for the user to report a
+% proper bug report.
 
-% (c) 2011-13, Till Biskup
-% 2013-04-08
+% (c) 2011-14, Till Biskup
+% 2014-07-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -229,7 +229,7 @@ function button_Callback(varargin)
         case 'refresh'
             set(textdisplay,'String',report);
         case 'bugreporter'
-            startBrowser(bugZillaBugReportUrl);
+            webbrowser(bugZillaBugReportUrl);
         case 'save'
             % Set default filename
             defaultFileName = sprintf('trepr-bug-%s.txt',datestr(now,30));
@@ -287,25 +287,6 @@ function keypress_Callback(~,evt)
 %         end
     catch exception
             throw(exception);
-    end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function startBrowser(url)
-    if any(strfind(platform,'Windows'))
-        dos(['start ' url]);
-    else
-        webstat = web(url,'-browser');
-        switch webstat
-            case 1
-                trEPRmsg('Could not find system browser','warning');
-            case 2
-                trEPRmsg('Could not launch system browser','warning');
-            otherwise
-        end 
     end
 end
 
