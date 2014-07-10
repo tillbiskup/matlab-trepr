@@ -27,6 +27,7 @@ if any(strfind(platform,'Windows'))
 else
     if any(strfind(platform,'Linux'))
         oldldlibrarypath = getenv('LD_LIBRARY_PATH');
+        setenv('LD_LIBRARY_PATH','');
     end
     webstat = web(url,'-browser');
     switch webstat
