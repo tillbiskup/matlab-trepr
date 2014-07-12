@@ -24,7 +24,7 @@ function status = trEPRmsg(message,varargin)
 % get displayed on the Matlab(tm) command line.
 
 % (c) 2011-14, Till Biskup
-% 2014-06-02
+% 2014-07-12
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their
@@ -39,12 +39,16 @@ if nargin > 1 && ischar(varargin{1})
     switch lower(logLevel)
         case {'debug','d'}
             logLevelAbbr = '(DD) ';
+            logLevel = 'debug';
         case {'info','i'}
             logLevelAbbr = '(II) ';
+            logLevel = 'info';
         case {'warning','warn','w'}
             logLevelAbbr = '(WW) ';
+            logLevel = 'warning';
         case {'error','err','e'}
             logLevelAbbr = '(EE) ';
+            logLevel = 'error';
         otherwise
             fprintf('Unknown log level "%s"\n',logLevel);
     end

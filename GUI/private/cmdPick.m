@@ -21,8 +21,8 @@ function [status,warnings] = cmdPick(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-02-05
+% (c) 2013-14, Till Biskup
+% 2014-07-12
 
 status = 0;
 warnings = cell(0);
@@ -78,6 +78,14 @@ switch lower(opt{1}(1:3))
         ad.data{active}.display.position.x = ximin;
         ad.data{active}.display.position.y = yimin;
         
+        % Display info about values in status window
+        message = sprintf('Values of minimum: x = %e, y = %8.2f, z = %f',...
+            ad.data{active}.axes.x.values(ximin),...
+            ad.data{active}.axes.y.values(yimin),...
+            ad.data{active}.data(yimin,ximin) ...
+            );
+        trEPRmsg(message,'info')
+        
         % Set appdata from main GUI
         setappdata(handle,'data',ad.data);
         
@@ -92,6 +100,14 @@ switch lower(opt{1}(1:3))
         [~,yimax] = max(data(:,ximax));
         ad.data{active}.display.position.x = ximax;
         ad.data{active}.display.position.y = yimax;
+        
+        % Display info about values in status window
+        message = sprintf('Values of maximum: x = %e, y = %8.2f, z = %f',...
+            ad.data{active}.axes.x.values(ximax),...
+            ad.data{active}.axes.y.values(yimax),...
+            ad.data{active}.data(yimax,ximax) ...
+            );
+        trEPRmsg(message,'info')
         
         % Set appdata from main GUI
         setappdata(handle,'data',ad.data);

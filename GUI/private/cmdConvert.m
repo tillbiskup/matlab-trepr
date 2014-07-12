@@ -21,8 +21,8 @@ function [status,warnings] = cmdConvert(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
-% 2013-09-03
+% (c) 2013-14, Till Biskup
+% 2014-07-12
 
 status = 0;
 warnings = cell(0);
@@ -64,27 +64,50 @@ if ~active
     return;
 end
 
-if ~isempty(opt)
-    % Check whether first option is numeric (-> dataset no) or char
-    % (conversion option)
-    if ~isnan(str2double(opt{1}))
-        dataset = str2double(opt{1});
-        % Remove first option
-        opt(1) = [];
-    else
-        dataset = active;
-    end
-    
-    % Perform actual conversion
-    ad.data{dataset} = trEPRconvertUnits(ad.data{dataset},opt{1});
-    setappdata(handle,'data',ad.data);
-    update_mainAxis();
-else
+if isempty(opt)
     warnings{end+1} = sprintf(...
         'Command "%s": Not enough options. Use "help %s" to get some help.',cmd,cmd);
     status = -2;
     return;
 end
+
+% Check whether first option is numeric (-> dataset no) or char
+% (conversion option)
+if ~isnan(str2double(opt{1}))
+    dataset = str2double(opt{1});
+    % Remove first option
+    opt(1) = [];
+else
+    dataset = active;
+end
+
+% Check first option for special selection of datasets
+switch lower(opt{1})
+    case 'all'
+        dataset = 1:length(ad.data);
+        opt(1) = [];
+    case {'visible','vis'}
+        dataset = ad.control.spectra.visible;
+        opt(1) = [];
+    case {'invisible','invis','inv'}
+        dataset = ad.control.spectra.invisible;
+        opt(1) = [];
+end
+
+% Check again for options
+if isempty(opt)
+    warnings{end+1} = sprintf(...
+        'Command "%s": Not enough options. Use "help %s" to get some help.',cmd,cmd);
+    status = -2;
+    return;
+end
+
+% Perform actual conversion
+for idx = 1:length(dataset)
+    ad.data{dataset(idx)} = trEPRconvertUnits(ad.data{dataset(idx)},opt{1});
+end
+setappdata(handle,'data',ad.data);
+update_mainAxis();
 
 end
 

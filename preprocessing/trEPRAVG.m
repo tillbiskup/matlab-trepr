@@ -28,7 +28,7 @@ function [avgData] = trEPRAVG(data,parameters)
 %              from the averaging in the history.parameters field
 
 % (c) 2011-14, Till Biskup
-% 2014-06-09
+% 2014-07-12
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -76,6 +76,8 @@ try
             % Fix problem with time axis in parameters
             avgData.parameters.transient.points = ...
                 length(avgData.axes.x.values);
+            % Reset slider position
+            avgData.display.position.x = 1;
         case 'y'
             avgData.data = ...
                 mean(avgData.data(...
@@ -95,6 +97,8 @@ try
             avgData.axes.y.values = mean(...
                 [avgData.axes.y.values(parameters.start.index) ...
                 avgData.axes.y.values(parameters.stop.index)]);
+            % Reset slider position
+            avgData.display.position.y = 1;
         otherwise
             fprintf('\nUnknown dimension to average over: %s\n',...
                 parameters.dimension);
@@ -102,6 +106,9 @@ try
             % be returned
             return;
     end
+
+    % Set avg dimension
+    avgData.avg.dimension = parameters.dimension;
     
     % Set label if applicable
     if isfield(parameters,'label')

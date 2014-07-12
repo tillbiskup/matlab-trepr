@@ -155,12 +155,24 @@ switch ad.control.axis.displayType
             'style','slider');
         set(sliderHandles,'Enable','off');
         set(gh.reset_button,'Enable','off');
+        if ad.control.axis.colormap.individual
+            if ad.control.axis.colormap.symmetric
+                clims = [-max(abs([min(min(data)) max(max(data))])) ...
+                    max(abs([min(min(data)) max(max(data))]))];
+            else
+                clims = [min(min(data)) max(max(data))];
+            end
+        else
+            minmax = allMinMax;
+            if ad.control.axis.colormap.symmetric
+                clims = [-max(abs([min(minmax(:,1)) max(minmax(:,2))])) ...
+                    max(abs([min(minmax(:,1)) max(minmax(:,2))]))];
+            else
+                clims = [min(minmax(:,1)) max(minmax(:,2))];
+            end
+        end
         % Do the actual plotting
-        imagesc(...
-            x,...
-            y,...
-            data...
-            );
+        imagesc(x,y,data,clims);
         set(gca,'YDir','normal');
         set(gca,'Tag','mainAxis');
         % Plot axis labels
@@ -1115,5 +1127,23 @@ end
 
 % update appdata of main window
 setappdata(mainWindow,'control',ad.control);    
+
+end
+
+function minmax = allMinMax()
+% Get appdata from main GUI
+mainWindow = trEPRguiGetWindowHandle();
+ad = getappdata(mainWindow);
+
+if isempty(ad.control.spectra.visible)
+    minmax = [];
+    return;
+end
+
+minmax = zeros(length(ad.control.spectra.visible),2);
+for idx = 1:length(ad.control.spectra.visible)
+    minmax(idx,1) = min(min(ad.data{ad.control.spectra.visible(idx)}.data));
+    minmax(idx,2) = max(max(ad.data{ad.control.spectra.visible(idx)}.data));
+end
 
 end

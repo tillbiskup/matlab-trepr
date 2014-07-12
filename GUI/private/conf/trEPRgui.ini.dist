@@ -1,6 +1,6 @@
 % Sample configuration file for the trEPRgui function of the trEPR toolbox
 %
-% (c) 2012-13, Till Biskup <till@till-biskup.de>
+% (c) 2012-14, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
 % configuration in the file "trEPRgui.ini" in the same directory.
@@ -113,6 +113,11 @@ export1Dincludeaxis = 1
 display3DoffsetAuto = 1
 thresholdMin = 0
 thresholdMax = 0
+
+% Configuration for the colormap settings used for 2D plots
+[colormap]
+symmetric = 0
+individual = 0
 
 % Configuration for the configuration panel
 [configuration]

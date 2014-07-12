@@ -10,8 +10,8 @@ function display = trEPRhistoryDisplay(history)
 %           human readable formatting of the parameters of the performed
 %           action described in the given history struct
 
-% (c) 2011-12, Till Biskup
-% 2012-05-30
+% (c) 2011-14, Till Biskup
+% 2014-07-12
 
 try
     display = cell(0);
@@ -79,7 +79,17 @@ try
                 history.parameters.label);
         case 'trEPRBLC'
         otherwise
-            display{end+1} = 'No parameters to display currently';
+            % Get fieldnames of parameters
+            paramFieldNames = fieldnames(history.parameters);
+            if isempty(paramFieldNames)
+                display{end+1} = 'No parameters to display currently';
+            else
+                for param = 1:length(paramFieldNames)
+                    display{end+1} = sprintf('%s: %s',...
+                        paramFieldNames{param},...
+                        num2str(history.parameters.(paramFieldNames{param}))); %#ok<AGROW>
+                end
+            end
     end
 catch exception
     throw(exception);

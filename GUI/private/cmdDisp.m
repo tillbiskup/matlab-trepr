@@ -22,7 +22,7 @@ function [status,warnings] = cmdDisp(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-26
+% 2014-07-12
 
 status = 0;
 warnings = cell(0);
@@ -321,6 +321,29 @@ switch lower(opt{1})
                         ' not understood.'];
                     return;
             end
+        end
+    case {'colormap','colourmap'}
+        if length(opt) < 2
+            status = -3;
+            warnings{end+1} = ['Command ' cmd ': Missing option.'];
+            return;
+        end
+        switch lower(opt{2})
+            case {'symmetric','sym'}
+                ad.control.axis.colormap.symmetric = true;
+            case {'asymmetric','asym','scaled'}
+                ad.control.axis.colormap.symmetric = false;
+            case 'global'
+                ad.control.axis.colormap.individual = false;
+            case 'individual'
+                ad.control.axis.colormap.individual = true;
+            case {'default','reset'}
+                ad.control.axis.colormap = ad.configuration.colormap;
+            otherwise
+                status = -3;
+                warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                    ' not understood.'];
+                return;
         end
     otherwise
         return;

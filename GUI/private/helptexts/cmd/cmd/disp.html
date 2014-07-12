@@ -105,6 +105,23 @@
 				<dd>Set axes in <em>x</em>, <em>y</em>, and <em>z</em> direction explicitly.</dd>
 				<dd>Has to be followed by two numeric values for the minimum and maximum.</dd>
 			</dl></dd>
+			<dt><tt>colormap|colourmap</tt></dt>
+			<dd>Control colormap used in 2D plot.</dd>
+			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
+			<dd><dl>
+				<dt><tt>symmetric|sym</tt></dt>
+				<dd>Set colormap limits such that zero is in the middle of the map.</dd>
+				<dd>Leads normally to green colouring for the zero value, red for positive and blue for negative values.</dd>
+				<dt><tt>asymmetric|asym</tt></dt>
+				<dd>Set colormap limits according to min/max value of the dataset(s).</dd>
+				<dt><tt>individual</tt></dt>
+				<dd>Scale for each dataset individually.</dd>
+				<dt><tt>global</tt></dt>
+				<dd>Scale for each dataset in the same way, thus making comparison of intensities feasible.</dd>
+				<dd>Please note that comparing intensities of TREPR spectra is at best questionable, as it depends on many hard to control parameters rendering quantitative analysis normally impossible.</dd>
+				<dt><tt>reset|default</tt></dt>
+				<dd>Set to values from configuration.</dd>
+			</dl></dd>
 		</dl>
 		<h2>Further Information</h2>
 		<p>
@@ -115,7 +132,7 @@
 			&copy; 2013-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-06-26
+			2014-07-12
 		</p>
 		</div>
 	</body>
