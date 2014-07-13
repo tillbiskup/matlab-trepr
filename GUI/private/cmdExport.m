@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % (c) 2013-14, Till Biskup
-% 2014-06-10
+% 2014-07-13
 
 status = 0;
 warnings = cell(0);
@@ -218,6 +218,21 @@ update_mainAxis(newFig,...
     'noyticks',get(gh.display_panel_axesexport_removeyticks_checkbox,'Value'),...
     'noyaxis',get(gh.display_panel_axesexport_removeyaxis_checkbox,'Value'),...
     'nobox',get(gh.display_panel_axesexport_removebox_checkbox,'Value'));
+
+% Check whether to plot colorbar
+if strcmpi(ad.control.axis.displayType,'2d plot') && ...
+    ad.control.axis.colormap.colorbar
+    cbar = colorbar;
+    ad.control.axis.labels.z.measure = 'Intensity';
+    if ~isempty(ad.control.axis.labels.z.measure)
+        if isempty(ad.control.axis.labels.z.unit)
+            ylabel(cbar,['{\it' ad.control.axis.labels.z.measure '}']);
+        else
+            ylabel(cbar,['{\it' ad.control.axis.labels.z.measure ...
+                '} / ' ad.control.axis.labels.z.unit]);
+        end
+    end
+end
 
 % Check whether to open caption GUI
 if get(gh.display_panel_axesexport_includecaption_checkbox,'Value')
