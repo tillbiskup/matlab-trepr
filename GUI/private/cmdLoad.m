@@ -58,6 +58,9 @@ gh = guidata(handle);
 
 if isempty(opt)
     FileName = getFileName();
+    if isempty(FileName)
+        return;
+    end
 else
     FileName = opt;
 end
@@ -366,6 +369,7 @@ end
 
 % If the user cancels file selection, print status message and return
 if isequal(FileName,0)
+    FileName = '';
     trEPRmsg('Loading dataset(s) cancelled by user.','info');
     return;
 end
