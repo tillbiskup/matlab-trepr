@@ -6,8 +6,8 @@ function handle = guiProcessingPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-13, Till Biskup
-% 2013-03-02
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-13
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

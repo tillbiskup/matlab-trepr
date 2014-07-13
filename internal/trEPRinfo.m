@@ -54,7 +54,7 @@ function varargout = trEPRinfo(varargin)
 %
 % See also VER
 
-% (c) 2007-12, Till Biskup
+% Copyright (c) 2007-12, Till Biskup
 % 2012-06-23
 
 % The place to centrally manage the revision number and date is the file

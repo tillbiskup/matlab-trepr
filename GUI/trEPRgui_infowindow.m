@@ -21,7 +21,7 @@ function varargout = trEPRgui_infowindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-12
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

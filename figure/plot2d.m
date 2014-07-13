@@ -21,7 +21,7 @@ function h = plot2d(C,varargin)
 %
 % See also IMAGE, IMAGESC, CONTOUR, CONTOURF
 
-% (c) 2014, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-03-01
 
 % Assign output parameter

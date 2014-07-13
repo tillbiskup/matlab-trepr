@@ -38,7 +38,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %
 % See also: trEPRiniFileWrite
 
-% (c) 2008-13, Till Biskup, Bernd Paulus
+% Copyright (c) 2008-13, Till Biskup, Bernd Paulus
 % 2013-04-07
 
 % TODO

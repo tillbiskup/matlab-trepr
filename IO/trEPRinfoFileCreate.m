@@ -20,7 +20,7 @@ function [fileContents,warnings] = trEPRinfoFileCreate(parameters,varargin)
 %
 % See also: TREPRINFOFILEPARSE, TREPRINFOFILEWRITE
 
-% (c) 2012-13, Till Biskup
+% Copyright (c) 2012-13, Till Biskup
 % 2013-05-19
 
 % If called without parameter, do something useful: display help

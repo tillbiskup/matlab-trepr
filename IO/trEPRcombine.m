@@ -25,7 +25,7 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % otherwise the label of the first dataset that is combined gets used.
 %
 
-% (c) 2011, Till Biskup
+% Copyright (c) 2011, Till Biskup
 % 2011-11-21
 
 % Parse input arguments using the inputParser functionality

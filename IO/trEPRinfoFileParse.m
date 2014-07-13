@@ -29,7 +29,7 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 %
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
-% (c) 2012-13, Till Biskup
+% Copyright (c) 2012-13, Till Biskup
 % 2013-02-26
 
 % If called without parameter, do something useful: display help

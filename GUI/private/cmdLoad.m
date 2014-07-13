@@ -22,7 +22,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013-14, Till Biskup
+% Copyright (c) 2013-14, Till Biskup
 % 2014-07-13
 
 status = 0;

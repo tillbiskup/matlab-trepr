@@ -22,7 +22,7 @@ function [data,warnings] = trEPRfsc2MetaLoad(filename)
 %
 % See also TREPRLOAD, TREPRFSC2LOAD.
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-05-09
 
 % If called without parameter, do something useful: display help

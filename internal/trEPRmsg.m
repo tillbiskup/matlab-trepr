@@ -23,7 +23,7 @@ function status = trEPRmsg(message,varargin)
 % NOTE: If there is currently no trEPR GUI window open, the message will
 % get displayed on the Matlab(tm) command line.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-12
 
 % Define log levels

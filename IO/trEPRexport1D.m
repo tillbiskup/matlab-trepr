@@ -21,7 +21,7 @@
 %              Otherwise it contains an error description
 %
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-04-22
 
 function status = trEPRexport1D(data,fileName,parameters)

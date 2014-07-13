@@ -12,7 +12,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 %
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
-% (c) 2012, Till Biskup
+% Copyright (c) 2012, Till Biskup
 % 2012-10-22
 
 % Parse input arguments using the inputParser functionality

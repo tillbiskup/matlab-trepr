@@ -3,7 +3,7 @@ function varargout = trEPRgui_moduleswindow()
 % installed for the trEPR toolbox, including links to the toolbox modules'
 % homepage.
 
-% (c) 2012-13, Till Biskup
+% Copyright (c) 2012-13, Till Biskup
 % 2013-02-19
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

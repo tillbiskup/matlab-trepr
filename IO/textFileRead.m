@@ -11,7 +11,7 @@ function text = textFileRead(filename,varargin)
 %              contains all lines of the textfile
 %
 
-% (c) 2011, Till Biskup
+% Copyright (c) 2011, Till Biskup
 % 2011-11-05
 
 % Parse input arguments using the inputParser functionality

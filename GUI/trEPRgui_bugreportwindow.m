@@ -3,7 +3,7 @@ function trEPRgui_bugreportwindow(varargin)
 % exception that has been thrown, making it easier for the user to report a
 % proper bug report.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

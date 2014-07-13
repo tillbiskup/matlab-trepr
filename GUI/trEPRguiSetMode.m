@@ -24,7 +24,7 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-08-24
 
 status = 0;

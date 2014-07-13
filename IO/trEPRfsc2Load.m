@@ -36,7 +36,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
-% (c) 2009-2013, Till Biskup
+% Copyright (c) 2009-2013, Till Biskup
 % 2013-10-03
 
 % If called without parameter, do something useful: display help

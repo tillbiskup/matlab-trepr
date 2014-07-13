@@ -6,7 +6,7 @@ function status = update_measurePanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-06-27
 
 % Is there currently a trEPRgui object?

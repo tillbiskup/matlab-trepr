@@ -20,7 +20,7 @@ function handle = trEPRguiGetWindowHandle(varargin)
 %
 % If no handle could be found, an empty cell array will be returned.
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-05
 
 try

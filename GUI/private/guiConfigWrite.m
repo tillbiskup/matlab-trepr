@@ -21,7 +21,7 @@ function status = guiConfigWrite(guiname,conf)
 % See also GUICONFIGREAD, GUICONFIGAPPLY, TREPRINIFILEREAD,
 % TREPRINIFILEWRITE 
 
-% (c) 2012, Till Biskup
+% Copyright (c) 2012, Till Biskup
 % 2012-04-21
 
 try

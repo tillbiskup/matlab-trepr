@@ -8,7 +8,7 @@ function webbrowser(varargin)
 %   url - string
 %         URL of webpage to load
 
-% (c) 2014, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-07-10
 
 % Parse input arguments using the inputParser functionality

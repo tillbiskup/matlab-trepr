@@ -15,7 +15,7 @@ function status = trackPointer(varargin)
 %           -4: no datasets displayed
 %            0: successful
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-02-28
 
 % Is there currently a trEPRgui object?

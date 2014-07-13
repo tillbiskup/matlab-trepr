@@ -23,7 +23,7 @@ function data = trEPRspikeRemoval(data,fieldPositions)
 %              way. Use entirely on your own risk knowing what you're
 %              doing.
 
-% (c) 2014, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-07-12
 
 % If called without parameter, display help

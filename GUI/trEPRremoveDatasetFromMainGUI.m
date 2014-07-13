@@ -12,7 +12,7 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-06-24
 
 % Parse input arguments using the inputParser functionality

@@ -41,7 +41,7 @@ function varargout = trEPRdataStructure(varargin)
 %
 % See also TREPRLOAD.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-06-25
 
 if ~nargin && ~nargout

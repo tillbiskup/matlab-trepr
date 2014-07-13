@@ -5,7 +5,7 @@ function varargout = trEPRgui_ACC_helpwindow(varargin)
 %
 % See also trEPRGUI_ACCWINDOW
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

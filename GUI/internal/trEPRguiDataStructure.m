@@ -30,7 +30,7 @@ function varargout = trEPRguiDataStructure(varargin)
 %
 % See also TREPRDATASTRUCTURE.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-12
 
 % Create empty trEPR toolbox data structure

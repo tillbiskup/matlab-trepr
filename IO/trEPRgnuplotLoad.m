@@ -29,7 +29,7 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
-% (c) 2009-2014, Till Biskup
+% Copyright (c) 2009-2014, Till Biskup
 % 2014-02-20
 
     % Parse input arguments using the inputParser functionality

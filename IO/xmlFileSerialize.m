@@ -5,7 +5,7 @@ function xmlFileSerialize(filename)
 % Usage:
 %   xmlFileSerialize(filename)
 
-% (c) 2010-2012, Till Biskup
+% Copyright (c) 2010-2012, Till Biskup
 % 2012-06-10
 
 % Parse input arguments using the inputParser functionality

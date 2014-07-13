@@ -19,7 +19,7 @@ function conf = trEPRguiConfigLoad(guiname,varargin)
 %
 % See also GUICONFIGWRITE, GUICONFIGAPPLY, trEPRINIFILEREAD, trEPRINIFILEWRITE
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-19
 
 % Parse input arguments using the inputParser functionality

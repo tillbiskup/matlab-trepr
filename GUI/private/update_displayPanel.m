@@ -6,7 +6,7 @@ function status = update_displayPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-13
 
 % Is there currently a trEPRgui object?

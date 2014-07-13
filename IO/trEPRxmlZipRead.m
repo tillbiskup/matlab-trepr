@@ -15,7 +15,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 %
 % SEE ALSO TREPRXMLZIPWRITE
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-08
 
 % Parse input arguments using the inputParser functionality

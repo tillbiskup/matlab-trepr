@@ -13,7 +13,7 @@ function trEPRdatasetShowCharacteristics(varargin)
 %   axisHandle - handle (OPTIONAL)
 %                Handle of axis to plot into
 
-% (c) 2014, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-06-26
 
 % Manual check for input arguments, as first argument is optional

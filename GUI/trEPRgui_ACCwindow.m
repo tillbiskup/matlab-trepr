@@ -6,7 +6,7 @@ function varargout = trEPRgui_ACCwindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-05-12
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

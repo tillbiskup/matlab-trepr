@@ -2,7 +2,7 @@ function varargout = trEPRgui_aboutwindow()
 % TREPRGUI_ABOUTWINDOW Display basic information about the trEPR toolbox,
 % including links to the toolbox homepage and a list of contributors.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-13
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

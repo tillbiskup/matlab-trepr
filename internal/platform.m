@@ -5,7 +5,7 @@ function p = platform
 %
 %   See also: COMPUTER
 
-% (c) 2007-12, Till Biskup
+% Copyright (c) 2007-12, Till Biskup
 % 2012-06-26
 
 % find platform OS

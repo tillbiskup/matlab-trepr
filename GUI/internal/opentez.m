@@ -5,7 +5,7 @@ function opentez(filename)
 % Usage
 %   opentez(filename)
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-04-16
 
 trEPRopen(filename);

@@ -17,7 +17,7 @@ function [ data, warnings ] = trEPRbrukerASCIIload(filename)
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 
-% (c) 2011, Till Biskup
+% Copyright (c) 2011, Till Biskup
 % 2011-07-06
 
 % Parse input arguments using the inputParser functionality

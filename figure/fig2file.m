@@ -34,7 +34,7 @@ function status = fig2file(figHandle,fileName,varargin)
 %                'fig2file.ini' that is in the same directory as fig2file.m
 %
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-05-15
 
 % If called without arguments, print help and list of formats

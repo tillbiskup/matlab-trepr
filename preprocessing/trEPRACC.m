@@ -16,7 +16,7 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              used for the trEPRgui_ACCwindow
 %              a copy is copied to the history.info field
 
-% (c) 2011-13, Till Biskup, Bernd Paulus
+% Copyright (c) 2011-13, Till Biskup, Bernd Paulus
 % 2013-05-19
 
 % Parse input arguments using the inputParser functionality

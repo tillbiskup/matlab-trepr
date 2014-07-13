@@ -10,7 +10,7 @@ function data = trEPRconvertUnits(data,conversion,varargin)
 % conversion - string
 %              Conversion to be performed on the dataset.
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-09-03
 
 % Parse input arguments using the inputParser functionality

@@ -3,7 +3,7 @@ function varargout = trEPRgui_combine_helpwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

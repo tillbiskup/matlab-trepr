@@ -3,7 +3,7 @@ function varargout = trEPRgui(varargin)
 %
 % Main GUI window of the trEPR toolbox.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-12
 
 % Make GUI effectively a singleton

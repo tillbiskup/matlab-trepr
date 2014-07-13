@@ -6,7 +6,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 %
 % See also trEPRgui
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2013-06-03
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

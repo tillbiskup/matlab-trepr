@@ -6,7 +6,7 @@ function varargout = trEPRgui_setdirectorieswindow(varargin)
 %
 % See also TREPRGUI
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-02-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

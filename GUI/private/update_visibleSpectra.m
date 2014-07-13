@@ -10,7 +10,7 @@ function status = update_visibleSpectra()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated panels listing the spectra
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-13
 
 % Is there currently a trEPRgui object?

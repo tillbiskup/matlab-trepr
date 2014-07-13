@@ -11,7 +11,7 @@ function status = trEPRguiUpdateStatusWindow(statusmessages)
 %   Using the findjobj function from Y. Altman, it ensures that always
 %   the last (i.e., most current) line of the status window is visible.
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-04-11
 
 % Is there currently a trEPRgui_statuswindow object?

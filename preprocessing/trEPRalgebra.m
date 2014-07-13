@@ -17,7 +17,7 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 % warnings   - string
 %              Empty if everything went well, otherwise contains message.
 
-% (c) 2013-14, Till Biskup
+% Copyright (c) 2013-14, Till Biskup
 % 2014-07-13
 
 % Parse input arguments using the inputParser functionality

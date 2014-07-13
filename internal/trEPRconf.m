@@ -38,7 +38,7 @@ function varargout = trEPRconf(action,varargin)
 %   module    - string
 %               Name of the module the config file(s) belong(s) to.
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-10-25
 
 % If none or the wrong input parameter, display help and exit

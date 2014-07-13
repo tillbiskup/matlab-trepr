@@ -7,7 +7,7 @@ function varargout = trEPRgui_MWfrequencyDrift_helpwindow(varargin)
 %
 % See also TREPRGUI_MWFREQUENCYDRIFTWINDOW
 
-% (c) 2012-13, Till Biskup
+% Copyright (c) 2012-13, Till Biskup
 % 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

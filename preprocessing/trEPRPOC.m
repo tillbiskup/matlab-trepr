@@ -36,7 +36,7 @@ function varargout = trEPRPOC (data, varargin)
 %
 % See also: trEPRBGC
 
-% (c) 2010-13, Till Biskup
+% Copyright (c) 2010-13, Till Biskup
 % 2013-09-10
 
 % Parse input arguments using the inputParser functionality

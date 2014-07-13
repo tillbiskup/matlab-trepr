@@ -16,7 +16,7 @@
 %              0 if some problems occurred
 %
 
-% (c) 2011, Till Biskup
+% Copyright (c) 2011, Till Biskup
 % 2011-09-02
 
 function figHandle = threeDrepresentation(data,parameters)

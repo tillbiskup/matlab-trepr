@@ -11,7 +11,7 @@ function varargout = trEPRgui_setLabelWindow(varargin)
 % Output
 %   status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% (c) 2011-13, Till Biskup, Bernd Paulus
+% Copyright (c) 2011-13, Till Biskup, Bernd Paulus
 % 2013-02-04
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

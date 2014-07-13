@@ -7,7 +7,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-13
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

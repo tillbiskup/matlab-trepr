@@ -18,7 +18,7 @@ function varargout = trEPRsave(filename,struct)
 %
 % See also TREPRLOAD
 
-% (c) 2010-12, Till Biskup
+% Copyright (c) 2010-12, Till Biskup
 % 2012-06-08
 
 % Parse input arguments using the inputParser functionality

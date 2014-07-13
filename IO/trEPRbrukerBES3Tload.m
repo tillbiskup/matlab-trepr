@@ -16,7 +16,7 @@ function [data,warnings] = trEPRbrukerBES3Tload(filename)
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-07
 
 % Parse input arguments using the inputParser functionality

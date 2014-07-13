@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisation_helpwindow(varargin)
 %
 % See also TREPRGUI_NETPOLARISATIONWINDOW
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

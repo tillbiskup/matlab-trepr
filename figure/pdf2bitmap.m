@@ -9,7 +9,7 @@ function status = pdf2bitmap(pdfFile,varargin)
 % makes heavy use of the SYSTEM command. Currently, only Linux and Mac are
 % supported.
 
-% (c) 2014, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-07-13
 
 % Set status

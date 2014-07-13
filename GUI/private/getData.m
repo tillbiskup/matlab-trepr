@@ -15,7 +15,7 @@ function data = getData(dataset)
 %           Experimental data, if available, otherwise calculated data.
 %           Empty if none exists.
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-08-24
 
 if ~isempty(dataset.data)

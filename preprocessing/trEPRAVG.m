@@ -27,7 +27,7 @@ function [avgData] = trEPRAVG(data,parameters)
 %              and all usual parameters of a dataset and the parameters
 %              from the averaging in the history.parameters field
 
-% (c) 2011-14, Till Biskup
+% Copyright (c) 2011-14, Till Biskup
 % 2014-07-13
 
 % Parse input arguments using the inputParser functionality

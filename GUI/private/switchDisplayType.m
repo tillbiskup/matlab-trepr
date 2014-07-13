@@ -5,7 +5,7 @@ function status = switchDisplayType(displayType)
 %
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-02-04
 
 try

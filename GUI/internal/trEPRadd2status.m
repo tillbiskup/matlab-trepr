@@ -25,7 +25,7 @@ function status = trEPRadd2status(statusmessage,varargin)
 %
 % See also TREPRMSG
 
-% (c) 2012, Till Biskup
+% Copyright (c) 2012, Till Biskup
 % 2012-06-26
 
 % Display warning for use of deprecated function

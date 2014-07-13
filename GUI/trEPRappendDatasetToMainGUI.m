@@ -7,7 +7,7 @@ function status = trEPRappendDatasetToMainGUI(dataset,varargin)
 % Status:  0 - everything fine
 %         -1 - no main GUI window found
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-26
 
 % Parse input arguments using the inputParser functionality

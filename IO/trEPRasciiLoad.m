@@ -16,7 +16,7 @@ function varargout = trEPRasciiLoad(filename, varargin)
 % warning  - cell array of strings
 %            empty if there are no warnings
 
-% (c) 2009-12, Till Biskup
+% Copyright (c) 2009-12, Till Biskup
 % 2012-06-10
 
 % Parse input arguments using the inputParser functionality

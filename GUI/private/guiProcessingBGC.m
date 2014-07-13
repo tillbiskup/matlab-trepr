@@ -4,7 +4,7 @@ function guiProcessingBGC(datasetnum)
 %
 % Normally only called from within the trEPR GUI.
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-09-10
 
 method = 'trEPRBGC';

@@ -9,9 +9,9 @@ function status = trEPRexport4glotaran(dataset,filename,varargin)
 %
 
 % Original file: glotaran.m
-% (c) 2011, Bernd Paulus
+% Copyright (c) 2011, Bernd Paulus
 
-% (c) 2011-12, Till Biskup
+% Copyright (c) 2011-12, Till Biskup
 % 2012-06-10
 
 % Parse input arguments using the inputParser functionality

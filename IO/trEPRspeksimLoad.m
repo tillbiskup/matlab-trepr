@@ -29,7 +29,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
-% (c) 2009-2013, Till Biskup
+% Copyright (c) 2009-2013, Till Biskup
 % 2013-05-13
 
     % Parse input arguments using the inputParser functionality

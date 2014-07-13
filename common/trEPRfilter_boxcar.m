@@ -11,7 +11,7 @@ function data = trEPRfilter_boxcar(data,window)
 %   window - filter window width
 %
 
-% (c) 11, Till Biskup
+% Copyright (c) 11, Till Biskup
 % 2011-11-27
 
 [x,y] = size(data);

@@ -6,7 +6,7 @@ function cmdMatch = guiCommands
 % Usage:
 %   cmdMatch = guiCommands
 
-% (c) 2013-14, Till Biskup
+% Copyright (c) 2013-14, Till Biskup
 % 2014-06-03
 
 % PLEASE NOTE: All variables from within the context of the calling

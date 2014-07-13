@@ -8,7 +8,7 @@ function varargout = showTip(varargin)
 %
 % See also msgbox
 
-% (c) 2012, Till Biskup
+% Copyright (c) 2012, Till Biskup
 % 2012-05-21
 
 % Make GUI effectively a singleton

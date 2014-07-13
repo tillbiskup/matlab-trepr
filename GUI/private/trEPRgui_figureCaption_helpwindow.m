@@ -6,7 +6,7 @@ function varargout = trEPRgui_figureCaption_helpwindow(varargin)
 %
 % See also TREPRGUI_FIGURECAPTIONWINDOW
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-06-02
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

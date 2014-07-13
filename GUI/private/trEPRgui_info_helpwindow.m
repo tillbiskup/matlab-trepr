@@ -5,7 +5,7 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 %
 % See also TAGUI_HELPWINDOW
 
-% (c) 2011-13, Till Biskup
+% Copyright (c) 2011-13, Till Biskup
 % 2013-02-17
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
