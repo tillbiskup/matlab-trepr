@@ -2,8 +2,8 @@ function varargout = trEPRgui_aboutwindow()
 % TREPRGUI_ABOUTWINDOW Display basic information about the trEPR toolbox,
 % including links to the toolbox homepage and a list of contributors.
 
-% (c) 2011-13, Till Biskup
-% 2013-05-19
+% (c) 2011-14, Till Biskup
+% 2014-07-13
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -32,7 +32,7 @@ toolboxNameString = 'trEPR Toolbox';
 versionString = ...
     sprintf('v.%s (%s)',info.version.Version,info.version.Date);
 copyrightInfo = {...
-    sprintf('(c) 2005-13, %s, <%s>',info.maintainer.name,info.maintainer.email)...
+    sprintf('(c) 2005-14, %s, <%s>',info.maintainer.name,info.maintainer.email)...
 %     ''...
 %     sprintf('%s',info.url)...
     };

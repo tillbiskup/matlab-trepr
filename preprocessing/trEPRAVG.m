@@ -28,7 +28,7 @@ function [avgData] = trEPRAVG(data,parameters)
 %              from the averaging in the history.parameters field
 
 % (c) 2011-14, Till Biskup
-% 2014-07-12
+% 2014-07-13
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -40,7 +40,7 @@ p.addRequired('data', @(x)isstruct(x));
 p.addRequired('parameters', @(x)isstruct(x));
 p.parse(data,parameters);
 
-avgData = struct();
+avgData = [];
 
 % Check whether we have a twodimensional dataset
 if min(size(data.data)) < 2
@@ -105,6 +105,12 @@ try
             % As we do not overwrite the dataset, the original dataset will
             % be returned
             return;
+    end
+    
+    % Check whether something went wrong with averaging (NaN in avgData)
+    if any(isnan(avgData.data))
+        avgData = [];
+        return;
     end
 
     % Set avg dimension

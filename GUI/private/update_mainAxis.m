@@ -171,6 +171,12 @@ switch ad.control.axis.displayType
                 clims = [min(minmax(:,1)) max(minmax(:,2))];
             end
         end
+        % For very special cases where limits are identical
+        % (example: user subtracted dataset from itself)
+        if min(clims) == max(clims)
+            clims(1) = clims(1)-0.000000001;
+            clims(2) = clims(2)+0.000000001;
+        end
         % Do the actual plotting
         imagesc(x,y,data,clims);
         set(gca,'YDir','normal');

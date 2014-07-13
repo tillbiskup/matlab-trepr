@@ -17,8 +17,8 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 % warnings   - string
 %              Empty if everything went well, otherwise contains message.
 
-% (c) 2013, Till Biskup
-% 2013-08-24
+% (c) 2013-14, Till Biskup
+% 2014-07-13
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -190,7 +190,7 @@ try
             history.parameters.scalingFactor = scalingFactor;
     end
     
-    % Assign complete accReport to info field of history
+    % Assign complete report to info field of history
     history.info = cell(0);
     if length(data) > 1
         history.info{end+1} = ...

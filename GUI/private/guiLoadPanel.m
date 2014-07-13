@@ -6,8 +6,8 @@ function handle = guiLoadPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% (c) 2011-13, Till Biskup
-% 2013-09-04
+% (c) 2011-14, Till Biskup
+% 2014-07-13
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -201,81 +201,7 @@ uicontrol('Tag','load_panel_load_pushbutton',...
 
 function pushbutton_Callback(~,~)
     try
-        state = struct();
-        FilterSpec = '*.*';
-        
-        % Get the appdata of the main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        % Set directory where to load files from
-        if isfield(ad,'control') && isfield(ad.control,'dirs') && ...
-                isfield(ad.control.dirs,'lastLoad')  && ...
-                ~isempty(ad.control.dirs.lastLoad)
-            startDir = ad.control.dirs.lastLoad;
-        else
-            startDir = pwd;
-        end
-        
-        if get(gh.load_panel_files_directory_checkbox,'Value')
-            state.dir = true;
-        else
-            state.dir = false;
-        end
-        
-        if (state.dir)
-            FileName = uigetdir(...
-                startDir,...
-                'Select directory to load'...
-                );
-            PathName = '';
-        else
-            [FileName,PathName,~] = uigetfile(...
-                FilterSpec,...
-                'Select file(s) to load',...
-                'MultiSelect','on',...
-                startDir...
-                );
-        end
-        
-        % If the user cancels file selection, print status message and return
-        if isequal(FileName,0)
-            trEPRmsg('Loading dataset(s) cancelled by user.','info');
-            return;
-        end
-        
-        % In case of files, not a directory, add path to filename
-        if exist('PathName','var') && exist(PathName,'file')
-            % In case of multiple files
-            if iscell(FileName)
-                for k = 1 : length(FileName)
-                    FileName{k} = fullfile(PathName,FileName{k});
-                end
-            else
-                FileName = fullfile(PathName,FileName);
-            end
-        end
-        
-        % Set lastLoadDir in appdata
-        if exist(PathName,'dir')
-            ad.control.dirs.lastLoad = PathName;
-        else
-            if iscell(FileName)
-                ad.control.dirs.lastLoad = FileName{1};
-            else
-                ad.control.dirs.lastLoad = FileName;
-            end
-        end
-        setappdata(mainWindow,'control',ad.control);
-        
-        % If FileName is not a cell string, convert it into a cell string
-        if ~isa(FileName,'cell')
-            FileName = cellstr(FileName);
-        end
-        
-        cmdLoad(mainWindow,FileName);
-        
+        cmdLoad(trEPRguiGetWindowHandle);
     catch exception
         try
             msgStr = ['An exception occurred in ' ...
@@ -294,10 +220,5 @@ function pushbutton_Callback(~,~)
         end
     end
 end
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 end

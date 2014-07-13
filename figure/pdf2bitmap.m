@@ -10,10 +10,17 @@ function status = pdf2bitmap(pdfFile,varargin)
 % supported.
 
 % (c) 2014, Till Biskup
-% 2014-03-01
+% 2014-07-13
 
 % Set status
-status = 0;
+if nargout
+    status = 0;
+end
+
+if ~nargin
+    help pdf2bitmap
+    return;
+end
 
 % Currently, no support for Windows platform
 if ispc
@@ -25,7 +32,7 @@ end
 if ~exist(pdfFile,'file')
     [pdfFilePath,pdfFileName,~] = fileparts(pdfFile);
     pdfFile = fullfile(pdfFilePath,[pdfFileName '.pdf']);
-    if ~exist(pdfFile);
+    if ~exist(pdfFile,'file');
         disp(['File ' pdfFile ' seems not to exist.']);
         return;
     end
@@ -38,7 +45,11 @@ end
 
 convertCommand = fullfile(locateConvertTool,'convert');
 
+convertOptions1 = '-density 600x600 -quality 90 -alpha remove';
+convertOptions2 = '-resize 680';
 
+system([convertCommand ' ' convertOptions1 ' ' pdfFile ' ' ...
+    convertOptions2 ' ' fullfile(pdfFilePath,[pdfFileName '.png']) ]);
 
 end
 
@@ -79,8 +90,8 @@ end
 % ("system" returns a string including newline characters)
 paths = regexp(message(1:end-1),'\n','split');
 
-% Take last path
-[pathToConvert,~,~] = fileparts(paths{end});
+% Take first path
+[pathToConvert,~,~] = fileparts(paths{1});
 
 
 end

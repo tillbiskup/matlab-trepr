@@ -6,8 +6,8 @@ function guiKeyBindings(src,evt)
 %     src - handle of calling source
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
-% (c) 2011-13, Till Biskup
-% 2013-02-24
+% (c) 2011-14, Till Biskup
+% 2014-07-13
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -121,6 +121,9 @@ try
                 case 'l'
                     trEPRguiSetMode('command');
                     return;
+                case 'o'
+                    cmdLoad(mainWindow);
+                    return;
             end
         end
     end
@@ -189,7 +192,7 @@ try
                     end
                 end
             end
-        case 'pageup'
+        case 'pagedown'
             if ~ad.control.spectra.active || ...
                     length(ad.control.spectra.visible) == 1
                 return;
@@ -205,7 +208,7 @@ try
             update_visibleSpectra();
             update_processingPanel();
             update_sliderPanel();
-        case 'pagedown'
+        case 'pageup'
             if ~ad.control.spectra.active || ...
                     length(ad.control.spectra.visible) == 1
                 return;

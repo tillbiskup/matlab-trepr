@@ -1,4 +1,4 @@
-function [status,warnings] = cmdLoad(handle,opt,varargin)
+function [status,warnings] = cmdLoad(handle,varargin)
 % CMDLOAD Command line command of the trEPR GUI.
 %
 % Usage:
@@ -35,9 +35,8 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('handle', @(x)ishandle(x));
-p.addRequired('opt', @(x)iscell(x));
-%p.addOptional('opt',cell(0),@(x)iscell(x));
-p.parse(handle,opt,varargin{:});
+p.addOptional('opt',cell(0),@(x)iscell(x));
+p.parse(handle,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
@@ -57,8 +56,12 @@ ad = getappdata(handle);
 % Get handles from handle
 gh = guidata(handle);
 
-% Convert opt into FileName
-FileName = opt;
+if isempty(opt)
+    FileName = getFileName();
+else
+    FileName = opt;
+end
+
 mainWindow = handle;
 
 if isempty(FileName)
@@ -324,6 +327,76 @@ if get(gh.load_panel_axislabels_checkbox,'Value')
         end
     end
     setappdata(mainWindow,'control',ad.control);
+end
+
+end
+
+function FileName = getFileName()
+
+FilterSpec = '*.*';
+
+% Get the appdata of the main window
+mainWindow = trEPRguiGetWindowHandle;
+ad = getappdata(mainWindow);
+gh = guihandles(mainWindow);
+
+% Set directory where to load files from
+if isfield(ad,'control') && isfield(ad.control,'dirs') && ...
+        isfield(ad.control.dirs,'lastLoad')  && ...
+        ~isempty(ad.control.dirs.lastLoad)
+    startDir = ad.control.dirs.lastLoad;
+else
+    startDir = pwd;
+end
+
+if get(gh.load_panel_files_directory_checkbox,'Value')
+    FileName = uigetdir(...
+        startDir,...
+        'Select directory to load'...
+        );
+    PathName = '';
+else
+    [FileName,PathName,~] = uigetfile(...
+        FilterSpec,...
+        'Select file(s) to load',...
+        'MultiSelect','on',...
+        startDir...
+        );
+end
+
+% If the user cancels file selection, print status message and return
+if isequal(FileName,0)
+    trEPRmsg('Loading dataset(s) cancelled by user.','info');
+    return;
+end
+
+% In case of files, not a directory, add path to filename
+if exist('PathName','var') && exist(PathName,'file')
+    % In case of multiple files
+    if iscell(FileName)
+        for k = 1 : length(FileName)
+            FileName{k} = fullfile(PathName,FileName{k});
+        end
+    else
+        FileName = fullfile(PathName,FileName);
+    end
+end
+
+% Set lastLoadDir in appdata
+if exist(PathName,'dir')
+    ad.control.dirs.lastLoad = PathName;
+else
+    if iscell(FileName)
+        ad.control.dirs.lastLoad = FileName{1};
+    else
+        ad.control.dirs.lastLoad = FileName;
+    end
+end
+setappdata(mainWindow,'control',ad.control);
+
+% If FileName is not a cell string, convert it into a cell string
+if ~isa(FileName,'cell')
+    FileName = cellstr(FileName);
 end
 
 end
