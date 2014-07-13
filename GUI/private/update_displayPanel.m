@@ -7,7 +7,7 @@ function status = update_displayPanel()
 %            0: successfully updated main axis
 
 % (c) 2011-14, Till Biskup
-% 2014-06-14
+% 2014-07-13
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -78,6 +78,16 @@ set(gh.display_panel_axislimits_z_max_edit,'String',...
 % Toggle state of axislimits auto checkbox
 set(gh.display_panel_axislimits_auto_checkbox,'Value',...
     ad.control.axis.limits.auto);
+
+% Toggle some other checkboxes
+set(gh.display_panel_stdev_checkbox,'Value',...
+    ad.control.axis.stdev);
+set(gh.display_panel_sim_checkbox,'Value',...
+    ad.control.axis.sim);
+set(gh.display_panel_colormap_individual_checkbox,'Value',...
+    ad.control.axis.colormap.individual);
+set(gh.display_panel_colormap_symmetric_checkbox,'Value',...
+    ad.control.axis.colormap.symmetric);
 
 % Toggle state of axislimits edit fields according to "automatic"
 editHandles = findobj(...
