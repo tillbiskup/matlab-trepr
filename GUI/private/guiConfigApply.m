@@ -14,8 +14,8 @@ function status = guiConfigApply(guiname)
 %
 % See also GUICONFIGLOAD, INIFILEREAD
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-09-04
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-14
 
 status = 0;
 
@@ -107,6 +107,14 @@ try
             if isfield(ad.configuration.load,'labels')
                 set(gh.load_panel_axislabels_checkbox,...
                     'Value',ad.configuration.load.labels);
+            end
+            if isfield(ad.configuration.load,'visible')
+                set(gh.load_panel_visible_checkbox,...
+                    'Value',ad.configuration.load.visible);
+            end
+            if isfield(ad.configuration.load,'unitconversion')
+                set(gh.load_panel_unitconversion_checkbox,...
+                    'Value',ad.configuration.load.unitconversion);
             end
             if isfield(ad.configuration.load,'format')
                 % Get value from load_panel_filetype_popupmenu

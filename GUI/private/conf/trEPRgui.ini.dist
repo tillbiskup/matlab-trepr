@@ -78,6 +78,7 @@ unitconversion = 0
 POC = 0
 BGC = 0
 labels = 1
+visible = 0
 format = automatic 
 
 % Configuration of the sliders
