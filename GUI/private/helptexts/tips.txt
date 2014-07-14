@@ -55,3 +55,21 @@ You can get help for any command in the command line using the command <tt>?</tt
 You can save information along with a figure - with the new Figure Caption GUI. Simply check the box in the display panel.
 
 You can open a .tez file from within Matlab(tm) by simply double-clicking on the file. This will start the trEPR GUI if necessary and display the file.
+
+"Ctrl+o" opens the file selection dialogue for loading new dataa.
+
+You can control the colormap for 2D plots in some detail: Same colormap for all visible datasets, symmetric colormap centered around zero. Furthermore you can add a colorbar when exporting 2D figures.
+
+You can remove unwanted spikes (artifacts) using either the CMD "spikeremove" or directy the underlying function trEPRspikeRemoval
+
+If you use the "pick" command, it will display x,y,z values in the status window.
+
+You can use "doc" as alias for "help" in CMD.
+
+You can set characteristics (points, POI, distances, DOI, slices, SOI) of a dataset for further analysis.
+
+Interested in scripting? CMD now understands variables (to some extent).
+
+Multiple spectra/time traces and bored to manually stack 'em? Use "stack" - and "unstack" if unhappy.
+
+Numbers of datasets are now displayed in front of their labels in the list boxes.

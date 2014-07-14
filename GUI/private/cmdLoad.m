@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-13
+% 2014-07-14
 
 status = 0;
 warnings = cell(0);
@@ -262,14 +262,24 @@ trEPRbusyWindow('deletedelayed');
 % Get appdata again after making changes to it before
 ad = getappdata(mainWindow);
 
-% Add new loaded spectra to "invisible"
-ad.control.spectra.invisible = [...
-    ad.control.spectra.invisible ...
-    newDataIdx...
-    ];
-setappdata(mainWindow,'control',ad.control);
+% Check whether dataset shall be made visible upon load
+if get(gh.load_panel_visible_checkbox,'Value')
+    % Add new loaded spectra to "visible"
+    ad.control.spectra.visible = [...
+        ad.control.spectra.visible ...
+        newDataIdx...
+        ];
+else
+    % Add new loaded spectra to "invisible"
+    ad.control.spectra.invisible = [...
+        ad.control.spectra.invisible ...
+        newDataIdx...
+        ];
+end
 
+setappdata(mainWindow,'control',ad.control);
 update_invisibleSpectra;
+update_visibleSpectra;
 
 % Handle dataset corrections when checked
 % pretrigger offset compensation
@@ -331,6 +341,8 @@ if get(gh.load_panel_axislabels_checkbox,'Value')
     end
     setappdata(mainWindow,'control',ad.control);
 end
+
+update_mainAxis;
 
 end
 

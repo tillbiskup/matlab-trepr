@@ -7,7 +7,7 @@ function status = update_displayPanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-13
+% 2014-07-14
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -84,6 +84,8 @@ set(gh.display_panel_stdev_checkbox,'Value',...
     ad.control.axis.stdev);
 set(gh.display_panel_sim_checkbox,'Value',...
     ad.control.axis.sim);
+set(gh.display_panel_characteristics_checkbox,'Value',...
+    ad.control.axis.characteristics);
 set(gh.display_panel_colormap_individual_checkbox,'Value',...
     ad.control.axis.colormap.individual);
 set(gh.display_panel_colormap_symmetric_checkbox,'Value',...
