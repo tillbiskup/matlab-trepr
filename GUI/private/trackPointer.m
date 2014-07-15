@@ -15,8 +15,8 @@ function status = trackPointer(varargin)
 %           -4: no datasets displayed
 %            0: successful
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-28
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-15
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -60,7 +60,7 @@ axisPosition = get(mainAxis,'Position');
 % TODO: Could be figured out programmatically with getting the parent of
 % the axis handle and then get its position and traverse that until we
 % reach the main figure handle...
-axisCoordinatesOffset = [0 55];
+axisCoordinatesOffset = [0 73];
 % Coordinates are "real" x,y pairs relative to the mainWindow
 axisCoordinates = [ ...
     axisPosition(1)+axisCoordinatesOffset(1)-1 ...
