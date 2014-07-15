@@ -22,7 +22,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-09
+% 2014-07-15
 
 status = 0;
 warnings = cell(0);
@@ -50,6 +50,9 @@ if (isempty(mainWindow))
     status = -1;
     return;
 end
+
+% Remove leading and trailing whitespace
+command = strtrim(command);
 
 % Handle empty command: ignore
 if isempty(command)

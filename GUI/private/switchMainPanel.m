@@ -7,8 +7,8 @@ function status = switchMainPanel(panelName)
 %
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-24
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-14
 
 try
     % Get handles of main window
@@ -39,13 +39,13 @@ try
         gh.tbConfigure ...
         ];
     
-    switch panelName
-        case 'Load'
+    switch lower(panelName)
+        case 'load'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.load_panel,'Visible','on');
             set(gh.tbLoad,'Value',1);
-        case 'Datasets'
+        case 'datasets'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.data_panel,'Visible','on');
@@ -54,46 +54,46 @@ try
             update_invisibleSpectra();
             update_visibleSpectra();
             update_datasetPanel();
-        case 'Slider'
+        case 'slider'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.slider_panel,'Visible','on');
             set(gh.tbSlider,'Value',1);
             % Update slider panel
             update_sliderPanel();
-        case 'Measure'
+        case 'measure'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.measure_panel,'Visible','on');
             set(gh.tbMeasure,'Value',1);
             % Update measure panel
             update_measurePanel();
-        case 'Display'
+        case 'display'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.display_panel,'Visible','on');
             set(gh.tbDisplay,'Value',1);
             % Update display panel
             update_displayPanel();
-        case 'Processing'
+        case 'processing'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.processing_panel,'Visible','on');
             set(gh.tbProcessing,'Value',1);
             % Update processing panel
             update_processingPanel();
-        case 'Analysis'
+        case 'analysis'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.analysis_panel,'Visible','on');
             set(gh.tbAnalysis,'Value',1);
-        case 'Internal'
+        case 'internal'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.internal_panel,'Visible','on');
             set(gh.tbInternal,'Value',1);
             update_internalPanel();
-        case 'Configure'
+        case 'configure'
             set(panels,'Visible','off');
             set(buttons,'Value',0);
             set(gh.configure_panel,'Visible','on');
