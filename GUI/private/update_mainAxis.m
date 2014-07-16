@@ -8,8 +8,8 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-11-28
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-16
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -221,6 +221,10 @@ switch ad.control.axis.displayType
             );
         if ad.control.axis.characteristics
             trEPRdatasetShowCharacteristics(mainAxes,ad.data{active});
+        end
+        if ad.control.axis.BGpositions
+            trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
+                'DisplayType','2D');
         end
     case '1D along x' % time profile
         % Enable sliders
@@ -872,6 +876,10 @@ switch ad.control.axis.displayType
         end
         % Display legend - internal function
         display_legend(mainAxes);
+        if ad.control.axis.BGpositions
+            trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
+                'DisplayType','1D');
+        end
     otherwise
         st = dbstack;
         trEPRmsg(...

@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-14
+% 2014-07-16
 
 status = 0;
 warnings = cell(0);
@@ -279,8 +279,6 @@ else
 end
 
 setappdata(mainWindow,'control',ad.control);
-update_invisibleSpectra;
-update_visibleSpectra;
 
 % Handle dataset corrections when checked
 % pretrigger offset compensation
@@ -343,6 +341,8 @@ if get(gh.load_panel_axislabels_checkbox,'Value')
     setappdata(mainWindow,'control',ad.control);
 end
 
+update_invisibleSpectra;
+update_visibleSpectra;
 update_mainAxis;
 
 end

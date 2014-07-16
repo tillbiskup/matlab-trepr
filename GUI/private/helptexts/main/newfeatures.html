@@ -17,11 +17,16 @@
 		</p>
 		<h2>v.0.3.45</h2>
 		<ul>
+		    <li>New features</li>
+		    <ul>
+				<li>New function <tt>trEPRdatasetShowBGpositions</tt> for displaying the background correction events in certain recording modes.</li>
+		    </ul>
 		    <li>CMD</li>
 		    <ul>
 			    <li>New command <tt>history</tt> for opening the history window of the CMD.</li>
 			    <li>New command <tt>run</tt> for executing scripts on the CMD.</li>
 			    <li>New command <tt>panel</tt> for switching between panels of the GUI.</li>
+			    <li><tt>disp</tt> has new option <tt>BG|BGpositions</tt> for displaying the background correction events in certain recording modes.</li>
 		    </ul>
 		    <li>GUI layout and usability</li>
 		    <ul>
@@ -30,18 +35,20 @@
 		    </ul>
 		    <li>Compatibility</li>
 		    <ul>
+			    <li><b>GUI appdata version 1.9.</b></li>
 			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;visible&quot; in load section.</li>
 		    </ul>
 		    <li>Bug fixes</li>
 		    <ul>
 				<li>CMD: Can now handle commands with leading whitespace.</li>
+				<li><tt>load</tt> makes loaded spectrum the active one if visible on load.</li>
 			</ul>
 		</ul>
 		<h2>v.0.3.44</h2>
 		<ul>
 		    <li>New features</li>
 		    <ul>
-				<li>New function trEPRspikeRemoval for removing spikes in datasets.</li>
+				<li>New function <tt>trEPRspikeRemoval</tt> for removing spikes in datasets.</li>
 				<li>Colormap settings for 2D display: individual/global and symmetric/asymmetric.</li>
 				<li>Colorbar as option when exporting 2D display.</li>
 		    </ul>
@@ -418,7 +425,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-14
+			2014-07-16
 		</p>
 		</div>
 	</body>
