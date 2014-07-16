@@ -36,9 +36,29 @@
 			<dt><tt>x|y|z</tt></dt>
 			<dd>Each of these parameters will set one of the corresponding display modes, named "1D along x", "1D along y" and "2D plot".</dd>
 			<dd>Currently, these parameters do not take any additional value.</dd>
+			<dt><tt>BG|BGpositions</tt></dt>
+			<dd>Toggle displaying of positions where the background has been recorded (in certain recording modes such as the ones used frequently in Freiburg).</dd>
+			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
 			<dt><tt>characteristics</tt></dt>
 			<dd>Toggle displaying the characteristic slices (SOI), points (POI) and distances (DOI) of the current dataset. Gets (currently) displayed only in 2D mode.</dd>
 			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
+			<dt><tt>colormap|colourmap</tt></dt>
+			<dd>Control colormap used in 2D plot.</dd>
+			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
+			<dd><dl>
+				<dt><tt>symmetric|sym</tt></dt>
+				<dd>Set colormap limits such that zero is in the middle of the map.</dd>
+				<dd>Leads normally to green colouring for the zero value, red for positive and blue for negative values.</dd>
+				<dt><tt>asymmetric|asym</tt></dt>
+				<dd>Set colormap limits according to min/max value of the dataset(s).</dd>
+				<dt><tt>individual</tt></dt>
+				<dd>Scale for each dataset individually.</dd>
+				<dt><tt>global</tt></dt>
+				<dd>Scale for each dataset in the same way, thus making comparison of intensities feasible.</dd>
+				<dd>Please note that comparing intensities of TREPR spectra is at best questionable, as it depends on many hard to control parameters rendering quantitative analysis normally impossible.</dd>
+				<dt><tt>reset|default</tt></dt>
+				<dd>Set to values from configuration.</dd>
+			</dl></dd>
 			<dt><tt>grid</tt></dt>
 			<dd>Set grid-related parameters.</dd>
 			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
@@ -73,12 +93,17 @@
 				<dd>Toggle between displaying a box around the legend.</dd>
 				<dd>This value can alternatively be followed by an additional parameter that can take the values <tt>on</tt> and <tt>off</tt>, used to programmatically set the box display of the legend.</dd>
 			</dl></dd>
-			<dt><tt>onlyactive</tt></dt>
-			<dd>Toggle displaying only the active dataset.</dd>
-			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
-			<dt><tt>stdev|std</tt></dt>
-			<dd>Toggle displaying of the standard deviation (std|stdev) in combination with averaged data.</dd>
-			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
+			<dt><tt>limit|limits</tt></dt>
+			<dd>Set limits of the axes in all three dimensions.</dd>
+			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
+			<dd><dl>
+				<dt><tt>auto</tt></dt>
+				<dd>Set axes automatically to fit the data displayed.</dd>
+				<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
+				<dt><tt>x|y|z</tt></dt>
+				<dd>Set axes in <em>x</em>, <em>y</em>, and <em>z</em> direction explicitly.</dd>
+				<dd>Has to be followed by two numeric values for the minimum and maximum.</dd>
+			</dl></dd>
 			<dt><tt>norm|normalise|normalize|normalisation|normalization</tt></dt>
 			<dd>Set normalisation parameters.</dd>
 			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
@@ -94,34 +119,12 @@
 				<dt><tt>min</tt></dt>
 				<dd>Set maximum to one.</dd>
 			</dl></dd>
-			<dt><tt>limit|limits</tt></dt>
-			<dd>Set limits of the axes in all three dimensions.</dd>
-			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
-			<dd><dl>
-				<dt><tt>auto</tt></dt>
-				<dd>Set axes automatically to fit the data displayed.</dd>
-				<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
-				<dt><tt>x|y|z</tt></dt>
-				<dd>Set axes in <em>x</em>, <em>y</em>, and <em>z</em> direction explicitly.</dd>
-				<dd>Has to be followed by two numeric values for the minimum and maximum.</dd>
-			</dl></dd>
-			<dt><tt>colormap|colourmap</tt></dt>
-			<dd>Control colormap used in 2D plot.</dd>
-			<dd>Has to be followed by one of the values described in more detail in the following. Values currently supported are:</dd>
-			<dd><dl>
-				<dt><tt>symmetric|sym</tt></dt>
-				<dd>Set colormap limits such that zero is in the middle of the map.</dd>
-				<dd>Leads normally to green colouring for the zero value, red for positive and blue for negative values.</dd>
-				<dt><tt>asymmetric|asym</tt></dt>
-				<dd>Set colormap limits according to min/max value of the dataset(s).</dd>
-				<dt><tt>individual</tt></dt>
-				<dd>Scale for each dataset individually.</dd>
-				<dt><tt>global</tt></dt>
-				<dd>Scale for each dataset in the same way, thus making comparison of intensities feasible.</dd>
-				<dd>Please note that comparing intensities of TREPR spectra is at best questionable, as it depends on many hard to control parameters rendering quantitative analysis normally impossible.</dd>
-				<dt><tt>reset|default</tt></dt>
-				<dd>Set to values from configuration.</dd>
-			</dl></dd>
+			<dt><tt>onlyactive</tt></dt>
+			<dd>Toggle displaying only the active dataset.</dd>
+			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
+			<dt><tt>stdev|std</tt></dt>
+			<dd>Toggle displaying of the standard deviation (std|stdev) in combination with averaged data.</dd>
+			<dd>Can be followed by an additional parameter that can be either <tt>on</tt> or <tt>off</tt>. This allows programmatic and unambiguous setting of the respective value.</dd>
 		</dl>
 		<h2>Further Information</h2>
 		<p>
@@ -132,7 +135,7 @@
 			&copy; 2013-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-12
+			2014-07-16
 		</p>
 		</div>
 	</body>
