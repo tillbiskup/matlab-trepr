@@ -16,7 +16,7 @@ function trEPRdatasetShowBGpositions(varargin)
 %                Handle of axis to plot into
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-16
+% 2014-07-18
 
 % Manual check for input arguments, as first argument is optional
 if nargin < 1
@@ -51,7 +51,7 @@ if nargin > 1
     p.parse(varargin{2:end});
 end
 
-BGpositions = getBGpositions(dataset);
+BGpositions = getBGpositions(dataset,p.Results.Shift);
 
 if isempty(BGpositions)
     return;
@@ -119,7 +119,7 @@ hold off;
 
 end
 
-function BGpositions = getBGpositions(dataset)
+function BGpositions = getBGpositions(dataset,shift)
 
 BGpositions = [];
 
@@ -154,6 +154,7 @@ try
         otherwise
             return;
     end
+    BGpositions = BGpositions + shift*dataset.parameters.field.step.value;
 catch  %#ok<CTCH>
 end
 

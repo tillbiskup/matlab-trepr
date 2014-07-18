@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-17
+% 2014-07-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -222,9 +222,10 @@ switch ad.control.axis.displayType
         if ad.control.axis.characteristics
             trEPRdatasetShowCharacteristics(mainAxes,ad.data{active});
         end
-        if ad.control.axis.BGpositions
+        if ad.control.axis.BGpositions.enable
             trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
-                'DisplayType','2D');
+                'DisplayType','2D',...
+                'Shift',ad.control.axis.BGpositions.shift);
         end
         % Set axes limits according to zoom
         if ad.control.axis.zoom.enable
@@ -894,9 +895,10 @@ switch ad.control.axis.displayType
         end
         % Display legend - internal function
         display_legend(mainAxes);
-        if ad.control.axis.BGpositions
+        if ad.control.axis.BGpositions.enable
             trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
-                'DisplayType','1D');
+                'DisplayType','1D',...
+                'Shift',ad.control.axis.BGpositions.shift);
         end
         % Set axes limits according to zoom
         if ad.control.axis.zoom.enable

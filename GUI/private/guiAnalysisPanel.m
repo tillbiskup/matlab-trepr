@@ -7,7 +7,7 @@ function handle = guiAnalysisPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-17
+% 2014-07-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -193,8 +193,8 @@ uicontrol('Tag','analysis_panel_bgpositions_offset_edit',...
     'Units','Pixels',...
     'Position',[140 10 60 25],...
     'String','0',...
-    'Enable','inactive',...
-    'TooltipString','...'...
+    'TooltipString','...',...
+    'Callback',{@edit_Callback,'BGpositionsShift'}...
     );
 uicontrol('Tag','analysis_panel_bgpositions_help_pushbutton',...
     'Style','pushbutton',...
@@ -372,7 +372,7 @@ function checkbox_Callback(source,~,action)
         
         switch lower(action)
             case 'bgpositions'
-                ad.control.axis.BGpositions = get(source,'Value');
+                ad.control.axis.BGpositions.enable = get(source,'Value');
             otherwise
                 st = dbstack;
                 trEPRmsg(...
@@ -382,6 +382,59 @@ function checkbox_Callback(source,~,action)
         end
         setappdata(mainWindow,'control',ad.control);
         
+        % Update main axis
+        update_mainAxis();
+    catch exception
+        try
+            msgStr = ['An exception occurred in ' ...
+                exception.stack(1).name  '.'];
+            trEPRmsg(msgStr,'error');
+        catch exception2
+            exception = addCause(exception2, exception);
+            disp(msgStr);
+        end
+        try
+            trEPRgui_bugreportwindow(exception);
+        catch exception3
+            % If even displaying the bug report window fails...
+            exception = addCause(exception3, exception);
+            throw(exception);
+        end
+    end
+end
+
+function edit_Callback(source,~,action)
+    try
+        if isempty(action)
+            return;
+        end
+        
+        % Get appdata and handles of main GUI
+        mainWindow = trEPRguiGetWindowHandle();
+        ad = getappdata(mainWindow);
+        
+        active = ad.control.spectra.active;
+        if isempty(active) && ~active
+            return;
+        end
+        
+        value = trEPRguiSanitiseNumericInput(get(source,'String'));
+        if isnan(value)
+            update_displayPanel();
+            return;
+        end
+        
+        switch action
+            case 'BGpositionsShift'
+                ad.control.axis.BGpositions.shift = value;
+            otherwise
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : unknown action "' action '"'],...
+                    'warning');
+                return;
+        end
+        setappdata(mainWindow,'control',ad.control);
         % Update main axis
         update_mainAxis();
     catch exception
