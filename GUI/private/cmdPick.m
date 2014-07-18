@@ -22,7 +22,7 @@ function [status,warnings] = cmdPick(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-12
+% 2014-07-17
 
 status = 0;
 warnings = cell(0);
@@ -84,7 +84,7 @@ switch lower(opt{1}(1:3))
             ad.data{active}.axes.y.values(yimin),...
             ad.data{active}.data(yimin,ximin) ...
             );
-        trEPRmsg(message,'info')
+        trEPRmsg(message,'info');
         
         % Set appdata from main GUI
         setappdata(handle,'data',ad.data);
@@ -107,7 +107,7 @@ switch lower(opt{1}(1:3))
             ad.data{active}.axes.y.values(yimax),...
             ad.data{active}.data(yimax,ximax) ...
             );
-        trEPRmsg(message,'info')
+        trEPRmsg(message,'info');
         
         % Set appdata from main GUI
         setappdata(handle,'data',ad.data);

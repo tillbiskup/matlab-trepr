@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-16
+% 2014-07-17
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -225,6 +225,15 @@ switch ad.control.axis.displayType
         if ad.control.axis.BGpositions
             trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
                 'DisplayType','2D');
+        end
+        % Set axes limits according to zoom
+        if ad.control.axis.zoom.enable
+            if min(ad.control.axis.zoom.x) ~= max(ad.control.axis.zoom.x)
+                set(mainAxes,'XLim',ad.control.axis.zoom.x);
+            end
+            if min(ad.control.axis.zoom.y) ~= max(ad.control.axis.zoom.y)
+                set(mainAxes,'YLim',ad.control.axis.zoom.y);
+            end
         end
     case '1D along x' % time profile
         % Enable sliders
@@ -535,6 +544,15 @@ switch ad.control.axis.displayType
         end
         % Display legend - internal function
         display_legend(mainAxes);
+        % Set axes limits according to zoom
+        if ad.control.axis.zoom.enable
+            if min(ad.control.axis.zoom.x) ~= max(ad.control.axis.zoom.x)
+                set(mainAxes,'XLim',ad.control.axis.zoom.x);
+            end
+            if min(ad.control.axis.zoom.z) ~= max(ad.control.axis.zoom.z)
+                set(mainAxes,'YLim',ad.control.axis.zoom.z);
+            end
+        end
     case '1D along y' % B0 spectrum
         % Enable sliders
         sliderHandles = findobj(...
@@ -879,6 +897,15 @@ switch ad.control.axis.displayType
         if ad.control.axis.BGpositions
             trEPRdatasetShowBGpositions(mainAxes,ad.data{active},...
                 'DisplayType','1D');
+        end
+        % Set axes limits according to zoom
+        if ad.control.axis.zoom.enable
+            if min(ad.control.axis.zoom.y) ~= max(ad.control.axis.zoom.y)
+                set(mainAxes,'XLim',ad.control.axis.zoom.y);
+            end
+            if min(ad.control.axis.zoom.z) ~= max(ad.control.axis.zoom.z)
+                set(mainAxes,'YLim',ad.control.axis.zoom.z);
+            end
         end
     otherwise
         st = dbstack;
