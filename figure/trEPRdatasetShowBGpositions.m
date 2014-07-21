@@ -16,7 +16,7 @@ function trEPRdatasetShowBGpositions(varargin)
 %                Handle of axis to plot into
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-18
+% 2014-07-21
 
 % Manual check for input arguments, as first argument is optional
 if nargin < 1
@@ -134,9 +134,9 @@ try
     occurrence = dataset.parameters.background.occurrence;
     switch lower(dataset.parameters.field.sequence)
         case {'inward','in','inwards'}
-            BGpositions = field(end-ceil(occurrence/2):-ceil(occurrence/2):1);
+            BGpositions = field(end-ceil(occurrence/2):-ceil(occurrence):1);
             BGpositions = [ BGpositions ...
-                 field(1+floor(occurrence/2):floor(occurrence/2):end) ] + ...
+                 field(1+floor(occurrence/2):floor(occurrence):end) ] + ...
                 dataset.parameters.field.step.value/2;
         case {'outward','out','outwards'}
             centerField = ceil(length(field)/2);

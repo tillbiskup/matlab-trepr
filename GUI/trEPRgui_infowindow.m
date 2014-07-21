@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-18
+% 2014-07-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -4697,7 +4697,9 @@ function updateParameterPanel()
         
         % Account for "duration" field ("General")
         if ~any(strfind(ad.data{active}.parameters.date.start,'x')) && ...
-                ~any(strfind(ad.data{active}.parameters.date.end,'x'))
+                ~any(strfind(ad.data{active}.parameters.date.end,'x')) && ...
+                ~isempty(ad.data{active}.parameters.date.start) && ...
+                ~isempty(ad.data{active}.parameters.date.end)
             set(gh.parameter_panel_duration_edit,'String',datestr(...
                 datenum(ad.data{active}.parameters.date.end,...
                 'yyyy-mm-dd HH:MM:SS') - ...
