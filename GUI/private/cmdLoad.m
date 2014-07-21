@@ -301,7 +301,12 @@ end
 
 % TODO: Include unitConversion here
 if get(gh.load_panel_unitconversion_checkbox,'Value')
-    trEPRmsg('Automatic unit conversion on load not yet implemented...','w');
+    conversions = regexp(ad.configuration.load.convert,',','split');
+    for k=1:length(newDataIdx)
+        for conversion = 1:length(conversions)
+            cmdConvert(newDataIdx(k),conversions(conversion));
+        end
+    end
 end
 
 % Try to load axis labels from file

@@ -80,6 +80,8 @@ BGC = 0
 labels = 1
 visible = 0
 format = automatic 
+% convert can take a comma-separated list of values
+convert = G2mT
 
 % Configuration of the sliders
 [slider]
