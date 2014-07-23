@@ -8,11 +8,12 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-14
+% 2014-07-23
 
 try
     % Get handles of main window
     mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
     gh = guihandles(mainWindow);
     
     panels = [...
@@ -105,6 +106,9 @@ try
                 'warning');
             return;
     end
+    
+    ad.control.panel = panelName;
+    setappdata(mainWindow,'control',ad.control);
     
     status = 0;
 catch exception

@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-12
+% 2014-07-23
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -571,7 +571,7 @@ uicontrol('Tag','displaytype_popupmenu',...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
     'Position',[10 10 mainPanelWidth-120 20],...
-    'String','2D plot|1D along x|1D along y',...
+    'String','2D|x (time)|y (field)',...
     'Callback', {@popupmenu_Callback,'displaytype'}...
     );
 uicontrol('Tag','previous_pushbutton',...
@@ -583,7 +583,7 @@ uicontrol('Tag','previous_pushbutton',...
     'Position',[guiSize(1)-110 40 45 45],...
     'FontWeight','normal',...
     'String','<<',...
-    'TooltipString','Show previous spectrum',...
+    'TooltipString','<html>Show previous spectrum<br>Key: <tt>Page down</tt>',...
     'Callback',{@pushbutton_Callback,'previous'}...
     );
 uicontrol('Tag','next_pushbutton',...
@@ -595,7 +595,7 @@ uicontrol('Tag','next_pushbutton',...
     'Position',[guiSize(1)-65 40 45 45],...
     'FontWeight','normal',...
     'String','>>',...
-    'TooltipString','Show next spectrum',...
+    'TooltipString','<html>Show next spectrum<br>Key: <tt>Page down</tt>',...
     'Callback',{@pushbutton_Callback,'next'}...
     );
 
@@ -895,10 +895,10 @@ function slider_Callback(source,~,action)
             case 'displaceh'
                 switch ad.control.axis.displayType
                     case {'2D plot','1D along x'}
-                        ad.data{active}.display.displacement.x = ...
+                        ad.data{active}.display.displacement.data.x = ...
                             get(source,'Value');
                     case '1D along y'
-                        ad.data{active}.display.displacement.y = ...
+                        ad.data{active}.display.displacement.data.y = ...
                             get(source,'Value');
                     otherwise
                         st = dbstack;
@@ -910,10 +910,10 @@ function slider_Callback(source,~,action)
             case 'displacev'
                 switch ad.control.axis.displayType
                     case '2D plot'
-                        ad.data{active}.display.displacement.y = ...
+                        ad.data{active}.display.displacement.data.y = ...
                             get(source,'Value');
                     case {'1D along x','1D along y'}
-                        ad.data{active}.display.displacement.z = ...
+                        ad.data{active}.display.displacement.data.z = ...
                             get(source,'Value');
                     otherwise
                         st = dbstack;
@@ -933,9 +933,9 @@ function slider_Callback(source,~,action)
                 % Depending on display type settings
                 switch ad.control.axis.displayType
                     case {'2D plot','1D along x'}
-                        ad.data{active}.display.scaling.x = scalingFactor;
+                        ad.data{active}.display.scaling.data.x = scalingFactor;
                     case '1D along y'
-                        ad.data{active}.display.scaling.y = scalingFactor;
+                        ad.data{active}.display.scaling.data.y = scalingFactor;
                     otherwise
                         st = dbstack;
                         trEPRmsg(...
@@ -952,9 +952,9 @@ function slider_Callback(source,~,action)
                 end
                 switch lower(ad.control.axis.displayType)
                     case '2d plot'
-                        ad.data{active}.display.scaling.y = scalingFactor;
+                        ad.data{active}.display.scaling.data.y = scalingFactor;
                     case {'1d along x','1d along y'}
-                        ad.data{active}.display.scaling.z = scalingFactor;
+                        ad.data{active}.display.scaling.data.z = scalingFactor;
                 end
             otherwise
                 st = dbstack;
@@ -1052,13 +1052,13 @@ function pushbutton_Callback(source,~,action)
                 end
                                 
                 % Reset displacement and scaling for current spectrum
-                ad.data{active}.display.displacement.x = 0;
-                ad.data{active}.display.displacement.y = 0;
-                ad.data{active}.display.displacement.z = 0;
+                ad.data{active}.display.displacement.data.x = 0;
+                ad.data{active}.display.displacement.data.y = 0;
+                ad.data{active}.display.displacement.data.z = 0;
                 
-                ad.data{active}.display.scaling.x = 1;
-                ad.data{active}.display.scaling.y = 1;
-                ad.data{active}.display.scaling.z = 1;
+                ad.data{active}.display.scaling.data.x = 1;
+                ad.data{active}.display.scaling.data.y = 1;
+                ad.data{active}.display.scaling.data.z = 1;
                 
                 % Update appdata of main window
                 setappdata(mainWindow,'data',ad.data);
@@ -1285,9 +1285,14 @@ function popupmenu_Callback(source,~,action)
         switch lower(action)
             case 'displaytype'
                 displayTypes = cellstr(get(source,'String'));
-                displayType = displayTypes{get(source,'Value')};
-                ad.control.axis.displayType = displayType;
-                
+                switch lower(displayTypes{get(source,'Value')})
+                    case '2d'
+                        ad.control.axis.displayType = '2D plot';
+                    case 'x (time)'
+                        ad.control.axis.displayType = '1D along x';
+                    case 'y (field)'
+                        ad.control.axis.displayType = '1D along y';
+                end                
                 % Update appdata of main window
                 setappdata(mainWindow,'control',ad.control);
                 

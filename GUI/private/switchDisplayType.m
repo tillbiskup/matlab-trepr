@@ -5,8 +5,8 @@ function status = switchDisplayType(displayType)
 %
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-04
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-23
 
 try
     % Get appdata and handles of main window
@@ -21,15 +21,24 @@ try
     end
     
     displayTypes = cellstr(get(gh.displaytype_popupmenu,'String'));
-    [~,idx] = max(strcmpi(displayType,displayTypes));
-    set(gh.displaytype_popupmenu,'Value',idx);
+    switch lower(displayType)
+        case '2d plot'
+            [~,idx] = max(strcmpi('2D',displayTypes));
+            set(gh.displaytype_popupmenu,'Value',idx);
+        case '1d along x'
+            [~,idx] = max(strcmpi('x (time)',displayTypes));
+            set(gh.displaytype_popupmenu,'Value',idx);
+        case '1d along y'
+            [~,idx] = max(strcmpi('y (field)',displayTypes));
+            set(gh.displaytype_popupmenu,'Value',idx);
+    end
     ad.control.axis.displayType = displayType;
     
     % Switch mode to none in case that we have switched to '2D plot' and
     % mode was "scale" or "displace"
     if strcmpi(displayType,'2D plot') && ...
             any(strcmpi(ad.control.mode,{'scale','displace'}))
-        trEPRsetMode('none');
+        trEPRguiSetMode('none');
     end
     
     % Update appdata of main window

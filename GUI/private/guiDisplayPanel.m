@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-14
+% 2014-07-23
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1603,7 +1603,7 @@ uicontrol('Tag','display_panel_normalise_pkpk_radiobutton',...
     'Style','Radiobutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
-    'String','Pk-Pk',...
+    'String','Pk2Pk',...
     'TooltipString','Set peak-peak (amplitude) to 1',...
     'pos',[0 30 (handle_size(3)-40-60)/2 30],...
     'parent',handle_pp6_1_1,...
@@ -1962,10 +1962,10 @@ function popupmenu_Callback(source,~,action)
                 switch lineType
                     case 'measured'
                         if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.edgeColor = ...
-                                ad.data{active}.line.color;
+                            ad.data{active}.display.lines.data.marker.edgeColor = ...
+                                ad.data{active}.display.lines.data.color;
                         else
-                            ad.data{active}.line.marker.edgeColor = value;
+                            ad.data{active}.display.lines.data.marker.edgeColor = value;
                         end
                     case 'calculated'
                         if strcmpi(value,'colour')
@@ -1990,10 +1990,10 @@ function popupmenu_Callback(source,~,action)
                 switch lineType
                     case 'measured'
                         if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.faceColor = ...
-                                ad.data{active}.line.color;
+                            ad.data{active}.display.lines.data.marker.faceColor = ...
+                                ad.data{active}.display.lines.data.color;
                         else
-                            ad.data{active}.line.marker.faceColor = value;
+                            ad.data{active}.display.lines.data.marker.faceColor = value;
                         end
                     case 'calculated'
                         if strcmpi(value,'colour')
@@ -2073,7 +2073,7 @@ function edit_Callback(source,~,action)
                     get(gh.display_panel_line_popupmenu,'Value')};
                 switch lineType
                     case 'measured'
-                        ad.data{active}.line.marker.size = value;
+                        ad.data{active}.display.lines.data.marker.size = value;
                     case 'calculated'
                         ad.data{active}.display.lines.calculated.marker.size = value;
                     otherwise
@@ -2214,13 +2214,13 @@ function pushbutton_Callback(~,~,action)
                     get(gh.display_panel_line_popupmenu,'Value')};
                 switch lineType
                     case 'measured'
-                        if ischar(ad.data{active}.line.color)
-                            ad.data{active}.line.color = colors{...
-                                strcmpi(ad.data{active}.line.color,...
+                        if ischar(ad.data{active}.display.lines.data.color)
+                            ad.data{active}.display.lines.data.color = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.color,...
                                 colors(:,1)),2};
                         end
-                        ad.data{active}.line.color = uisetcolor(...
-                            ad.data{active}.line.color,...
+                        ad.data{active}.display.lines.data.color = uisetcolor(...
+                            ad.data{active}.display.lines.data.color,...
                             'Set measured line colour');
                     case 'calculated'
                         if ischar(ad.data{active}.display.lines.calculated.color)
@@ -2258,13 +2258,13 @@ function pushbutton_Callback(~,~,action)
                     get(gh.display_panel_line_popupmenu,'Value')};
                 switch lineType
                     case 'measured'
-                        if ischar(ad.data{active}.line.marker.edgeColor)
-                            ad.data{active}.line.marker.edgeColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.edgeColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
                                 colors(:,1)),2};
                         end
-                        ad.data{active}.line.marker.edgeColor = uisetcolor(...
-                            ad.data{active}.line.marker.edgeColor,...
+                        ad.data{active}.display.lines.data.marker.edgeColor = uisetcolor(...
+                            ad.data{active}.display.lines.data.marker.edgeColor,...
                             'Set line marker edge colour');
                     case 'calculated'
                         if ischar(ad.data{active}.display.lines.calculated.marker.edgeColor)
@@ -2302,13 +2302,13 @@ function pushbutton_Callback(~,~,action)
                     get(gh.display_panel_line_popupmenu,'Value')};
                 switch lineType
                     case 'measured'
-                        if ischar(ad.data{active}.line.marker.faceColor)
-                            ad.data{active}.line.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.faceColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
                                 colors(:,1)),2};
                         end
-                        ad.data{active}.line.marker.faceColor = uisetcolor(...
-                            ad.data{active}.line.marker.faceColor,...
+                        ad.data{active}.display.lines.data.marker.faceColor = uisetcolor(...
+                            ad.data{active}.display.lines.data.marker.faceColor,...
                             'Set line marker face colour');
                     case 'calculated'
                         if ischar(ad.data{active}.display.lines.calculated.marker.faceColor)
@@ -2346,10 +2346,10 @@ function pushbutton_Callback(~,~,action)
                     get(gh.display_panel_line_popupmenu,'Value')};
                 switch lineType
                     case 'measured'
-                        ad.data{active}.line.marker.type = 'none';
-                        ad.data{active}.line.marker.edgeColor = 'auto';
-                        ad.data{active}.line.marker.faceColor = 'none';
-                        ad.data{active}.line.marker.size = 6;
+                        ad.data{active}.display.lines.data.marker.type = 'none';
+                        ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
+                        ad.data{active}.display.lines.data.marker.faceColor = 'none';
+                        ad.data{active}.display.lines.data.marker.size = 6;
                     case 'calculated'
                         ad.data{active}.display.lines.calculated.marker.type = 'none';
                         ad.data{active}.display.lines.calculated.marker.edgeColor = 'auto';
@@ -3061,7 +3061,7 @@ function togglebutton_Callback(source,~,action)
         gh = guihandles(mainWindow);
         
         switch lower(action)
-            case 'normalise1d'
+            case {'normalise1d','normalise2d'}
                 % For some currently unknown reason, findobj seems not to work. The
                 % parent handle behaves weird...
                 normaliseButtons = [...
@@ -3069,42 +3069,17 @@ function togglebutton_Callback(source,~,action)
                     gh.display_panel_normalise_2d_togglebutton ...
                     ];
                 % Switch normalisation on or off
+                dimension = upper(action(end-1:end));
                 if (get(source,'Value'))
                     ad.control.axis.normalisation.enable = true;
-                    ad.control.axis.normalisation.dimension = '1D';
+                    ad.control.axis.normalisation.dimension = dimension;
                     ad.control.axis.normalisation.type = lower(get(get(...
                         gh.display_panel_normalise_buttongroup,...
                         'SelectedObject'),'String'));
                     set(normaliseButtons,'Value',0);
                     set(source,'Value',1);
                     set(gh.status_panel_normalisation_text,...
-                        'String','1D',...
-                        'BackgroundColor',[1 1 0.5]);
-                else
-                    ad.control.axis.normalisation.enable = false;
-                    set(normaliseButtons,'Value',0);
-                    set(gh.status_panel_normalisation_text,...
-                        'String','no',...
-                        'BackgroundColor',[1 1 1]);
-                end
-            case 'normalise2d'
-                % For some currently unknown reason, findobj seems not to work. The
-                % parent handle behaves weird...
-                normaliseButtons = [...
-                    gh.display_panel_normalise_1d_togglebutton ...
-                    gh.display_panel_normalise_2d_togglebutton ...
-                    ];
-                % Switch normalisation on or off
-                if (get(source,'Value'))
-                    ad.control.axis.normalisation.enable = true;
-                    ad.control.axis.normalisation.dimension = '2D';
-                    ad.control.axis.normalisation.type = lower(get(get(...
-                        gh.display_panel_normalise_buttongroup,...
-                        'SelectedObject'),'String'));
-                    set(normaliseButtons,'Value',0);
-                    set(source,'Value',1);
-                    set(gh.status_panel_normalisation_text,...
-                        'String','2D',...
+                        'String',dimension,...
                         'BackgroundColor',[1 1 0.5]);
                 else
                     ad.control.axis.normalisation.enable = false;
@@ -3257,7 +3232,7 @@ function linewidth_popupmenu_Callback(~,~)
                 get(gh.display_panel_line_popupmenu,'Value')};
             switch lineType
                 case 'measured'
-                    ad.data{active}.line.width = str2double(lineWidth(1));
+                    ad.data{active}.display.lines.data.width = str2double(lineWidth(1));
                 case 'calculated'
                     ad.data{active}.display.lines.calculated.width = ...
                         str2double(lineWidth(1));
@@ -3318,15 +3293,15 @@ function linestyle_popupmenu_Callback(source,~,action)
                         case 'measured'
                             switch lineStyle
                                 case 'solid'
-                                    ad.data{active}.line.style = '-';
+                                    ad.data{active}.display.lines.data.style = '-';
                                 case 'dashed'
-                                    ad.data{active}.line.style = '--';
+                                    ad.data{active}.display.lines.data.style = '--';
                                 case 'dotted'
-                                    ad.data{active}.line.style = ':';
+                                    ad.data{active}.display.lines.data.style = ':';
                                 case 'dash-dotted'
-                                    ad.data{active}.line.style = '-.';
+                                    ad.data{active}.display.lines.data.style = '-.';
                                 case 'none'
-                                    ad.data{active}.line.style = 'none';
+                                    ad.data{active}.display.lines.data.style = 'none';
                                 otherwise
                                     % That shall never happen
                                     st = dbstack;
@@ -3434,33 +3409,33 @@ function linemarker_popupmenu_Callback(~,~)
                 case 'measured'
                     switch lineMarker
                         case 'none'
-                            ad.data{active}.line.marker.type = 'none';
+                            ad.data{active}.display.lines.data.marker.type = 'none';
                         case 'plus'
-                            ad.data{active}.line.marker.type = '+';
+                            ad.data{active}.display.lines.data.marker.type = '+';
                         case 'circle'
-                            ad.data{active}.line.marker.type = 'o';
+                            ad.data{active}.display.lines.data.marker.type = 'o';
                         case 'asterisk'
-                            ad.data{active}.line.marker.type = '*';
+                            ad.data{active}.display.lines.data.marker.type = '*';
                         case 'point'
-                            ad.data{active}.line.marker.type = '.';
+                            ad.data{active}.display.lines.data.marker.type = '.';
                         case 'cross'
-                            ad.data{active}.line.marker.type = 'x';
+                            ad.data{active}.display.lines.data.marker.type = 'x';
                         case 'square'
-                            ad.data{active}.line.marker.type = 's';
+                            ad.data{active}.display.lines.data.marker.type = 's';
                         case 'diamond'
-                            ad.data{active}.line.marker.type = 'd';
+                            ad.data{active}.display.lines.data.marker.type = 'd';
                         case 'triangle up'
-                            ad.data{active}.line.marker.type = '^';
+                            ad.data{active}.display.lines.data.marker.type = '^';
                         case 'triangle down'
-                            ad.data{active}.line.marker.type = 'v';
+                            ad.data{active}.display.lines.data.marker.type = 'v';
                         case 'triangle right'
-                            ad.data{active}.line.marker.type = '<';
+                            ad.data{active}.display.lines.data.marker.type = '<';
                         case 'triangle left'
-                            ad.data{active}.line.marker.type = '>';
+                            ad.data{active}.display.lines.data.marker.type = '>';
                         case 'pentagram'
-                            ad.data{active}.line.marker.type = 'p';
+                            ad.data{active}.display.lines.data.marker.type = 'p';
                         case 'hexagram'
-                            ad.data{active}.line.marker.type = 'h';
+                            ad.data{active}.display.lines.data.marker.type = 'h';
                         otherwise
                             % That shall never happen
                             st = dbstack;

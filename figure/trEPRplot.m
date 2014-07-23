@@ -321,32 +321,23 @@ if strcmpi(parameters.normalisationDimension,'1D') && ...
         strcmpi(parameters.dimension,'1D')
     switch parameters.direction
         case 'x'
-            slice = dataset.data(parameters.position,:);
+            data = dataset.data(parameters.position,:);
         case 'y'
-            slice = dataset.data(:,parameters.position);
-    end
-    switch lower(parameters.normalisationType)
-        case 'pk-pk'
-            normalisationFactor = 1/(max(slice)-min(slice));
-        case 'area'
-            normalisationFactor = 1/abs(sum(slice));
-        case 'max'
-            normalisationFactor = 1/max(slice);
-        case 'min'
-            normalisationFactor = 1/abs(min(slice));
+            data = dataset.data(:,parameters.position);
     end
 else
-    switch lower(parameters.normalisationType)
-        case 'pk-pk'
-            normalisationFactor = 1/(max(max(dataset.data))-...
-                min(min(dataset.data)));
-        case 'area'
-            normalisationFactor = 1/abs(sum(sum(dataset.data)));
-        case 'max'
-            normalisationFactor = 1/max(max(dataset.data));
-        case 'min'
-            normalisationFactor = 1/abs(min(min(dataset.data)));
-    end
+    data = dataset.data;
+end
+
+switch lower(parameters.normalisationType)
+    case 'pk2pk'
+        normalisationFactor = 1/(max(max(data))-min(min(data)));
+    case 'area'
+        normalisationFactor = 1/abs(sum(sum(data)));
+    case 'max'
+        normalisationFactor = 1/max(max(data));
+    case 'min'
+        normalisationFactor = 1/abs(min(min(data)));
 end
 
 dataset.data = dataset.data .* normalisationFactor;

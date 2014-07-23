@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-16
+% 2014-07-23
 
 status = 0;
 warnings = cell(0);
@@ -176,12 +176,6 @@ if isempty(data)
 end
 
 % Get names of successfully loaded files
-% In parallel, add additional fields to each dataset
-% Define default display structure to add to datasets
-guiDataStruct = trEPRguiDataStructure('datastructure');
-% Important: Delete "history" field not to overwrite history
-guiDataStruct = rmfield(guiDataStruct,'history');
-guiDataStructFields = fieldnames(guiDataStruct);
 if iscell(data)
     fileNames = cell(0);
     for k = 1 : length(data)
@@ -189,13 +183,6 @@ if iscell(data)
         fileNames{k} = fullfile(p,[fn ext]);
         if ~isfield(data{k},'label') || isempty(data{k}.label)
             data{k}.label = [fn ext];
-        end
-        for l=1:length(guiDataStructFields)
-            data{k}.(guiDataStructFields{l}) = ...
-                guiDataStruct.(guiDataStructFields{l});
-        end
-        if ~isfield(data{k},'history')
-            data{k}.history = cell(0);
         end
         % For compatibility with old versions of trEPRread and for
         % consistency with the naming of all other structures
@@ -213,13 +200,6 @@ else
     [~,fn,ext] = fileparts(data.file.name);
     if ~isfield(data,'label') || isempty(data.label)
         data.label = [fn ext];
-    end
-    for l=1:length(guiDataStructFields)
-        data.(guiDataStructFields{l}) = ...
-            guiDataStruct.(guiDataStructFields{l});
-    end
-    if ~isfield(data,'history')
-        data.history = cell(0);
     end
     % For compatibility with old versions of trEPRread and for
     % consistency with the naming of all other structures

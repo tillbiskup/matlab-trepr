@@ -6,8 +6,8 @@ function guiScale(dimension,step)
 %     step      - scalar|string
 %                 if string, one of {'first','last','end'}
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-06
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-23
 
 try
     % Get appdata of main window
@@ -28,83 +28,83 @@ try
             switch ad.control.axis.displayType
                 case '1D along x'
                     if ischar(step) && strcmpi(step,'first')
-                        ad.data{active}.display.scaling.x = vMax(1);
+                        ad.data{active}.display.scaling.data.x = vMax(1);
                     elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                        ad.data{active}.display.scaling.x = vMax(2);
+                        ad.data{active}.display.scaling.data.x = vMax(2);
                     elseif isscalar(step)
-                        ad.data{active}.display.scaling.x = ...
-                            ad.data{active}.display.scaling.x + step*vStep;
+                        ad.data{active}.display.scaling.data.x = ...
+                            ad.data{active}.display.scaling.data.x + step*vStep;
                         % Check for boundaries
-                        if (ad.data{active}.display.scaling.x < vMax(1))
-                            ad.data{active}.display.scaling.x = vMax(1);
+                        if (ad.data{active}.display.scaling.data.x < vMax(1))
+                            ad.data{active}.display.scaling.data.x = vMax(1);
                         end
-                        if (ad.data{active}.display.scaling.x > vMax(2))
-                            ad.data{active}.display.scaling.x = vMax(2);
+                        if (ad.data{active}.display.scaling.data.x > vMax(2))
+                            ad.data{active}.display.scaling.data.x = vMax(2);
                         end
                     else
                         return;
                     end
-                    if ad.data{active}.display.scaling.x > 1
+                    if ad.data{active}.display.scaling.data.x > 1
                         set(gh.horz1_slider,'Value',...
-                            ad.data{active}.display.scaling.x-1);
-                    elseif ad.data{active}.display.scaling.x < 1
+                            ad.data{active}.display.scaling.data.x-1);
+                    elseif ad.data{active}.display.scaling.data.x < 1
                         set(gh.horz1_slider,'Value',...
-                            -2*ad.data{active}.display.scaling.x);
+                            -2*ad.data{active}.display.scaling.data.x);
                     else
                         set(gh.horz1_slider,'Value',0);
                     end
                 case '1D along y'
                     if ischar(step) && strcmpi(step,'first')
-                        ad.data{active}.display.scaling.y = vMax(1);
+                        ad.data{active}.display.scaling.data.y = vMax(1);
                     elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                        ad.data{active}.display.scaling.y = vMax(2);
+                        ad.data{active}.display.scaling.data.y = vMax(2);
                     elseif isscalar(step)
-                        ad.data{active}.display.scaling.y = ...
-                            ad.data{active}.display.scaling.y + step*vStep;
+                        ad.data{active}.display.scaling.data.y = ...
+                            ad.data{active}.display.scaling.data.y + step*vStep;
                         % Check for boundaries
-                        if (ad.data{active}.display.scaling.y < vMax(1))
-                            ad.data{active}.display.scaling.y = vMax(1);
+                        if (ad.data{active}.display.scaling.data.y < vMax(1))
+                            ad.data{active}.display.scaling.data.y = vMax(1);
                         end
-                        if (ad.data{active}.display.scaling.y > vMax(2))
-                            ad.data{active}.display.scaling.y = vMax(2);
+                        if (ad.data{active}.display.scaling.data.y > vMax(2))
+                            ad.data{active}.display.scaling.data.y = vMax(2);
                         end
                     else
                         return;
                     end
-                    if ad.data{active}.display.scaling.y > 1
+                    if ad.data{active}.display.scaling.data.y > 1
                         set(gh.horz1_slider,'Value',...
-                            ad.data{active}.display.scaling.y-1);
-                    elseif ad.data{active}.display.scaling.y < 1
+                            ad.data{active}.display.scaling.data.y-1);
+                    elseif ad.data{active}.display.scaling.data.y < 1
                         set(gh.horz1_slider,'Value',...
-                            -2*ad.data{active}.display.scaling.y);
+                            -2*ad.data{active}.display.scaling.data.y);
                     else
                         set(gh.horz1_slider,'Value',0);
                     end
             end
         case 'y'
             if ischar(step) && strcmpi(step,'first')
-                ad.data{active}.display.scaling.z = vMax(1);
+                ad.data{active}.display.scaling.data.z = vMax(1);
             elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                ad.data{active}.display.scaling.z = vMax(2);
+                ad.data{active}.display.scaling.data.z = vMax(2);
             elseif isscalar(step)
-                ad.data{active}.display.scaling.z = ...
-                    ad.data{active}.display.scaling.z + (step*vStep);
+                ad.data{active}.display.scaling.data.z = ...
+                    ad.data{active}.display.scaling.data.z + (step*vStep);
                 % Check for boundaries
-                if (ad.data{active}.display.scaling.z < vMax(1))
-                    ad.data{active}.display.scaling.z = vMax(1);
+                if (ad.data{active}.display.scaling.data.z < vMax(1))
+                    ad.data{active}.display.scaling.data.z = vMax(1);
                 end
-                if (ad.data{active}.display.scaling.z > vMax(2))
-                    ad.data{active}.display.scaling.z = vMax(2);
+                if (ad.data{active}.display.scaling.data.z > vMax(2))
+                    ad.data{active}.display.scaling.data.z = vMax(2);
                 end
             else
                 return;
             end
-            if ad.data{active}.display.scaling.y > 1
+            if ad.data{active}.display.scaling.data.y > 1
                 set(gh.vert2_slider,'Value',...
-                    ad.data{active}.display.scaling.y-1);
-            elseif ad.data{active}.display.scaling.y < 1
+                    ad.data{active}.display.scaling.data.y-1);
+            elseif ad.data{active}.display.scaling.data.y < 1
                 set(gh.vert2_slider,'Value',...
-                    -2*ad.data{active}.display.scaling.y);
+                    -2*ad.data{active}.display.scaling.data.y);
             else
                 set(gh.vert2_slider,'Value',0);
             end
