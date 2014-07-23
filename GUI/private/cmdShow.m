@@ -22,7 +22,7 @@ function [status,warnings] = cmdShow(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-07
+% 2014-07-23
 
 status = 0;
 warnings = cell(0);
@@ -252,12 +252,44 @@ else
                     warnings{end+1} = ['Option ' opt{2} ' not understood.'];
                     return;
             end
+        case {'next','n'}
+            if ~ad.control.spectra.active || ...
+                    length(ad.control.spectra.visible) == 1
+                return;
+            end
+            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
+            if idx < length(ad.control.spectra.visible)
+                ad.control.spectra.active = ad.control.spectra.visible(idx+1);
+            else
+                ad.control.spectra.active = ad.control.spectra.visible(1);
+            end
+            setappdata(handle,'control',ad.control);
+            update_mainAxis();
+            update_visibleSpectra();
+            update_processingPanel();
+            update_sliderPanel();
+        case {'prev','previous','p'}
+            if ~ad.control.spectra.active || ...
+                    length(ad.control.spectra.visible) == 1
+                return;
+            end
+            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
+            if idx == 1
+                ad.control.spectra.active = ad.control.spectra.visible(end);
+            else
+                ad.control.spectra.active = ad.control.spectra.visible(idx-1);
+            end
+            setappdata(handle,'control',ad.control);
+            update_mainAxis();
+            update_visibleSpectra();
+            update_processingPanel();
+            update_sliderPanel();
+        case {char([100 105 108 98 101 114 116]),char([120 107 99 100])}
+            guiProcRast(opt{1});
         otherwise
             status = -3;
             warnings{end+1} = ['Option ' opt{1} ' not understood.'];
             return;
     end
-end
 
 end
-

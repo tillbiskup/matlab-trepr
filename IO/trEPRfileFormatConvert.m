@@ -51,7 +51,7 @@ else
 end
 
 % There is nothing to do for the most current version...
-if strcmpi(version,'1.6')
+if strcmpi(version,'1.10')
     if nargout == 2
         varargout{1} = warning;
     end
@@ -62,6 +62,30 @@ end
 newdata = structcopy(trEPRdataStructure('structure'),data);
 
 switch version
+    case '1.9'
+        newdata.display.lines.data = data.line;
+        newdata.display.displacement.data.x = data.display.displacement.x;
+        newdata.display.displacement.data.y = data.display.displacement.y;
+        newdata.display.displacement.data.z = data.display.displacement.z;
+        newdata.display.scaling.data.x = data.display.scaling.x;
+        newdata.display.scaling.data.y = data.display.scaling.y;
+        newdata.display.scaling.data.z = data.display.scaling.z;
+        newdata.display.smoothing.data.x.filterfun = ...
+            data.display.smoothing.x.filterfun;
+        newdata.display.smoothing.data.x.width = ...
+            data.display.smoothing.x.value;
+        newdata.display.smoothing.data.y.filterfun = ...
+            data.display.smoothing.y.filterfun;
+        newdata.display.smoothing.data.y.width = ...
+            data.display.smoothing.y.value;
+        % Remove old fields
+        newdata.display = rmfield(newdata.display,'line');
+        newdata.display.displacement = ...
+            rmfield(newdata.display.displacement,{'x','y','z'});
+        newdata.display.scaling = ...
+            rmfield(newdata.display.scaling,{'x','y','z'});
+        newdata.display.smoothing = ...
+            rmfield(newdata.display.smoothing,{'x','y'});
     case '1.5'
         newdata.parameters.purpose = {''};
         newdata.sample.buffer = {''};

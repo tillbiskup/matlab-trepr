@@ -19,9 +19,17 @@
 		<ul>
 		    <li>New features</li>
 		    <ul>
+		        <li>New function <tt>getCascadedField</tt> for handling hierarchical structures more conveniently.</li>
+		        <li>New function <tt>trEPRfilter_SavitzkyGolay</tt> implementing a Savitzky-Golay filter.</li>
 				<li>New function <tt>trEPRplot</tt> for plotting datasets from the command line.</li>
 				<li><tt>trEPRdatasetShowBGpositions</tt> can now handle (manual) shift of BG positions.</li>
 				<li>Automatic unit conversion on load.</li>
+		    </ul>
+		    <li>CMD</li>
+		    <ul>
+			    <li>New command <tt>reset</tt> for resetting the view (displacement and scaling).</li>
+			    <li>New command <tt>get</tt> for displaying internals of the GUI appdata structure.</li>
+			    <li><tt>show</tt> has new options <tt>next</tt> and <tt>prev|previous</tt> for displaying next or previous dataset in list of visible datasets.</li>
 		    </ul>
 		    <li>GUI layout and usability</li>
 		    <ul>
@@ -81,7 +89,7 @@
 		    </ul>
 		    <li>CMD</li>
 		    <ul>
-			    <li>New command <tt>spikreremove</tt> for removing spikes in datasets.</li>
+			    <li>New command <tt>spikeremove</tt> for removing spikes in datasets.</li>
 			    <li><tt>load</tt> without option now opens file selection dialogue.</li>
 			    <li><tt>disp</tt> has new option <tt>colormap</tt> for controlling colormap settings of 2D display.</li>
 			    <li><tt>convert</tt> now understands &quot;all&quot;, &quot;invisible&quot;, and &quot;visible&quot; as specifiers for datasets.</li>

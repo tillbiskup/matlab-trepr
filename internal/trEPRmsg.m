@@ -24,7 +24,11 @@ function status = trEPRmsg(message,varargin)
 % get displayed on the Matlab(tm) command line.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-12
+% 2014-07-23
+
+if isempty(message)
+    return;
+end
 
 % Define log levels
 % IDEA is to have the log levels sorted in descending order of their

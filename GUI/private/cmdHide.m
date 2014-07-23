@@ -22,7 +22,7 @@ function [status,warnings] = cmdHide(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-09
+% 2014-07-23
 
 status = 0;
 warnings = cell(0);
@@ -56,9 +56,6 @@ ad = getappdata(handle);
 % Get handles from handle
 gh = guidata(handle);
 
-% For convenience and shorter lines
-active = ad.control.spectra.active;
-
 if isempty(ad.data)
     warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
     return;
@@ -73,8 +70,6 @@ if isempty(opt)
         if selected == 0
             return;
         end
-        
-        selectedId = ad.control.spectra.visible(selected);
         
         % Move to invisible
         ad.control.spectra.invisible = [...

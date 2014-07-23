@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-13
+% 2014-07-23
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -193,37 +193,9 @@ try
                 end
             end
         case 'pagedown'
-            if ~ad.control.spectra.active || ...
-                    length(ad.control.spectra.visible) == 1
-                return;
-            end
-            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
-            if idx < length(ad.control.spectra.visible)
-                ad.control.spectra.active = ad.control.spectra.visible(idx+1);
-            else
-                ad.control.spectra.active = ad.control.spectra.visible(1);
-            end
-            setappdata(mainWindow,'control',ad.control);
-            update_mainAxis();
-            update_visibleSpectra();
-            update_processingPanel();
-            update_sliderPanel();
+            cmdShow(mainWindow,{'next'});
         case 'pageup'
-            if ~ad.control.spectra.active || ...
-                    length(ad.control.spectra.visible) == 1
-                return;
-            end
-            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
-            if idx == 1
-                ad.control.spectra.active = ad.control.spectra.visible(end);
-            else
-                ad.control.spectra.active = ad.control.spectra.visible(idx-1);
-            end
-            setappdata(mainWindow,'control',ad.control);
-            update_mainAxis();
-            update_visibleSpectra();
-            update_processingPanel();
-            update_sliderPanel();
+            cmdShow(mainWindow,{'prev'});
         % Keys for mode switching
         case {'c','d'}
             if ad.control.spectra.active && ...

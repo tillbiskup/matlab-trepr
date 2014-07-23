@@ -1050,24 +1050,7 @@ function pushbutton_Callback(source,~,action)
                 if (get(source,'Value') == 0) || ~active || isempty(active)
                     return;
                 end
-                                
-                % Reset displacement and scaling for current spectrum
-                ad.data{active}.display.displacement.data.x = 0;
-                ad.data{active}.display.displacement.data.y = 0;
-                ad.data{active}.display.displacement.data.z = 0;
-                
-                ad.data{active}.display.scaling.data.x = 1;
-                ad.data{active}.display.scaling.data.y = 1;
-                ad.data{active}.display.scaling.data.z = 1;
-                
-                % Update appdata of main window
-                setappdata(mainWindow,'data',ad.data);
-                
-                % Update slider panel
-                update_sliderPanel();
-                
-                %Update main axis
-                update_mainAxis();
+                cmdReset(mainWindow,{});
                 return;
             case 'detach'
                 % Open new figure window
@@ -1077,98 +1060,10 @@ function pushbutton_Callback(source,~,action)
                 update_mainAxis(newFig);
                 return;
             case 'next'
-                % This shall never happen, as the element should not be active in
-                % this case
-                if (length(ad.control.spectra.visible) < 2)
-                    return;
-                end
-                
-                if(active == ad.control.spectra.visible(end))
-                    ad.control.spectra.active = ad.control.spectra.visible(1);
-                else
-                    ad.control.spectra.active = ad.control.spectra.visible(...
-                        find(ad.control.spectra.visible==active)+1);
-                end
-                
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                % Add status message (mainly for debug reasons)
-                % IMPORTANT: Has to go AFTER setappdata
-                msgStr = cell(0,1);
-                msgStr{end+1} = sprintf(...
-                    'Dataset %i (%s) made active',...
-                    ad.control.spectra.active,...
-                    ad.data{ad.control.spectra.active}.label);
-                invStr = sprintf('%i ',ad.control.spectra.invisible);
-                visStr = sprintf('%i ',ad.control.spectra.visible);
-                msgStr{end+1} = sprintf(...
-                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-                    invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
-                clear msgStr;
-                
-                % Update processing panel
-                update_processingPanel();
-                
-                % Update slider panel
-                update_sliderPanel();
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update visible spectra listboxes (in diverse panels!)
-                update_visibleSpectra();
-                
-                %Update main axis
-                update_mainAxis();
+                cmdShow(mainWindow,{'next'});
                 return;
             case 'previous'
-                % This shall never happen, as the element should not be active in this
-                % case
-                if (length(ad.control.spectra.visible) < 2)
-                    return;
-                end
-                
-                if (active == ad.control.spectra.visible(1))
-                    ad.control.spectra.active = ad.control.spectra.visible(end);
-                else
-                    ad.control.spectra.active = ad.control.spectra.visible(...
-                        find(ad.control.spectra.visible==active)-1);
-                end
-                
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                % Add status message (mainly for debug reasons)
-                % IMPORTANT: Has to go AFTER setappdata
-                msgStr = cell(0,1);
-                msgStr{end+1} = sprintf(...
-                    'Dataset %i (%s) made active',...
-                    ad.control.spectra.active,...
-                    ad.data{active}.label);
-                invStr = sprintf('%i ',ad.control.spectra.invisible);
-                visStr = sprintf('%i ',ad.control.spectra.visible);
-                msgStr{end+1} = sprintf(...
-                    'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-                    invStr,visStr,length(ad.data));
-                trEPRmsg(msgStr,'info');
-                clear msgStr;
-                
-                % Update processing panel
-                update_processingPanel();
-                
-                % Update slider panel
-                update_sliderPanel();
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update visible spectra listboxes (in diverse panels!)
-                update_visibleSpectra();
-                
-                %Update main axis
-                update_mainAxis();
+                cmdShow(mainWindow,{'prev'});
                 return;
             case 'executescript'
                 [~,runScriptWarnings] = trEPRguiRunScript('');
@@ -1397,9 +1292,5 @@ function command_keypress_Callback(source,evt)
         end
     end    
 end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 end
