@@ -50,8 +50,10 @@ else
     version = data.version;
 end
 
+newdata = trEPRdataStructure('structure');
+
 % There is nothing to do for the most current version...
-if strcmpi(version,'1.10')
+if strcmpi(version,newdata.format.version)
     if nargout == 2
         varargout{1} = warning;
     end
@@ -59,7 +61,7 @@ if strcmpi(version,'1.10')
 end
 
 % Get empty data structure and copy fields if possible
-newdata = structcopy(trEPRdataStructure('structure'),data);
+newdata = structcopy(newdata,data);
 
 switch version
     case '1.9'
@@ -72,12 +74,16 @@ switch version
         newdata.display.scaling.data.z = data.display.scaling.z;
         newdata.display.smoothing.data.x.filterfun = ...
             data.display.smoothing.x.filterfun;
-        newdata.display.smoothing.data.x.width = ...
+        newdata.display.smoothing.data.x.parameters.width = ...
             data.display.smoothing.x.value;
         newdata.display.smoothing.data.y.filterfun = ...
             data.display.smoothing.y.filterfun;
-        newdata.display.smoothing.data.y.width = ...
+        newdata.display.smoothing.data.y.parameters.width = ...
             data.display.smoothing.y.value;
+        newdata.display.smoothing.calculated.x.parameters.width = ...
+            data.display.smoothing.calculated.x.value;
+        newdata.display.smoothing.calculated.y.parameters.width = ...
+            data.display.smoothing.calculated.y.value;
         % Remove old fields
         newdata.display = rmfield(newdata.display,'line');
         newdata.display.displacement = ...
@@ -86,6 +92,10 @@ switch version
             rmfield(newdata.display.scaling,{'x','y','z'});
         newdata.display.smoothing = ...
             rmfield(newdata.display.smoothing,{'x','y'});
+        newdata.display.smoothing.calculated.x = ...
+            rmfield(newdata.display.smoothing.calculated.x,'value');
+        newdata.display.smoothing.calculated.y = ...
+            rmfield(newdata.display.smoothing.calculated.y,'value');
     case '1.5'
         newdata.parameters.purpose = {''};
         newdata.sample.buffer = {''};

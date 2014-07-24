@@ -6,8 +6,8 @@ function status = update_processingPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-05-31
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-24
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -16,78 +16,57 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handles from main window
+% Get handles and appdata from main window
 gh = guidata(mainWindow);
-
-% Get appdata from main GUI
 ad = getappdata(mainWindow);
 
-
-% Get appdata of main window
-mainWindow = trEPRguiGetWindowHandle();
-ad = getappdata(mainWindow);
-
-if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
-    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),'Enable','Inactive');
+if isempty(ad.control.spectra.visible)
+    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
+        'Enable','Inactive');
     return;
+end
+
+active = ad.control.spectra.active;
+
+set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
+    'Enable','On');
+% Disable Savitzky-Golay-specific fields if not needed
+smoothingTypes = cellstr(...
+    get(gh.processing_panel_smoothing_type_popupmenu,'String'));
+smoothingType = smoothingTypes{...
+    get(gh.processing_panel_smoothing_type_popupmenu,'Value')};
+if ~strcmpi(smoothingType,'savitzkygolay')
+    set(gh.processing_panel_smoothing_order_edit,'Enable','off');
+    set(gh.processing_panel_smoothing_deriv_edit,'Enable','off');
+end
+
+% Update smoothing panel
+% Get direction along which to smooth
+direction = get(get(gh.processing_panel_smoothing_buttongroup,...
+    'SelectedObject'),'String');
+
+% Set edit fields
+set(gh.processing_panel_smoothing_width_points_edit,...
+    'String',num2str(...
+    ad.data{active}.display.smoothing.data.(direction(1)).parameters.width)...
+    );
+units = ad.data{active}.axes.(direction(1)).values;
+if length(units)>1
+    deltaUnits = (units(2)-units(1))*ad.data{active}.display.smoothing.data.(...
+        direction(1)).parameters.width;
 else
-    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),'Enable','On');
+    deltaUnits = 0;
 end
-
-% Update x points display
-set(gh.processing_panel_average_x_points_edit,...
-    'String',...
-    num2str(ad.data{ad.control.spectra.active}.display.smoothing.data.x.width)...
+set(gh.processing_panel_smoothing_width_unit_edit,...
+    'String',num2str(deltaUnits)...
     );
+% Set filter type popupmenu
+filterTypes = cellstr(...
+    get(gh.processing_panel_smoothing_type_popupmenu,'String'));
+filterType = ad.data{active}.display.smoothing.data.(direction(1)).filterfun;
+set(gh.processing_panel_smoothing_type_popupmenu,'Value',...
+    find(strcmpi(filterTypes,filterType(length('trEPRfilter_')+1:end))));
 
-% Update x unit display
-[x,y] = size(ad.data{ad.control.spectra.active}.data);
-x = linspace(1,x,x);
-y = linspace(1,y,y);
-if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-        && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
-        && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
-        && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
-    x = ad.data{ad.control.spectra.active}.axes.x.values;
-end
-% In case that we loaded 1D data...
-if isscalar(x)
-    x = [x x+1];
-end
-if isscalar(y)
-    y = [y y+1];
-end
-set(gh.processing_panel_average_x_unit_edit,...
-    'String',...
-    num2str((x(2)-x(1))*str2num(get(gh.processing_panel_average_x_points_edit,'String')))...
-    );
-
-% Update y points display
-set(gh.processing_panel_average_y_points_edit,...
-    'String',...
-    num2str(ad.data{ad.control.spectra.active}.display.smoothing.data.y.width)...
-    );
-
-% Update y unit display accordingly
-[x,y] = size(ad.data{ad.control.spectra.active}.data);
-x = linspace(1,x,x);
-y = linspace(1,y,y);
-% In case that we loaded 1D data...
-if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-        && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
-        && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
-        && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
-    y = ad.data{ad.control.spectra.active}.axes.y.values;
-end
-if isscalar(x)
-    x = [x x+1];
-end
-if isscalar(y)
-    y = [y y+1];
-end
-set(gh.processing_panel_average_y_unit_edit,...
-    'String',...
-    num2str((y(2)-y(1))*str2num(get(gh.processing_panel_average_y_points_edit,'String'))));
 
 
 status = 0;

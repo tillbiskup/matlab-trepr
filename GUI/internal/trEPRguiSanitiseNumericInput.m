@@ -51,7 +51,7 @@ warnings = cell(0);
 
 % If called with no input arguments, just display help and exit
 if (nargin==0)
-    help sanitiseInput;
+    help trEPRguiSanitiseNumericInput;
     return;
 end
 

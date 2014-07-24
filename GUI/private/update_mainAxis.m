@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-07-24
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -326,9 +326,9 @@ switch ad.control.axis.displayType
                 end
             end
             % Apply filter if necessary
-            if (ad.data{k}.display.smoothing.data.x.width > 1)
+            if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
                 filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                y = filterfun(y,ad.data{k}.display.smoothing.data.x.width);
+                y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters.width);
             end
             % Apply scaling if necessary
             if (ad.data{k}.display.scaling.data.x ~= 0)
@@ -423,9 +423,9 @@ switch ad.control.axis.displayType
                     end
                 end
                 % Apply filter if necessary
-                if (ad.data{k}.display.smoothing.data.x.width > 1)
+                if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
                     filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                    y = filterfun(y,ad.data{k}.display.smoothing.data.x.width);
+                    y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters.width);
                 end
                 % Apply scaling if necessary
                 if (ad.data{k}.display.scaling.data.x ~= 0)
@@ -644,9 +644,9 @@ switch ad.control.axis.displayType
                 end
             end
             % Apply filter if necessary
-            if (ad.data{k}.display.smoothing.data.y.width > 1)
+            if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)
                 filterfun = str2func(ad.data{k}.display.smoothing.data.y.filterfun);
-                x = filterfun(x,ad.data{k}.display.smoothing.data.y.width);
+                x = filterfun(x,ad.data{k}.display.smoothing.data.y.parameters.width);
             end
             % Apply scaling if necessary
             if (ad.data{k}.display.scaling.data.y ~= 0)
@@ -758,9 +758,9 @@ switch ad.control.axis.displayType
                     end
                 end
                 % Apply filter if necessary
-                if (ad.data{k}.display.smoothing.data.y.width > 1)
+                if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)
                     filterfun = str2func(ad.data{k}.display.smoothing.data.y.filterfun);
-                    x = filterfun(x,ad.data{k}.display.smoothing.data.y.width);
+                    x = filterfun(x,ad.data{k}.display.smoothing.data.y.parameters.width);
                 end
                 % Apply scaling if necessary
                 if (ad.data{k}.display.scaling.data.y ~= 0)

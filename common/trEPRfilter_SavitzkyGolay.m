@@ -7,7 +7,7 @@ function data = trEPRfilter_SavitzkyGolay(data,width,order,deriv)
 %
 %   data   - data to filter
 %
-%   window - filter window width (optional, default=15)
+%   window - filter window width (optional, default=5)
 %
 %   order  - polynomial order (optional, default=2)
 %
@@ -18,10 +18,10 @@ function data = trEPRfilter_SavitzkyGolay(data,width,order,deriv)
 %     Chemistry. 36, Nr. 8, 1. Juni 1964, S. 1627?1639,
 %     doi:10.1021/ac60214a047
 %
-% See also: trEPRfilter_boxcar
+% See also: trEPRfilter_binomial, trEPRfilter_boxcar
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-23
+% 2014-07-24
 
 % Based on code written by Cleiton A. Nunes, UFLA,MG,Brazil
 
@@ -37,7 +37,7 @@ if nargin<3
   order=2; 
 end
 if nargin<2
-  width=min(15,floor(n/2)); 
+  width=min(5,floor(n/2)); 
 end
 
 w=max( 3, 1+2*round((width-1)/2) );
@@ -53,5 +53,9 @@ di(1:w,1:p+1)=(xc(1:p+1,1:1+o-d)*w1)';
 di(n-w+1:n,n-p:n)=(xc(p+1:w,1:1+o-d)*w1)';
 
 data=data*di;
+
+if m>n
+    data = data';
+end
 
 end
