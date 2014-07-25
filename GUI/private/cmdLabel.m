@@ -57,7 +57,7 @@ ad = getappdata(handle);
 % For convenience and shorter lines
 active = ad.control.spectra.active;
 
-if ~active
+if ~active && isempty(opt)
     warnings{end+1} = ['Command "' lower(cmd) '" needs an active dataset.'];
     status = -3;
     return;

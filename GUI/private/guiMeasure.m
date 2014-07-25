@@ -8,7 +8,7 @@ function guiMeasure(action,nPoints)
 %               Number of points: 1 - pick mode; 2 - measure mode
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-27
+% 2014-07-25
 
 try
     % Get appdata of main window
@@ -181,19 +181,13 @@ function switchMeasurePointer(~,~)
                         measureEnd();
                         return;
                     otherwise
-                        % That shall never happen!
-                        st = dbstack;
-                        trEPRmsg(...
-                            [st.name ' : unknown point "' ...
-                            ad.control.measure.point '"'],'warning');
+                        trEPRguiOptionUnknown(ad.control.measure.point,...
+                            'point');
                         return;
                 end
             otherwise
-                % That shall never happen!
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown nPoints "' ...
-                    ad.control.measure.nPoints '"'],'warning');
+                trEPRguiOptionUnknown(ad.control.measure.nPoints,...
+                    'nPoints');
                 return;
         end
         
@@ -316,12 +310,8 @@ function assignPointsToDataStructure()
                     ad.data{active}.display.position.y = ...
                         ad.data{active}.display.measure.point(1).index(1);
                 otherwise
-                    % That shall never happen
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' : unknown display type "' ...
-                        ad.control.axis.displayType '"'],...
-                        'warning');
+                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                        'display type');
                     return;
             end
         end

@@ -8,7 +8,7 @@ function handle = guiMeasurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-06-27
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -347,21 +347,7 @@ try
     set(gh.measure_panel_setslider_checkbox,...
         'Value',ad.configuration.measure.setslider);
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRguiExceptionHandling(exception)
 end
 
 
@@ -392,21 +378,7 @@ function checkbox_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -426,29 +398,12 @@ function togglebutton_Callback(source,~,action)
                     trEPRguiSetMode('none');
                 end
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end    
+        trEPRguiExceptionHandling(exception)
+    end
 end
 
 function pushbutton_Callback(~,~,action)
@@ -462,28 +417,11 @@ function pushbutton_Callback(~,~,action)
             case 'doi'
                 cmdDoi(trEPRguiGetWindowHandle,cell(0));
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 

@@ -7,8 +7,8 @@ function varargout = trEPRgui_combinewindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-06-26
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -399,29 +399,12 @@ function listbox_Callback(~,~,field)
             case 'notcombine'
             case 'combine'
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown field "' field '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(field,'field');
                 return;
         end
         updateSpectra();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -443,28 +426,11 @@ function edit_Callback(source,~,field)
                 setappdata(mainWindow,'combine',ad.combine);
                 updateLabel();
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown field "' field '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(field,'field');
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -616,28 +582,11 @@ function pushbutton_Callback(~,~,action)
                 delete(trEPRguiGetWindowHandle(mfilename));
                 trEPRmsg('Combine GUI window closed.','info')
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -672,21 +621,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -714,21 +649,7 @@ function status = checkForCombinableDatasets()
             end
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -762,21 +683,7 @@ function updateFileformats()
         ad.combine.spectra.combine = [];
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -823,21 +730,7 @@ function updateBasenames()
 
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -891,21 +784,7 @@ function updateSpectra()
             set(gh.combine_listbox,'Value',1);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -929,21 +808,7 @@ function updateLabel()
         setappdata(mainWindow,'combine',ad.combine);
 
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 

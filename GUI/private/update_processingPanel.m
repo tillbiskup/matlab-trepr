@@ -7,7 +7,7 @@ function status = update_processingPanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-24
+% 2014-07-25
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -64,9 +64,10 @@ set(gh.processing_panel_smoothing_width_unit_edit,...
 filterTypes = cellstr(...
     get(gh.processing_panel_smoothing_type_popupmenu,'String'));
 filterType = ad.data{active}.display.smoothing.data.(direction(1)).filterfun;
-set(gh.processing_panel_smoothing_type_popupmenu,'Value',...
-    find(strcmpi(filterTypes,filterType(length('trEPRfilter_')+1:end))));
-
+if ~isempty(filterType)
+    set(gh.processing_panel_smoothing_type_popupmenu,'Value',...
+        find(strcmpi(filterTypes,filterType(length('trEPRfilter_')+1:end))));
+end
 
 
 status = 0;

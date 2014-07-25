@@ -319,10 +319,7 @@ if ad.control.spectra.active
             set(gh.display_panel_markersize_edit,'String',...
                 num2str(ad.data{active}.display.lines.calculated.marker.size));
         otherwise
-            st = dbstack;
-            trEPRmsg(...
-                [st.name ' : unknown line type "' lineType '"'],...
-                'warning');
+            trEPRguiOptionUnknown(lineType,'line type');
             return;
     end
     
@@ -332,10 +329,7 @@ if ad.control.spectra.active
 %         case 'calculated'
 %             fieldName = 'calculated';
 %         otherwise
-%             st = dbstack;
-%             trEPRmsg(...
-%                 [st.name ' : unknown line type "' lineType '"'],...
-%                 'warning');
+%             trEPRguiOptionUnknown(lineType,'line type');
 %             return;
 %     end
 %     

@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-24
+% 2014-07-25
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -19,53 +19,28 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Display "Splash"
-splashW = 300;
-splashH = 80;
-try
-    desktop = com.mathworks.mde.desk.MLDesktop.getInstance;
-    desktopMainFrame = desktop.getMainFrame;
-    
-    % Get desktop dimensions
-    desktopDims = desktopMainFrame.getSize;
-    desktopW = desktopDims.getWidth;
-    desktopH = desktopDims.getHeight;
-    desktopX = desktopMainFrame.getX;
-    desktopY = desktopMainFrame.getY;
-    
-    splashX = floor(desktopW/2+desktopX-splashW/2);
-    splashY = floor(desktopH/2+desktopY-splashH/2);
-catch exception
-    trEPRmsg('Failed to get coordinates of main Matlab window - nevermind',...
-        'warning');
-    splashX = 200;
-    splashY = 400;
-end
+hSplash = trEPRguiSplashWindow();
 
-initDialogue = dialog(...
-    'WindowStyle','modal',...
-    'Name','Initialising...',...
-    'Position',[splashX splashY splashW splashH]);
-uicontrol('Tag','InitialisingText',...
-    'Style','text',...
-    'parent',initDialogue,...
-    'FontUnit','Pixel','Fontsize',14,...
-    'HorizontalAlignment','Center',...
-    'BackgroundColor',get(initDialogue,'Color'),...
-    'Visible','on',...
-    'Units','pixels',...
-    'String',{...
-    'Initialising trEPR toolbox...','','This may take a few seconds.'},...
-    'Position',[10 10 280 55]...
-    );
+% Set some defaults in case configuration cannot be loaded
+defaultBackground = [.9 .9 .9];
+dx = 20;
+dy = 40;
 
+% Load configuration
+conf = trEPRguiConfigLoad(mfilename);
+% Assign config values from "general" to variables in function workspace
+assignConfigValues(conf)
+
+% Define main GUI window (figure)
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Main Window',...
     'Units','Pixels',...
-    'Position',[20,40,950,700],...
+    'Position',[dx,dy,950,700],...
     'Resize','off',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
+    'Color',defaultBackground,...
     'KeyPressFcn',@keyBindings,...
     'CloseRequestFcn',@closeGUI);
 
@@ -76,9 +51,6 @@ appdataFields = fieldnames(ad);
 for k=1:length(appdataFields)
     setappdata(hMainFigure,appdataFields{k},ad.(appdataFields{k}));
 end
-
-defaultBackground = [.9 .9 .9];
-set(hMainFigure,'Color',defaultBackground);
 
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
@@ -585,7 +557,7 @@ uicontrol('Tag','previous_pushbutton',...
     'Position',[guiSize(1)-110 40 45 45],...
     'FontWeight','normal',...
     'String','<<',...
-    'TooltipString','<html>Show previous spectrum<br>Key: <tt>Page down</tt>',...
+    'TooltipString','<html>Show previous spectrum<br>Key: <tt>Page up</tt>',...
     'Callback',{@pushbutton_Callback,'previous'}...
     );
 uicontrol('Tag','next_pushbutton',...
@@ -773,7 +745,8 @@ set(hPlotAxes,'XLim',[-.0001,0.0002]);
 try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
     [path,~,~] = fileparts(mfilename('fullpath'));
-    splash = imread(fullfile(path,'private','splashes','trEPRtoolboxSplash.png'),'png');
+    splash = imread(fullfile(path,...
+        'private','splashes','trEPRtoolboxSplash.png'),'png');
     image(splash);
     axis off          % Remove axis ticks and numbers
 catch exception
@@ -824,9 +797,12 @@ setappdata(hMainFigure,'control',ad.control);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-if ishandle(initDialogue)
-    delete(initDialogue);
+if ishandle(hSplash)
+    delete(hSplash);
 end
+
+% Start garbage collector
+guiGarbageCollector('start');
 
 % Be very careful, such as not to break old installations without updated
 % config files
@@ -904,11 +880,8 @@ function slider_Callback(source,~,action)
                         ad.data{active}.display.displacement.data.y = ...
                             get(source,'Value');
                     otherwise
-                        st = dbstack;
-                        trEPRmsg(...
-                            [st.name ' : ' ...
-                            'Display type "' ad.control.axis.displayType '" '...
-                            'currently unsupported'],'warning');
+                        trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                            'display type');
                 end
             case 'displacev'
                 switch ad.control.axis.displayType
@@ -919,11 +892,8 @@ function slider_Callback(source,~,action)
                         ad.data{active}.display.displacement.data.z = ...
                             get(source,'Value');
                     otherwise
-                        st = dbstack;
-                        trEPRmsg(...
-                            [st.name ' :' ...
-                            'Display type "' ad.control.axis.displayType '" '...
-                            'currently unsupported'],'warning');
+                        trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                            'display type');
                 end
             case 'scaleh'
                 % Convert slider value to scaling factor
@@ -940,11 +910,8 @@ function slider_Callback(source,~,action)
                     case '1D along y'
                         ad.data{active}.display.scaling.data.y = scalingFactor;
                     otherwise
-                        st = dbstack;
-                        trEPRmsg(...
-                            [st.name ' :' ...
-                            'Display type "' ad.control.axis.displayType '" '...
-                            'currently unsupported'],'warning');
+                        trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                            'display type');
                 end
             case 'scalev'
                 % Convert slider value to scaling factor
@@ -960,10 +927,7 @@ function slider_Callback(source,~,action)
                         ad.data{active}.display.scaling.data.z = scalingFactor;
                 end
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
         
@@ -976,21 +940,7 @@ function slider_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1011,28 +961,11 @@ function togglebutton_Callback(source,~,action)
                     trEPRguiSetMode('none');
                 end
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1075,28 +1008,11 @@ function pushbutton_Callback(source,~,action)
                 end
                 return;
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1112,21 +1028,7 @@ function tbg_Callback(source,~)
                 'warning');
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1134,21 +1036,7 @@ function closeGUI(~,~)
     try
         guiClose();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1156,21 +1044,7 @@ function keyBindings(src,evt)
     try
         guiKeyBindings(src,evt);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1196,28 +1070,11 @@ function popupmenu_Callback(source,~,action)
                 
                 update_mainAxis();
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1233,22 +1090,8 @@ function command_Callback(source,~)
         end
         set(source,'String','');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end    
+        trEPRguiExceptionHandling(exception)
+    end
 end
 
 function command_keypress_Callback(source,evt)
@@ -1278,22 +1121,24 @@ function command_keypress_Callback(source,evt)
         end
         setappdata(mainWindow,'control',ad.control);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end    
+        trEPRguiExceptionHandling(exception)
+    end
+end
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Helper functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function assignConfigValues(conf)
+
+if ~isempty(fieldnames(conf)) && isfield(conf,'general')
+    generalFields = fieldnames(conf.general);
+    for field = 1:length(generalFields)
+        assignin('caller',generalFields{field},...
+            conf.general.(generalFields{field}));
+    end
 end
 
 end

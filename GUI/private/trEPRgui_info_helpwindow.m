@@ -5,8 +5,8 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 %
 % See also TAGUI_HELPWINDOW
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-17
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -199,11 +199,7 @@ function helptext_popupmenu_Callback(source,~)
                     'GUI','private','helptexts','info','keybindings.html');
                 browser.setCurrentLocation(helpTextFile);
             otherwise
-                % That shall never happen
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : Unknown helptext "' helpText '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(helpText,'helptext')
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...

@@ -18,8 +18,8 @@ function structure = structcopy(master,tocopy,varargin)
 %          and if fields of tocopy don't exist in master, they will be
 %          created.
 
-% Copyright (c) 2012, Till Biskup
-% 2012-04-23
+% Copyright (c) 2012-14, Till Biskup
+% 2014-07-25
 
 if ~nargin
     help structcopy
@@ -51,6 +51,11 @@ elseif ~isstruct(tocopy)
     else
         tocopy = struct();
     end
+end
+
+if isempty(fieldnames(tocopy))
+    structure = master;
+    return;
 end
 
 [structure,tocopy] = traverse(master,tocopy);

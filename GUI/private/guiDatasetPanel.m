@@ -6,8 +6,8 @@ function handle = guiDatasetPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-06
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -300,28 +300,11 @@ function pushbutton_Callback(~,~,action)
             case 'Duplicate'
                 cmdDuplicate(mainWindow,{});
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -343,7 +326,7 @@ function visible_listbox_Callback(~,~)
         
         % If user double clicked on list entry
         if strcmp(get(gcf,'SelectionType'),'open')
-            datasetChangeLabel(ad.control.spectra.active);
+            cmdLabel(mainWindow,{});
         end
         
         % Update processing panel
@@ -358,21 +341,7 @@ function visible_listbox_Callback(~,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -384,28 +353,12 @@ function invisible_listbox_Callback(source,~)
         
         % If user double clicked on list entry
         if strcmp(get(gcf,'SelectionType'),'open')
-            datasetChangeLabel(...
-                ad.control.spectra.invisible(...
-                get(source,'Value')...
-                ));
+            cmdLabel(mainWindow,{num2str(ad.control.spectra.invisible(...
+                get(source,'Value')))});
         end
         update_invisibleSpectra();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -423,77 +376,13 @@ function checkbox_Callback(source,~,action)
             case 'showonlyactive'
                 ad.control.axis.onlyActive = get(source,'Value');
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown action "' action '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
         update_mainAxis();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function datasetChangeLabel(index)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        ad.data{index}.label = trEPRgui_setLabelWindow(ad.data{index}.label);
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Add status message (mainly for debug reasons)
-        % IMPORtrEPRNT: Has to go AFTER setappdata
-        msgStr = cell(0,1);
-        msgStr{end+1} = sprintf(...
-            'Changed label of dataset %i to "%s"',...
-            ad.control.spectra.active,...
-            ad.data{index}.label);
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
-        msgStr{end+1} = sprintf(...
-            'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
-            invStr,visStr,length(ad.data));
-        trEPRmsg(msgStr,'info');
-        clear msgStr;
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 

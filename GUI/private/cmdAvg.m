@@ -59,121 +59,122 @@ active = ad.control.spectra.active;
 % Create some structure for AVG parameters
 avg = struct();
 
-if ~isempty(opt)
-    % Check for minumum number of options
-    if length(opt) < 2
-        warnings{end+1} = sprintf(...
-            'Command "%s": Not enough options. Use "help %s" to get some help.',cmd,cmd);
-        status = -2;
-        return;
-    end
-        
-    % Check whether first option is numeric (-> dataset no) or char (dim)
-    if ~isnan(str2double(opt{1}))
-        avg.dataset = str2double(opt{1});
-        % Remove first option
-        opt(1) = [];
-    else
-        avg.dataset = active;
-        % If there is no active dataset, return
-        if ~active
-            warnings{end+1} = sprintf('Command "%s": No active dataset.',cmd);
-            status = -3;
-            return;
-        end
-    end
-    % Check for dimension of dataset (averaging 1D datasets is impossible)
-    if min(size(ad.data{avg.dataset}.data)) < 2
-        warnings{end+1} = sprintf(...
-            'Command "%s": Cannot average 1D datasets.',cmd);
-        status = -3;
-        return;
-    end
-    % Check for dimension
-    if any(strcmpi(opt{1},{'x','y'}))
-        avg.dimension = lower(opt{1});
-    else
-        warnings{end+1} = sprintf(...
-            'Command "%s": Wrong dimension "%s".',cmd,lower(opt{1}));
-        status = -3;
-        return;
-    end
-    % Check for start:stop vs center,width
-    if strfind(opt{2},':')
-        % We have a range
-        [avg.start.index,conversion1Status] = trEPRguiSanitiseNumericInput(...
-            opt{2}(1:strfind(opt{2},':')-1),...
-            ad.data{avg.dataset}.axes.(avg.dimension).values,...
-            'map',true,'index',true);
-        [avg.stop.index,conversion2Status] = trEPRguiSanitiseNumericInput(...
-            opt{2}(strfind(opt{2},':')+1:end),...
-            ad.data{avg.dataset}.axes.(avg.dimension).values,...
-            'map',true,'index',true);
-        if isnan(avg.start.index) || isnan(avg.stop.index) ...
-                || conversion1Status || conversion2Status
-            warnings{end+1} = sprintf(...
-                'Command "%s": Problems with averaging window "%s".',...
-                cmd,lower(opt{2}));
-            status = -3;
-            return;
-        end
-    elseif strfind(opt{2},';')
-        % We have center;width
-        % Convert center and width value to numeric values
-        [center,conversion1Status] = trEPRguiSanitiseNumericInput(...
-            opt{2}(1:strfind(opt{2},';')-1));
-        [width,conversion2Status] = trEPRguiSanitiseNumericInput(...
-            opt{2}(strfind(opt{2},';')+1:end));
-        % Transform center;width into start:stop and map to dataset axis
-        [avg.start.index,conversion3Status] = trEPRguiSanitiseNumericInput(...
-            num2str(center-width/2),...
-            ad.data{avg.dataset}.axes.(avg.dimension).values,...
-            'map',true,'index',true);
-        [avg.stop.index,conversion4Status] = trEPRguiSanitiseNumericInput(...
-            num2str(center+width/2),...
-            ad.data{avg.dataset}.axes.(avg.dimension).values,...
-            'map',true,'index',true);
-        if isnan(avg.start.index) || isnan(avg.stop.index) ...
-                || conversion1Status || conversion2Status ...
-                || conversion3Status || conversion4Status
-            warnings{end+1} = sprintf(...
-                'Command "%s": Problems with averaging window "%s".',...
-                cmd,lower(opt{2}));
-            status = -3;
-            return;
-        end
-    else
-        warnings{end+1} = sprintf(...
-            'Command "%s": Wrong averaging window "%s".',cmd,lower(opt{2}));
-        status = -3;
-        return;
-    end
-    % In case we have additional options, this should be a label
-    % As labels are allowed to contain spaces, reconcatenate the remaining
-    % options.
-    if length(opt) > 2
-        avg.label = strtrim(sprintf('%s ',opt{3:end}));
-    end
-        
-    % Perform actual averaging
-    avgData = trEPRAVG(ad.data{avg.dataset},avg);
+if isempty(opt)
+    trEPRgui_AVGwindow();
+    return;
+end
     
-    if isempty(avgData)
-        warnings{end+1} = sprintf(...
-            'Command "%s": Some problems with averaging.',cmd);
+% Check for minumum number of options
+if length(opt) < 2
+    warnings{end+1} = sprintf(...
+        'Command "%s": Not enough options. Use "help %s" to get some help.',cmd,cmd);
+    status = -2;
+    return;
+end
+
+% Check whether first option is numeric (-> dataset no) or char (dim)
+if ~isnan(str2double(opt{1}))
+    avg.dataset = str2double(opt{1});
+    % Remove first option
+    opt(1) = [];
+else
+    avg.dataset = active;
+    % If there is no active dataset, return
+    if ~active
+        warnings{end+1} = sprintf('Command "%s": No active dataset.',cmd);
         status = -3;
         return;
     end
-    
-    % Add dataset to main GUI
-    status = trEPRappendDatasetToMainGUI(avgData,'modified',true);
-    if status
+end
+% Check for dimension of dataset (averaging 1D datasets is impossible)
+if min(size(ad.data{avg.dataset}.data)) < 2
+    warnings{end+1} = sprintf(...
+        'Command "%s": Cannot average 1D datasets.',cmd);
+    status = -3;
+    return;
+end
+% Check for dimension
+if any(strcmpi(opt{1},{'x','y'}))
+    avg.dimension = lower(opt{1});
+else
+    warnings{end+1} = sprintf(...
+        'Command "%s": Wrong dimension "%s".',cmd,lower(opt{1}));
+    status = -3;
+    return;
+end
+% Check for start:stop vs center,width
+if strfind(opt{2},':')
+    % We have a range
+    [avg.start.index,conversion1Status] = trEPRguiSanitiseNumericInput(...
+        opt{2}(1:strfind(opt{2},':')-1),...
+        ad.data{avg.dataset}.axes.(avg.dimension).values,...
+        'map',true,'index',true);
+    [avg.stop.index,conversion2Status] = trEPRguiSanitiseNumericInput(...
+        opt{2}(strfind(opt{2},':')+1:end),...
+        ad.data{avg.dataset}.axes.(avg.dimension).values,...
+        'map',true,'index',true);
+    if isnan(avg.start.index) || isnan(avg.stop.index) ...
+            || conversion1Status || conversion2Status
         warnings{end+1} = sprintf(...
-            'Command "%s": Some problems appending averaged data.',cmd);
+            'Command "%s": Problems with averaging window "%s".',...
+            cmd,lower(opt{2}));
         status = -3;
+        return;
+    end
+elseif strfind(opt{2},';')
+    % We have center;width
+    % Convert center and width value to numeric values
+    [center,conversion1Status] = trEPRguiSanitiseNumericInput(...
+        opt{2}(1:strfind(opt{2},';')-1));
+    [width,conversion2Status] = trEPRguiSanitiseNumericInput(...
+        opt{2}(strfind(opt{2},';')+1:end));
+    % Transform center;width into start:stop and map to dataset axis
+    [avg.start.index,conversion3Status] = trEPRguiSanitiseNumericInput(...
+        num2str(center-width/2),...
+        ad.data{avg.dataset}.axes.(avg.dimension).values,...
+        'map',true,'index',true);
+    [avg.stop.index,conversion4Status] = trEPRguiSanitiseNumericInput(...
+        num2str(center+width/2),...
+        ad.data{avg.dataset}.axes.(avg.dimension).values,...
+        'map',true,'index',true);
+    if isnan(avg.start.index) || isnan(avg.stop.index) ...
+            || conversion1Status || conversion2Status ...
+            || conversion3Status || conversion4Status
+        warnings{end+1} = sprintf(...
+            'Command "%s": Problems with averaging window "%s".',...
+            cmd,lower(opt{2}));
+        status = -3;
+        return;
     end
 else
-    trEPRgui_AVGwindow();
+    warnings{end+1} = sprintf(...
+        'Command "%s": Wrong averaging window "%s".',cmd,lower(opt{2}));
+    status = -3;
+    return;
+end
+% In case we have additional options, this should be a label
+% As labels are allowed to contain spaces, reconcatenate the remaining
+% options.
+if length(opt) > 2
+    avg.label = strtrim(sprintf('%s ',opt{3:end}));
+end
+
+% Perform actual averaging
+avgData = trEPRAVG(ad.data{avg.dataset},avg);
+
+if isempty(avgData)
+    warnings{end+1} = sprintf(...
+        'Command "%s": Some problems with averaging.',cmd);
+    status = -3;
+    return;
+end
+
+% Add dataset to main GUI
+status = trEPRappendDatasetToMainGUI(avgData,'modified',true);
+if status
+    warnings{end+1} = sprintf(...
+        'Command "%s": Some problems appending averaged data.',cmd);
+    status = -3;
 end
 
 end

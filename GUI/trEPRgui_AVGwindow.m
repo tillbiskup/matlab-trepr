@@ -6,8 +6,8 @@ function varargout = trEPRgui_AVGwindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-10-16
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1042,21 +1042,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1075,11 +1061,8 @@ function position_slider_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'value'));
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Display type "' ad.control.axis.displayType '" '...
-                    'currently unsupported'],'warning');
+                trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                    'display type');
         end
         
         % Set appdata from AVG GUI
@@ -1088,21 +1071,7 @@ function position_slider_Callback(source,~)
         updateAxes();
         update_position_display();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1196,21 +1165,7 @@ function position_edit_Callback(source,~,position)
         %Update main axis
         updateAxes();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1228,21 +1183,7 @@ function showposition_checkbox_Callback(source,~)
         % Update display
         updateAxes();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1397,10 +1338,7 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Unknown action "' action '".'],'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
         
@@ -1417,21 +1355,7 @@ function area_edit_Callback(source,~,position)
         %Update main axis
         updateAxes();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1451,21 +1375,7 @@ function visible_panel_listbox_Callback(source,~)
         updateAxes();
         update_position_display();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1503,21 +1413,7 @@ function edit_Callback(source,~,field)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1552,28 +1448,11 @@ function popupmenu_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Unknown action "' action '".'],'warning');
+                trEPRguiOptionUnknown(action);
         end
 
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end  
 end
 
@@ -1631,10 +1510,7 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' :' ...
-                        'Unknown action "' action '".'],'warning');
+                    trEPRguiOptionUnknown(action);
                     return;
             end
         else % If toggle button switched OFF
@@ -1668,30 +1544,13 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' :' ...
-                        'Unknown action "' action '".'],'warning');
+                    trEPRguiOptionUnknown(action);
                     return;
             end
         end
         
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
         
@@ -1892,28 +1751,11 @@ function pushbutton_Callback(~,~,action)
                 delete(trEPRguiGetWindowHandle(mfilename));
                 trEPRmsg('AVG GUI window closed.','info');
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Unknown action "' action '".'],'warning');
+                trEPRguiOptionUnknown(action);
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -1940,27 +1782,10 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Unknown action "' action '".'],'warning');
+                trEPRguiOptionUnknown(action);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
     
@@ -1999,21 +1824,7 @@ function displaytype_popupmenu_Callback(source,~)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -2072,21 +1883,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -2119,21 +1916,7 @@ function switchPanel(panelName)
             otherwise
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end 
 end
 
@@ -2199,21 +1982,7 @@ function updateSliderPanel()
             y(ad.data{ad.control.spectra.active}.display.position.y)...
             );
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -2306,21 +2075,7 @@ function updateAveragePanel()
                 );
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addcause(exception2, exception);
-            disp(msgstr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % if even displaying the bug report window fails...
-            exception = addcause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -2386,21 +2141,7 @@ function updateSettingsPanel(varargin)
         set(gh.avglinesettings_style_popupmenu,'Value',ind2)
 
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end 
 end
         
@@ -2445,23 +2186,8 @@ function updateSpectra()
         set(gh.slider_panel_maximum_pushbutton,'Enable','on');
 
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end 
-    
 end
 
 function update_position_display()
@@ -2521,21 +2247,7 @@ function update_position_display()
                     ad.data{ad.control.spectra.active}.display.position.x);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end 
 end
 
@@ -2853,10 +2565,7 @@ function updateAxes()
                         'Parent',gh.axis2);
                 end
             otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' :' ...
-                    'Unknown AVG dimension "' ad.avg.dimension '".'],'warning');
+                trEPRguiOptionUnknown(ad.avg.dimension,'AVG dimension');
         end
         
         % Set grid for main axis
@@ -2879,21 +2588,7 @@ function updateAxes()
         end        
 
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end 
 end
 
@@ -2919,21 +2614,7 @@ function switchMeasurePointer(~,~)
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 
@@ -3147,12 +2828,8 @@ function trackPointer(varargin)
                         pointerPositionInAxis(1),'nearest');
                     indy=indx;
                 otherwise
-                    % That shall never happen!
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' :' ...
-                        'Unknown display type "' ...
-                        ad.control.axis.displayType '".'],'warning');
+                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                        'display type');
                     set(mainWindow,'Pointer','arrow');
                     return;
             end
@@ -3172,21 +2849,7 @@ function trackPointer(varargin)
         end
         
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 

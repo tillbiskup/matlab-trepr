@@ -5,8 +5,8 @@ function varargout = trEPRgui_helpwindow(varargin)
 % Besides that, it gives access to all the other sources of additional
 % help, such as the Matlab Help Browser and the toolbox website.
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-05-20
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -356,6 +356,7 @@ function listbox_Callback(source,~,action)
                     browser.setHtmlText(htmlText);
                 end
             otherwise
+                trEPRguiOptionUnknown(action);
         end
     catch exception
         try
@@ -616,11 +617,7 @@ function helptext_selector(helpText)
                     'private','helptexts','main','configure_panel.html');
                 browser.setCurrentLocation(helpTextFile);
             otherwise
-                % That shall never happen
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : Unknown helptext "' helpText '"'],...
-                    'warning');
+                trEPRguiOptionUnknown(helpText,'helptext');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...

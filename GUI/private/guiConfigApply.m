@@ -34,27 +34,10 @@ try
         return;
     end
     
-    % Define config file
-    confFile = fullfile(...
-        trEPRinfo('dir'),'GUI','private','conf',[guiname '.ini']);
-    % If that file does not exist, try to create it from the
-    % distributed config file sample
-    if ~exist(confFile,'file')
-        fprintf('Config file\n  %s\nseems not to exist. %s\n',...
-            confFile,'Trying to create it from distributed file.');
-        trEPRconf('create','overwrite',true,'file',confFile);
-    end
     ad = getappdata(handle);
     gh = guihandles(handle);
-    
-    % Try to load and append configuration
-    conf = trEPRiniFileRead(confFile,'typeConversion',true);
-    if isempty(conf)
-        status = -1;
-        return;
-    end
-    
-    ad.configuration = conf;
+
+    ad.configuration = trEPRguiConfigLoad(guiname);
     setappdata(handle,'configuration',ad.configuration);
 
     % Switch depending on GUI name - use GUI mfilename therefore

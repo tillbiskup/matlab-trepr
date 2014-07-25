@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-23
+% 2014-07-25
 
 status = 0;
 warnings = cell(0);
@@ -329,6 +329,7 @@ end
 update_invisibleSpectra;
 update_visibleSpectra;
 update_mainAxis;
+update_processingPanel;
 
 end
 

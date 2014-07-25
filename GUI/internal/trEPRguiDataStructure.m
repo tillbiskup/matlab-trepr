@@ -31,7 +31,7 @@ function varargout = trEPRguiDataStructure(varargin)
 % See also TREPRDATASTRUCTURE.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-07-25
 
 % Version string of appdata
 versionString = '1.10';
@@ -416,28 +416,10 @@ if nargin && ischar(varargin{1})
     end
 else
     if nargout
-        varargout{1} = guiDataStructure;
+        varargout{1} = struct();
     end
 end
 
-end
-
-function fieldNameList = getFieldNameList(structure)
-fieldNameList = cell(0);
-    function traverse(structure,parent)
-        fieldNames = fieldnames(structure);
-        for k=1:length(fieldNames)
-            if isstruct(structure.(fieldNames{k})) && ...
-                    ~isempty(fieldnames(structure.(fieldNames{k})))
-                % It is important to check whether the struct is empty, as
-                % it would not get added to the list of field names.
-                traverse(structure.(fieldNames{k}),[parent '.' fieldNames{k}]);
-            else
-                fieldNameList{end+1} = sprintf('%s.%s',parent,fieldNames{k});
-            end
-        end
-    end
-traverse(structure,'structure');
 end
 
 function [missingFields,wrongType] = checkStructure(model,structure,name)

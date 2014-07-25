@@ -1,6 +1,6 @@
 % Sample configuration file for the trEPRgui function of the trEPR toolbox
 %
-% (c) 2012-14, Till Biskup <till@till-biskup.de>
+% Copyright (c) 2012-14, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
 % configuration in the file "trEPRgui.ini" in the same directory.
@@ -12,10 +12,12 @@
 
 % General configuration settings
 %
-% dx, dy - Position of the GUI relative to the main screen
+% dx, dy            - Position of the GUI relative to the main screen
+% defaultBackground - default background colour of all GUI elements
 [general]
 dx = 20
 dy = 40
+defaultBackground = [0.9 0.9 0.9]
 
 % Configuration of the behaviour of the toolbox when started
 %

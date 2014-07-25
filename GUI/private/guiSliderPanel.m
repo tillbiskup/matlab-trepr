@@ -7,8 +7,8 @@ function handle = guiSliderPanel(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-11-17
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -576,6 +576,7 @@ function edit_Callback(source,~,action)
                 ad.data{ad.control.spectra.active}.display.scaling.z = ...
                     1+value/(z(2)-z(1));
             otherwise
+                trEPRguiOptionUnknown(action);
                 return;
         end
         
@@ -596,21 +597,7 @@ function edit_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRguiExceptionHandling(exception)
     end
 end
 

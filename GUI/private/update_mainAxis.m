@@ -51,7 +51,7 @@ if (nargin > 0)
                 case 'nobox'
                     showBox = ~varargin{k+1};
                 otherwise
-                    disp(['Optional argument "' varargin{k} '" not understood']);
+                    trEPRguiOptionUnknown(varargin{k},'optional argument');
             end
         end
     end
@@ -912,10 +912,7 @@ switch ad.control.axis.displayType
             end
         end
     otherwise
-        st = dbstack;
-        trEPRmsg(...
-            [st.name ' : unknown display type "' ...
-            ad.control.axis.displayType '"'],'warning');
+        trEPRguiOptionUnknown(ad.control.axis.displayType,'display type');
         return;
 end
 

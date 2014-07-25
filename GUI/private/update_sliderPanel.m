@@ -6,8 +6,8 @@ function status = update_sliderPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-08-24
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-25
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -290,10 +290,8 @@ switch ad.control.axis.displayType
             ad.data{active}.display.displacement.data.y...
             );
     otherwise
-        st = dbstack;
-        trEPRmsg(...
-            [st.name ' : unknown display type "' ...
-            ad.control.axis.displayType '"'],'warning');
+        trEPRguiOptionUnknown(ad.control.axis.displayType,...
+            'display type');
         return;
 end
 

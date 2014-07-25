@@ -12,8 +12,8 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 %
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
-% Copyright (c) 2012, Till Biskup
-% 2012-10-22
+% Copyright (c) 2012-14, Till Biskup
+% 2014-07-25
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -85,7 +85,6 @@ switch version
         newdata.display.smoothing.calculated.y.parameters.width = ...
             data.display.smoothing.calculated.y.value;
         % Remove old fields
-        newdata.display = rmfield(newdata.display,'line');
         newdata.display.displacement = ...
             rmfield(newdata.display.displacement,{'x','y','z'});
         newdata.display.scaling = ...
@@ -96,6 +95,49 @@ switch version
             rmfield(newdata.display.smoothing.calculated.x,'value');
         newdata.display.smoothing.calculated.y = ...
             rmfield(newdata.display.smoothing.calculated.y,'value');
+        newdata = rmfield(newdata,'line');
+        % Change value of filter width
+        newdata.display.smoothing.data.x.parameters.width = floor(...
+            (newdata.display.smoothing.data.x.parameters.width-1)/2);
+        newdata.display.smoothing.data.y.parameters.width = floor(...
+            (newdata.display.smoothing.data.y.parameters.width-1)/2);
+    case '1.8'
+        newdata.display.lines.data = data.line;
+        newdata.display.displacement.data.x = data.display.displacement.x;
+        newdata.display.displacement.data.y = data.display.displacement.y;
+        newdata.display.displacement.data.z = data.display.displacement.z;
+        newdata.display.scaling.data.x = data.display.scaling.x;
+        newdata.display.scaling.data.y = data.display.scaling.y;
+        newdata.display.scaling.data.z = data.display.scaling.z;
+        newdata.display.smoothing.data.x.filterfun = ...
+            data.display.smoothing.x.filterfun;
+        newdata.display.smoothing.data.x.parameters.width = ...
+            data.display.smoothing.x.value;
+        newdata.display.smoothing.data.y.filterfun = ...
+            data.display.smoothing.y.filterfun;
+        newdata.display.smoothing.data.y.parameters.width = ...
+            data.display.smoothing.y.value;
+        newdata.display.smoothing.calculated.x.parameters.width = ...
+            data.display.smoothing.calculated.x.value;
+        newdata.display.smoothing.calculated.y.parameters.width = ...
+            data.display.smoothing.calculated.y.value;
+        % Remove old fields
+        newdata.display.displacement = ...
+            rmfield(newdata.display.displacement,{'x','y','z'});
+        newdata.display.scaling = ...
+            rmfield(newdata.display.scaling,{'x','y','z'});
+        newdata.display.smoothing = ...
+            rmfield(newdata.display.smoothing,{'x','y'});
+        newdata.display.smoothing.calculated.x = ...
+            rmfield(newdata.display.smoothing.calculated.x,'value');
+        newdata.display.smoothing.calculated.y = ...
+            rmfield(newdata.display.smoothing.calculated.y,'value');
+        newdata = rmfield(newdata,'line');
+        % Change value of filter width
+        newdata.display.smoothing.data.x.parameters.width = floor(...
+            (newdata.display.smoothing.data.x.parameters.width-1)/2);
+        newdata.display.smoothing.data.y.parameters.width = floor(...
+            (newdata.display.smoothing.data.y.parameters.width-1)/2);
     case '1.5'
         newdata.parameters.purpose = {''};
         newdata.sample.buffer = {''};

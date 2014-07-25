@@ -8,7 +8,7 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-07-25
 
 try
     % Get handles of main window
@@ -100,10 +100,7 @@ try
             set(gh.configure_panel,'Visible','on');
             set(gh.tbConfigure,'Value',1);
         otherwise
-            st = dbstack;
-            trEPRmsg(...
-                [st.name ' : unknown panel "' panelName '"'],...
-                'warning');
+            trEPRguiOptionUnknown(panelName,'panel');
             return;
     end
     

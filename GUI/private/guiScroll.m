@@ -6,8 +6,8 @@ function guiScroll(dimension,step)
 %     step      - scalar|string
 %                 if string, one of {'first','last','end'}
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-06
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-25
 
 try
     % Get appdata of main window
@@ -70,11 +70,8 @@ try
         case '1D along y'
             set(gh.vert1_slider,'Value',ad.data{active}.display.position.x);
         otherwise
-            st = dbstack;
-            trEPRmsg(...
-                [st.name ' :' ...
-                'Display type "' ad.control.axis.displayType '" '...
-                'currently unsupported'],'warning');
+            trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                'display type');
     end
     
     % Update appdata of main window

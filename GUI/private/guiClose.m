@@ -36,6 +36,9 @@ try
     % Close all GUI windows currently open
     delete(findobj('-regexp','Tag','trEPRgui_*'));
     
+    % Stop garbage collector
+    guiGarbageCollector('stop');
+
 catch exception
     % Hm... that should really not happen.
     disp('Sorry, but there were some problems closing the GUI.');

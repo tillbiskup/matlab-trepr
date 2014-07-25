@@ -34,6 +34,7 @@
 		    </ul>
 		    <li>GUI layout and usability</li>
 		    <ul>
+				<li>New splash window at startup.</li>
 				<li>Display modi: renamed for better usability.</li>
 				<li>Load panel: unit conversion checkbox now operational.</li>
 			    <li>Zoom is kept when refreshing axes.</li>
@@ -44,6 +45,12 @@
 			    <li><b>trEPR dataset structure version 1.10.</b><br />Now all display information for a dataset is part of the dataset structure and gets recovered on load.</li>
 			    <li><b>GUI appdata version 1.10.</b></li>
 			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;convert&quot; in load section.</li>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		    	<li>New function <tt>trEPRguiOptionUnknown</tt> for handling unknown options mainly in switch-case statements, making code (especially of callback functions) much easier to read.</li>
+		    	<li>New function <tt>trEPRguiExceptionHandling</tt> for GUI exception handling, making code (especially of callback functions) much easier to read.</li>
+		    	<li>Main GUI now loads config file at the beginning.</li>
 		    </ul>
 		    <li>Bug fixes</li>
 		    <ul>
@@ -461,7 +468,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-24
+			2014-07-25
 		</p>
 		</div>
 	</body>
