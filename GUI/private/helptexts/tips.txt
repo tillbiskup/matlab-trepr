@@ -73,3 +73,5 @@ Interested in scripting? CMD now understands variables (to some extent).
 Multiple spectra/time traces and bored to manually stack 'em? Use "stack" - and "unstack" if unhappy.
 
 Numbers of datasets are now displayed in front of their labels in the list boxes.
+
+There are "easter eggs" in the GUI. But you have to find them on your own...

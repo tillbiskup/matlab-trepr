@@ -1162,7 +1162,7 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('BLC GUI window closed.','debug')
+                trEPRmsg('BLC GUI window closed.','debug');
                 return;
             case 'showMaximum'
                 mainWindow = trEPRguiGetWindowHandle(mfilename);

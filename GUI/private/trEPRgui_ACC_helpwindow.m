@@ -132,7 +132,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('ACC GUI help window opened.','debug')
+    trEPRmsg('ACC GUI help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)

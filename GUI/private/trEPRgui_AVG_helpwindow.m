@@ -130,7 +130,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('AVG GUI help window opened.','debug')
+    trEPRmsg('AVG GUI help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)

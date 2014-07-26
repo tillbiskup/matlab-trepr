@@ -8,8 +8,8 @@ function varargout = showTip(varargin)
 %
 % See also msgbox
 
-% Copyright (c) 2012, Till Biskup
-% 2012-05-21
+% Copyright (c) 2012-14, Till Biskup
+% 2014-07-26
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','showTip');
@@ -78,7 +78,7 @@ hMsgBox = figure('Tag','showTip',...
     'Name','Did you know...?',...
     'Visible','off',...
     'Units','Pixels',...
-    'Position',[position,450,150],...
+    'Position',[position,450,180],...
     'Resize','off',...
     'NumberTitle','off', ...
     'KeyPressFcn',@keypress_Callback,...
@@ -104,11 +104,11 @@ jIconLabel.setBackground(java.awt.Color(bgColor{:}));
 % Display Text
 headerString = '<html><b><i>Did you know...?</b></i></html>';
 jHeaderLabel = javaObjectEDT('javax.swing.JLabel',headerString);
-javacomponent(jHeaderLabel,[90,115,figSize(1)-110,15],hMsgBox);
+javacomponent(jHeaderLabel,[90,figSize(2)-35,figSize(1)-110,15],hMsgBox);
 jHeaderLabel.setBackground(java.awt.Color(bgColor{:}));
 labelStr = '';
 jTextLabel = javaObjectEDT('javax.swing.JLabel',labelStr);
-javacomponent(jTextLabel,[90,50,figSize(1)-105,55],hMsgBox);
+javacomponent(jTextLabel,[90,50,figSize(1)-105,figSize(2)-95],hMsgBox);
 jTextLabel.setBackground(java.awt.Color(bgColor{:}));
 
 % Checkbox for showing tips at startup
@@ -217,7 +217,7 @@ function pushbutton_Callback(~,~,action)
                 return;
         end
     catch exception
-        throw(exception);
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -251,7 +251,7 @@ function keypress_Callback(~,evt)
                 return;
         end
     catch exception
-        throw(exception);
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -265,7 +265,7 @@ function closeWindow()
         varargout{1} = get(hShowCheckbox,'Value');
         delete(hMsgBox);
     catch exception
-        throw(exception);
+        trEPRexceptionHandling(exception);
     end
 end
 

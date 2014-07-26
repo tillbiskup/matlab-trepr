@@ -19,7 +19,6 @@
 		<ul>
 		    <li>New features</li>
 		    <ul>
-		        <li>New function <tt>getCascadedField</tt> for handling hierarchical structures more conveniently.</li>
 		        <li>New function <tt>trEPRfilter_binomial</tt> implementing a binomially weighted filter.</li>
 		        <li>New function <tt>trEPRfilter_SavitzkyGolay</tt> implementing a Savitzky-Golay filter.</li>
 				<li>New function <tt>trEPRplot</tt> for plotting datasets from the command line.</li>
@@ -34,6 +33,8 @@
 		    </ul>
 		    <li>GUI layout and usability</li>
 		    <ul>
+				<li>New colour scheme (slightly lighter).</li>
+				<li>New CMD help button right of the CMD.</li>
 				<li>New splash window at startup.</li>
 				<li>Display modi: renamed for better usability.</li>
 				<li>Load panel: unit conversion checkbox now operational.</li>
@@ -49,8 +50,10 @@
 		    </ul>
 		    <li>Internals</li>
 		    <ul>
+		    	<li>Code cleaning (using <tt>trEPRoptionUnknown</tt> and <tt>trEPRexceptionHandling</tt>)</li>
 		    	<li>New function <tt>trEPRoptionUnknown</tt> for handling unknown options mainly in switch-case statements, making code (especially of GUI callback functions) much easier to read.</li>
 		    	<li>New function <tt>trEPRexceptionHandling</tt> for exception handling, making code (especially of GUI callback functions) much easier to read.</li>
+		        <li>New function <tt>getCascadedField</tt> for handling hierarchical structures more conveniently.</li>
 		    	<li>Main GUI now loads config file at the beginning.</li>
 		    </ul>
 		    <li>Bug fixes</li>
