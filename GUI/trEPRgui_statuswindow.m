@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % Copyright (c) 2011-14, Till Biskup
-% 2013-06-03
+% 2013-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -107,7 +107,7 @@ end
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('Status window opened.','info');
+trEPRmsg('Status window opened.','debug');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -134,7 +134,7 @@ trEPRguiUpdateStatusWindow(statusstring);
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('Status window closed.','info');
+        trEPRmsg('Status window closed.','debug');
     catch exception
         try
             msgStr = ['An exception occurred in ' ...

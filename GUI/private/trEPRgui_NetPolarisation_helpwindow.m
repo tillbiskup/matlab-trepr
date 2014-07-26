@@ -7,8 +7,8 @@ function varargout = trEPRgui_NetPolarisation_helpwindow(varargin)
 %
 % See also TREPRGUI_NETPOLARISATIONWINDOW
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-17
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -24,6 +24,8 @@ if (singleton)
     return;
 end
 
+defaultBackground = [.9 .9 .9];
+
 % Try to get NetPolarisationwindow GUI position
 mainGUIHandle = trEPRguiGetWindowHandle('trEPRgui_NetPolarisationwindow');
 if ishandle(mainGUIHandle)
@@ -37,6 +39,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Net Polarisation Analysis : Help Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -44,7 +47,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -135,7 +137,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Net polarisation drift help window opened.','info');
+    trEPRmsg('Net polarisation drift help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -146,21 +148,7 @@ try
         'GUI','private','helptexts','NetPolarisation','intro.html');
     browser.setCurrentLocation(helpTextFile);
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -208,21 +196,7 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setHtmlText(htmlText);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -238,21 +212,7 @@ function pushbutton_Callback(~,~,action)
                 browser.executeScript('javascript:history.forward()');
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -280,21 +240,7 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -306,23 +252,9 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
-        trEPRmsg('Net polarisation help window closed.','info');
+        trEPRmsg('Net polarisation help window closed.','debug');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 

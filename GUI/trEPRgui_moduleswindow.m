@@ -3,8 +3,8 @@ function varargout = trEPRgui_moduleswindow()
 % installed for the trEPR toolbox, including links to the toolbox modules'
 % homepage.
 
-% Copyright (c) 2012-13, Till Biskup
-% 2013-02-19
+% Copyright (c) 2012-14, Till Biskup
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -16,6 +16,8 @@ if (singleton)
     varargout{1} = figure(singleton);
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -34,6 +36,7 @@ title = 'trEPR Toolbox: Modules';
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name',title,...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -42,8 +45,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'CloseRequestFcn',{@closeWindow}...
     );
-
-defaultBackground = get(hMainFigure,'Color');
 
 p1 = uipanel('Tag','modules_panel',...
     'Parent',hMainFigure,...
@@ -189,7 +190,7 @@ guidata(hMainFigure,gh);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('Modules window opened.','info');
+trEPRmsg('Modules window opened.','debug');
 
 % Add keypress function to every element that can have one...
 handles = findall(...
@@ -238,21 +239,7 @@ end
                     return;
             end
         catch exception
-            try
-                msgStr = ['An exception occurred in ' ...
-                    exception.stack(1).name  '.'];
-                trEPRmsg(msgStr,'error');
-            catch exception2
-                exception = addCause(exception2, exception);
-                disp(msgStr);
-            end
-            try
-                trEPRgui_bugreportwindow(exception);
-            catch exception3
-                % If even displaying the bug report window fails...
-                exception = addCause(exception3, exception);
-                throw(exception);
-            end
+            trEPRexceptionHandling(exception);
         end
     end
 
@@ -291,53 +278,21 @@ end
             set(hjBugtracker,'MouseClickedCallback',...
                 {@startBrowser,moduleInfo.(module).bugtracker.url});
         catch exception
-            try
-                msgStr = ['An exception occurred in ' ...
-                    exception.stack(1).name  '.'];
-                trEPRmsg(msgStr,'error');
-            catch exception2
-                exception = addCause(exception2, exception);
-                disp(msgStr);
-            end
-            try
-                trEPRgui_bugreportwindow(exception);
-            catch exception3
-                % If even displaying the bug report window fails...
-                exception = addCause(exception3, exception);
-                throw(exception);
-            end
+            trEPRexceptionHandling(exception);
         end
     end
 
     function closeWindow(~,~)
         try
             delete(hMainFigure);
-            trEPRmsg('Modules window closed.','info');
+            trEPRmsg('Modules window closed.','debug');
         catch exception
-            try
-                msgStr = ['An exception occurred in ' ...
-                    exception.stack(1).name  '.'];
-                trEPRmsg(msgStr,'error');
-            catch exception2
-                exception = addCause(exception2, exception);
-                disp(msgStr);
-            end
-            try
-                trEPRgui_bugreportwindow(exception);
-            catch exception3
-                % If even displaying the bug report window fails...
-                exception = addCause(exception3, exception);
-                throw(exception);
-            end
+            trEPRexceptionHandling(exception);
         end
     end
 
     function startBrowser(~,~,url)
-        if any(strfind(platform,'Windows'))
-            dos(['start ' url]);
-        else
-            web(url,'-browser');
-        end
+        webbrowser(url);
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

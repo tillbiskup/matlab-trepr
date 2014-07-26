@@ -6,8 +6,8 @@ function varargout = trEPRgui_setdirectorieswindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-24
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -22,6 +22,8 @@ if (singleton)
     end
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 guiPosition = [160,240,650,430];
 % Try to get NetPolarisationwindow GUI position
@@ -39,6 +41,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Show/Set Directories Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -46,7 +49,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -261,27 +263,13 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Show/Set directories window opened.','info');
+    trEPRmsg('Show/Set directories window opened.','debug');
     
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -343,26 +331,12 @@ function pushbutton_Callback(~,~,action)
                         {lower(action),directory});
                 end
             otherwise
-                disp(['Action ' action ' not understood.'])
+                trEPRoptionUnknown(action);
                 return;
         end
         updateWindow()
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -385,26 +359,12 @@ function edit_Callback(source,~,action)
             case {'loaddir','savedir','savefigdir','exportdir','snapshotdir'}
                 cmdDir(trEPRguiGetWindowHandle(),{lower(action),directory});
             otherwise
-                disp(['Action ' action ' not understood.'])
+                trEPRoptionUnknown(action)
                 return;
         end
         updateWindow()
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -451,21 +411,7 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -477,23 +423,9 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
-        trEPRmsg('Show/Set directories window closed.','info');
+        trEPRmsg('Show/Set directories window closed.','debug');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -511,21 +443,7 @@ function updateWindow()
         set(gh.exportdir_panel_edit,'String',admain.control.dirs.lastExport);
         set(gh.snapshotdir_panel_edit,'String',admain.control.dirs.lastSnapshot);
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 

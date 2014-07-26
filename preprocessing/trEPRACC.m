@@ -16,8 +16,8 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              used for the trEPRgui_ACCwindow
 %              a copy is copied to the history.info field
 
-% Copyright (c) 2011-13, Till Biskup, Bernd Paulus
-% 2013-05-19
+% Copyright (c) 2011-14, Till Biskup, Bernd Paulus
+% 2014-07-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -417,7 +417,7 @@ try
     accData.history{end+1} = history;
     
 catch exception
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end
 
 end

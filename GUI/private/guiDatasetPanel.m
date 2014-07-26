@@ -300,11 +300,11 @@ function pushbutton_Callback(~,~,action)
             case 'Duplicate'
                 cmdDuplicate(mainWindow,{});
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -341,7 +341,7 @@ function visible_listbox_Callback(~,~)
         %Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -358,7 +358,7 @@ function invisible_listbox_Callback(source,~)
         end
         update_invisibleSpectra();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -376,13 +376,13 @@ function checkbox_Callback(source,~,action)
             case 'showonlyactive'
                 ad.control.axis.onlyActive = get(source,'Value');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

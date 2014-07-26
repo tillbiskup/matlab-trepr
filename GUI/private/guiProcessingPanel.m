@@ -7,7 +7,7 @@ function handle = guiProcessingPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -141,7 +141,8 @@ uicontrol('Tag','processing_panel_corrections_background_pushbutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
-    'Position',[floor((handle_size(3)-40)/2)+10 10 floor((handle_size(3)-40)/2) 30],...
+    'Position',[floor((handle_size(3)-40)/2)+10 10 ...
+    floor((handle_size(3)-40)/2) 30],...
     'String','Background',...
     'TooltipString','Perform basic background correction (BGC)',...
     'Callback',{@corrections_pushbutton_Callback,'BGC'}...
@@ -172,7 +173,8 @@ uicontrol('Tag','processing_panel_corrections_accumulate_pushbutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
-    'Position',[floor((handle_size(3)-40)/2)+10 10 floor((handle_size(3)-40)/2) 30],...
+    'Position',[floor((handle_size(3)-40)/2)+10 ...
+    10 floor((handle_size(3)-40)/2) 30],...
     'String','Accumulate...',...
     'TooltipString','Open accumulation (ACC) GUI',...
     'Callback',{@corrections_pushbutton_Callback,'ACC'}...
@@ -213,7 +215,8 @@ uicontrol('Tag','processing_panel_scaling_pushbutton',...
     'Units','Pixels',...
     'Position',[handle_size(3)-90 10 60 30],...
     'String','Scale',...
-    'TooltipString','<html>Scale dataset in z direction (intensity)<br />by given factor</html>',...
+    'TooltipString',['<html>Scale dataset in z direction (intensity)'...
+    '<br />by given factor</html>'],...
     'Callback',{@pushbutton_Callback,'scale'}...
     );
 
@@ -517,7 +520,7 @@ function pages_buttongroup_Callback(source,~)
         update_processingPanel();
         update_visibleSpectra();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -590,14 +593,14 @@ function pushbutton_Callback(~,~,action)
                     trEPRmsg(warnings,'warning');
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
         % Update visible spectra listbox
         update_visibleSpectra();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -608,7 +611,8 @@ function corrections_pushbutton_Callback(~,~,correction)
         ad = getappdata(mainWindow);
         
         % If no dataset is selected
-        if isempty(ad.control.spectra.active) || (ad.control.spectra.active == 0)
+        if isempty(ad.control.spectra.active) || ...
+                (ad.control.spectra.active == 0)
             return;
         end
         
@@ -622,13 +626,13 @@ function corrections_pushbutton_Callback(~,~,correction)
             case 'BLC'
                 trEPRgui_BLCwindow();
             otherwise
-                trEPRguiOptionUnknown(correction);
+                trEPRoptionUnknown(correction);
         end
         
         % Update visible spectra listbox
         update_visibleSpectra();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -672,7 +676,7 @@ function listbox_Callback(~,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -779,7 +783,7 @@ function edit_Callback(source,~,action)
                 pushbutton_Callback([],[],'scale');
                 return;
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
@@ -798,7 +802,7 @@ function edit_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -828,7 +832,7 @@ function popupmenu_Callback(source,~,action)
                     direction(1)).filterfun = ...
                     sprintf('trEPRfilter_%s',value);
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'data',ad.data);
@@ -837,7 +841,7 @@ function popupmenu_Callback(source,~,action)
         % Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -850,14 +854,14 @@ function radiobutton_Callback(~,~,action)
         switch lower(action)
             case 'smoothing'
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
         %Update processing panel
         update_processingPanel();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

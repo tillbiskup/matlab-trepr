@@ -18,7 +18,7 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %              Empty if everything went well, otherwise contains message.
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-13
+% 2014-07-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -248,7 +248,7 @@ try
     resdata.history{end+1} = history;
     
 catch exception
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end
 
 end

@@ -310,11 +310,11 @@ function pushbutton_Callback(~,~,action)
                     trEPRmsg(status,'info');
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

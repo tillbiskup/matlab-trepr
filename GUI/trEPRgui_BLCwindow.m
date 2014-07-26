@@ -7,7 +7,7 @@ function varargout = trEPRgui_BLCwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,6 +20,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -34,6 +36,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Baseline Compensation (BLC) Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -41,7 +44,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -811,7 +813,7 @@ setappdata(hMainFigure,'blc',ad.blc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('BLC GUI window opened','info');
+trEPRmsg('BLC GUI window opened','debug');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -858,7 +860,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -887,7 +889,7 @@ function fitarea_panel_slider_Callback(source,~,area)
         update_position_display();
         update_fitarea_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -935,7 +937,7 @@ function addpoints_panel_checkbox_Callback(source,~,point)
         update_fitarea_display();
         update_addpoint_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -956,7 +958,7 @@ function addpoints_panel_slider_Callback(source,~,point)
         update_fitarea_display();
         update_addpoint_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -975,7 +977,7 @@ function position_slider_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'value'));
             otherwise
-                trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                trEPRoptionUnknown(ad.control.axis.displayType,...
                     'display type');
         end
         
@@ -985,7 +987,7 @@ function position_slider_Callback(source,~)
         updateAxes();
         update_position_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1003,7 +1005,7 @@ function showposition_checkbox_Callback(source,~)
         % Update display
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1025,7 +1027,7 @@ function visible_panel_listbox_Callback(source,~)
         update_fitarea_display();
         update_addpoint_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1060,12 +1062,12 @@ function displaytype_popupmenu_Callback(source,~)
                 set(gh.position_slider,'Enable','On');
                 updateAxes()
             otherwise
-                trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                trEPRoptionUnknown(ad.control.axis.displayType,...
                     'display type');
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1105,11 +1107,11 @@ function correctionmethod_popupmenu_Callback(source,~)
                     'it from each spectrum at each point in time.'] ...
                     'Currently doesn''t work.'});
             otherwise
-                trEPRguiOptionUnknown(correctionMethod,'method');
+                trEPRoptionUnknown(correctionMethod,'method');
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1160,7 +1162,7 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('BLC GUI window closed.','info')
+                trEPRmsg('BLC GUI window closed.','debug')
                 return;
             case 'showMaximum'
                 mainWindow = trEPRguiGetWindowHandle(mfilename);
@@ -1191,11 +1193,11 @@ function pushbutton_Callback(~,~,action)
                 if_BLC('reset');
                 return;
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1254,7 +1256,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1283,10 +1285,10 @@ function switchPanel(panelName)
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1527,7 +1529,7 @@ function updateAxes()
             'Parent',gh.axis2);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1594,7 +1596,7 @@ function updateSpectra()
             'SliderStep',[1/(y-1) 10/(y-1)]...
             );
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
     
 end
@@ -1656,7 +1658,7 @@ function update_position_display()
                     ad.data{ad.control.spectra.active}.display.position.x);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1691,7 +1693,7 @@ function update_fitarea_display()
         set(gh.fitarea_panel_back_slider,'Value',...
             ad.data{ad.control.spectra.active}.blc.fit.area.back);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1721,7 +1723,7 @@ function update_addpoint_display()
         set(gh.addpoints_panel_pt2_slider,'Value',...
             ad.data{ad.control.spectra.active}.blc.fit.point(2).position);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1785,7 +1787,7 @@ function if_BLC(action)
                         updateAxes();
                         return;
                     otherwise
-                        trEPRguiOptionUnknown(correctionMethod,...
+                        trEPRoptionUnknown(correctionMethod,...
                             'correction method');
                         return;
                 end
@@ -1833,11 +1835,11 @@ function if_BLC(action)
                 updateAxes();
                 return;
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 

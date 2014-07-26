@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,6 +20,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -34,6 +36,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : AVG Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -41,7 +44,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 mainPanelWidth = 260;
 mainPanelHeight = 540;
 panel_size = 240;
@@ -971,7 +973,7 @@ setappdata(hMainFigure,'avgdata',ad.avgdata);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('AVG GUI window opened','info');
+trEPRmsg('AVG GUI window opened','debug');
 
 
 % Load data from Main GUI
@@ -1042,7 +1044,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1061,7 +1063,7 @@ function position_slider_Callback(source,~)
                 ad.data{ad.control.spectra.active}.display.position.x = ...
                     int16(get(source,'value'));
             otherwise
-                trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                trEPRoptionUnknown(ad.control.axis.displayType,...
                     'display type');
         end
         
@@ -1071,7 +1073,7 @@ function position_slider_Callback(source,~)
         updateAxes();
         update_position_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1165,7 +1167,7 @@ function position_edit_Callback(source,~,position)
         %Update main axis
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1183,7 +1185,7 @@ function showposition_checkbox_Callback(source,~)
         % Update display
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1338,7 +1340,7 @@ function area_edit_Callback(source,~,position)
                         ad.data{active}.avg.start+ad.data{active}.avg.delta;
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
@@ -1355,7 +1357,7 @@ function area_edit_Callback(source,~,position)
         %Update main axis
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1375,7 +1377,7 @@ function visible_panel_listbox_Callback(source,~)
         updateAxes();
         update_position_display();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1413,7 +1415,7 @@ function edit_Callback(source,~,field)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1448,11 +1450,11 @@ function popupmenu_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end  
 end
 
@@ -1510,7 +1512,7 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         else % If toggle button switched OFF
@@ -1544,13 +1546,13 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         end
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
         
@@ -1749,13 +1751,13 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('AVG GUI window closed.','info');
+                trEPRmsg('AVG GUI window closed.','debug');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1782,10 +1784,10 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'avg',ad.avg);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
     
@@ -1824,7 +1826,7 @@ function displaytype_popupmenu_Callback(source,~)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1877,13 +1879,9 @@ function keypress_Callback(src,evt)
             case 'f1'
                 trEPRgui_AVG_helpwindow();
                 return;
-            otherwise
-%                 disp(evt);
-%                 fprintf('       Caller: %i\n\n',src);
-                return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1916,7 +1914,7 @@ function switchPanel(panelName)
             otherwise
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1982,7 +1980,7 @@ function updateSliderPanel()
             y(ad.data{ad.control.spectra.active}.display.position.y)...
             );
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2075,7 +2073,7 @@ function updateAveragePanel()
                 );
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2141,7 +2139,7 @@ function updateSettingsPanel(varargin)
         set(gh.avglinesettings_style_popupmenu,'Value',ind2)
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
         
@@ -2186,7 +2184,7 @@ function updateSpectra()
         set(gh.slider_panel_maximum_pushbutton,'Enable','on');
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2247,7 +2245,7 @@ function update_position_display()
                     ad.data{ad.control.spectra.active}.display.position.x);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2565,7 +2563,7 @@ function updateAxes()
                         'Parent',gh.axis2);
                 end
             otherwise
-                trEPRguiOptionUnknown(ad.avg.dimension,'AVG dimension');
+                trEPRoptionUnknown(ad.avg.dimension,'AVG dimension');
         end
         
         % Set grid for main axis
@@ -2588,7 +2586,7 @@ function updateAxes()
         end        
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2614,7 +2612,7 @@ function switchMeasurePointer(~,~)
         % Update appdata of main window
         setappdata(mainWindow,'control',ad.control);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2828,7 +2826,7 @@ function trackPointer(varargin)
                         pointerPositionInAxis(1),'nearest');
                     indy=indx;
                 otherwise
-                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
                         'display type');
                     set(mainWindow,'Pointer','arrow');
                     return;
@@ -2849,7 +2847,7 @@ function trackPointer(varargin)
         end
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

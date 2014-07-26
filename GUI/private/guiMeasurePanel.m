@@ -347,7 +347,7 @@ try
     set(gh.measure_panel_setslider_checkbox,...
         'Value',ad.configuration.measure.setslider);
 catch exception
-    trEPRguiExceptionHandling(exception)
+    trEPRexceptionHandling(exception)
 end
 
 
@@ -378,7 +378,7 @@ function checkbox_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -398,11 +398,11 @@ function togglebutton_Callback(source,~,action)
                     trEPRguiSetMode('none');
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -417,11 +417,11 @@ function pushbutton_Callback(~,~,action)
             case 'doi'
                 cmdDoi(trEPRguiGetWindowHandle,cell(0));
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

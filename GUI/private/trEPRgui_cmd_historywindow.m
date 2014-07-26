@@ -6,8 +6,8 @@ function varargout = trEPRgui_cmd_historywindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-28
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -23,6 +23,7 @@ if (singleton)
     return;
 end
 
+defaultBackground = [.9 .9 .9];
 guiPosition = [160,240,650,430];
 % Try to get NetPolarisationwindow GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -39,6 +40,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Cmd History',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -46,7 +48,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -166,7 +167,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Cmd history window opened.','info');
+    trEPRmsg('Cmd history window opened.','debug');
     
     if (nargout == 1)
         varargout{1} = hMainFigure;
@@ -174,21 +175,7 @@ try
     
     uicontrol(cmdHistory);
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -221,21 +208,7 @@ function pushbutton_Callback(~,~,action)
         end
         updateWindow()
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -267,21 +240,7 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -292,23 +251,9 @@ end
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('Cmd history window closed.','info');
+        trEPRmsg('Cmd history window closed.','debug');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -325,21 +270,7 @@ function updateWindow()
         set(gh.history_panel_listbox,'Value',...
             length(admain.control.cmd.history));
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 

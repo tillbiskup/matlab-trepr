@@ -20,7 +20,7 @@ function trEPRguiOptionUnknown(option,varargin)
 %           trEPRguiOptionUnknown(option);
 %   end
 %
-% See also: trEPRguiExceptionHandling
+% See also: trEPRexceptionHandling
 
 % Copyright (c) 2014, Till Biskup
 % 2014-07-25

@@ -6,7 +6,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % help, such as the Matlab Help Browser and the toolbox website.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,6 +20,8 @@ if (singleton)
 end
 
 guiPosition = [160,240,850,450];
+defaultBackground = [0.90 0.90 0.90];
+
 % Get position of main window to position help window relative to it
 mainGUIHandle = trEPRguiGetWindowHandle();
 if ishandle(mainGUIHandle)
@@ -32,6 +34,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Help Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -39,7 +42,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -176,24 +178,13 @@ uicontrol('Tag','help_panel_about_pushbutton',...
     'String','About',...
     'Callback',{@(~,~)trEPRgui_aboutwindow}...
     );
-uicontrol('Tag','help_panel_launcher2_pushbutton',...
-    'Style','pushbutton',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'Position',[400 10 70 30],...
-    'TooltipString','Show trEPR toolbox manual (in MATLAB(TM) helpbrowser)',...
-    'String','Manual',...
-    'Callback',{@(~,~)web([trEPRinfo('dir') '/doc/index.html'],'-helpbrowser')}...
-    );
 uicontrol('Tag','help_panel_website_pushbutton',...
     'Style','pushbutton',...
     'Parent',hMainFigure,...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'Units','Pixels',...
-    'Position',[470 10 70 30],...
+    'Position',[400 10 70 30],...
     'TooltipString',sprintf('%s\n%s',...
     'Open website of the trEPR toolbox (in system webbrowser)',...
     '(Warning: Apparently that does not work with Windows.)'),...
@@ -236,6 +227,7 @@ try
         'Report a bug','bugreport'; ...
         'Other resources','resources'; ...
         'Disclaimer','disclaimer'; ...
+        'License','license'; ...
         };
     set(hGeneralListbox,'String',generalTopics(:,1));
     
@@ -285,28 +277,14 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('trEPR GUI help window opened.','info');
+    trEPRmsg('trEPR GUI help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -356,24 +334,10 @@ function listbox_Callback(source,~,action)
                     browser.setHtmlText(htmlText);
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -399,21 +363,7 @@ function buttongroup_Callback(source,~,action)
                 end
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -429,21 +379,7 @@ function pushbutton_Callback(~,~,action)
                 browser.executeScript('javascript:history.forward()');
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -470,53 +406,21 @@ function keypress_Callback(~,evt)
                 return;
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('trEPR GUI help window closed.','info');
+        trEPRmsg('trEPR GUI help window closed.','debug');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
 function startBrowser(~,~,url)
-    if any(strfind(platform,'Windows'))
-        dos(['start ' url]);
-    else
-        web(url,'-browser');
-    end
+    webbrowser(url);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -617,7 +521,7 @@ function helptext_selector(helpText)
                     'private','helptexts','main','configure_panel.html');
                 browser.setCurrentLocation(helpTextFile);
             otherwise
-                trEPRguiOptionUnknown(helpText,'helptext');
+                trEPRoptionUnknown(helpText,'helptext');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -625,21 +529,7 @@ function helptext_selector(helpText)
                 browser.setHtmlText(htmlText);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 

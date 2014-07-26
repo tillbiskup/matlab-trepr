@@ -331,11 +331,11 @@ function pushbutton_Callback(~,~,action)
             case 'bgpositionshelp'
                 trEPRgui_helpwindow();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -353,7 +353,7 @@ function checkbox_Callback(source,~,action)
             case 'bgpositions'
                 ad.control.axis.BGpositions.enable = get(source,'Value');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
@@ -361,7 +361,7 @@ function checkbox_Callback(source,~,action)
         % Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -390,14 +390,14 @@ function edit_Callback(source,~,action)
             case 'BGpositionsShift'
                 ad.control.axis.BGpositions.shift = value;
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
         % Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

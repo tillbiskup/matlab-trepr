@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -35,6 +35,8 @@ for k=1:length(formatNames)
     end
 end
 
+defaultBackground = [.9 .9 .9];
+
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
 if ishandle(mainGUIHandle)
@@ -48,6 +50,7 @@ end
 hMainFigure = figure('Tag','trEPRgui_combinewindow',...
     'Visible','off',...
     'Name','trEPR GUI : Combine Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -55,7 +58,6 @@ hMainFigure = figure('Tag','trEPRgui_combinewindow',...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 mainPanelWidth = 260;
 mainPanelHeight = 540;
 panel_size = 240;
@@ -358,7 +360,7 @@ end
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('Combine GUI window opened','info');
+trEPRmsg('Combine GUI window opened','debug');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -399,12 +401,12 @@ function listbox_Callback(~,~,field)
             case 'notcombine'
             case 'combine'
             otherwise
-                trEPRguiOptionUnknown(field,'field');
+                trEPRoptionUnknown(field,'field');
                 return;
         end
         updateSpectra();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -426,11 +428,11 @@ function edit_Callback(source,~,field)
                 setappdata(mainWindow,'combine',ad.combine);
                 updateLabel();
             otherwise
-                trEPRguiOptionUnknown(field,'field');
+                trEPRoptionUnknown(field,'field');
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -580,13 +582,13 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('Combine GUI window closed.','info')
+                trEPRmsg('Combine GUI window closed.','debug')
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -615,13 +617,9 @@ function keypress_Callback(src,evt)
             case 'f1'
                 trEPRgui_combine_helpwindow();
                 return;
-            otherwise
-%                 disp(evt);
-%                 fprintf('       Caller: %i\n\n',src);
-                return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -649,7 +647,7 @@ function status = checkForCombinableDatasets()
             end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -683,7 +681,7 @@ function updateFileformats()
         ad.combine.spectra.combine = [];
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -730,7 +728,7 @@ function updateBasenames()
 
         setappdata(mainWindow,'combine',ad.combine);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -784,7 +782,7 @@ function updateSpectra()
             set(gh.combine_listbox,'Value',1);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -808,7 +806,7 @@ function updateLabel()
         setappdata(mainWindow,'combine',ad.combine);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

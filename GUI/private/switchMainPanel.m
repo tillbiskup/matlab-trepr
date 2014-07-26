@@ -100,7 +100,7 @@ try
             set(gh.configure_panel,'Visible','on');
             set(gh.tbConfigure,'Value',1);
         otherwise
-            trEPRguiOptionUnknown(panelName,'panel');
+            trEPRoptionUnknown(panelName,'panel');
             return;
     end
     

@@ -44,12 +44,13 @@
 		    <ul>
 			    <li><b>trEPR dataset structure version 1.10.</b><br />Now all display information for a dataset is part of the dataset structure and gets recovered on load.</li>
 			    <li><b>GUI appdata version 1.10.</b></li>
-			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;convert&quot; in load section.</li>
+			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;defaultBackground&quot; in &quot;general&quot; section.</li>
+			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;convert&quot; in &quot;load&quot; section.</li>
 		    </ul>
 		    <li>Internals</li>
 		    <ul>
-		    	<li>New function <tt>trEPRguiOptionUnknown</tt> for handling unknown options mainly in switch-case statements, making code (especially of callback functions) much easier to read.</li>
-		    	<li>New function <tt>trEPRguiExceptionHandling</tt> for GUI exception handling, making code (especially of callback functions) much easier to read.</li>
+		    	<li>New function <tt>trEPRoptionUnknown</tt> for handling unknown options mainly in switch-case statements, making code (especially of GUI callback functions) much easier to read.</li>
+		    	<li>New function <tt>trEPRexceptionHandling</tt> for exception handling, making code (especially of GUI callback functions) much easier to read.</li>
 		    	<li>Main GUI now loads config file at the beginning.</li>
 		    </ul>
 		    <li>Bug fixes</li>
@@ -468,7 +469,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-25
+			2014-07-26
 		</p>
 		</div>
 	</body>

@@ -19,10 +19,11 @@ function varargout = trEPRbusyWindow(varargin)
 %                 four-element vector determining the window position
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-04-13
+% 2014-04-26
 
 title = 'Processing...';
 position = [220,350,270,120];
+defaultBackground = [.95 .95 .90];
 
 % Delay time for closing window (in seconds)
 closeDelayTime = 2;
@@ -72,6 +73,7 @@ else
         'Visible','off',...
         'WindowStyle','modal',...
         'Name',title,...
+        'Color',defaultBackground,...
         'Units','Pixels',...
         'Position',position,...
         'Resize','off',...
@@ -85,14 +87,14 @@ end
 
 ad = getappdata(hMainFigure);
 
-defaultBackground = get(hMainFigure,'Color');
 % bgColor for Java elements
 bgColor = num2cell(defaultBackground);
 
 % Text label for general description
 jTextLabel1 = javaObjectEDT('javax.swing.JLabel',ad.description);
 jTextLabel1.setBackground(java.awt.Color(bgColor{:}));
-javacomponent(jTextLabel1,[90 50 ad.position(3)-90-10 ad.position(4)-50-10],hMainFigure);
+javacomponent(jTextLabel1,...
+    [90 50 ad.position(3)-90-10 ad.position(4)-50-10],hMainFigure);
 
 % Close button
 hBtn = uicontrol('Tag','close_pushbutton',...

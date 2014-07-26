@@ -51,7 +51,7 @@ if (nargin > 0)
                 case 'nobox'
                     showBox = ~varargin{k+1};
                 otherwise
-                    trEPRguiOptionUnknown(varargin{k},'optional argument');
+                    trEPRoptionUnknown(varargin{k},'optional argument');
             end
         end
     end
@@ -912,7 +912,7 @@ switch ad.control.axis.displayType
             end
         end
     otherwise
-        trEPRguiOptionUnknown(ad.control.axis.displayType,'display type');
+        trEPRoptionUnknown(ad.control.axis.displayType,'display type');
         return;
 end
 

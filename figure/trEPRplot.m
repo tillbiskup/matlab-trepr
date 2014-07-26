@@ -22,7 +22,7 @@ function trEPRplot(varargin)
 % (Hint: Matlab(r) input parser is used to parse parameters.)
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-23
+% 2014-07-26
 
 % PLEASE NOTE: The additional parameters are defined together with their
 %              default values in the subfunction parseAdditionalParameters
@@ -277,7 +277,7 @@ if length(inputArguments) > 1
         
         parameters = p.Results;
     catch exception
-        throw(exception)
+        trEPRexceptionHandling(exception);
     end
 end
 

@@ -38,8 +38,8 @@ function varargout = trEPRconf(action,varargin)
 %   module    - string
 %               Name of the module the config file(s) belong(s) to.
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-10-25
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-26
 
 % If none or the wrong input parameter, display help and exit
 if nargin == 0 || isempty(action) || ~ischar(action)
@@ -207,5 +207,5 @@ catch exception
     if exist('PWD','var')
         cd(PWD);
     end
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end

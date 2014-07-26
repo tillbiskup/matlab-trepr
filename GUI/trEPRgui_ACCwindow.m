@@ -7,7 +7,7 @@ function varargout = trEPRgui_ACCwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,6 +20,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -34,6 +36,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Accumulate (ACC) Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -41,7 +44,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 mainPanelWidth = 260;
 mainPanelHeight = 550;
 panel_size = 240;
@@ -1096,7 +1098,7 @@ setappdata(hMainFigure,'acc',ad.acc);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('ACC GUI window opened','info');
+trEPRmsg('ACC GUI window opened','debug');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -1189,7 +1191,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1218,7 +1220,7 @@ function slider_Callback(source,~)
                         int16(get(source,'Value'));
                 end
             otherwise
-                trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                trEPRoptionUnknown(ad.control.axis.displayType,...
                     'display type');
         end
         
@@ -1232,7 +1234,7 @@ function slider_Callback(source,~)
         %Update main axis
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1258,7 +1260,7 @@ function accumulated_listbox_Callback(~,~)
         % Update axes
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1384,7 +1386,7 @@ function position_edit_Callback(source,~,position)
         %Update main axis
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1405,7 +1407,7 @@ function edit_Callback(~,~,position)
         % of indices.
         return;
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1463,7 +1465,7 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         else % If toggle button switched OFF
@@ -1497,12 +1499,12 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1520,13 +1522,13 @@ function checkbox_Callback(source,~,action)
             case 'showonlyactive'
                 ad.control.axis.onlyActive = get(source,'Value');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         setappdata(mainWindow,'control',ad.control);
         updateAxes();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1780,13 +1782,13 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('ACC GUI window closed.','info');
+                trEPRmsg('ACC GUI window closed.','debug');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1849,11 +1851,11 @@ function popupmenu_Callback(source,~,action)
                             'Enable','Off');
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1911,7 +1913,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1941,10 +1943,10 @@ function switchPanel(panelName)
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2034,7 +2036,7 @@ function updateDimensionPanel(panel)
                 % Default
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2127,7 +2129,7 @@ function updateSpectra()
         setappdata(mainWindow,'control',ad.control);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2196,7 +2198,7 @@ function updateSliderPanel()
                 );
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2400,7 +2402,7 @@ function updateAxes()
                         ad.control.axis.labels.z.measure,...
                         ad.control.axis.labels.z.unit));
                 otherwise
-                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
                         'display type');
             end
             
@@ -2683,7 +2685,7 @@ function updateAxes()
                             ad.data{active}.axes.z.unit));
                     end
                 otherwise
-                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
                         'display type');
             end
         end
@@ -2699,7 +2701,7 @@ function updateAxes()
         end
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2759,7 +2761,7 @@ function setAccParameters()
         % Set appdata of ACC GUI
         setappdata(mainWindow,'acc',ad.acc);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

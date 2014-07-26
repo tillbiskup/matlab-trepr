@@ -34,8 +34,8 @@ function status = fig2file(figHandle,fileName,varargin)
 %                'fig2file.ini' that is in the same directory as fig2file.m
 %
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-05-15
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-26
 
 % If called without arguments, print help and list of formats
 if ~nargin
@@ -252,7 +252,7 @@ try
     % Set status to empty string
     status = '';
 catch exception
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end
 
 end

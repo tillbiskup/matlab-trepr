@@ -4,7 +4,7 @@ function varargout = trEPRgui_combine_helpwindow(varargin)
 %          to the help command. 
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -16,6 +16,8 @@ if (singleton)
     figure(singleton);
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_combinewindow');
@@ -30,6 +32,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Combine : Help Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -37,7 +40,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -128,7 +130,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Combine GUI help window opened.','info');
+    trEPRmsg('Combine GUI help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -139,7 +141,7 @@ try
         'GUI','private','helptexts','combine','intro.html');
     browser.setCurrentLocation(helpTextFile);
 catch exception
-    trEPRguiExceptionHandling(exception)
+    trEPRexceptionHandling(exception)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -163,7 +165,7 @@ function helptext_popupmenu_Callback(source,~)
                     'GUI','private','helptexts','combine','keybindings.html');
                 browser.setCurrentLocation(helpTextFile);
             otherwise
-                trEPRguiOptionUnknown(helpText,'helptext');
+                trEPRoptionUnknown(helpText,'helptext');
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -171,7 +173,7 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setHtmlText(htmlText);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -187,7 +189,7 @@ function pushbutton_Callback(~,~,action)
                 browser.executeScript('javascript:history.forward()');
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -215,16 +217,16 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('Combine GUI help window closed.','info');
+        trEPRmsg('Combine GUI help window closed.','debug');
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

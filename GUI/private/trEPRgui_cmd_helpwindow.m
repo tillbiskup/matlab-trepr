@@ -7,7 +7,7 @@ function varargout = trEPRgui_cmd_helpwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -23,6 +23,8 @@ if (singleton)
     return;
 end
 
+defaultBackground = [.9 .9 .9];
+
 guiPosition = [160,240,850,450];
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -36,6 +38,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Command Line : Help Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -43,7 +46,6 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -278,14 +280,14 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Command line help window opened.','info');
+    trEPRmsg('Command line help window opened.','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end
 catch exception
-    trEPRguiExceptionHandling(exception)
+    trEPRexceptionHandling(exception)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -339,10 +341,10 @@ function listbox_Callback(source,~,action)
                     browser.setHtmlText(htmlText);
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -368,7 +370,7 @@ function buttongroup_Callback(source,~,action)
                 end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -436,7 +438,7 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -448,9 +450,9 @@ function closeGUI(~,~)
     try
         clear('jObject');
         delete(hMainFigure);
-        trEPRmsg('Command line help window closed.','info');
+        trEPRmsg('Command line help window closed.','debug');
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

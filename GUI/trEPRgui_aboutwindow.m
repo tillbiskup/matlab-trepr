@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-13
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -15,6 +15,8 @@ if (singleton)
     varargout{1} = figure(singleton);
     return;
 end
+
+defaultBackground = [1 1 .95];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -41,6 +43,7 @@ copyrightInfo = {...
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name',title,...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -49,8 +52,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'CloseRequestFcn',{@closeWindow}...
     );
-
-defaultBackground = get(hMainFigure,'Color');
 
 % Set icon (jLabel)
 [path,~,~] = fileparts(mfilename('fullpath'));
@@ -182,7 +183,7 @@ uicontrol('Tag','close_pushbutton',...
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('About window opened.','info');
+trEPRmsg('About window opened.','debug');
 
 
 % Add keypress function to every element that can have one...
@@ -251,21 +252,7 @@ end
                     return;
             end
         catch exception
-            try
-                msgStr = ['An exception occurred in ' ...
-                    exception.stack(1).name  '.'];
-                trEPRmsg(msgStr,'error');
-            catch exception2
-                exception = addCause(exception2, exception);
-                disp(msgStr);
-            end
-            try
-                trEPRgui_bugreportwindow(exception);
-            catch exception3
-                % If even displaying the bug report window fails...
-                exception = addCause(exception3, exception);
-                throw(exception);
-            end
+            trEPRexceptionHandling(exception);
         end
     end
 
@@ -280,32 +267,14 @@ end
         end
         try
             delete(hMainFigure);
-            trEPRmsg('About window closed.','info');
+            trEPRmsg('About window closed.','debug');
         catch exception
-            try
-                msgStr = ['An exception occurred in ' ...
-                    exception.stack(1).name  '.'];
-                trEPRmsg(msgStr,'error');
-            catch exception2
-                exception = addCause(exception2, exception);
-                disp(msgStr);
-            end
-            try
-                trEPRgui_bugreportwindow(exception);
-            catch exception3
-                % If even displaying the bug report window fails...
-                exception = addCause(exception3, exception);
-                throw(exception);
-            end
+            trEPRexceptionHandling(exception);
         end
     end
 
     function startBrowser(~,~,url)
-        if any(strfind(platform,'Windows'))
-            dos(['start ' url]);
-        else
-            web(url,'-browser');
-        end
+        webbrowser(url);
     end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

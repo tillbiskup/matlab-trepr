@@ -70,7 +70,7 @@ try
         case '1D along y'
             set(gh.vert1_slider,'Value',ad.data{active}.display.position.x);
         otherwise
-            trEPRguiOptionUnknown(ad.control.axis.displayType,...
+            trEPRoptionUnknown(ad.control.axis.displayType,...
                 'display type');
     end
     

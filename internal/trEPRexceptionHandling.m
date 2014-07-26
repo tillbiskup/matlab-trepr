@@ -1,9 +1,9 @@
-function trEPRguiExceptionHandling(exception)
+function trEPRexceptionHandling(exception)
 % GUIEXCEPTIONHANDLING Helper function for GUI handling exception in
 % try-catch construct.
 %
 % Usage:
-%   trEPRguiExceptionHandling(exception)
+%   trEPRexceptionHandling(exception)
 %
 %   exception - MException object
 %               exception catched by "catch" statement
@@ -12,7 +12,7 @@ function trEPRguiExceptionHandling(exception)
 %   try
 %       % some code...
 %   catch exception
-%       trEPRguiExceptionHandling(exception);
+%       trEPRexceptionHandling(exception);
 %   end
 %
 % See also: trEPRgui_bugreportwindow, trEPRmsg, MException

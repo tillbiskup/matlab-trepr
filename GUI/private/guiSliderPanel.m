@@ -576,7 +576,7 @@ function edit_Callback(source,~,action)
                 ad.data{ad.control.spectra.active}.display.scaling.z = ...
                     1+value/(z(2)-z(1));
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
@@ -597,7 +597,7 @@ function edit_Callback(source,~,action)
         %Update main axis
         update_mainAxis();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

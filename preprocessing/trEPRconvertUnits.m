@@ -10,8 +10,8 @@ function data = trEPRconvertUnits(data,conversion,varargin)
 % conversion - string
 %              Conversion to be performed on the dataset.
 
-% Copyright (c) 2013, Till Biskup
-% 2013-09-03
+% Copyright (c) 2013-14, Till Biskup
+% 2014-07-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create inputParser instance
@@ -103,7 +103,7 @@ try
             trEPRmsg(['Conversion "' conversion '" not understood'],'w');
     end
 catch exception
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end
 
 end

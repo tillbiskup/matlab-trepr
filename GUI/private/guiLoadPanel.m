@@ -194,7 +194,7 @@ function pushbutton_Callback(~,~)
     try
         cmdLoad(trEPRguiGetWindowHandle);
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

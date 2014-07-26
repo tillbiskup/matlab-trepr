@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -21,6 +21,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -35,6 +37,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : MW Frequency Drift Analysis Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -42,7 +45,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 mainPanelWidth = 260;
 mainPanelHeight = 420;
 panel_size = 240;
@@ -964,7 +966,7 @@ setappdata(hMainFigure,'MWfreq',ad.MWfreq);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('MW Frequency Drift Analysis GUI window opened.','info');
+trEPRmsg('MW Frequency Drift Analysis GUI window opened.','debug');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -1025,7 +1027,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1049,7 +1051,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.line.width = value;
+                        ad.data{ad.control.spectra.active}.display.lines.data.width = value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average mwfreq'
                         ad.MWfreq.line.width = value;
@@ -1067,7 +1069,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.line.marker.size = ...
+                        ad.data{ad.control.spectra.active}.display.lines.data.marker.size = ...
                             value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average mwfreq'
@@ -1086,10 +1088,10 @@ function edit_Callback(source,~,action)
                 setappdata(mainWindow,'MWfreq',ad.MWfreq);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1152,7 +1154,7 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         else % If toggle button switched OFF
@@ -1191,12 +1193,12 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1278,13 +1280,13 @@ function pushbutton_Callback(~,~,action)
             case 'lineColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.color)
-                            ad.data{active}.line.color = colors{...
-                                strcmpi(ad.data{active}.line.color,...
+                        if ischar(ad.data{active}.display.lines.data.color)
+                            ad.data{active}.display.lines.data.color = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.color,...
                                 colors(:,1)),2};
                         end
-                        ad.data{active}.line.color = uisetcolor(...
-                            ad.data{active}.line.color,...
+                        ad.data{active}.display.lines.data.color = uisetcolor(...
+                            ad.data{active}.display.lines.data.color,...
                             'Set line colour');
                         setappdata(mainWindow,'data',ad.data);
                     case 'average mwfreq'
@@ -1302,23 +1304,23 @@ function pushbutton_Callback(~,~,action)
             case 'markerEdgeColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.marker.edgeColor)
-                            ad.data{active}.line.marker.edgeColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.edgeColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
                                 colors(:,1)),2};
                         end
                         newColour = uisetcolor(...
-                            ad.data{active}.line.marker.edgeColor,...
+                            ad.data{active}.display.lines.data.marker.edgeColor,...
                             'Set line marker edge colour');
                         if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.line.marker.edgeColor = newColour;
+                            ad.data{active}.display.lines.data.marker.edgeColor = newColour;
                             setappdata(mainWindow,'data',ad.data);
                         end
                     case 'average mwfreq'
                         if ischar(ad.MWfreq.line.marker.edgeColor)
                             if length(ad.MWfreq.line.marker.edgeColor) == 1
                                 ad.MWfreq.line.marker.edgeColor = colors{...
-                                    strcmpi(ad.data{active}.line.marker.edgeColor,...
+                                    strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
                                     colors(:,1)),2};
                             else
                                 ad.MWfreq.line.marker.edgeColor = [];
@@ -1341,16 +1343,16 @@ function pushbutton_Callback(~,~,action)
             case 'markerFaceColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.marker.faceColor)
-                            ad.data{active}.line.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.faceColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
                                 colors(:,1)),2};
                         end
                         newColour = uisetcolor(...
-                            ad.data{active}.line.marker.faceColor,...
+                            ad.data{active}.display.lines.data.marker.faceColor,...
                             'Set MFoff line marker face colour');
                         if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.line.marker.faceColor = newColour;
+                            ad.data{active}.display.lines.data.marker.faceColor = newColour;
                             setappdata(mainWindow,'data',ad.data);
                         end
                     case 'average mwfreq'
@@ -1421,13 +1423,13 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('MWfrequency drift window closed','info');
+                trEPRmsg('MWfrequency drift window closed','debug');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1612,11 +1614,11 @@ function popupmenu_Callback(source,~,action)
                 end
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1643,10 +1645,10 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'MWfreq',ad.MWfreq);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1704,7 +1706,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1734,10 +1736,10 @@ function switchPanel(panelName)
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -1833,7 +1835,7 @@ function updateAnalysisPanel()
                 'Background',[0.8 1 0.8]);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1882,11 +1884,11 @@ function updateSettingsPanel(varargin)
         switch lower(lineType)
             case 'main'
                 set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.data{active}.line.color);
+                    ad.data{active}.display.lines.data.color);
                 set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.data{active}.line.width));
+                    num2str(ad.data{active}.display.lines.data.width));
                 % Set line style
-                lineStyle = ad.data{active}.line.style;
+                lineStyle = ad.data{active}.display.lines.data.style;
                 for k=1:length(lineStyles)
                     if strcmp(lineStyles{k},lineStyle)
                         lineStyleIndex = k;
@@ -1895,7 +1897,7 @@ function updateSettingsPanel(varargin)
                 set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
                 
                 % Set line marker type
-                lineMarker = ad.data{active}.line.marker.type;
+                lineMarker = ad.data{active}.display.lines.data.marker.type;
                 for k=1:length(lineMarkers)
                     if strcmp(lineMarkers{k},lineMarker)
                         lineMarkerIndex = k;
@@ -1903,7 +1905,7 @@ function updateSettingsPanel(varargin)
                 end
                 set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
                 % Set line marker edge colour
-                lineMarkerEdgeColor = ad.data{active}.line.marker.edgeColor;
+                lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
                 lineMarkerEdgeColorPopupmenuValues = ...
                     cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
                 if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
@@ -1916,16 +1918,18 @@ function updateSettingsPanel(varargin)
                                 'BackgroundColor',get(mainWindow,'Color'))
                         case 'auto'
                             set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.data{active}.line.color);
+                                'BackgroundColor',...
+                                ad.data{active}.display.lines.data.color);
                     end
                 else
                     set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
                         find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
                     set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.line.marker.edgeColor);
+                        'BackgroundColor',...
+                        ad.data{active}.display.lines.data.marker.edgeColor);
                 end
                 % Set line marker face colour
-                lineMarkerFaceColor = ad.data{active}.line.marker.faceColor;
+                lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
                 lineMarkerFaceColorPopupmenuValues = ...
                     cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
                 if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
@@ -1944,12 +1948,13 @@ function updateSettingsPanel(varargin)
                     set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
                         find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
                     set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.line.marker.faceColor);
+                        'BackgroundColor',...
+                        ad.data{active}.display.lines.data.marker.faceColor);
                 end
 
                 % Set line marker size
                 set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.data{active}.line.marker.size));
+                    num2str(ad.data{active}.display.lines.data.marker.size));
             case 'average mwfreq'
                 set(gh.display_panel_linecoloursample_text,'Background',...
                     ad.MWfreq.line.color);
@@ -2023,7 +2028,7 @@ function updateSettingsPanel(varargin)
         end
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2087,13 +2092,13 @@ function updateAxes(varargin)
         plot(...
             B0,...
             MWfreq,...
-            'Color',ad.data{active}.line.color,...
-            'LineStyle',ad.data{active}.line.style,...
-            'Marker',ad.data{active}.line.marker.type,...
-            'MarkerEdgeColor',ad.data{active}.line.marker.edgeColor,...
-            'MarkerFaceColor',ad.data{active}.line.marker.faceColor,...
-            'MarkerSize',ad.data{active}.line.marker.size,...
-            'LineWidth',ad.data{active}.line.width...
+            'Color',ad.data{active}.display.lines.data.color,...
+            'LineStyle',ad.data{active}.display.lines.data.style,...
+            'Marker',ad.data{active}.display.lines.data.marker.type,...
+            'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
+            'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
+            'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
+            'LineWidth',ad.data{active}.display.lines.data.width...
             );
         if ad.control.axis.mean
             line(...
@@ -2162,7 +2167,7 @@ function updateAxes(varargin)
         end
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

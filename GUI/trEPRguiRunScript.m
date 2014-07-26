@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiRunScript(script,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-02
+% 2014-07-26
 
 status = 0;
 warnings = cell(0);
@@ -32,10 +32,10 @@ if (nargin==0)
 end
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
+p = inputParser;            % Create an instance of the inputParser class.
+p.FunctionName = mfilename; % Function name included in error messages
+p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+p.StructExpand = true;      % Enable passing arguments in a structure
 
 p.addRequired('script', @(x)ischar(x));
 %p.addOptional('command','',@(x)ischar(x));
@@ -44,7 +44,7 @@ p.parse(script,varargin{:});
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
 if (isempty(mainWindow))
-    warnings{end+1} = 'No trEPRgui window could be found.';
+    warnings{end+1} = [mfilename ': No trEPRgui window could be found.'];
     status = -1;
     return;
 end
@@ -54,7 +54,7 @@ if isempty(script)
 end
 
 if isempty(script) || ~exist(script,'file')
-    warnings{end+1} = 'Filename empty or file does not exist.';
+    warnings{end+1} = [mfilename ': Filename empty or file does not exist.'];
     status = -3;
     return;
 end

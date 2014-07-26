@@ -6,7 +6,7 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 % See also TAGUI_HELPWINDOW
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -18,6 +18,8 @@ if (singleton)
     figure(singleton);
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 infoGUIHandle = trEPRguiGetWindowHandle('trEPRgui_infowindow');
@@ -32,6 +34,7 @@ end
 hMainFigure = figure('Tag','trEPRgui_info_helpwindow',...
     'Visible','off',...
     'Name','trEPR GUI : Info : Help Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -39,7 +42,6 @@ hMainFigure = figure('Tag','trEPRgui_info_helpwindow',...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
@@ -130,7 +132,7 @@ try
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
-    trEPRmsg('Info GUI help window opened','info');
+    trEPRmsg('Info GUI help window opened','debug');
     
     guidata(hMainFigure,guihandles);
     if (nargout == 1)
@@ -141,21 +143,7 @@ try
         'GUI','private','helptexts','info','intro.html');
     browser.setCurrentLocation(helpTextFile);
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -199,7 +187,7 @@ function helptext_popupmenu_Callback(source,~)
                     'GUI','private','helptexts','info','keybindings.html');
                 browser.setCurrentLocation(helpTextFile);
             otherwise
-                trEPRguiOptionUnknown(helpText,'helptext')
+                trEPRoptionUnknown(helpText,'helptext')
                 htmlText = ['<html>' ...
                     '<h1>Sorry, help could not be found</h1>'...
                     '<p>The help text you requested could not be found.</p>'...
@@ -207,21 +195,7 @@ function helptext_popupmenu_Callback(source,~)
                 browser.setHtmlText(htmlText);
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -237,21 +211,7 @@ function pushbutton_Callback(~,~,action)
                 browser.executeScript('javascript:history.forward()');
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
@@ -279,44 +239,16 @@ function keypress_Callback(~,evt)
             end                    
         end
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('Info GUI help window closed.','info');
+        trEPRmsg('Info GUI help window closed.','debug');
     catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+        trEPRexceptionHandling(exception);
     end
 end
 

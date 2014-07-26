@@ -328,11 +328,11 @@ function pushbutton_Callback(~,~,action)
             case 'snapshotshow'
                 trEPRgui_snapshot_showwindow();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -355,7 +355,7 @@ function popupmenu_Callback(source,~,action)
             case 'display'
                 ad.control.messages.display.level = lower(value);
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
@@ -363,7 +363,7 @@ function popupmenu_Callback(source,~,action)
         setappdata(mainWindow,'control',ad.control);
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -381,7 +381,7 @@ function checkbox_Callback(source,~,action)
             case 'cmdsavehistory'
                 ad.control.cmd.historysave = get(source,'Value');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
         
@@ -389,7 +389,7 @@ function checkbox_Callback(source,~,action)
         setappdata(mainWindow,'control',ad.control);
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 

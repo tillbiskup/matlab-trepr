@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -35,6 +35,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -49,6 +51,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Info Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -56,7 +59,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 noneditableBackground = [0.92 0.92 0.92];
 editableBackground = [1 1 1];
 editableWarningBackground = [1 1 0.9];
@@ -3177,7 +3179,7 @@ switchPanel('General');
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('Info GUI window opened.','info');
+trEPRmsg('Info GUI window opened.','debug');
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -3211,7 +3213,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3219,7 +3221,7 @@ function ptbg_Callback(source,~)
     try 
         switchParameterPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3242,7 +3244,7 @@ function dataset_listbox_Callback(source,~)
         updateInfofilePanel();
         updateHistoryPanel();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3313,7 +3315,7 @@ function general_edit_Callback(source,~,value)
                     end
                 end
             otherwise
-                trEPRguiOptionUnknown(value,'field');
+                trEPRoptionUnknown(value,'field');
                 return;
         end
         
@@ -3327,7 +3329,7 @@ function general_edit_Callback(source,~,value)
         % Update dataset list
         updateDatasets();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end     
 
@@ -3596,7 +3598,7 @@ function parameter_edit_Callback(source,~,value)
         % Update dataset display
         updateDatasets();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3615,7 +3617,7 @@ function history_listbox_Callback(source,~)
         % Update panels
         updateHistoryPanel();
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3901,11 +3903,11 @@ function pushbutton_Callback(~,~,action)
                 end
                 guiClose();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3938,11 +3940,11 @@ function popupmenu_Callback(source,~,action)
                         return;
                 end
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -3999,7 +4001,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -4015,10 +4017,10 @@ function guiClose()
         if ishandle(hHelpWindow)
             delete(hHelpWindow);
         end
-        trEPRmsg('Info GUI window closed.','info');
+        trEPRmsg('Info GUI window closed.','debug');
         delete(trEPRguiGetWindowHandle(mfilename));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4105,11 +4107,11 @@ function switchPanel(panelName)
                     });
                 updateInfofilePanel()
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4146,11 +4148,11 @@ function switchParameterPanel(panelName)
                 set(gh.parameter_page3_panel,'Visible','on');
                 set(gh.parameter_page3_togglebutton,'Value',1);
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4207,7 +4209,7 @@ function updateDatasets()
         setappdata(mainWindow,'control',ad.control);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4249,7 +4251,7 @@ function updateGeneralPanel()
             ad.data{ad.control.spectra.active}.comment);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4495,7 +4497,7 @@ function updateParameterPanel()
                 'yyyy-mm-dd HH:MM:SS'), 'HH:MM:SS'));
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4513,7 +4515,7 @@ function updateInfofilePanel()
 %         gh = guidata(mainWindow);
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4590,7 +4592,7 @@ function updateHistoryPanel()
         end
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4616,7 +4618,7 @@ function value = getCascadedField (struct, fieldName)
             end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -4639,7 +4641,7 @@ function struct = setCascadedField (struct, fieldName, value)
             struct.(fieldName(1:nDots(1)-1)) = innerstruct;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 

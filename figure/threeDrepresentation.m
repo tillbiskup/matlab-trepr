@@ -16,8 +16,8 @@
 %              0 if some problems occurred
 %
 
-% Copyright (c) 2011, Till Biskup
-% 2011-09-02
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-26
 
 function figHandle = threeDrepresentation(data,parameters)
 
@@ -191,7 +191,7 @@ try
     end
     
 catch exception
-    throw(exception);
+    trEPRexceptionHandling(exception);
 end
 
 end

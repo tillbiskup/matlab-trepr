@@ -181,12 +181,12 @@ function switchMeasurePointer(~,~)
                         measureEnd();
                         return;
                     otherwise
-                        trEPRguiOptionUnknown(ad.control.measure.point,...
+                        trEPRoptionUnknown(ad.control.measure.point,...
                             'point');
                         return;
                 end
             otherwise
-                trEPRguiOptionUnknown(ad.control.measure.nPoints,...
+                trEPRoptionUnknown(ad.control.measure.nPoints,...
                     'nPoints');
                 return;
         end
@@ -310,7 +310,7 @@ function assignPointsToDataStructure()
                     ad.data{active}.display.position.y = ...
                         ad.data{active}.display.measure.point(1).index(1);
                 otherwise
-                    trEPRguiOptionUnknown(ad.control.axis.displayType,...
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
                         'display type');
                     return;
             end

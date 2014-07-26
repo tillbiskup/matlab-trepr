@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-25
+% 2014-07-26
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -20,6 +20,8 @@ if (singleton)
     varargout{1} = singleton;
     return;
 end
+
+defaultBackground = [.9 .9 .9];
 
 % Try to get main GUI position
 mainGUIHandle = trEPRguiGetWindowHandle();
@@ -34,6 +36,7 @@ end
 hMainFigure = figure('Tag',mfilename,...
     'Visible','off',...
     'Name','trEPR GUI : Net Polarisation Analysis Window',...
+    'Color',defaultBackground,...
     'Units','Pixels',...
     'Position',guiPosition,...
     'Resize','off',...
@@ -41,7 +44,6 @@ hMainFigure = figure('Tag',mfilename,...
     'KeyPressFcn',@keypress_Callback,...
     'Menu','none','Toolbar','none');
 
-defaultBackground = get(hMainFigure,'Color');
 mainPanelWidth = 260;
 mainPanelHeight = 420;
 panel_size = 240;
@@ -1061,7 +1063,7 @@ setappdata(hMainFigure,'NP',ad.NP);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
-trEPRmsg('Net Polarisation Analysis GUI window opened.','info');
+trEPRmsg('Net Polarisation Analysis GUI window opened.','debug');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
@@ -1125,7 +1127,7 @@ function tbg_Callback(source,~)
     try 
         switchPanel(get(get(source,'SelectedObject'),'String'));
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1231,7 +1233,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.line.width = value;
+                        ad.data{ad.control.spectra.active}.display.lines.data.width = value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
                         ad.NP.line.width = value;
@@ -1252,7 +1254,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.line.marker.size = ...
+                        ad.data{ad.control.spectra.active}.display.lines.data.marker.size = ...
                             value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
@@ -1274,10 +1276,10 @@ function edit_Callback(source,~,action)
                 setappdata(mainWindow,'NP',ad.NP);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1350,7 +1352,7 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         else % If toggle button switched OFF
@@ -1399,12 +1401,12 @@ function togglebutton_Callback(source,~,action)
                     updateAxes();
                     return;
                 otherwise
-                    trEPRguiOptionUnknown(action);
+                    trEPRoptionUnknown(action);
                     return;
             end
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1486,13 +1488,13 @@ function pushbutton_Callback(~,~,action)
             case 'lineColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.color)
-                            ad.data{active}.line.color = colors{...
-                                strcmpi(ad.data{active}.line.color,...
+                        if ischar(ad.data{active}.display.lines.data.color)
+                            ad.data{active}.display.lines.data.color = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.color,...
                                 colors(:,1)),2};
                         end
-                        ad.data{active}.line.color = uisetcolor(...
-                            ad.data{active}.line.color,...
+                        ad.data{active}.display.lines.data.color = uisetcolor(...
+                            ad.data{active}.display.lines.data.color,...
                             'Set line colour');
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
@@ -1515,23 +1517,23 @@ function pushbutton_Callback(~,~,action)
             case 'markerEdgeColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.marker.edgeColor)
-                            ad.data{active}.line.marker.edgeColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.edgeColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
                                 colors(:,1)),2};
                         end
                         newColour = uisetcolor(...
-                            ad.data{active}.line.marker.edgeColor,...
+                            ad.data{active}.display.lines.data.marker.edgeColor,...
                             'Set line marker edge colour');
                         if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.line.marker.edgeColor = newColour;
+                            ad.data{active}.display.lines.data.marker.edgeColor = newColour;
                             setappdata(mainWindow,'data',ad.data);
                         end
                     case 'average pretrig np'
                         if ischar(ad.NP.line.marker.edgeColor)
                             if length(ad.NP.line.marker.edgeColor) == 1
                                 ad.NP.line.marker.edgeColor = colors{...
-                                    strcmpi(ad.data{active}.line.marker.edgeColor,...
+                                    strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
                                     colors(:,1)),2};
                             else
                                 ad.NP.line.marker.edgeColor = [];
@@ -1571,16 +1573,16 @@ function pushbutton_Callback(~,~,action)
             case 'markerFaceColourPalette'
                 switch lower(lineType)
                     case 'main'
-                        if ischar(ad.data{active}.line.marker.faceColor)
-                            ad.data{active}.line.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.line.marker.faceColor,...
+                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
+                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
                                 colors(:,1)),2};
                         end
                         newColour = uisetcolor(...
-                            ad.data{active}.line.marker.faceColor,...
+                            ad.data{active}.display.lines.data.marker.faceColor,...
                             'Set MFoff line marker face colour');
                         if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.line.marker.faceColor = newColour;
+                            ad.data{active}.display.lines.data.marker.faceColor = newColour;
                             setappdata(mainWindow,'data',ad.data);
                         end
                     case 'average pretrig np'
@@ -1627,10 +1629,10 @@ function pushbutton_Callback(~,~,action)
             case 'markerDefaults'
                 switch lower(lineType)
                     case 'main'
-                        ad.data{active}.line.marker.type = 'none';
-                        ad.data{active}.line.marker.edgeColor = 'auto';
-                        ad.data{active}.line.marker.faceColor = 'none';
-                        ad.data{active}.line.marker.size = 6;
+                        ad.data{active}.display.lines.data.marker.type = 'none';
+                        ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
+                        ad.data{active}.display.lines.data.marker.faceColor = 'none';
+                        ad.data{active}.display.lines.data.marker.size = 6;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
                         ad.NP.line.marker.type = 'none';
@@ -1674,13 +1676,14 @@ function pushbutton_Callback(~,~,action)
                     delete(hHelpWindow);
                 end
                 delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('Net polarisation analysis GUI window closed','info');
+                trEPRmsg('Net polarisation analysis GUI window closed',...
+                    'debug');
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1712,15 +1715,15 @@ function popupmenu_Callback(source,~,action)
                         active = ad.control.spectra.active;
                         switch value
                             case 'solid'
-                                ad.data{active}.line.style = '-';
+                                ad.data{active}.display.lines.data.style = '-';
                             case 'dashed'
-                                ad.data{active}.line.style = '--';
+                                ad.data{active}.display.lines.data.style = '--';
                             case 'dotted'
-                                ad.data{active}.line.style = ':';
+                                ad.data{active}.display.lines.data.style = ':';
                             case 'dash-dotted'
-                                ad.data{active}.line.style = '-.';
+                                ad.data{active}.display.lines.data.style = '-.';
                             case 'none'
-                                ad.data{active}.line.style = 'none';
+                                ad.data{active}.display.lines.data.style = 'none';
                             otherwise
                                 % That shall never happen
                                 disp([mfilename ': popupmenu_Callback(): '...
@@ -1774,33 +1777,33 @@ function popupmenu_Callback(source,~,action)
                         active = ad.control.spectra.active;
                         switch value
                             case 'none'
-                                ad.data{active}.line.marker.type = 'none';
+                                ad.data{active}.display.lines.data.marker.type = 'none';
                             case 'plus'
-                                ad.data{active}.line.marker.type = '+';
+                                ad.data{active}.display.lines.data.marker.type = '+';
                             case 'circle'
-                                ad.data{active}.line.marker.type = 'o';
+                                ad.data{active}.display.lines.data.marker.type = 'o';
                             case 'asterisk'
-                                ad.data{active}.line.marker.type = '*';
+                                ad.data{active}.display.lines.data.marker.type = '*';
                             case 'point'
-                                ad.data{active}.line.marker.type = '.';
+                                ad.data{active}.display.lines.data.marker.type = '.';
                             case 'cross'
-                                ad.data{active}.line.marker.type = 'x';
+                                ad.data{active}.display.lines.data.marker.type = 'x';
                             case 'square'
-                                ad.data{active}.line.marker.type = 's';
+                                ad.data{active}.display.lines.data.marker.type = 's';
                             case 'diamond'
-                                ad.data{active}.line.marker.type = 'd';
+                                ad.data{active}.display.lines.data.marker.type = 'd';
                             case 'triangle up'
-                                ad.data{active}.line.marker.type = '^';
+                                ad.data{active}.display.lines.data.marker.type = '^';
                             case 'triangle down'
-                                ad.data{active}.line.marker.type = 'v';
+                                ad.data{active}.display.lines.data.marker.type = 'v';
                             case 'triangle right'
-                                ad.data{active}.line.marker.type = '<';
+                                ad.data{active}.display.lines.data.marker.type = '<';
                             case 'triangle left'
-                                ad.data{active}.line.marker.type = '>';
+                                ad.data{active}.display.lines.data.marker.type = '>';
                             case 'pentagram'
-                                ad.data{active}.line.marker.type = 'p';
+                                ad.data{active}.display.lines.data.marker.type = 'p';
                             case 'hexagram'
-                                ad.data{active}.line.marker.type = 'h';
+                                ad.data{active}.display.lines.data.marker.type = 'h';
                             otherwise
                                 % That shall never happen
                                 disp([mfilename ': popupmenu_Callback(): '...
@@ -1889,10 +1892,10 @@ function popupmenu_Callback(source,~,action)
                     case 'main'
                         active = ad.control.spectra.active;
                         if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.edgeColor = ...
-                                ad.data{active}.line.color;
+                            ad.data{active}.display.lines.data.marker.edgeColor = ...
+                                ad.data{active}.display.lines.data.color;
                         else
-                            ad.data{active}.line.marker.edgeColor = value;
+                            ad.data{active}.display.lines.data.marker.edgeColor = value;
                         end
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
@@ -1914,10 +1917,10 @@ function popupmenu_Callback(source,~,action)
                     case 'main'
                         active = ad.control.spectra.active;
                         if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.faceColor = ...
-                                ad.data{active}.line.color;
+                            ad.data{active}.display.lines.data.marker.faceColor = ...
+                                ad.data{active}.display.lines.data.color;
                         else
-                            ad.data{active}.line.marker.faceColor = value;
+                            ad.data{active}.display.lines.data.marker.faceColor = value;
                         end
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
@@ -1935,11 +1938,11 @@ function popupmenu_Callback(source,~,action)
                 end
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -1966,10 +1969,10 @@ function slider_Callback(source,~,action)
                 setappdata(mainWindow,'NP',ad.NP);
                 updateAxes();
             otherwise
-                trEPRguiOptionUnknown(action);
+                trEPRoptionUnknown(action);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2027,7 +2030,7 @@ function keypress_Callback(src,evt)
                 return;
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2057,10 +2060,10 @@ function switchPanel(panelName)
                 set(pp3,'Visible','on');
                 set(tb3,'Value',1);
             otherwise
-                trEPRguiOptionUnknown(panelName,'panel');
+                trEPRoptionUnknown(panelName,'panel');
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2131,7 +2134,7 @@ function updateAnalysisPanel()
                 'Background',[0.8 1 0.8]);
         end
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
@@ -2180,11 +2183,11 @@ function updateSettingsPanel(varargin)
         switch lower(lineType)
             case 'main'
                 set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.data{active}.line.color);
+                    ad.data{active}.display.lines.data.color);
                 set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.data{active}.line.width));
+                    num2str(ad.data{active}.display.lines.data.width));
                 % Set line style
-                lineStyle = ad.data{active}.line.style;
+                lineStyle = ad.data{active}.display.lines.data.style;
                 for k=1:length(lineStyles)
                     if strcmp(lineStyles{k},lineStyle)
                         lineStyleIndex = k;
@@ -2193,7 +2196,7 @@ function updateSettingsPanel(varargin)
                 set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
                 
                 % Set line marker type
-                lineMarker = ad.data{active}.line.marker.type;
+                lineMarker = ad.data{active}.display.lines.data.marker.type;
                 for k=1:length(lineMarkers)
                     if strcmp(lineMarkers{k},lineMarker)
                         lineMarkerIndex = k;
@@ -2201,7 +2204,7 @@ function updateSettingsPanel(varargin)
                 end
                 set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
                 % Set line marker edge colour
-                lineMarkerEdgeColor = ad.data{active}.line.marker.edgeColor;
+                lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
                 lineMarkerEdgeColorPopupmenuValues = ...
                     cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
                 if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
@@ -2214,16 +2217,16 @@ function updateSettingsPanel(varargin)
                                 'BackgroundColor',get(mainWindow,'Color'))
                         case 'auto'
                             set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.data{active}.line.color);
+                                'BackgroundColor',ad.data{active}.display.lines.data.color);
                     end
                 else
                     set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
                         find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
                     set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.line.marker.edgeColor);
+                        'BackgroundColor',ad.data{active}.display.lines.data.marker.edgeColor);
                 end
                 % Set line marker face colour
-                lineMarkerFaceColor = ad.data{active}.line.marker.faceColor;
+                lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
                 lineMarkerFaceColorPopupmenuValues = ...
                     cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
                 if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
@@ -2242,12 +2245,12 @@ function updateSettingsPanel(varargin)
                     set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
                         find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
                     set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.line.marker.faceColor);
+                        'BackgroundColor',ad.data{active}.display.lines.data.marker.faceColor);
                 end
 
                 % Set line marker size
                 set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.data{active}.line.marker.size));
+                    num2str(ad.data{active}.display.lines.data.marker.size));
             case 'average pretrig np'
                 set(gh.display_panel_linecoloursample_text,'Background',...
                     ad.NP.line.color);
@@ -2391,7 +2394,7 @@ function updateSettingsPanel(varargin)
         end
 
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end 
 end
 
@@ -2438,13 +2441,13 @@ function updateAxes(varargin)
         plot(...
             t,...
             NP,...
-            'Color',ad.data{active}.line.color,...
-            'LineStyle',ad.data{active}.line.style,...
-            'Marker',ad.data{active}.line.marker.type,...
-            'MarkerEdgeColor',ad.data{active}.line.marker.edgeColor,...
-            'MarkerFaceColor',ad.data{active}.line.marker.faceColor,...
-            'MarkerSize',ad.data{active}.line.marker.size,...
-            'LineWidth',ad.data{active}.line.width...
+            'Color',ad.data{active}.display.lines.data.color,...
+            'LineStyle',ad.data{active}.display.lines.data.style,...
+            'Marker',ad.data{active}.display.lines.data.marker.type,...
+            'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
+            'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
+            'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
+            'LineWidth',ad.data{active}.display.lines.data.width...
             );
         if ad.NP.smooth.window > 1
             filterfun = str2func(ad.NP.smooth.filterfun);
@@ -2549,7 +2552,7 @@ function updateAxes(varargin)
         end
         
     catch exception
-        trEPRguiExceptionHandling(exception)
+        trEPRexceptionHandling(exception)
     end
 end
 
