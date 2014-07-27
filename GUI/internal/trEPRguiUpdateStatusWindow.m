@@ -11,8 +11,8 @@ function status = trEPRguiUpdateStatusWindow(statusmessages)
 %   Using the findjobj function from Y. Altman, it ensures that always
 %   the last (i.e., most current) line of the status window is visible.
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-04-11
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-27
 
 % Is there currently a trEPRgui_statuswindow object?
 statuswindow = trEPRguiGetWindowHandle('trEPRgui_statuswindow');
@@ -32,9 +32,7 @@ set(textdisplay,'String',statusmessages);
 % uses findjobj from Yair Altman
 % Get the underlying Java control peer (a scroll-pane object)
 PWD = pwd;
-cd(fileparts(mfilename('fullpath')));
 jhEdit = findjobj(textdisplay);
-cd(PWD);
 % Get the scroll-pane's internal edit control
 jEdit = jhEdit.getComponent(0).getComponent(0);
 % Now move the caret position to the end of the text

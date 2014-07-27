@@ -1,6 +1,6 @@
-function hFigure = msgWindow(message,varargin)
-% MSGWINDOW Display message window similar to Matlab(r) msgbox, but with
-% nicer icons and HTML formatting for message.
+function hFigure = dialogueWindow(varargin)
+% DIALOGUEWINDOW Create dialogue window similar to Matlab(r) dialog, but
+% already with (nicer) icons and HTML formatting for message.
 %
 % Default keyboard shortcuts (only for non-modal windows):
 %
@@ -12,17 +12,17 @@ function hFigure = msgWindow(message,varargin)
 %              using HTML.
 %
 % Usage:
-%   msgWindow(message)
-%   handle = msgWindow(message)
-%   msgWindow(message,<parameter>,<value>)
-%
-%   message - text
-%             message to be displayed
+%   dialogueWindow
+%   handle = dialogueWindow
+%   handle = dialogueWindow(<parameter>,<value>)
 %
 %   handle  - handle
 %             handle of the figure window
 %
 % Optional parameters that can be set:
+%
+%   message         - text
+%                     message to be displayed
 %
 %   title           - string
 %                     title of the window
@@ -57,7 +57,7 @@ function hFigure = msgWindow(message,varargin)
 %                     background color for the text
 %                     If not provided, a default background color is used.
 %
-% See also: msgbox, uiText, uiImage
+% See also: msgWindow, uiText, uiImage, msgbox
 
 % Copyright (c) 2014, Till Biskup
 % 2014-07-27
@@ -70,50 +70,54 @@ try
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addRequired('message',@(x)ischar(x));
+    p.addParamValue('message','',@(x)ischar(x));
     p.addParamValue('title','Message',@(x)ischar(x));
     p.addParamValue('Position',[],...
-        @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
+        @(x)isempty(x) || (isvector(x) && (length(x) == 2 || length(x) == 4)));
     p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
     p.addParamValue('icon','',...
         @(x)ischar(x) && any(strcmpi(x,{'info','help','warning','error'})));
     p.addParamValue('WindowStyle','normal',...
         @(x)ischar(x) && any(strcmpi(x,{'normal','modal'})));
-    p.parse(message,varargin{:});
+    p.addParamValue('visible','on',...
+        @(x)ischar(x) && any(strcmpi(x,{'on','off'})));
+    p.parse(varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
     return;
 end
 
-hFigure = dialogueWindow(...
-    'Message',p.Results.message,...
-    'title',p.Results.title,...
-    'Position',p.Results.Position,...
-    'backgroundColor',p.Results.backgroundColor,...
-    'icon',p.Results.icon,...
-    'WindowStyle',p.Results.WindowStyle, ...
-    'visible','off' ...
+message = p.Results.message;
+if isempty(message)
+    message = 'Lorem ipsum dolor sit amet';
+end
+
+msgDim = getMessageDimensions(message);
+
+iconDim = getIconDimensions(p.Results.icon);
+
+position = getWindowPosition(p.Results.Position,msgDim,iconDim);
+
+hFigure = figure(...
+    'Name',p.Results.title,...
+    'NumberTitle','off', ...
+    'Menu','none','Toolbar','none',...
+    'Color',p.Results.backgroundColor,...
+    'Position',position,...
+    'WindowStyle',p.Results.WindowStyle,...
+    'Visible',p.Results.visible...
     );
 
-windowSize = get(hFigure,'Position');
-buttonXOffset = 48+20;
+msgPos = getMessagePosition(msgDim,iconDim);
 
-hButton = uicontrol('Tag','close_pushbutton',...
-    'Style','pushbutton',...
-    'Parent',hFigure,...
-    'BackgroundColor',p.Results.backgroundColor,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'Position',[round((windowSize(3)-buttonXOffset/2)/2) 12 60 25],...
-    'String','OK',...
-    'TooltipString','Close window',...
-    'Callback',{@closeWindow}...
-    );
+uiText(message,'parent',hFigure,'Position',msgPos);
+
+plotIcon(p.Results.icon,iconDim,msgDim);
 
 % Keyboard shortcuts only in non-modal mode
 if strcmpi(p.Results.WindowStyle,'normal')
-    set([hFigure,hButton],'KeyPressFcn',{@keypress_Callback});
+    set(hFigure,'KeyPressFcn',{@keypress_Callback});
 end
 
 % Block of callback functions that need to be inside the main function to
@@ -152,6 +156,80 @@ end
     end
 % end of callback functions blocks
 
-set(hFigure,'Visible','on');
+end
+
+function msgDim = getMessageDimensions(message)
+
+if length(message) < 70
+    msgDim = [ceil(500/70)*length(message) 15];
+else
+    msgDim = [500 15*ceil(length(message)/70)];
+end
+
+end
+
+function position = getWindowPosition(position,msgDim,iconDim)
+
+if length(position) == 4
+    return;
+end
+
+if isempty(position)
+    screenSize = get(0,'ScreenSize');
+    position = [screenSize(3)/2-msgDim(1)/2-iconDim(1)/2+20 ...
+        screenSize(4)/2-msgDim(2)/2+20 msgDim+20];
+elseif length(position) == 2
+    position = [position msgDim+20];
+end
+
+position(3) = position(3)+iconDim(1);
+position(4) = position(4)+30;
+
+if position(4) < iconDim(2)+20+30
+    position(4) = iconDim(2)+20+30;
+end
+
+end
+
+function iconDim = getIconDimensions(icon)
+
+if isempty(icon)
+    iconDim = [0 0];
+else
+    iconDim = [48+10 48];
+end
+
+end
+
+function msgPos = getMessagePosition(msgDim,iconDim)
+
+msgPos = [10+iconDim(1) 40 msgDim];
+
+if msgDim(2) < iconDim(2)
+    msgPos(2) = msgPos(2)+(iconDim(2)-msgDim(2))/2;
+end
+
+end
+
+function plotIcon(icon,iconDim,msgDim)
+
+if isempty(icon)
+    return;
+end
+
+iconFile = struct(...
+    'info','note.png',...
+    'help','tip.png',...
+    'warning','warning.png',...
+    'error','error.png' ...
+    );
+
+iconPos = [10 40];
+if msgDim(2) > iconDim(2)
+    iconPos(2) = iconPos(2)+(msgDim(2)-iconDim(2))/2;
+end
+
+[filePath,~,~] = fileparts(mfilename('fullpath'));
+uiImage(fullfile(filePath,iconFile.(icon)),'Position',iconPos);
 
 end

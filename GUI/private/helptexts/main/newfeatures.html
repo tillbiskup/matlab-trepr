@@ -50,6 +50,7 @@
 		    </ul>
 		    <li>Internals</li>
 		    <ul>
+		    	<li>New functions <tt>dialogueWindow</tt>, <tt>msgWindow</tt>, and <tt>questionDialogue</tt> for nice, HTML-formatted message windows replacing default Matlab(r) dialogues.</li>
 		    	<li>Code cleaning (using <tt>trEPRoptionUnknown</tt> and <tt>trEPRexceptionHandling</tt>)</li>
 		    	<li>New function <tt>trEPRoptionUnknown</tt> for handling unknown options mainly in switch-case statements, making code (especially of GUI callback functions) much easier to read.</li>
 		    	<li>New function <tt>trEPRexceptionHandling</tt> for exception handling, making code (especially of GUI callback functions) much easier to read.</li>
@@ -58,6 +59,7 @@
 		    </ul>
 		    <li>Bug fixes</li>
 		    <ul>
+		    	<li><tt>cmdLoad</tt>: Fix with converting units</li>
 		        <li>Some fields of the dataset had wrong type after loading an info file.</li>
 				<li><tt>trEPRdatasetShowBGpositions</tt>: Fix with field recording mode &quot;inward&quot;.</li>
 			</ul>
@@ -472,7 +474,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-26
+			2014-07-27
 		</p>
 		</div>
 	</body>

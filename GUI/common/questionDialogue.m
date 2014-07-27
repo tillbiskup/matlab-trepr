@@ -1,26 +1,22 @@
-function hFigure = msgWindow(message,varargin)
-% MSGWINDOW Display message window similar to Matlab(r) msgbox, but with
-% nicer icons and HTML formatting for message.
-%
-% Default keyboard shortcuts (only for non-modal windows):
-%
-%   Ctrl/Cmd + w  - close window
-%   Esc           - close window
+function answer = questionDialogue(message,varargin)
+% QUESTIONDIALOGUE Display question dialogue window similar to Matlab(r)
+% questdlg, but with nicer icons and HTML formatting for message.
 %
 % Please note: The function makes use of the underlying Java functionality
 %              in Matlab(r) and therefore allows for extended formatting
 %              using HTML.
 %
 % Usage:
-%   msgWindow(message)
-%   handle = msgWindow(message)
-%   msgWindow(message,<parameter>,<value>)
+%   questionDialogue(message)
+%   answer = questionDialogue(message)
+%   answer = questionDialogue(message,<parameter>,<value>)
 %
 %   message - text
 %             message to be displayed
 %
-%   handle  - handle
-%             handle of the figure window
+%   answer  - text
+%             Label of the button pressed.
+%             Empty if dialogue was closed without pressing a button.
 %
 % Optional parameters that can be set:
 %
@@ -32,18 +28,6 @@ function hFigure = msgWindow(message,varargin)
 %                     icon to be displayed on the left side of the window
 %                     One of "info", "help", "warning", "error"
 %                     Default: no icon
-%
-%   WindowStyle     - string
-%                     Window style used for message window.
-%                     One of "modal", "normal"
-%                     Default: "normal"
-%
-%                     Modal windows prevent the user from interacting with
-%                     other windows before responding.For more information,
-%                     see "WindowStyle" in the MATLAB Figure Properties.
-%
-%                     Please note that the keyboard shortcuts work only
-%                     with non-modal windows.
 %
 %   Position        - vector (2x1 or 4x1)
 %                     2x1: position of the window relative to the screen.
@@ -57,12 +41,12 @@ function hFigure = msgWindow(message,varargin)
 %                     background color for the text
 %                     If not provided, a default background color is used.
 %
-% See also: msgbox, uiText, uiImage
+% See also: msgWindow, dialogueWindow, uiText, uiImage
 
 % Copyright (c) 2014, Till Biskup
 % 2014-07-27
 
-hFigure = [];
+answer = '';
 
 % Parse input arguments using the inputParser functionality
 try
@@ -72,14 +56,14 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('message',@(x)ischar(x));
     p.addParamValue('title','Message',@(x)ischar(x));
+    p.addParamValue('buttons',{'OK','Cancel'},@(x)ischar(x) || iscell(x));
+    p.addParamValue('defaultButton','OK',@(x)ischar(x));
     p.addParamValue('Position',[],...
         @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
     p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
     p.addParamValue('icon','',...
         @(x)ischar(x) && any(strcmpi(x,{'info','help','warning','error'})));
-    p.addParamValue('WindowStyle','normal',...
-        @(x)ischar(x) && any(strcmpi(x,{'normal','modal'})));
     p.parse(message,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
@@ -92,32 +76,53 @@ hFigure = dialogueWindow(...
     'Position',p.Results.Position,...
     'backgroundColor',p.Results.backgroundColor,...
     'icon',p.Results.icon,...
-    'WindowStyle',p.Results.WindowStyle, ...
+    'WindowStyle','modal', ...
     'visible','off' ...
     );
 
 windowSize = get(hFigure,'Position');
 buttonXOffset = 48+20;
+buttonSize = [60 25];
 
-hButton = uicontrol('Tag','close_pushbutton',...
-    'Style','pushbutton',...
-    'Parent',hFigure,...
-    'BackgroundColor',p.Results.backgroundColor,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'Position',[round((windowSize(3)-buttonXOffset/2)/2) 12 60 25],...
-    'String','OK',...
-    'TooltipString','Close window',...
-    'Callback',{@closeWindow}...
-    );
+for button = 1:length(p.Results.buttons)
+    uicontrol(...
+        'Style','pushbutton',...
+        'Parent',hFigure,...
+        'BackgroundColor',p.Results.backgroundColor,...
+        'FontUnit','Pixel','Fontsize',12,...
+        'Units','Pixels',...
+        'Position',[...
+        round(windowSize(3)+buttonXOffset-length(p.Results.buttons)*...
+        buttonSize(1))/2+(button-1)*buttonSize(1) 12 buttonSize],...
+        'String',p.Results.buttons{button},...
+        'Callback',{@pushbutton_Callback}...
+        );
+end
 
-% Keyboard shortcuts only in non-modal mode
-if strcmpi(p.Results.WindowStyle,'normal')
-    set([hFigure,hButton],'KeyPressFcn',{@keypress_Callback});
+% Keyboard shortcuts
+set([hFigure,findobj('Style','pushbutton')'],...
+    'KeyPressFcn',{@keypress_Callback});
+
+% Select default button
+defaultButton = findobj(...
+    allchild(hFigure),...
+    'Style','pushbutton','-and','String',p.Results.defaultButton);
+
+if ~isempty(defaultButton)
+    uicontrol(defaultButton);
 end
 
 % Block of callback functions that need to be inside the main function to
 % get easy access to the main figure handle
+    function pushbutton_Callback(source,~)
+        try
+            answer = get(source,'String');
+            closeWindow();
+        catch exception
+            trEPRexceptionHandling(exception);
+        end
+    end
+        
     function keypress_Callback(~,evt)
         
         if isempty(evt.Character) && isempty(evt.Key)
@@ -153,5 +158,7 @@ end
 % end of callback functions blocks
 
 set(hFigure,'Visible','on');
+
+waitfor(hFigure);
 
 end
