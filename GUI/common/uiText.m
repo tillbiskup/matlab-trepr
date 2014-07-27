@@ -36,7 +36,7 @@ function uiText(text,varargin)
 
 % Parse input arguments using the inputParser functionality
 try
-    p = inputParser;            % Create inputParse instance
+    p = inputParser;            % Create inputParser instance
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
