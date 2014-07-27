@@ -24,7 +24,7 @@ function data = trEPRspikeRemoval(data,fieldPositions)
 %              doing.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-12
+% 2014-07-27
 
 % If called without parameter, display help
 if ~nargin && ~nargout
@@ -49,7 +49,7 @@ Z = data.data;
 
 % Get field positions
 try
-    positions = arrayfun(@(x)find(y==x),fieldPositions);
+    positions = interp1(y,1:length(y),fieldPositions,'nearest');
 catch %#ok<CTCH>
     trEPRmsg('Problems finding positions in dataset.','warn');
     return;
@@ -62,7 +62,9 @@ y(positions) = [];
 
 % Interpolate
 if length(x) > 1
-    data.data(positions,:) = interp2(x,y,Z,x,yi');
+    [x2,y2] = meshgrid(x,y);
+    [x1,y1] = meshgrid(x,yi);
+    data.data(positions,:) = interp2(x2,y2,Z,x1,y1);
 else
     data.data(positions,:) = interp1(y,Z,yi');
 end

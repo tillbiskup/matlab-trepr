@@ -7,7 +7,7 @@ function handle = guiProcessingPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-07-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -560,12 +560,6 @@ function pushbutton_Callback(~,~,action)
                 % If result is not empty, assign
                 if ~isempty(resdata)
                     trEPRappendDatasetToMainGUI(resdata,'modified',true);
-%                     ad.data{primary} = resdata;
-%                     if ~any(ad.control.spectra.modified==primary)
-%                         ad.control.spectra.modified(end+1) = primary;
-%                     end
-%                     setappdata(mainWindow,'data',ad.data);
-%                     setappdata(mainWindow,'control',ad.control);
                     update_visibleSpectra();
                     update_processingPanel();
                     update_mainAxis();

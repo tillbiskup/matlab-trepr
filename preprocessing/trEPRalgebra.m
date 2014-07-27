@@ -7,6 +7,7 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %
 % data       - cell array
 %              Datasets conforming to the trEPR toolbox data format
+%
 % operation  - string
 %              Operation to be performed on the two datasets.
 %              Currently '+' or '-' and the pendants 'add' and 'subtract',
@@ -14,241 +15,113 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %
 % data       - struct
 %              Dataset resulting from the algebraic operation.
+%
 % warnings   - string
 %              Empty if everything went well, otherwise contains message.
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-26
+% 2014-07-27
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Include function in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('data', @(x)iscell(x));
+    p.addRequired('operation', @(x)ischar(x) || isstruct(x));
+    p.parse(data,operation);
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
-p.addRequired('data', @(x)iscell(x));
-p.addRequired('operation', @(x)ischar(x));
-p.parse(data,operation);
+warnings = '';
+resdata = [];
+
+if ischar(operation)
+    parameters.operation = operation;
+end
 
 try
-    warnings = '';
-    resdata = [];
-    
-    if (length(data) ~= 2) && ~strcmpi(operation,'scaling')
+    if (length(data) ~= 2) && ~strcmpi(parameters.operation,'scaling')
         warnings = 'Other than two datasets, therefore no operation done';
         return;
     end
-
+    
     % Convert operations
-    if any(strfind(lower(operation),'add')) || strcmpi(operation,'+')
-        operation = 'addition';
+    if any(strfind(lower(parameters.operation),'add')) || ...
+            strcmpi(parameters.operation,'+')
+        parameters.operation = 'addition';
     end
-    if any(strfind(lower(operation),'sub')) || strcmpi(operation,'-')
-        operation = 'subtraction';
+    if any(strfind(lower(parameters.operation),'sub')) || ...
+            strcmpi(parameters.operation,'-')
+        parameters.operation = 'subtraction';
     end
     
     
     % Perform all (temporary) operations such as displacement, scaling,
-    % smoothing
+    % smoothing, normalisation
+    
     for k=1:length(data)
-        if isfield(data{k},'display')
-            
-            % Displacement
-            if isfield(data{k}.display,'displacement')
-                if isfield(data{k}.display.displacement,'z')
-                    data{k}.data = data{k}.data + ...
-                        data{k}.display.displacement.z;
-                    if isfield(data{k},'calculated')
-                        data{k}.calculated = data{k}.calculated + ...
-                            data{k}.display.displacement.z;
-                    end
-                end
-                % TODO: Displacement in x, y
-            end
-            
-            % Scaling
-            if isfield(data{k}.display,'scaling')
-                if isfield(data{k}.display.scaling,'z')
-                    data{k}.data = data{k}.data * ...
-                        data{k}.display.scaling.z;
-                    if isfield(data{k},'calculated')
-                        data{k}.calculated = data{k}.calculated * ...
-                            data{k}.display.scaling.z;
-                    end
-                end
-                % TODO: Scaling in x, y
-            end
-            
-            % Smoothing
-            if isfield(data{k}.display,'smoothing')
-                [dimy,dimx] = size(data{k}.data);
-                if isfield(data{k}.display.smoothing,'x') ...
-                        && (data{k}.display.smoothing.x.value > 1) ...
-                        && isfield(data{k}.display.smoothing.x,'filterfun')
-                    filterfun = str2func(data{k}.display.smoothing.x.filterfun);
-                    for l=1:dimy
-                        data{k}.data(l,:) = filterfun(...
-                            data{k}.data(l,:),...
-                            data{k}.display.smoothing.x.value);
-                    end
-                    if isfield(data{k},'calculated')
-                        for l=1:dimy
-                            data{k}.calculated(l,:) = filterfun(...
-                                data{k}.calculated(l,:),...
-                                data{k}.display.smoothing.x.value);
-                        end
-                    end
-                end
-                if isfield(data{k}.display.smoothing,'y') ...
-                        && (data{k}.display.smoothing.y.value > 1) ...
-                        && isfield(data{k}.display.smoothing.y,'filterfun')
-                    filterfun = str2func(data{k}.display.smoothing.y.filterfun);
-                    for l=1:dimx
-                        data{k}.data(:,l) = filterfun(...
-                            data{k}.data(:,l),...
-                            data{k}.display.smoothing.y.value);
-                    end
-                    if isfield(data{k},'calculated')
-                        for l=1:dimx
-                            data{k}.calculated(:,l) = filterfun(...
-                                data{k}.calculated(:,l),...
-                                data{k}.display.smoothing.y.value);
-                        end
-                    end
-                end
-            end
-        end
+        data{k} = trEPRdatasetApplyDisplacement(data{k});
+        data{k} = trEPRdatasetApplyScaling(data{k});
+        data{k} = trEPRdatasetApplySmoothing(data{k});
     end
     
     % Assign dataset1 to output
     resdata = data{1};
     
     % Perform actual arithmetic functions
-    switch operation
+    switch parameters.operation
         case 'addition'
             resdata.data = data{1}.data + data{2}.data;
             if isfield(data{1},'calculated')
                 if isfield(data{2},'calculated')
-                    resdata.calculated = data{1}.calculated + data{2}.calculated;
+                    resdata.calculated = ...
+                        data{1}.calculated + data{2}.calculated;
                 else
-                    resdata.calculated = data{1}.calculated + data{2}.data;
+                    resdata.calculated = ...
+                        data{1}.calculated + data{2}.data;
                 end
             end
         case 'subtraction'
             resdata.data = data{1}.data - data{2}.data;
             if isfield(data{1},'calculated')
                 if isfield(data{2},'calculated')
-                    resdata.calculated = data{1}.calculated - data{2}.calculated;
+                    resdata.calculated = ...
+                        data{1}.calculated - data{2}.calculated;
                 else
-                    resdata.calculated = data{1}.calculated - data{2}.data;
+                    resdata.calculated = ...
+                        data{1}.calculated - data{2}.data;
                 end
             end
         case 'scaling'
-            if nargin < 3
+            if nargin < 3 && ~isfield(parameters.scalingFactor)
                 warnings = 'No scaling factor specified.';
                 return;
-            else
-                scalingFactor = varargin{1};
-                if ~isnumeric(scalingFactor)
-                    scalingFactor = str2double(scalingFactor);
-                    if isnan(scalingFactor)
-                        warnings = 'Scaling factor not understood.';
-                    end
-                end
+            elseif ~isfield(parameters.scalingFactor)
+                parameters.scalingFactor = varargin{1};
             end
-            resdata.data = data{1}.data * scalingFactor;
+            resdata.data = data{1}.data * parameters.scalingFactor;
             if isfield(data{1},'calculated')
-                resdata.calculated = data{1}.calculated * scalingFactor;
+                resdata.calculated = ...
+                    data{1}.calculated * parameters.scalingFactor;
             end
         otherwise
-            warnings = sprintf('Operation "%s" not understood.',operation);
+            trEPRoptionUnknown(operation,'operation');
             return;
     end
     
-    % Write history
-    history = struct();
-    history.date = datestr(now,31);
+    % Write history record
+    history = trEPRdataStructure('history');
     history.method = mfilename;
-    % Get username of current user
-    % In worst case, username is an empty string. So nothing should really
-    % rely on it.
-    % Windows style
-    history.system.username = getenv('UserName');
-    % Unix style
-    if isempty(history.system.username)
-        history.system.username = getenv('USER');
-    end
-    history.system.platform = platform;
-    history.system.matlab = version;
-    history.system.trEPR = trEPRinfo('version');
-    
-    % Add parameters
-    history.parameters.operation = operation;
-    
-    switch operation
-        case 'scaling'
-            history.parameters.scalingFactor = scalingFactor;
-    end
-    
-    % Assign complete report to info field of history
-    history.info = cell(0);
-    if length(data) > 1
-        history.info{end+1} = ...
-            sprintf('Primary dataset:    %s',data{1}.label);
-    end
-    if data{1}.display.displacement.z ~= 0
-        history.info{end+1} = sprintf('  Displacement (z): %f',...
-            data{1}.display.displacement.z);
-    end
-    if data{1}.display.scaling.z ~= 1
-        history.info{end+1} = sprintf('  Scaling (z):      %f',...
-            data{1}.display.scaling.z);
-    end
-    if data{1}.display.smoothing.x.value ~= 1
-        history.info{end+1} = sprintf('  Smoothing (x):');
-        history.info{end+1} = sprintf('            points: %i',...
-            data{1}.display.smoothing.x.value);
-        history.info{end+1} = sprintf('          function: %s',...
-            data{1}.display.smoothing.x.filterfun);
-    end
-    if data{1}.display.smoothing.y.value ~= 1
-        history.info{end+1} = sprintf('  Smoothing (y):');
-        history.info{end+1} = sprintf('            points: %i',...
-            data{1}.display.smoothing.y.value);
-        history.info{end+1} = sprintf('          function: %s',...
-            data{1}.display.smoothing.y.filterfun);
-    end
-    if length(data) > 1
-        history.info{end+1} = sprintf('Secondary dataset:  %s',data{2}.label);
-        if data{2}.display.displacement.z ~= 0
-            history.info{end+1} = sprintf('  Displacement (z): %f',...
-                data{2}.display.displacement.z);
-        end
-        if data{2}.display.scaling.z ~= 1
-            history.info{end+1} = sprintf('  Scaling (z):      %f',...
-                data{2}.display.scaling.z);
-        end
-        if data{2}.display.smoothing.x.value ~= 1
-            history.info{end+1} = sprintf('  Smoothing (x):');
-            history.info{end+1} = sprintf('            points: %i',...
-                data{2}.display.smoothing.x.value);
-            history.info{end+1} = sprintf('          function: %s',...
-                data{2}.display.smoothing.x.filterfun);
-        end
-        if data{2}.display.smoothing.y.value ~= 1
-            history.info{end+1} = sprintf('  Smoothing (y):');
-            history.info{end+1} = sprintf('            points: %i',...
-                data{2}.display.smoothing.y.value);
-            history.info{end+1} = sprintf('          function: %s',...
-                data{2}.display.smoothing.y.filterfun);
-        end
-    end
-    
-    % Assign history to dataset of accumulated data
+    history.parameters = parameters;
     resdata.history{end+1} = history;
-    
+
 catch exception
     trEPRexceptionHandling(exception);
 end
 
 end
+
