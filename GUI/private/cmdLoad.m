@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-25
+% 2014-07-27
 
 status = 0;
 warnings = cell(0);
@@ -284,7 +284,8 @@ if get(gh.load_panel_unitconversion_checkbox,'Value')
     conversions = regexp(ad.configuration.load.convert,',','split');
     for k=1:length(newDataIdx)
         for conversion = 1:length(conversions)
-            cmdConvert(newDataIdx(k),conversions(conversion));
+            cmdConvert(handle,...
+                {num2str(newDataIdx(k)),conversions{conversion}});
         end
     end
 end
