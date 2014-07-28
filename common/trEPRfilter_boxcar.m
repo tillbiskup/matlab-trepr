@@ -1,13 +1,18 @@
-function data = trEPRfilter_boxcar(data,width)
+function data = trEPRfilter_boxcar(data,varargin)
 % TREPRFILTER_BOXCAR Filter 1D data with a boxcar filter with given window
 % length.
 %
 % Usage
-%   data = trEPRfilter_boxcar(data,window)
+%   data = trEPRfilter_boxcar(data,width)
+%   data = trEPRfilter_boxcar(data,parameters)
 %
-%   data  - data to filter
+%   data       - data to filter
 %
-%   width - filter window width (actual filter window is 2*width+1)
+%   width      - filter window width (actual filter window is 2*width+1)
+%
+%   parameters - struct
+%                structure with field "width"
+%                Alternative to providing parameters as scalar inputs
 %
 % PLEASE NOTE: Using this unweighted filter is strongly discouraged, as it
 %              is known to broaden lines and distort line shapes. Use
@@ -22,7 +27,19 @@ function data = trEPRfilter_boxcar(data,width)
 % See also: trEPRfilter_binomial, trEPRfilter_SavitzkyGolay
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-24
+% 2014-07-28
+
+% Set default
+width = 2;
+
+if isscalar(varargin{1})
+    width = varargin{1};
+elseif isstruct(varargin{1})
+    parameters = varargin{1};
+    if isfield(parameters,'width')
+        width = parameters.width;
+    end
+end
 
 width = 2*width+1;
 filter = ones(1,width)/width;

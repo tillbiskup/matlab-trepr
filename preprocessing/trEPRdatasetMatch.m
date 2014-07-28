@@ -6,12 +6,39 @@ function [data] = trEPRdatasetMatch(data,varargin)
 %
 % Usage
 %   [datasets] = trEPRdatasetMatch(datasets)
+%   [datasets] = trEPRdatasetMatch(datasets,<parameter>,<value>)
 %
 % data - 1x2 struct
 %        Datasets conforming to the trEPR toolbox data format
+%
+% Optional parameters that can be set:
+%
+%   dimension - string
+%               dimension(s) the datasets should be matched
+%               Possible values: "2D", "x", "y"
+%               If not specified, "2D" will be assumed.
+%               If one dataset is one-dimensional, the respective 1D mode
+%               will be tried
+%
+% The function performs some basic checkings for the dataset format and
+% whether the datasets overlap in the given dimension(s). In case both
+% datasets have identical dimensions and axes values, they are returned
+% immediately.
+%
+% The function *does not* check for units of the respective axes, therefore
+% handle with care in case you change units and end up with still
+% overlapping datasets.
+%
+% The second dataset is interpolated on top of the first dataset. A proper
+% history record is added to both datasets.
+%
+% If the datasets do not overlap in the given dimension, the output
+% parameter will be an empty cell array and a warning will be issued.
+%
+% See also: interp1, interp2
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% 2014-07-28
 
 % Parse input arguments using the inputParser functionality
 try
@@ -28,6 +55,7 @@ catch exception
     return;
 end
 
+% Basic check for dataset format
 for dataset = 1:length(data)
     if ~isfield(data{dataset},'format') || ...
             ~isfield(data{dataset}.format,'name') || ...
@@ -35,6 +63,15 @@ for dataset = 1:length(data)
         trEPRmsg([mfilename ': Problems with dataset(s)'],'warning');
         return;
     end
+end
+
+% Check for identical dimensions and axis values of the datasets
+% NOTE: Units are *not* checked
+if all(size(data{1}.data) == size(data{2}.data)) && ...
+        all(size(data{1}.axes.x.values) == size(data{2}.axes.x.values)) && ...
+        all(size(data{1}.axes.y.values) == size(data{2}.axes.y.values))
+    trEPRmsg([mfilename ': Datasets have identical dimensions'],'info');
+    return;
 end
 
 try
@@ -81,6 +118,13 @@ for dim = 1:length(dimensions)
         1:length(data{1}.axes.(dimensions{dim}).values),...
         limit.(dimensions{dim}).value(2),'nearest');
     
+    % Check for non-overlapping datasets
+    if any(isnan(limit.(dimensions{dim}).index))
+        trEPRmsg([mfilename ': Datasets seem not to overlap'],'warning');       
+        data = {};
+        return;
+    end
+    
     % Cut axes of first dataset
     data{1}.axes.(dimensions{dim}).values = ...
         data{1}.axes.(dimensions{dim}).values(...
@@ -115,9 +159,9 @@ if nargin > 1
 end
 
 if size(data{1}.data,1) == 1 || size(data{2}.data,1) == 1
-    dimension = 'y';
-elseif size(data{1}.data,2) == 1 || size(data{2}.data,2) == 1
     dimension = 'x';
+elseif size(data{1}.data,2) == 1 || size(data{2}.data,2) == 1
+    dimension = 'y';
 end
 
 % Get overlapping area in respective dimension
@@ -144,6 +188,13 @@ limit.(dimension).index(2) = ...
     interp1(data{1}.axes.(dimension).values,...
     1:length(data{1}.axes.(dimension).values),...
     limit.(dimension).value(2),'nearest');
+
+% Check for non-overlapping datasets
+if any(isnan(limit.(dimension).index))
+    trEPRmsg([mfilename ': Datasets seem not to overlap'],'warning');
+    data = {};
+    return;
+end
 
 % Cut respective axis of first dataset
 data{1}.axes.(dimension).values = ...
