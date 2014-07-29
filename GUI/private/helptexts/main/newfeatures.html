@@ -15,11 +15,37 @@
 		<p>
 			Basically, the complete toolbox got reimplemented for version 0.3, and the GUI rewritten with a complete new layout (and underlying code).
 		</p>
+		<h2>v.0.3.47</h2>
+		<ul>
+		    <li>New features</li>
+		    <ul>
+		        <li><tt>trEPRupdateCheck</tt> checks for new version of toolbox online.<br/>Automatically performed on GUI start if configured this way.</li>
+		    	<li><tt>trEPRalgebra</tt> operational (even from GUI).</li>
+		    </ul>
+		    <li>CMD</li>
+		    <ul>
+		    </ul>
+		    <li>GUI layout and usability</li>
+		    <ul>
+		    	<li>Adding/subtracting two datasets (processing panel) operational.</li>
+		    </ul>
+		    <li>Compatibility</li>
+		    <ul>
+			    <li><b>GUI appdata version 1.11.</b></li>
+			    <li>GUI configuration: <tt>trEPRgui.ini</tt> with new field &quot;updatecheck&quot; in &quot;start&quot; section.</li>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		    </ul>
+		    <li>Bug fixes</li>
+		    <ul>
+		    </ul>
+		</ul>
 		<h2>v.0.3.46</h2>
 		<ul>
 		    <li>New features</li>
 		    <ul>
-		        <li>New function <tt>trEPRdatasetMatch</tt> ....</li>
+		        <li>New function <tt>trEPRdatasetMatch</tt> to get overlapping parts of two datasets (uses interpolation if necessary).</li>
 		        <li>New function <tt>trEPRfilter_binomial</tt> implementing a binomially weighted filter.</li>
 		        <li>New function <tt>trEPRfilter_SavitzkyGolay</tt> implementing a Savitzky-Golay filter.</li>
 				<li>New function <tt>trEPRplot</tt> for plotting datasets from the command line.</li>
@@ -476,7 +502,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-07-28
+			2014-07-29
 		</p>
 		</div>
 	</body>

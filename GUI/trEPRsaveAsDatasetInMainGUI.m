@@ -11,8 +11,8 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-11-28
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-29
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -175,21 +175,7 @@ try
     status = 0;
     
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
     

@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-07-25
+% 2014-07-29
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -101,6 +101,21 @@ switch version
             (newdata.display.smoothing.data.x.parameters.width-1)/2);
         newdata.display.smoothing.data.y.parameters.width = floor(...
             (newdata.display.smoothing.data.y.parameters.width-1)/2);
+        % Check for wrong field types (was problem with old format)
+        if ischar(newdata.parameters.purpose)
+            purpose = newdata.parameters.purpose;
+            newdata.parameters = rmfield(newdata.parameters,'purpose');
+            newdata.parameters.purpose{1} = purpose;
+        end
+        sampleFieldNames = {'description','buffer','preparation'};
+        for k = 1:length(sampleFieldNames)
+            if ischar(newdata.sample.(sampleFieldNames{k}))
+                value = newdata.sample.(sampleFieldNames{k});
+                newdata.sample = ...
+                    rmfield(newdata.sample,(sampleFieldNames{k}));
+                newdata.sample.(sampleFieldNames{k}) = value;
+            end
+        end
     case '1.8'
         newdata.display.lines.data = data.line;
         newdata.display.displacement.data.x = data.display.displacement.x;
@@ -138,6 +153,21 @@ switch version
             (newdata.display.smoothing.data.x.parameters.width-1)/2);
         newdata.display.smoothing.data.y.parameters.width = floor(...
             (newdata.display.smoothing.data.y.parameters.width-1)/2);
+        % Check for wrong field types (was problem with old format)
+        if ischar(newdata.parameters.purpose)
+            purpose = newdata.parameters.purpose;
+            newdata.parameters = rmfield(newdata.parameters,'purpose');
+            newdata.parameters.purpose{1} = purpose;
+        end
+        sampleFieldNames = {'description','buffer','preparation'};
+        for k = 1:length(sampleFieldNames)
+            if ischar(newdata.sample.(sampleFieldNames{k}))
+                value = newdata.sample.(sampleFieldNames{k});
+                newdata.sample = ...
+                    rmfield(newdata.sample,(sampleFieldNames{k}));
+                newdata.sample.(sampleFieldNames{k}) = value;
+            end
+        end
     case '1.5'
         newdata.parameters.purpose = {''};
         newdata.sample.buffer = {''};

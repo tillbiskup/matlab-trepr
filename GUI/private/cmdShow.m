@@ -284,7 +284,8 @@ else
             update_visibleSpectra();
             update_processingPanel();
             update_sliderPanel();
-        case {char([100 105 108 98 101 114 116]),char([120 107 99 100])}
+        case {char([100 105 108 98 101 114 116]),char([120 107 99 100]),...
+                char([112 104 100 99 111 109 105 99])}
             guiProcRast(opt{1});
         otherwise
             status = -3;

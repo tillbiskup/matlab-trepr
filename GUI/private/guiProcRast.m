@@ -1,5 +1,5 @@
 function guiProcRast(varargin)
-% GUIPROCRAST An very important internal GUI function with quite telling
+% GUIPROCRAST A very important internal GUI function with quite telling
 % name.
 %
 % Usage
@@ -14,7 +14,7 @@ function guiProcRast(varargin)
 %              easily in the future. Don't blame the author... ;-)
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-24
+% 2014-07-29
 
 if ~nargin && ~ischar(varargin{1})
     return;
@@ -42,6 +42,17 @@ switch lower(varargin{1})
         trEPRbusyWindow('delete');
         if exist('c','var')
             showSomethingElse(c,d);
+        end
+    case char([112 104 100 99 111 109 105 99])
+        trEPRbusyWindow('start',['Good choice...<br>'...
+            '(retrieving necessary data)']);
+        try
+            [e,f] = getSomethingThird;
+        catch  %#ok<CTCH>
+        end
+        trEPRbusyWindow('delete');
+        if exist('e','var')
+            showSomethingThird(e,f);
         end
     otherwise
         return;
@@ -84,7 +95,7 @@ set(gcf,'unit','pixels','position',[(screenSize(3)-imgSize(2))/2 ...
     (screenSize(4)-imgSize(1))/2 imgSize(2)-3 imgSize(1)-1],...
     'MenuBar','none','NumberTitle','off',...
     'Name',[ char([68 105 108 98 101 114 116]) ' ' ...
-    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ...
+    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ' ' ...
     'http://' char([100 105 108 98 101 114 116]) '.com/']); 
 set(gca,'unit','pixels','position',[0 1 imgSize(2)-1 imgSize(1)-1]);
 
@@ -125,17 +136,58 @@ set(fHandle,'unit','pixels','position',[(screenSize(3)-imgSize(2))/2 ...
     (screenSize(4)-imgSize(1))/2 imgSize(2)-3 imgSize(1)-1],...
     'MenuBar','none','NumberTitle','off',...
     'Name',[char([120 107 99 100]) ' ' ...
-    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ...
+    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ' ' ...
     'https://www.' char([120 107 99 100]) '.com/']); 
+
+try
+    cdataImg = ind2rgb(img,gray);
+catch  %#ok<CTCH>
+    cdataImg = img;
+end
 
 uicontrol('Style','pushbutton','Parent',fHandle,...
     'Units','Pixels','Position',[0 1 imgSize(2)-1 imgSize(1)-1],...
-    'CData',ind2rgb(img,gray),'TooltipString',['<html>' title], ...
+    'CData',cdataImg,'TooltipString',['<html>' title], ...
     'Callback',{@closeFcn} ...
 );
 
-function closeFcn(~,~)
-close(gcf)
 end
+
+function [img,map] = getSomethingThird
+
+URL = ['http://' char([112 104 100 99 111 109 105 99 115]) '.com/' ...
+    char([99 111 109 105 99 115 46 112 104 112])];
+
+% Read URL
+uriContent = urlread(URL);
+startMatch = ['id=' char([99 111 109 105 99]) ' name=' ...
+    char([99 111 109 105 99]) ' src='];
+
+% Parse URL for link to strip
+startMatchPos = strfind(uriContent,startMatch);
+
+imgUrl = uriContent(startMatchPos+length(startMatch) : ...
+    startMatchPos+length(startMatch)+54);
+
+% Get image
+[img,map] = imread(imgUrl);
+end
+
+function showSomethingThird(img,map)
+
+figure();
+image(img); 
+colormap(map); 
+axis off; 
+axis image; 
+imgSize = size(img);
+screenSize = get(0,'ScreenSize');
+set(gcf,'unit','pixels','position',[(screenSize(3)-imgSize(2))/2 ...
+    (screenSize(4)-imgSize(1))/2 imgSize(2)-3 imgSize(1)-1],...
+    'MenuBar','none','NumberTitle','off',...
+    'Name',[ char([112 104 100 99 111 109 105 99 115]) ' ' ...
+    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ' ' ...
+    'http://' char([112 104 100 99 111 109 105 99 115]) '.com/']); 
+set(gca,'unit','pixels','position',[0 1 imgSize(2)-1 imgSize(1)-1]);
 
 end

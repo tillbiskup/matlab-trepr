@@ -25,10 +25,12 @@ defaultBackground = [0.9 0.9 0.9]
 %                Alternatively, directly the "Load panel" is displayed.
 % tip          - Whether to show a "Did you know...?" message at start.
 % statuswindow - Toggle between displaying the status window on startup 
+% statuswindow - Whether to check for updates on start
 [start]
 welcome = 1
 tip = 1
 statuswindow = 0
+updatecheck = 1
 
 % Configuration of the directories used internally
 %

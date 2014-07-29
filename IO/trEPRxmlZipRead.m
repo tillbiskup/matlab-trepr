@@ -15,8 +15,8 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 %
 % SEE ALSO TREPRXMLZIPWRITE
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-06-08
+% Copyright (c) 2011-14, Till Biskup
+% 2014-07-29
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -151,7 +151,12 @@ if exist('data','var')
 end
 cd(PWD);
 % Convert to current toolbox format if necessary
-[struct,convertWarning] = trEPRfileFormatConvert(struct);
+try
+    [struct,convertWarning] = trEPRfileFormatConvert(struct);
+catch exception
+    trEPRexceptionHandling(exception);
+    convertWarning = 'Serious Problems with converter function';
+end
 if ~isempty(convertWarning)
     warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';
     warning{end}.message = convertWarning;

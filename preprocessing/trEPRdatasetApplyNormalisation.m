@@ -21,7 +21,7 @@ function data = trEPRdatasetApplyNormalisation(data,varargin)
 % trEPRdatasetApplySmoothing
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% 2014-07-29
 
 % Parse input arguments using the inputParser functionality
 try
@@ -43,6 +43,8 @@ if ~isfield(data,'format') || ~isfield(data.format,'name') || ...
     trEPRmsg([mfilename ': Problems with dataset'],'warning');
     return;
 end
+
+parameters = p.Results.parameters;
 
 if ~isfield(parameters,'dimension') || ~isfield(parameters,'type') || ...
         ~isfield(parameters,'displayType')

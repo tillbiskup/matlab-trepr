@@ -7,7 +7,7 @@ function varargout = trEPRgui_ACCwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-07-28
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1131,30 +1131,30 @@ if (mainGuiWindow)
     %       - Frequency correction when displacing along the field axis...!
     for m=1:length(ad.data)
         % Handle displacement along all three axes
-        if (ad.data{m}.display.displacement.x ~= 0)
+        if (ad.data{m}.display.displacement.data.x ~= 0)
             % Get axis stepping
             xStep = ad.data{m}.axes.x.values(2)-ad.data{m}.axes.x.values(1);
             % Set new axes values
             ad.data{m}.axes.x.values = ad.data{m}.axes.x.values + ...
-                (xStep*ad.data{m}.display.displacement.x);
+                (xStep*ad.data{m}.display.displacement.data.x);
         end
-        if (ad.data{m}.display.displacement.y ~= 0)
+        if (ad.data{m}.display.displacement.data.y ~= 0)
             % Get axis stepping
             yStep = ad.data{m}.axes.y.values(2)-ad.data{m}.axes.y.values(1);
             % Set new axes values
             ad.data{m}.axes.y.values = ad.data{m}.axes.y.values + ...
-                (yStep*ad.data{m}.display.displacement.y);
+                (yStep*ad.data{m}.display.displacement.data.y);
         end
-        if (ad.data{m}.display.displacement.z ~= 0)
+        if (ad.data{m}.display.displacement.data.z ~= 0)
             ad.data{m}.data = ...
-                ad.data{m}.data + ad.data{m}.display.displacement.z;
+                ad.data{m}.data + ad.data{m}.display.displacement.data.z;
         end
         % Handle scaling along all three axes
-        if (ad.data{m}.display.scaling.x ~= 0)
+        if (ad.data{m}.display.scaling.data.x ~= 0)
         end
-        if (ad.data{m}.display.scaling.y ~= 0)
+        if (ad.data{m}.display.scaling.data.y ~= 0)
         end
-        if (ad.data{m}.display.scaling.z ~= 0)
+        if (ad.data{m}.display.scaling.data.z ~= 0)
         end
         % set appdata
         setappdata(hMainFigure,'data',ad.data);
@@ -1374,6 +1374,7 @@ function position_edit_Callback(source,~,position)
                 end
                 ad.acc.data.display.position.y = value;
             otherwise
+                trEPRoptionUnknown(position,'position');
                 return;
         end
         

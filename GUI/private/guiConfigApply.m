@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-14
+% 2014-07-29
 
 status = 0;
 
@@ -114,6 +114,9 @@ try
                 set(gh.display_panel_axesexport_includecaption_checkbox,...
                     'Value',ad.configuration.display.figsave.caption);
             end
+            % Set colormap settings
+            ad.control.axis.colormap = structcopy(...
+                ad.control.axis.colormap,ad.configuration.colormap);
             % Generically set a number of configuration settings where we
             % have a direct match
             matchConfig = {...

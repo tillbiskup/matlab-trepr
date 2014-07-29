@@ -11,7 +11,7 @@ function status = update_visibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-13
+% 2014-07-29
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -122,8 +122,6 @@ set(procPLboxSec,'String',labels);
 if ad.control.spectra.active
     set(procPLbox,'Value',find(vis==ad.control.spectra.active));
     set(procPLbox2,'Value',find(vis==ad.control.spectra.active));
-    set(procPLboxPrim,'Value',find(vis==ad.control.spectra.active));
-    set(procPLboxSec,'Value',find(vis==ad.control.spectra.active));
 end
 
 % Update list of spectra of the display panel

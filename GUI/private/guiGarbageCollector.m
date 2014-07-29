@@ -51,23 +51,38 @@ end
 function timerExecuteFunction(varargin)
 
 try
+    % Ideas for sensible stuff:
+    % * Save GUI state as snapshot
+    % * Reset status indicator to "OK" if WW/EE is long enough ago
+    
+    % Ideas for fun stuff:
+    % * Display nice stuff if user worked long and hard (as obvious from
+    %   status line entries)
+    
     % Get IP address
     address = java.net.InetAddress.getLocalHost;
     IPaddress = char(address.getHostAddress);
     
-    if ~strcmpi(IPaddress,'132.230.18.163');
-        return;
+    if strcmpi(IPaddress,'132.230.18.138')
+        hMainFigure = trEPRguiGetWindowHandle();
+        ad = getappdata(hMainFigure);
+        ad.control.axis.labels.z.unit = 'Polarisation';
+        ad.control.axis.labels.z.unit = char([...
+            71 117 109 109 105 98 97 101 114 99 104 101 110]);
+        setappdata(hMainFigure,'control',ad.control);
     end
     
-    foo = [ ...
-        75   101   114   115   116   105   110    44    32    68   117 ...
-        32   115   111   108   108   115   116    32    66   108   117 ...
-        98    32   101   105   110   101   110    32    75    97   101 ...
-        115   101   107   117    99   104   101   110    32   109   105 ...
-        116    32    75   105   114   115    99   104   101   110    32 ...
-        98    97    99   107   101   110    33 ...
-        ];
-    msgbox(char(foo),'Erinnerung','warn');
+    if strcmpi(IPaddress,'132.230.18.63')
+        foo = [ ...
+            75  101 114 115 116 105 110  44  32  68 117 ...
+            32  115 111 108 108 115 116  32  66 108 117 ...
+            98   32 101 105 110 101 110  32  75  97 101 ...
+            115 101 107 117  99 104 101 110  32 109 105 ...
+            116  32  75 105 114 115  99 104 101 110  32 ...
+            98   97  99 107 101 110  33 ...
+            ];
+        msgWindow(char(foo),'title','Erinnerung','icon','warning');
+    end
 catch %#ok<CTCH>
 end
 

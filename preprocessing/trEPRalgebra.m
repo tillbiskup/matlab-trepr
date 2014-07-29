@@ -22,6 +22,9 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 % Copyright (c) 2013-14, Till Biskup
 % 2014-07-27
 
+warnings = '';
+resdata = [];
+
 % Parse input arguments using the inputParser functionality
 try
     p = inputParser;            % Create inputParser instance.
@@ -36,11 +39,10 @@ catch exception
     return;
 end
 
-warnings = '';
-resdata = [];
-
 if ischar(operation)
     parameters.operation = operation;
+else
+    parameters = operation;
 end
 
 try
@@ -63,10 +65,21 @@ try
     % Perform all (temporary) operations such as displacement, scaling,
     % smoothing, normalisation
     
+    % Special case with normalisation: Exists only inside the GUI
+    mainWindow = trEPRguiGetWindowHandle();
+    if ~isempty(mainWindow)
+        ad = getappdata(mainWindow);
+        normPar = ad.control.axis.normalisation;
+        normPar.displayType = ad.control.axis.displayType;
+    end
+    
     for k=1:length(data)
         data{k} = trEPRdatasetApplyDisplacement(data{k});
         data{k} = trEPRdatasetApplyScaling(data{k});
         data{k} = trEPRdatasetApplySmoothing(data{k});
+        if exist('ad','var')
+            data{k} = trEPRdatasetApplyNormalisation(data{k},normPar);
+        end
     end
     
     % Assign dataset1 to output

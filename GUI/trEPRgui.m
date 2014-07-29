@@ -4,7 +4,7 @@ function varargout = trEPRgui(varargin)
 % Main GUI window of the trEPR toolbox.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-07-29
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -859,6 +859,14 @@ if ad.control.cmd.historysave
 end
 
 setappdata(hMainFigure,'control',ad.control);
+
+% Check for updates
+if ad.configuration.start.updatecheck
+    if trEPRupdateCheck
+        msgWindow('A new version of the toolbox is available online.',...
+            'title','Update availabe','icon','info');
+    end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
