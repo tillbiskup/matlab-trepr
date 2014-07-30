@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-07-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1728,10 +1728,6 @@ function pushbutton_Callback(~,~,action)
                         % Remove avg field in data structure
                         if isfield(ad.avgdata{k},'avg')
                             ad.avgdata{k}.avg = rmfield(ad.avgdata{k}.avg,'label');
-                        end
-                        % Remove display field in data structure
-                        if isfield(ad.avgdata{k},'display')
-                            ad.avgdata{k} = rmfield(ad.avgdata{k},'display');
                         end
                         status = trEPRappendDatasetToMainGUI(...
                             ad.avgdata{k},...
