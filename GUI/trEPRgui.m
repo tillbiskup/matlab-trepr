@@ -860,12 +860,10 @@ end
 
 setappdata(hMainFigure,'control',ad.control);
 
-% Check for updates
+% Check for updates - use special function with timer to prevent slow or
+% not-existing internet connections from slowing down GUI start
 if ad.configuration.start.updatecheck
-    if trEPRupdateCheck
-        msgWindow('A new version of the toolbox is available online.',...
-            'title','Update availabe','icon','info');
-    end
+    trEPRguiUpdateCheck;
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
