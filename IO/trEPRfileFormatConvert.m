@@ -13,16 +13,21 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-07-29
+% 2014-07-30
 
 % Parse input arguments using the inputParser functionality
-parser = inputParser;   % Create an instance of the inputParser class.
-parser.FunctionName = mfilename; % Function name included in error messages
-parser.KeepUnmatched = true; % Enable errors on unmatched arguments
-parser.StructExpand = true; % Enable passing arguments in a structure
-parser.addRequired('data', @(x)isstruct(x));
-% parser.addParamValue('checkFormat',logical(true),@islogical);
-parser.parse(data);
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('data', @(x)isstruct(x));
+    % parser.addParamValue('checkFormat',logical(true),@islogical);
+    p.parse(data);
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
 warning = '';
 
@@ -124,12 +129,10 @@ switch version
         newdata.display.scaling.data.x = data.display.scaling.x;
         newdata.display.scaling.data.y = data.display.scaling.y;
         newdata.display.scaling.data.z = data.display.scaling.z;
-        newdata.display.smoothing.data.x.filterfun = ...
-            data.display.smoothing.x.filterfun;
+        newdata.display.smoothing.data.x.filterfun = '';
         newdata.display.smoothing.data.x.parameters.width = ...
             data.display.smoothing.x.value;
-        newdata.display.smoothing.data.y.filterfun = ...
-            data.display.smoothing.y.filterfun;
+        newdata.display.smoothing.data.y.filterfun = '';
         newdata.display.smoothing.data.y.parameters.width = ...
             data.display.smoothing.y.value;
         newdata.display.smoothing.calculated.x.parameters.width = ...

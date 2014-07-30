@@ -1,4 +1,4 @@
-function value = getCascadedField (structure,fieldName)
+function value = getCascadedField(structure,fieldName)
 % GETCASCADEDFIELD Get content of a specific field of a structure where the
 % fieldname can be hierarchical (i.e., contain dots).
 %
@@ -16,9 +16,11 @@ function value = getCascadedField (structure,fieldName)
 %               Name of the field contained in S
 %
 %   value     - value of field fieldname in struct S
+%
+% See also: setCascadedField, setfield, getfield, fieldnames, isfield
 
 % (c) 2014, Till Biskup
-% 2014-06-29
+% 2014-07-30
 
 % If called without parameter, display help
 if ~nargin && ~nargout
@@ -27,14 +29,18 @@ if ~nargin && ~nargout
 end
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;            % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % include function name in error messages
-p.KeepUnmatched = true;     % Enable errors on unmatched arguments
-p.StructExpand = true;      % Enable passing arguments in a structure
-
-p.addRequired('structure', @(x)isstruct(x));
-p.addOptional('fieldName','',@(x)ischar(x));
-p.parse(structure,fieldName);
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('structure', @(x)isstruct(x));
+    p.addOptional('fieldName','',@(x)ischar(x));
+    p.parse(structure,fieldName);
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
 try
     % Get number of "." in fieldName

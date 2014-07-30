@@ -1,9 +1,9 @@
-function [status,warnings] = cmdGet(handle,opt,varargin)
-% CMDGET Command line command of the trEPR GUI.
+function [status,warnings] = cmdSet(handle,opt,varargin)
+% CMDSET Command line command of the trEPR GUI.
 %
 % Usage:
-%   cmdGet(handle,opt)
-%   [status,warnings] = cmdGet(handle,opt)
+%   cmdSet(handle,opt)
+%   [status,warnings] = cmdSet(handle,opt)
 %
 %   handle  - handle
 %             Handle of the window the command should be performed for
@@ -59,26 +59,29 @@ ad = getappdata(handle);
 % Get handles from handle
 % gh = guidata(handle);
 
-if isempty(opt)
+if length(opt) < 2
     return;
 end
 
-field = getCascadedField(ad,opt{1});
-
-if isempty(field)
-    trEPRmsg(['Field "' opt{1} '" seems not to exist or is empty.'],'info');
+ad = getappdata(handle);
+try
+    ad = setCascadedField(ad,opt{1},opt{2});
+catch exception
+    trEPRmsg(sprintf('%s\n%s',...
+        'Problems setting field:',exception.message),'warning');
     return;
 end
 
-msgStr{1} = ['Field: ' opt{1}];
-msgStr{2} = [sprintf('Value:\n') anything2string(field)];
+adFieldNames = fieldnames(ad);
+for field = 1:length(adFieldNames)
+    setappdata(handle,adFieldNames{field},ad.(adFieldNames{field}));
+end
 
+msgStr{1} = ['Set field: ' opt{1}];
+msgStr{2} = ['to value:  ' opt{2}];
 trEPRmsg(msgStr,'info');
 
-end
+% Update GUI
+trEPRguiUpdate;
 
-function str = anything2string(thing) %#ok<INUSD>
-str = evalc('disp(thing)');
-str = str(1:end-2); % Manually remove newline character at end
 end
-
