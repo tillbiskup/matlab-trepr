@@ -16,17 +16,23 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % SEE ALSO TREPRXMLZIPWRITE
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-07-30
 
 % Parse input arguments using the inputParser functionality
-parser = inputParser;   % Create an instance of the inputParser class.
-parser.FunctionName = mfilename; % Function name included in error messages
-parser.KeepUnmatched = true; % Enable errors on unmatched arguments
-parser.StructExpand = true; % Enable passing arguments in a structure
-parser.addRequired('filename', @(x)ischar(x) || iscell(x));
-% Note, this is to be compatible with TAload - currently without function!
-parser.addParamValue('checkFormat',logical(true),@islogical);
-parser.parse(filename);
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('filename', @(x)ischar(x) || iscell(x));
+    % Note, this is to be compatible with TAload - currently without function!
+    p.addParamValue('checkFormat',logical(true),@islogical);
+    p.addParamValue('convertFormat',logical(true),@islogical);
+    p.parse(filename);
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
 warning = cell(0);
 
@@ -151,11 +157,13 @@ if exist('data','var')
 end
 cd(PWD);
 % Convert to current toolbox format if necessary
-try
-    [struct,convertWarning] = trEPRfileFormatConvert(struct);
-catch exception
-    trEPRexceptionHandling(exception);
-    convertWarning = 'Serious Problems with converter function';
+if p.Results.convertFormat
+    try
+        [struct,convertWarning] = trEPRfileFormatConvert(struct);
+    catch exception
+        trEPRexceptionHandling(exception);
+        convertWarning = 'Serious Problems with converter function';
+    end
 end
 if ~isempty(convertWarning)
     warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';

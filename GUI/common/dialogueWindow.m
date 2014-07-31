@@ -60,7 +60,7 @@ function hFigure = dialogueWindow(varargin)
 % See also: msgWindow, uiText, uiImage, msgbox
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% 2014-07-30
 
 hFigure = [];
 
@@ -76,8 +76,8 @@ try
         @(x)isempty(x) || (isvector(x) && (length(x) == 2 || length(x) == 4)));
     p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
-    p.addParamValue('icon','',...
-        @(x)ischar(x) && any(strcmpi(x,{'info','help','warning','error'})));
+    p.addParamValue('icon','none',@(x)ischar(x) && ...
+        any(strcmpi(x,{'none','info','help','warning','error'})));
     p.addParamValue('WindowStyle','normal',...
         @(x)ischar(x) && any(strcmpi(x,{'normal','modal'})));
     p.addParamValue('visible','on',...
@@ -213,7 +213,7 @@ end
 
 function plotIcon(icon,iconDim,msgDim)
 
-if isempty(icon)
+if isempty(icon) || strcmpi(icon,'none')
     return;
 end
 

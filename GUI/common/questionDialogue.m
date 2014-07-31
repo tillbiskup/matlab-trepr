@@ -44,7 +44,7 @@ function answer = questionDialogue(message,varargin)
 % See also: msgWindow, dialogueWindow, uiText, uiImage
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% 2014-07-30
 
 answer = '';
 
@@ -58,12 +58,14 @@ try
     p.addParamValue('title','Message',@(x)ischar(x));
     p.addParamValue('buttons',{'OK','Cancel'},@(x)ischar(x) || iscell(x));
     p.addParamValue('defaultButton','OK',@(x)ischar(x));
+    p.addParamValue('buttonWidth',60,@(x)isscalar(x));
+    p.addParamValue('buttonHeight',25,@(x)isscalar(x));
     p.addParamValue('Position',[],...
         @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
     p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
-    p.addParamValue('icon','',...
-        @(x)ischar(x) && any(strcmpi(x,{'info','help','warning','error'})));
+    p.addParamValue('icon','none',@(x)ischar(x) && ...
+        any(strcmpi(x,{'none','info','help','warning','error'})));
     p.parse(message,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
@@ -82,7 +84,7 @@ hFigure = dialogueWindow(...
 
 windowSize = get(hFigure,'Position');
 buttonXOffset = 48+20;
-buttonSize = [60 25];
+buttonSize = [p.Results.buttonWidth p.Results.buttonHeight];
 
 for button = 1:length(p.Results.buttons)
     uicontrol(...
