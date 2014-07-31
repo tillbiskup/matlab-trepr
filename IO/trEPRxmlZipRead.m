@@ -36,7 +36,7 @@ try
     % Note, this is to be compatible with TAload - currently without function!
     p.addParamValue('checkFormat',logical(true),@islogical);
     p.addParamValue('convertFormat',logical(true),@islogical);
-    p.parse(filename);
+    p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
     return;
@@ -172,10 +172,10 @@ if p.Results.convertFormat
         trEPRexceptionHandling(exception);
         convertWarning = 'Serious Problems with converter function';
     end
-end
-if ~isempty(convertWarning)
-    warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';
-    warning{end}.message = convertWarning;
+    if ~isempty(convertWarning)
+        warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';
+        warning{end}.message = convertWarning;
+    end
 end
 if nargout
     varargout{1} = struct;

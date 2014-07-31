@@ -75,8 +75,7 @@ switch version
         % Main change: characteristics (POI, DOI, SOI, VOI)
         % Need to iterate over all characteristics of each type
         % SOI
-        sois = length(newdata.characteristics.soi);
-        for soi = 1:length(sois)
+        for soi = 1:length(newdata.characteristics.soi);
             newdata.characteristics.soi(soi).parameters.coordinates = ...
                 data.characteristics.soi(soi).coordinates;
             newdata.characteristics.soi(soi).parameters.direction = ...
@@ -98,8 +97,7 @@ switch version
             {'coordinates','direction','avgWindow','color','style',...
             'marker','width'});
         % POI
-        pois = length(newdata.characteristics.poi);
-        for poi = 1:length(pois)
+        for poi = 1:length(newdata.characteristics.poi);
             newdata.characteristics.poi(poi).parameters.coordinates = ...
                 data.characteristics.poi(poi).coordinates;
         end
@@ -107,8 +105,7 @@ switch version
         newdata.characteristics.poi = rmfield(...
             newdata.characteristics.poi,'coordinates');
         % DOI
-        dois = length(newdata.characteristics.doi);
-        for doi = 1:length(dois)
+        for doi = 1:length(newdata.characteristics.doi)
             newdata.characteristics.doi(doi).parameters.coordinates = ...
                 data.characteristics.doi(doi).coordinates;
             newdata.characteristics.doi(doi).parameters.distance = ...
@@ -128,8 +125,7 @@ switch version
             {'coordinates','distance','color','style',...
             'marker','width'});
         % VOI
-        vois = length(newdata.characteristics.voi);
-        for voi = 1:length(vois)
+        for voi = 1:length(newdata.characteristics.voi)
             newdata.characteristics.voi(voi).parameters.type = ...
                 data.characteristics.voi(voi).type;
             newdata.characteristics.voi(voi).parameters.offset = ...
