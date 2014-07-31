@@ -8,18 +8,19 @@ function structure = structcopy(master,tocopy,varargin)
 %
 % Usage
 %    struct = structcopy(master,tocopy)
+%    struct = structcopy(master,tocopy,<parameter>,<value>)
 %
-% master - struct
-%          Master means here master in terms of the available fields, but
-%          NOT in terms of their contents.
+%    master - struct
+%             Master means here master in terms of the available fields,
+%             but NOT in terms of their contents.
 %
-% tocopy - struct
-%          The contents of this struct get copied in the struct "master",
-%          and if fields of tocopy don't exist in master, they will be
-%          created.
+%    tocopy - struct
+%             The contents of this struct get copied in the struct
+%             "master", and if fields of tocopy don't exist in master, they
+%             will be created.
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-07-25
+% 2014-07-31
 
 if ~nargin
     help structcopy
@@ -27,30 +28,18 @@ if ~nargin
 end
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
-
-p.addRequired('master', @(x)isstruct(x));
-p.addRequired('tocopy', @(x)isstruct(x));
-p.addParamValue('overwrite',logical(false),@islogical);
-p.parse(master,tocopy,varargin{:});
-
-
-
-if ~isstruct(master)
-    fprintf('%s (master) has wrong type\n',master);
-    structure = struct();
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('master', @(x)isstruct(x));
+    p.addRequired('tocopy', @(x)isstruct(x));
+    p.addParamValue('overwrite',logical(false),@islogical);
+    p.parse(master,tocopy,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
     return;
-elseif ~isstruct(tocopy) 
-    if ~p.Results.overwrite
-        fprintf('%s (tocopy) has wrong type\n',tocopy);
-        structure = struct();
-        return;
-    else
-        tocopy = struct();
-    end
 end
 
 if isempty(fieldnames(tocopy))
@@ -58,29 +47,52 @@ if isempty(fieldnames(tocopy))
     return;
 end
 
-[structure,tocopy] = traverse(master,tocopy);
+[structure,tocopy] = traverse(master,tocopy); %#ok<NASGU>
 
 end
 
 
 function [master,tocopy] = traverse(master,tocopy)
 
-tocopyFieldNames = fieldnames(tocopy);
-for k=1:length(tocopyFieldNames)
-    if ~isfield(master,tocopyFieldNames{k})
-        master.(tocopyFieldNames{k}) = tocopy.(tocopyFieldNames{k});
-    elseif length(tocopy.(tocopyFieldNames{k}))>1 ...
-            && isstruct(tocopy.(tocopyFieldNames{k})(1))
-        for idx = 1:length(tocopy.(tocopyFieldNames{k}))
-            [master.(tocopyFieldNames{k})(idx),tocopy.(tocopyFieldNames{k})(idx)] = ...
-                traverse(master.(tocopyFieldNames{k})(idx),tocopy.(tocopyFieldNames{k})(idx));
+try
+    tocopyFieldNames = fieldnames(tocopy);
+    for k=1:length(tocopyFieldNames)
+        if ~isfield(master,tocopyFieldNames{k})
+            master.(tocopyFieldNames{k}) = tocopy.(tocopyFieldNames{k});
+        elseif length(tocopy.(tocopyFieldNames{k}))>1 && ...
+                isstruct(tocopy.(tocopyFieldNames{k})(1))
+            % Need to add additional field names before handling arrays of
+            % structures - otherwise getting "assignment between dissimilar
+            % structures" error
+            tmpFieldNames = fieldnames(tocopy.(tocopyFieldNames{k}));
+            for tmpFieldName = 1:length(tmpFieldNames)
+                if ~isfield(master.(tocopyFieldNames{k}),...
+                        tmpFieldNames(tmpFieldName))
+                    master.(tocopyFieldNames{k}).(...
+                        tmpFieldNames{tmpFieldName}) = '';
+                end
+            end
+            for idx = 1:length(tocopy.(tocopyFieldNames{k}))
+                if length(master.(tocopyFieldNames{k})) < idx
+                    master.(tocopyFieldNames{k})(idx) = ...
+                        master.(tocopyFieldNames{k})(idx-1);
+                end
+                [master.(tocopyFieldNames{k})(idx),...
+                    tocopy.(tocopyFieldNames{k})(idx)] = ...
+                    traverse(master.(tocopyFieldNames{k})(idx),...
+                    tocopy.(tocopyFieldNames{k})(idx));
+            end
+        elseif isstruct(tocopy.(tocopyFieldNames{k}))
+            [master.(tocopyFieldNames{k}),tocopy.(tocopyFieldNames{k})] = ...
+                traverse(master.(tocopyFieldNames{k}),...
+                tocopy.(tocopyFieldNames{k}));
+        else
+            master.(tocopyFieldNames{k}) = tocopy.(tocopyFieldNames{k});
         end
-    elseif isstruct(tocopy.(tocopyFieldNames{k}))
-        [master.(tocopyFieldNames{k}),tocopy.(tocopyFieldNames{k})] = ...
-            traverse(master.(tocopyFieldNames{k}),tocopy.(tocopyFieldNames{k}));
-    else
-        master.(tocopyFieldNames{k}) = tocopy.(tocopyFieldNames{k});
     end
+catch exception
+    disp(tocopyFieldNames{k});
+    throw(exception)
 end
 
 end

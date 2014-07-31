@@ -3,6 +3,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 %
 % Usage:
 %   [data,warning] = trEPRxmlZipRead(filename);
+%   [data,warning] = trEPRxmlZipRead(filename,<parameter>,<value>);
 %
 %   filename - string
 %              name of the ZIP archive containing the XML (and data)
@@ -13,10 +14,17 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 %   warning  - cell array
 %              Contains warnings if there are any, otherwise empty
 %
-% SEE ALSO TREPRXMLZIPWRITE
+% Optional parameters that can be set:
+%
+%   convertFormat - boolean
+%                   Convert to most current toolbox dataset structure on
+%                   load
+%                   Default: true
+%
+% See also: trEPRxmlZipWrite, trEPRload
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-30
+% 2014-07-31
 
 % Parse input arguments using the inputParser functionality
 try
