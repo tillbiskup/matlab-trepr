@@ -20,7 +20,7 @@ function update = trEPRupdateCheck
 % don't use this function.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-29
+% 2014-08-06
 
 update = false;
 
@@ -58,7 +58,7 @@ toolboxDate = tmp{2};
 
 % First easy check: date comparison
 % If webDate is more recent, there should be an update available...
-if datenum(toolboxDate,'YYYY-MM-DD') < datenum(webDate,'YYYY-MM-DD')
+if datenum(toolboxDate,'yyyy-mm-dd') < datenum(webDate,'yyyy-mm-dd')
     update = true;
     return
 end
