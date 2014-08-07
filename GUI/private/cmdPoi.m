@@ -22,7 +22,7 @@ function [status,warnings] = cmdPoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-27
+% 2014-08-07
 
 status = 0;
 warnings = cell(0);
@@ -70,17 +70,17 @@ S = trEPRdataStructure();
 poi = S.characteristics.poi;
 
 % Set coordinates
-poi.coordinates = ad.data{active}.display.measure.point(1).index;
+poi.parameters.coordinates = ad.data{active}.display.measure.point(1).index;
 
 poiIndex = 0;
 % Get number of current POI entries
-if isempty(ad.data{active}.characteristics.poi(1).coordinates)
+if isempty(ad.data{active}.characteristics.poi(1).parameters.coordinates)
     poiIndex = 1;
 else
     % Check whether we have already a POI entry for this coordinates
     for idx = 1:length(ad.data{active}.characteristics.poi)
-        if ad.data{active}.characteristics.poi(idx).coordinates == ...
-                poi.coordinates
+        if ad.data{active}.characteristics.poi(idx).parameters.coordinates == ...
+                poi.parameters.coordinates
             poiIndex = idx;
         end
     end
@@ -90,7 +90,7 @@ else
 end
 
 if poiIndex <= length(ad.data{active}.characteristics.poi) && ...
-        ~isempty(ad.data{active}.characteristics.poi(poiIndex).coordinates)
+        ~isempty(ad.data{active}.characteristics.poi(poiIndex).parameters.coordinates)
     poi = ad.data{active}.characteristics.poi(poiIndex);
 end
 

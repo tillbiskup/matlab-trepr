@@ -22,7 +22,7 @@ function [status,warnings] = cmdDoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-27
+% 2014-08-07
 
 status = 0;
 warnings = cell(0);
@@ -70,18 +70,18 @@ S = trEPRdataStructure();
 doi = S.characteristics.doi;
 
 % Set coordinates
-doi.coordinates = [ ad.data{active}.display.measure.point(1).index ; ...
+doi.parameters.coordinates = [ ad.data{active}.display.measure.point(1).index ; ...
     ad.data{active}.display.measure.point(2).index ];
 
 doiIndex = 0;
 % Get number of current doi entries
-if isempty(ad.data{active}.characteristics.doi(1).coordinates)
+if isempty(ad.data{active}.characteristics.doi(1).parameters.coordinates)
     doiIndex = 1;
 else
     % Check whether we have already a doi entry for this coordinates
     for idx = 1:length(ad.data{active}.characteristics.doi)
-        if ad.data{active}.characteristics.doi(idx).coordinates == ...
-                doi.coordinates
+        if ad.data{active}.characteristics.doi(idx).parameters.coordinates == ...
+                doi.parameters.coordinates
             doiIndex = idx;
         end
     end
@@ -91,7 +91,7 @@ else
 end
 
 if doiIndex <= length(ad.data{active}.characteristics.doi) && ...
-        ~isempty(ad.data{active}.characteristics.doi(doiIndex).coordinates)
+        ~isempty(ad.data{active}.characteristics.doi(doiIndex).parameters.coordinates)
     doi = ad.data{active}.characteristics.doi(doiIndex);
 end
 

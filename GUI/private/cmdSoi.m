@@ -22,7 +22,7 @@ function [status,warnings] = cmdSoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-26
+% 2014-08-07
 
 status = 0;
 warnings = cell(0);
@@ -74,24 +74,24 @@ soi = S.characteristics.soi;
 % Set coordinates according to display mode
 switch lower(ad.control.axis.displayType)
     case '1d along x'
-        soi.coordinates = ad.data{active}.display.position.y;
-        soi.direction = 'x';
+        soi.parameters.coordinates = ad.data{active}.display.position.y;
+        soi.parameters.direction = 'x';
     case '1d along y'
-        soi.coordinates = ad.data{active}.display.position.x;
-        soi.direction = 'y';
+        soi.parameters.coordinates = ad.data{active}.display.position.x;
+        soi.parameters.direction = 'y';
 end
 
 soiIndex = 0;
 % Get number of current SOI entries
-if isempty(ad.data{active}.characteristics.soi(1).coordinates)
+if isempty(ad.data{active}.characteristics.soi(1).parameters.coordinates)
     soiIndex = 1;
 else
     % Check whether we have already a SOI entry for this slice
     for idx = 1:length(ad.data{active}.characteristics.soi)
-        if strcmpi(ad.data{active}.characteristics.soi(idx).direction,...
+        if strcmpi(ad.data{active}.characteristics.soi(idx).parameters.direction,...
                 soi.direction) && ...
-            ad.data{active}.characteristics.soi(idx).coordinates == ...
-                soi.coordinates
+            ad.data{active}.characteristics.soi(idx).parameters.coordinates == ...
+                soi.parameters.coordinates
             soiIndex = idx;
         end
     end
@@ -101,7 +101,7 @@ else
 end
 
 if soiIndex <= length(ad.data{active}.characteristics.soi) && ...
-        ~isempty(ad.data{active}.characteristics.soi(soiIndex).coordinates)
+        ~isempty(ad.data{active}.characteristics.soi(soiIndex).parameters.coordinates)
     soi = ad.data{active}.characteristics.soi(soiIndex);
 end
 
