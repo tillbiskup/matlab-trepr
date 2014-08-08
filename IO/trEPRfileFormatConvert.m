@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-08-07
+% 2014-08-08
 
 % Parse input arguments using the inputParser functionality
 try
@@ -134,8 +134,12 @@ switch version
                 newdata.characteristics.voi(voi).parameters.offset.type = ...
                     'auto';
             end
-            newdata.characteristics.voi(voi).parameters.surface = ...
-                data.characteristics.voi(voi).surface;
+            newdata.characteristics.voi(voi).parameters.surface.edgeColor = ...
+                data.characteristics.voi(voi).surface.EdgeColor;
+            newdata.characteristics.voi(voi).parameters.surface.meshStyle = ...
+                data.characteristics.voi(voi).surface.MeshStyle;
+            newdata.characteristics.voi(voi).parameters.surface.lineStyle = ...
+                data.characteristics.voi(voi).surface.LineStyle;
             newdata.characteristics.voi(voi).parameters.view = ...
                 data.characteristics.voi(voi).view;
         end
