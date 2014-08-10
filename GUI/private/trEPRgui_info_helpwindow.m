@@ -1,6 +1,5 @@
-function varargout = trEPRgui_info_helpwindow(varargin)
-% TREPRGUI_INFO_HELPWINDOW Display help window for trEPR toolbox info
-% window.
+function handle = trEPRgui_info_helpwindow(varargin)
+% TREPRGUI_INFO_HELPWINDOW Help window for trEPR toolbox info GUI. 
 % Cannot be called externally.
 %
 % See also: helpWindow
@@ -11,9 +10,9 @@ function varargout = trEPRgui_info_helpwindow(varargin)
 % Get basedir
 [basedir,~,~] = fileparts(mfilename('fullpath'));
 
-helpWindow(...
+handle = helpWindow(...
     'tag',mfilename,...
-    'title','Test',...
+    'title','trEPR Info GUI',...
     'basedir',fullfile(basedir,'helptexts','info') ...
     );
 
