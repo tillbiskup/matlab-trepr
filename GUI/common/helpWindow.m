@@ -4,9 +4,49 @@ function varargout = helpWindow(varargin)
 % This window provides the user with "online" help included within the GUI.
 % Besides that, it gives access to all the other sources of additional
 % help, such as the Matlab Help Browser and the toolbox website.
+%
+% Usage:
+%   helpWindow
+%   helpWindow(<parameter>,<value>,...)
+%
+%
+% Optional parameters that can be set:
+%
+%   basedir   - string
+%               Directory containing the help files
+%               Must be an existing directory
+%               Default: "pwd"
+%
+%   tag       - string
+%               Tag of the help window used as figure tag
+%               Defaults to the mfilename of this function
+%               Important for identifying the different help windows.
+%               Normally, it should be set to the mfilename of the function
+%               calling this function
+%
+%   title     - string
+%               title of the help window
+%               Default: "trEPR GUI"
+%
+%   page      - string
+%               Page that should be displayed in the help window.
+%               To discern pages with identical name in different
+%               subdirectories, a slash ("/") can be used to separate
+%               directory and file.
+%
+%               If the respective page cannot be found, a default page is
+%               displayed.
+%
+%   position  - vector (2x1)
+%            	position of the window relative to the screen.
+%
+%   visible   - boolean
+%               Whether to make the help window visible at the end.
+%               In case additional controls should be added, it is wise to
+%               make it visible manually afterwards.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-08
+% 2014-08-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -19,24 +59,19 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addParamValue('basedir',pwd,@(x)ischar(x) && exist(x,'dir'));
-    p.addParamValue('tag','',@(x)ischar(x));
+    p.addParamValue('tag',mfilename,@(x)ischar(x));
     p.addParamValue('title','trEPR GUI',@(x)ischar(x));
     p.addParamValue('page','',@(x)ischar(x));
     p.addParamValue('position',[100 200],@(x)isvector(x) && length(x)==2);
+    p.addParamValue('visible',true,@(x)islogical(x));
     p.parse(varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
     return;
 end
 
-if isempty(p.Results.tag)
-    figureTag = mfilename;
-else
-    figureTag = [p.Results.tag '_' mfilename];
-end
-
 % Make GUI effectively a singleton
-singleton = findobj('Type','figure','Tag',figureTag);
+singleton = findobj('Type','figure','Tag',p.Results.tag);
 if (singleton)
     figure(singleton);
     return;
@@ -46,7 +81,7 @@ guiSize = [920 500];
 defaultBackground = [0.95 0.95 0.90];
 
 % Construct the components
-hMainFigure = figure('Tag',figureTag,...
+hMainFigure = figure('Tag',p.Results.tag,...
     'Visible','off',...
     'Name',[p.Results.title ' : Help Window'],...
     'Color',defaultBackground,...
@@ -113,31 +148,6 @@ uicontrol('Tag','fwd_pushbutton',...
     'Callback',{@pushbutton_Callback,'browserforward'} ...
     );
 
-uicontrol('Tag','help_panel_about_pushbutton',...
-    'Style','pushbutton',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'Position',[330 10 70 30],...
-    'TooltipString','Show general info about the trEPR toolbox and GUI',...
-    'String','About',...
-    'Callback',{@(~,~)trEPRgui_aboutwindow}...
-    );
-uicontrol('Tag','help_panel_website_pushbutton',...
-    'Style','pushbutton',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'Position',[400 10 70 30],...
-    'TooltipString',sprintf('%s\n%s',...
-    'Open website of the trEPR toolbox (in system webbrowser)',...
-    '(Warning: Apparently that does not work with Windows.)'),...
-    'String','Website',...
-    'Callback',{@startBrowser,trEPRinfo('url')}...
-    );
-
 uicontrol('Tag','close_pushbutton',...
     'Style','pushbutton',...
 	'Parent', hMainFigure, ...
@@ -157,7 +167,7 @@ uicontrol('Tag','close_pushbutton',...
 try
     % Store handles in guidata
     guidata(hMainFigure,guihandles);
-
+    
     % Fill topics listbox
     topics = getTopics(p.Results.basedir);
     set(hTopicsListbox,'String',...
@@ -178,7 +188,7 @@ try
             set(hPagesListbox,'String',pageTree.(topics{1})(:,1));
         end
     end
-    
+        
     if ~isempty(p.Results.page)
         % Check for slash as separator
         % Note that currently only one level of subdirectories is supported
@@ -252,8 +262,10 @@ try
     end
     
     % Make the GUI visible.
-    set(hMainFigure,'Visible','on');
-    trEPRmsg('trEPR GUI help window opened.','debug');
+    if p.Results.visible
+        set(hMainFigure,'Visible','on');
+    end
+    trEPRmsg([p.Results.title ' help window opened.'],'debug');
 
     if (nargout == 1)
         varargout{1} = hMainFigure;
@@ -323,7 +335,7 @@ function listbox_Callback(source,~,action)
                     pageList = pageTree.(topic)(:,1);
                     fileList = pageList;
                 end
-                if isdir(topic)
+                if isdir(fullfile(p.Results.basedir,topic))
                     helpTextFile = fullfile(p.Results.basedir,...
                         topic,[fileList{strcmpi(value,pageList)} '.html']);
                 else
@@ -335,7 +347,8 @@ function listbox_Callback(source,~,action)
                     browser.setCurrentLocation(helpTextFile);
                 else
                     % That shall never happen
-                    trEPRmsg('guiHelpPanel(): Unknown helptext','info');
+                    trEPRmsg(['guiHelpPanel(): Unknown helptext "'...
+                        helpTextFile '"'],'info');
                     htmlText = ['<html>' ...
                         '<h1>File not found.</h1>'...
                         '<p>Sorry, no help available (yet) for this topic.</p>'...
@@ -396,7 +409,7 @@ end
 function closeGUI(~,~)
     try
         delete(hMainFigure);
-        trEPRmsg('trEPR GUI help window closed.','debug');
+        trEPRmsg([p.Results.title ' help window closed.'],'debug');
     catch exception
         trEPRexceptionHandling(exception);
     end
@@ -408,16 +421,15 @@ end
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function startBrowser(~,~,url)
-    webbrowser(url);
-end
-
 function topicList = getTopics(baseDir)
 
 % Check whether file "topics.m" exists
 if exist(fullfile(baseDir,'topics.m'),'file');
+    PWD = pwd;
+    cd(baseDir);
     %topicList = topics;
     topics;
+    cd(PWD);
     return;
 end
 
