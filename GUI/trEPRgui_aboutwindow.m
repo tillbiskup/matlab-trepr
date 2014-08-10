@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-08-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -83,7 +83,8 @@ hPanel = uipanel('Parent',hMainFigure,...
 
 % Read text for welcome message from file and display it
 contributorsMessageFile = fullfile(...
-    trEPRinfo('dir'),'GUI','private','helptexts','main','contributors.html');
+    trEPRinfo('dir'),'GUI','private','helptexts',...
+    'main','general','contributors.html');
 contributorsMessageText = textFileRead(contributorsMessageFile);
 % Convert text into one single string
 contributorsText = cellfun(@(x) [char(x) ' '],contributorsMessageText,...
