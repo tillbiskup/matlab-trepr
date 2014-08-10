@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-08-10
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -129,7 +129,7 @@ try
     end
     switch evt.Key
         case 'f1'
-            trEPRgui_helpwindow();
+            trEPRgui_helpwindow('page',['panels/' ad.control.panel]);
             return;
         case 'f2'
             trEPRgui_aboutwindow();

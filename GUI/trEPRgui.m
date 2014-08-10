@@ -2,9 +2,18 @@ function varargout = trEPRgui(varargin)
 % TREPRGUI A GUI to display and process transient EPR data in Matlab.
 %
 % Main GUI window of the trEPR toolbox.
+%
+% Usage:
+%
+%   trEPRgui
+%   handle = trEPRgui
+%
+% Note that you can only open one trEPRgui window at a time ("singleton"
+% concept). Calling the function multiple times will only bring the current
+% trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-08-10
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -387,8 +396,8 @@ uicontrol('Tag','help_pushbutton',...
     'String','?',...
     'TooltipString','Display help for how to operate the GUI',...
     'pos',[guiSize(1)-mainPanelWidth-65 40 25 25],...
-    'Enable','on',...
-    'Callback',@trEPRgui_helpwindow...
+    'Enable','on', ...
+    'Callback',{@contextHelp} ...
     );
 
 
@@ -1155,6 +1164,20 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Helper functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function contextHelp(~,~)
+
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    trEPRgui_helpwindow('page',['panels/' ad.control.panel])
+catch exception
+    trEPRexceptionHandling(exception)
+end
+
+end
 
 function assignConfigValues(conf)
 
