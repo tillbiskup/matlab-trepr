@@ -44,6 +44,159 @@ function varargout = helpWindow(varargin)
 %               Whether to make the help window visible at the end.
 %               In case additional controls should be added, it is wise to
 %               make it visible manually afterwards.
+%
+%
+% A few notes for using the function for own help windows and regarding the
+% organisation of help files in general:
+%
+% * Help files can be organised in subdirectories.
+%   The subdirectories will be displayed in the upper left listbox.
+%   Note: Only one level of subdirectories is allowed.
+%
+% * There are two special files for structuring help: 
+%   "topics.m" and "pages.m". For details, see below.
+%
+% * "Real" help windows should call this function and set at least a
+%   minimum of parameters, such as "tag" (for a default, use "mfilename"),
+%   "title", and, most important, "basedir".
+%
+% Below an example for a simple yet fully functional routine
+% "testGUI_helpwindow":
+%
+%     function hMainFigure = testGUI_helpwindow
+% 
+%     % Get basedir
+%     [basedir,~,~] = fileparts(mfilename('fullpath'));
+% 
+%     hMainFigure = helpWindow(...
+%         'tag',mfilename,...
+%         'title','test GUI',...
+%         'basedir',fullfile(basedir,'helptexts','main')...
+%         );
+% 
+%     end
+%
+% Often it is nice to have an additional optional input parameter for the
+% page that shall be displayed, useful especially with GUIs with several
+% panels, where you want to display the corresponding help page depending
+% on the panel currently visible. This could be done as follows:
+%
+%     function hMainFigure = testGUI_helpwindow(varargin)
+% 
+%     % Parse input arguments using the inputParser functionality
+%     try
+%         p = inputParser;            % Create inputParser instance.
+%         p.FunctionName = mfilename; % Function name in error messages
+%         p.KeepUnmatched = true;     % Errors on unmatched arguments
+%         p.StructExpand = true;      % Passing arguments in a structure
+%         p.addParamValue('page','',@(x)ischar(x));
+%         p.parse(varargin{:});
+%     catch exception
+%         disp(['(EE) ' exception.message]);
+%         return;
+%     end
+% 
+%     % Get basedir
+%     [basedir,~,~] = fileparts(mfilename('fullpath'));
+% 
+%     hMainFigure = helpWindow(...
+%         'tag',mfilename,...
+%         'title','test GUI',...
+%         'basedir',fullfile(basedir,'helptexts','main'),...
+%         'page',p.Results.page ...
+%         );
+% 
+%     end
+%
+% And last but not least, a bit of information about the two files
+% "topics.m" and "pages.m". Both are optional, but a great help in both,
+% having meaningful names in the listboxes for the help topics and pages,
+% and determining the sequence of entries of both, topics and pages.
+%
+% For convenience, what follows is a full documentation of both files that
+% may serve as template for own uses.
+%
+% Contents of "topics.m"
+%
+%     % TOPICS List of topics for help window
+%     %
+%     % Format:
+%     %   topicList - cell array (nx3)
+%     %
+%     %   1st column: Description as it should appear in the listbox
+%     %
+%     %   2nd column: name of the directory the corresponding help files
+%     %               are located
+%     %
+%     %   3rd column: Lengthlier description (currently unused, might be 
+%     %               empty)
+%     %
+%     % Important notes:
+%     %
+%     %   * The variable needs to be named "topicList".
+%     %
+%     %   * The sequence of the entries (rows) in the topicList cell array
+%     %     determines the sequence of entries in the listbox.
+% 
+%     % Copyright (c) 2014, Till Biskup
+%     % 2014-08-08
+% 
+%     topicList = { ...
+%         'General topics','general',''; ...
+%         'Panel descriptions','panels',''; ...
+%         };
+%
+%
+% Contents of "pages.m"
+%
+%     % PAGES List of pages for help window
+%     %
+%     % Format:
+%     %   pageList - cell array (nx3)
+%     %
+%     %   1st column: Description as it should appear in the listbox
+%     %
+%     %   2nd column: filename of the file for the corresponding topic
+%     %               (without extension, "html" is assumed)
+%     %
+%     %   3rd column: Lengthlier description (currently unused, might be
+%     %               empty) 
+%     %
+%     % Important notes:
+%     %
+%     %   * The variable needs to be named "pageList".
+%     %
+%     %   * The sequence of the entries (rows) in the pageList cell array
+%     %     determines the sequence of entries in the listbox.
+% 
+%     % Copyright (c) 2014, Till Biskup
+%     % 2014-08-10
+% 
+%     pageList = {...
+%         'Introduction','intro'; ...
+%         'Key bindings','keybindings'; ...
+%         };
+%
+%
+% Sometimes, you might want to add additional ui controls to your help
+% window. Therefore, set the visibility to "off" at the beginning (note:
+% the parameter "visible" of this function is a boolean variable!), add the
+% ui controls directly after defining the figure, and at the end set the
+% figure's "visible" property to "on":
+%
+%     function hMainFigure = testGUI_helpwindow
+% 
+%     % ...
+% 
+%     hMainFigure = helpWindow(...
+%         % ...
+%         'visible',false ...
+%         );
+%   
+%     % Define additional ui controls here
+% 
+%     set(hMainFigure,'visible','on');
+%
 
 % Copyright (c) 2014, Till Biskup
 % 2014-08-10
