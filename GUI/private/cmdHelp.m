@@ -60,7 +60,7 @@ if ~isempty(opt)
         case 'modules'
             trEPRgui_moduleswindow();
         otherwise
-            trEPRgui_cmd_helpwindow(opt{1})
+            trEPRgui_cmd_helpwindow('page',opt{1})
     end
 else
     trEPRgui_cmd_helpwindow('introduction');
