@@ -1,0 +1,61 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de"
+      lang="de" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../../help.css" />
+    </head>
+    <body>
+		<h1>Introduction</h1>
+		<p class="intro">
+			A rather short introduction to the MW Frequency Drift Analysis GUI.
+		</p>
+		<div class="hurry">
+		<h2>If in a hurry</h2>
+		<p>
+			Suppose you just want to check whether the MW frequency drift of your dataset has some influence to the accuracy of the field axis. Given that you have loaded a dataset where more than one MW frequency value has been recorded, this GUI will immediately calculate min, max, delta, average and standard deviation of the MW frequency values for you, plot the MW frequency as function of the magnetic field, and calculate the magnetic field deviation for both, delta and standard deviation of the MW frequency for you. The colour coding of the magnetic field deviations (green = OK, yellow = pay attention, red = serious problem) lets you easily decide about the impact of the MW frequency drift to your data.
+		</p>
+		</div>
+		<h2>To the gentle reader</h2>
+		<p>
+			The MW Frequency Drift Analysis GUI is dedicated to the task of analysing the impact the (unavoidable) drift of the MW frequency of an EPR experiment has on your data and especially the reliability of the magnetic field axis.
+		</p>
+		<p>
+			<strong>Note:</strong> If your loaded dataset contains only one recorded MW frequency value, there is nothing this GUI can do for you. The minimum is two recorded MW frequency values (one at the beginning, one at the end), ideally a continuous record of MW frequency values, one for each time trace (as is normally done for data recorded in Freiburg).
+		</p>
+		<h3>GUI layout</h3>
+		<p>
+			Basically, the MW Frequency Drift Analysis GUI window is divided into two parts: The main axis to the left and three panels to the right. You can switch between the panels on the right with the buttons on the top or via shortcuts <key>Ctrl-1</key> to <key>Ctrl-3</key>.
+		</p>
+		<p>
+			More details to all the different panels and the meaning of their control elements can be found in the respective help topic:
+		</p>
+		<ul>
+			<li><a href="../panels/analysis.html">Analysis</a></li>
+			<li><a href="../panels/display.html">Display</a></li>
+			<li><a href="../panels/settings.html">Settings</a></li>
+		</ul>
+		<p>
+			What follows is a sketch of the typical operation of this GUI.
+		</p>
+		<p>
+			BTW: The button with the questionmark shows this help, as you might have figured out already.
+		</p>
+		<h3>Normal operation</h3>
+		<p>
+			Normally, as this GUI is dedicated to an analysis rather than a data modification task, you simply open it and will immediately see whether the MW frequency drift is large enough to have some impact on your data (and especially the accuracy of your magnetic field axis). All necessary values are immediately displayed in the "Analysis" panel to the right after you opened the GUI. The colour code of the two last fields in the "Magnetic Field" subpanel will immediately tell you whether you need to think about your data more seriously. More information about the colour coding and their meaning can be found in the <a href="../panels/analysis.html">respective help topic</a>.
+		</p>
+		<p>
+			To close the MW Frequency Drift Analysis GUI, simply hit the "Close" button on the bottom right. This will bring you back to the main GUI.
+		</p>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2012, Till Biskup
+		</p>
+		<p class="lastchange">
+			2012-06-05
+		</p>
+		</div>
+	</body>
+</html>

@@ -1,263 +1,50 @@
-function varargout = trEPRgui_figureCaption_helpwindow(varargin)
+function hMainFigure = trEPRgui_figureCaption_helpwindow(varargin)
 % TREPRGUI_FIGURECAPTION_HELPWINDOW Help window for the figure caption GUI.
 %
-% Normally, this window is called from within the trEPRgui_figureCaption
-% window. 
+% Normally, this window is called from within the trEPRgui window. 
 %
-% See also TREPRGUI_FIGURECAPTIONWINDOW
+% Usage:
+%   trEPRgui_cmd_helpwindow
+%   handle = trEPRgui_cmd_helpwindow
+%   trEPRgui_cmd_helpwindow(<parameter>,<value>)
+%
+% Optional parameters that can be set:
+%
+%   page      - string
+%               Page that should be displayed in the help window.
+%               To discern pages with identical name in different
+%               subdirectories, a slash ("/") can be used to separate
+%               directory and file.
+%
+%               If the respective page cannot be found, a default page is
+%               displayed.
+%
+% See also: helpWindow
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-26
+% 2014-08-10
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Construct the components
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Make GUI effectively a singleton
-singleton = findobj('Tag',mfilename);
-if (singleton)
-    figure(singleton);
-    if nargout
-        varargout{1} = singleton;
-    end
+% Parse input arguments using the inputParser functionality
+try
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % include function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addParamValue('page','',@(x)ischar(x));
+    p.parse(varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
     return;
 end
 
-% Set subdirectory for help files
-helpFileDir = 'figureCaption';
+% Get basedir
+[basedir,~,~] = fileparts(mfilename('fullpath'));
 
-defaultBackground = [.9 .9 .9];
-
-% Try to get figureCaption GUI position
-mainGUIHandle = trEPRguiGetWindowHandle('trEPRgui_figureCaptionwindow');
-if ishandle(mainGUIHandle)
-    mainGUIPosition = get(mainGUIHandle,'Position');
-    guiPosition = [mainGUIPosition(1)+140,mainGUIPosition(2)+60,450,450];
-else
-    guiPosition = [160,240,450,450];
-end
-
-%  Construct the components
-hMainFigure = figure('Tag',mfilename,...
-    'Visible','off',...
-    'Name','trEPR GUI : Figure Caption : Help Window',...
-    'Color',defaultBackground,...
-    'Units','Pixels',...
-    'Position',guiPosition,...
-    'Resize','off',...
-    'KeyPressFcn',@keypress_Callback,...
-    'NumberTitle','off', ...
-    'Menu','none','Toolbar','none');
-
-guiSize = get(hMainFigure,'Position');
-guiSize = guiSize([3,4]);
-
-uicontrol('Tag','heading_text',...
-    'Style','text',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',14,...
-    'HorizontalAlignment','Left',...
-    'FontWeight','bold',...
-    'Units','Pixels',...
-    'Position',[10 guiSize(2)-35 guiSize(1)-20 20],...
-    'String','How to Use the Figure Caption GUI?'...
+hMainFigure = helpWindow(...
+    'tag',mfilename,...
+    'title','trEPR GUI CMD',...
+    'basedir',fullfile(basedir,'helptexts','figurecaption'),...
+    'page',p.Results.page ...
     );
-uicontrol('Tag','helptopic_text',...
-    'Style','text',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'HorizontalAlignment','Left',...
-    'Units','Pixels',...
-    'Position',[10 guiSize(2)-70 100 20],...
-    'String','Choose topic'...
-    );
-uicontrol('Tag','helptopic_popupmenu',...
-    'Style','popupmenu',...
-    'Parent',hMainFigure,...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'Units','Pixels',...
-    'pos',[120 guiSize(2)-70 guiSize(1)-130 20],...
-    'String','Introduction|Caption|Information|Filename|Key bindings',...
-    'KeyPressFcn',@keypress_Callback,...
-    'Callback',@helptext_popupmenu_Callback...
-    );
-
-% Create the message window
-% NEW: Use a Java Browser object to display HTML
-jObject = com.mathworks.mlwidgets.html.HTMLBrowserPanel;
-[browser,container] = javacomponent(jObject, [], hMainFigure);
-set(container,...
-    'Units','Pixels',...
-    'Position',[10 50 guiSize(1)-20 guiSize(2)-135]...
-    );
-
-uicontrol('Tag','back_pushbutton',...
-    'Style','pushbutton',...
-	'Parent', hMainFigure, ...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'String','<html>&larr;</html>',...
-    'TooltipString','Go to previous page in browser history',...
-    'pos',[10 10 40 30],...
-    'Enable','on',...
-    'Callback',{@pushbutton_Callback,'browserback'} ...
-    );
-uicontrol('Tag','back_pushbutton',...
-    'Style','pushbutton',...
-	'Parent', hMainFigure, ...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'String','<html>&rarr;</html>',...
-    'TooltipString','Go to next page in browser history',...
-    'pos',[50 10 40 30],...
-    'Enable','on',...
-    'Callback',{@pushbutton_Callback,'browserforward'} ...
-    );
-
-uicontrol('Tag','close_pushbutton',...
-    'Style','pushbutton',...
-	'Parent', hMainFigure, ...
-    'BackgroundColor',defaultBackground,...
-    'FontUnit','Pixel','Fontsize',12,...
-    'String','Close',...
-    'TooltipString','Close Figure Caption Help window',...
-    'pos',[guiSize(1)-70 10 60 30],...
-    'Enable','on',...
-    'Callback',{@closeGUI}...
-    );
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Initialization tasks
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-try
-    % Store handles in guidata
-    guidata(hMainFigure,guihandles);
-    
-    % Make the GUI visible.
-    set(hMainFigure,'Visible','on');
-    trEPRmsg('Figure Caption help window opened.','debug');
-    
-    guidata(hMainFigure,guihandles);
-    if (nargout == 1)
-        varargout{1} = hMainFigure;
-    end
-    % Read text for welcome message from file and display it
-    helpTextFile = fullfile(trEPRinfo('dir'),...
-        'GUI','private','helptexts',helpFileDir,'intro.html');
-    browser.setCurrentLocation(helpTextFile);
-catch exception
-    trEPRexceptionHandling(exception);
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Callbacks
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function helptext_popupmenu_Callback(source,~)
-    try
-        helpTexts = cellstr(get(source,'String'));
-        helpText = helpTexts{get(source,'Value')};
-        
-        switch lower(helpText)
-            case 'introduction'
-                % Read text from file and display it
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts',helpFileDir,'intro.html');
-                browser.setCurrentLocation(helpTextFile);
-            case 'caption'
-                % Read text from file and display it
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts',helpFileDir,'caption.html');
-                browser.setCurrentLocation(helpTextFile);
-            case 'information'
-                % Read text from file and display it
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts',helpFileDir,'information.html');
-                browser.setCurrentLocation(helpTextFile);
-            case 'filename'
-                % Read text from file and display it
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts',helpFileDir,'filename.html');
-                browser.setCurrentLocation(helpTextFile);
-            case 'key bindings'
-                % Read text from file and display it
-                helpTextFile = fullfile(trEPRinfo('dir'),...
-                    'GUI','private','helptexts',helpFileDir,'keybindings.html');
-                browser.setCurrentLocation(helpTextFile);
-            otherwise
-                % That shall never happen
-                trEPRmsg('guiHelpPanel(): Unknown helptext','info');
-                htmlText = ['<html>' ...
-                    '<h1>Sorry, help could not be found</h1>'...
-                    '<p>The help text you requested could not be found.</p>'...
-                    '</html>'];
-                browser.setHtmlText(htmlText);
-        end
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
-end
-
-function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        switch action
-            case 'browserback'
-                browser.executeScript('javascript:history.back()');
-            case 'browserforward'
-                browser.executeScript('javascript:history.forward()');
-        end
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
-end
-
-function keypress_Callback(~,evt)
-    try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier
-            % key was pressed...
-            return;
-        end
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                switch evt.Key
-                    case 'w'
-                        closeGUI();
-                        return;
-                end
-            end
-        else
-            switch evt.Key
-                case 'escape'
-                    closeGUI();
-                    return;
-            end                    
-        end
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
-end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function closeGUI(~,~)
-    try
-        clear('jObject');
-        delete(hMainFigure);
-        trEPRmsg('Figure Caption help window closed.','debug');
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
-end
 
 end

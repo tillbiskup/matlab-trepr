@@ -21,8 +21,8 @@ function [status,warnings] = cmdHelp(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-21
+% Copyright (c) 2013-14, Till Biskup
+% 2014-08-10
 
 status = 0;
 warnings = cell(0);

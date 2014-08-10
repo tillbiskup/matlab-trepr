@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de"
+      lang="de" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../../help.css" />
+    </head>
+    <body>
+		<h1>Analysis</h1>
+		<p class="intro">
+			The analysis panel provides you with a full overview of the MW frequency drift and its potential impact on the reliability of the magnetic field axis.
+		</p>
+		<h2>MW Frequency</h2>
+		<p>
+			This panel summarises all important values for the MW frequency, such as minimum, maximum, delta (max-min), average and standard deviation (std. dev.).
+		</p>
+		<h2>Magnetic field</h2>
+		<p>
+			The actually interesting part of the analysis is summed up in this subpanel. The first two fields, "step" and "sequence", just display the field step and the sequence of the field values measured (up | down | stochastic | outward | inward), as far as the latter is available from the parameters of the dataset analysed.
+		</p>
+		<h3>Deviation due to MW Freq. drift</h3>
+		<p>
+			Magnetic field (<i>B</i><sub>0</sub>) and MW frequency (<i>h&nu;</i>) can be related mathematically via the resonance condition of magnetic resonance:
+		</p>
+		<p align="center">
+			<img src="resonance-condition.png" height="17" />
+		</p>
+		<p>
+			from which directly follows:
+		</p>
+		<p align="center">
+			<img src="deltaB0.png" height="42" />
+		</p>
+		<p>
+			with:
+		</p>
+		<p align="center">
+			<img src="constants.png" height="75" />
+		</p>
+		<p>
+			Therefore, for both the difference between minimum and maximum frequency value (delta) as well as for the standard deviation (std. dev.)<a href="#fnt1" name="fnm1" class="fnmark">1</a>, a deviation of the magnetic field can be calculated. If this deviation is comparable or even larger than the field step, you should be careful in relying on a single dataset.
+		</p>
+		<h3>Colour coding</h3>
+		<p>
+			To ease the analysis, the magnetic field deviation fields are colour coded in three different colours: green, yellow, and red. The meaning of these three colours is as follows:
+		</p>
+		<dl>
+			<dt>green</dt>
+			<dd>Everything seems fine, no need to worry.</dd>
+			<dd><i>Criterion:</i> Deviation is smaller than or equal to half the step size of the magnetic field axis.</dd>
+			<dt>yellow</dt>
+			<dd>It is not too bad, but you should be careful.</dd>
+			<dd><i>Criterion:</i> Deviation is larger than half the step size of the magnetic field axis, but smaller than or equal to the step size.</dd>
+			<dt>red</dt>
+			<dd>The deviation exceeds the step size of the field axis. Therefore, you should be careful in analysing the data.</dd>
+			<dd><i>Criterion:</i> Deviation is larger than the step size of the magnetic field axis.</dd>
+		</dl>
+		<p>
+			Please note that the colours for the two fields, delta and standard deviation, might differ, with delta always the bigger value. In such case, "delta" gives you an idea of the maximum deviation, and together with the plot you may easily decide whether you need to bother about it. The latter, deviation of the magnetic field according to the standard deviation of the MW frequency, therefore gives you an idea of the accuracy of the overall measurement.
+		</p>
+		<div class="footnotes">
+		<p>
+			<a href="#fnm1" name="fnt1" class="fnmark">1</a>To calculate the deviation of the magnetic field, 2*stdev is used, as normally, +/- stdev is displayed as error margins.
+		</p>
+		</div>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2012, Till Biskup
+		</p>
+		<p class="lastchange">
+			2012-06-06
+		</p>
+		</div>
+	</body>
+</html>

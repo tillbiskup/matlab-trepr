@@ -1,4 +1,4 @@
-function varargout = trEPRgui_cmd_helpwindow(varargin)
+function hMainFigure = trEPRgui_cmd_helpwindow(varargin)
 % TREPRGUI_CMD_HELPWINDOW Help window for the command line feature of the
 % main GUI.
 %

@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-26
+% 2014-08-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -27,9 +27,9 @@ defaultBackground = [.9 .9 .9];
 mainGUIHandle = trEPRguiGetWindowHandle();
 if ishandle(mainGUIHandle)
     mainGUIPosition = get(mainGUIHandle,'Position');
-    guiPosition = [mainGUIPosition(1),mainGUIPosition(2)+100,950,550];
+    guiPosition = [mainGUIPosition(1)+20,mainGUIPosition(2)+100,950,550];
 else
-    guiPosition = [20,170,950,550];
+    guiPosition = [40,170,950,550];
 end
 
 %  Construct the components
@@ -1018,7 +1018,7 @@ uicontrol('Tag','help_pushbutton',...
     'TooltipString','<html>Display help for how to operate the<br />MW Frequency Drift Analysis GUI</html>',...
     'pos',[guiSize(1)-mainPanelWidth+10 30 25 25],...
     'Enable','on',...
-    'Callback',@trEPRgui_NetPolarisation_helpwindow...
+    'Callback',{@(~,~)trEPRgui_NetPolarisation_helpwindow} ...
     );
 
 
