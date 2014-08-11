@@ -22,20 +22,25 @@ function [status,warnings] = cmdPoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-07
+% 2014-08-11
 
 status = 0;
 warnings = cell(0);
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;            % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Include function name in error messages
-p.KeepUnmatched = true;     % Enable errors on unmatched arguments
-p.StructExpand = true;      % Enable passing arguments in a structure
+try
+    p = inputParser;            % Create inputParser object.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('handle', @(x)ishandle(x));
+    p.addRequired('opt', @(x)iscell(x));
+    p.parse(handle,opt,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
-p.addRequired('handle', @(x)ishandle(x));
-p.addRequired('opt', @(x)iscell(x));
-p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
@@ -71,6 +76,13 @@ poi = S.characteristics.poi;
 
 % Set coordinates
 poi.parameters.coordinates = ad.data{active}.display.measure.point(1).index;
+
+% Set default label
+poi.label = sprintf('x = %e %s; y = %e %s',...
+    ad.data{active}.axes.x.values(poi.parameters.coordinates(1)),...
+    ad.data{active}.axes.x.unit,...
+    ad.data{active}.axes.y.values(poi.parameters.coordinates(2)),...
+    ad.data{active}.axes.y.unit);
 
 poiIndex = 0;
 % Get number of current POI entries

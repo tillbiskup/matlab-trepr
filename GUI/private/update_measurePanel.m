@@ -7,7 +7,7 @@ function status = update_measurePanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-06-27
+% 2014-08-11
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -55,6 +55,7 @@ else
     set(gh.measure_panel_point1_y_index_edit,'String','0');
     set(gh.measure_panel_point1_x_unit_edit,'String','0');
     set(gh.measure_panel_point1_y_unit_edit,'String','0');
+    set(gh.measure_panel_point1_z_unit_edit,'String','0');
     
     set(gh.measure_panel_poi_pushbutton,'Enable','off');
 end
@@ -89,11 +90,13 @@ else
     set(gh.measure_panel_point2_y_index_edit,'String','0');
     set(gh.measure_panel_point2_x_unit_edit,'String','0');
     set(gh.measure_panel_point2_y_unit_edit,'String','0');
+    set(gh.measure_panel_point2_z_unit_edit,'String','0');
     
     set(gh.measure_panel_distance_x_index_edit,'String','0');
     set(gh.measure_panel_distance_y_index_edit,'String','0');
     set(gh.measure_panel_distance_x_unit_edit,'String','0');
     set(gh.measure_panel_distance_y_unit_edit,'String','0');
+    set(gh.measure_panel_distance_z_unit_edit,'String','0');
 
     set(gh.measure_panel_doi_pushbutton,'Enable','off');
 end

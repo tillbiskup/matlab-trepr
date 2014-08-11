@@ -16,7 +16,7 @@ function status = trackPointer(varargin)
 %            0: successful
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-15
+% 2014-08-11
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -97,20 +97,29 @@ if pointerPosition(1) > axisCoordinates(1) && ...
     active = ad.control.spectra.active;
     
     % Get xdata and ydata of currently active dataset
-    if (strcmp(ad.control.axis.displayType,'2D plot'))
-        xdata = get(findobj('Parent',mainAxis,'-and','Type','image'),'xdata');
-        ydata = get(findobj('Parent',mainAxis,'-and','Type','image'),'ydata');
-    else
-        xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
-        ydata = get(findobj('Parent',mainAxis,'-and','Type','line'),'ydata');
+    switch ad.control.axis.displayType
+        case '2D plot'
+            xdata = get(findobj('Parent',mainAxis,'-and','Type','image'),'xdata');
+            ydata = get(findobj('Parent',mainAxis,'-and','Type','image'),'ydata');
+        case '1D along x'
+            xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
+            ydata = ad.data{active}.axes.y.values;
+        case '1D along y'
+            xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
+            ydata = ad.data{active}.axes.x.values;
     end
     
     % If we are in 1D display mode and there are more than one spectrum
     % and/or a zero line displayed
-    if (strcmp(ad.control.axis.displayType,'1D along x') || ...
-            strcmp(ad.control.axis.displayType,'1D along y')) 
-        xdata = xdata{length(xdata)-find(ad.control.spectra.visible==active)+1};
-        ydata = ydata{length(ydata)-find(ad.control.spectra.visible==active)+1};
+    if any(strcmp(ad.control.axis.displayType,{'1D along x','1D along y'}))
+        if iscell(xdata) && length(xdata) > 1
+            xdata = xdata{length(xdata)-...
+                find(ad.control.spectra.visible==active)+1};
+        end
+        if iscell(ydata) && length(ydata) > 1
+            ydata = ydata{length(ydata)-...
+                find(ad.control.spectra.visible==active)+1};
+        end
     end
     
     % Create vectors with indices for xdata and ydata
@@ -233,20 +242,23 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 linspace(1,axisPosition(4),length(newYdata)),...
                 newYindex,...
                 pointerPositionInAxis(2),'nearest');
+            valz = ad.data{active}.data(indy,indx);
         case '1D along x'
             % Get index of current point in dataset
             indx=interp1(...
                 linspace(1,axisPosition(3),length(newXdata)),...
                 newXindex,...
                 pointerPositionInAxis(1),'nearest');
-            indy=indx;
+            indy=ad.data{active}.display.position.y;
+            valz = ad.data{active}.data(indy,indx);
         case '1D along y'
             % Get index of current point in dataset
             indx=interp1(...
                 linspace(1,axisPosition(3),length(newXdata)),...
                 newXindex,...
                 pointerPositionInAxis(1),'nearest');
-            indy=indx;
+            indy=ad.data{active}.display.position.x;
+            valz = ad.data{active}.data(indx,indy);
         otherwise
             % That shall never happen!
             disp('trackPointer(): Unrecognised displayType');
@@ -266,12 +278,14 @@ if pointerPosition(1) > axisCoordinates(1) && ...
             set(gh.measure_panel_point1_x_unit_edit,'String',num2str(valx));
             set(gh.measure_panel_point1_y_index_edit,'String',num2str(indy));
             set(gh.measure_panel_point1_y_unit_edit,'String',num2str(valy));
+            set(gh.measure_panel_point1_z_unit_edit,'String',num2str(valz));
         case 2
             % Update display of second point
             set(gh.measure_panel_point2_x_index_edit,'String',num2str(indx));
             set(gh.measure_panel_point2_x_unit_edit,'String',num2str(valx));
             set(gh.measure_panel_point2_y_index_edit,'String',num2str(indy));
             set(gh.measure_panel_point2_y_unit_edit,'String',num2str(valy));
+            set(gh.measure_panel_point2_z_unit_edit,'String',num2str(valz));
             % Update display of Delta between points
             set(gh.measure_panel_distance_x_index_edit,'String',...
                 num2str(indx-...
@@ -285,6 +299,9 @@ if pointerPosition(1) > axisCoordinates(1) && ...
             set(gh.measure_panel_distance_y_unit_edit,'String',...
                 num2str(valy-...
                 str2double(get(gh.measure_panel_point1_y_unit_edit,'String'))));
+            set(gh.measure_panel_distance_z_unit_edit,'String',...
+                num2str(valz-...
+                str2double(get(gh.measure_panel_point1_z_unit_edit,'String'))));
         otherwise
             ad.control.measure.point
             % That shall never happen!

@@ -22,20 +22,25 @@ function [status,warnings] = cmdSoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-07
+% 2014-08-11
 
 status = 0;
 warnings = cell(0);
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;            % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Include function name in error messages
-p.KeepUnmatched = true;     % Enable errors on unmatched arguments
-p.StructExpand = true;      % Enable passing arguments in a structure
+try
+    p = inputParser;            % Create inputParser object.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('handle', @(x)ishandle(x));
+    p.addRequired('opt', @(x)iscell(x));
+    p.parse(handle,opt,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
-p.addRequired('handle', @(x)ishandle(x));
-p.addRequired('opt', @(x)iscell(x));
-p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
@@ -76,9 +81,17 @@ switch lower(ad.control.axis.displayType)
     case '1d along x'
         soi.parameters.coordinates = ad.data{active}.display.position.y;
         soi.parameters.direction = 'x';
+        % Set default label
+        soi.label = sprintf('%s (%e %s)',soi.parameters.direction,...
+            ad.data{active}.axes.y.values(soi.parameters.coordinates),...
+            ad.data{active}.axes.y.unit);
     case '1d along y'
         soi.parameters.coordinates = ad.data{active}.display.position.x;
         soi.parameters.direction = 'y';
+        % Set default label
+        soi.label = sprintf('%s (%e %s)',soi.parameters.direction,...
+            ad.data{active}.axes.x.values(soi.parameters.coordinates),...
+            ad.data{active}.axes.x.unit);
 end
 
 soiIndex = 0;
@@ -89,7 +102,7 @@ else
     % Check whether we have already a SOI entry for this slice
     for idx = 1:length(ad.data{active}.characteristics.soi)
         if strcmpi(ad.data{active}.characteristics.soi(idx).parameters.direction,...
-                soi.direction) && ...
+                soi.parameters.direction) && ...
             ad.data{active}.characteristics.soi(idx).parameters.coordinates == ...
                 soi.parameters.coordinates
             soiIndex = idx;

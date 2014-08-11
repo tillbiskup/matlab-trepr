@@ -8,7 +8,7 @@ function guiMeasure(action,nPoints)
 %               Number of points: 1 - pick mode; 2 - measure mode
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-25
+% 2014-08-11
 
 try
     % Get appdata of main window
@@ -66,10 +66,10 @@ try
             ad.control.measure.nPoints = 0;
             % Reset number of point in appdata
             ad.control.measure.point = 0;
-
+            
             % Update appdata of main window
             setappdata(mainWindow,'control',ad.control);
-
+            
             % Reset pointer callback functions
             set(mainWindow,'WindowButtonMotionFcn','');
             set(mainWindow,'WindowButtonDownFcn','');
@@ -90,258 +90,201 @@ try
             return;
     end
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
 end
 
 end
 
 function clearFields()
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        % Get guihandles of main window
-        gh = guihandles(mainWindow);
-        
-        % Reset edit fields
-        set(gh.measure_panel_point1_x_index_edit,'String','0');
-        set(gh.measure_panel_point1_x_unit_edit,'String','0');
-        set(gh.measure_panel_point1_y_index_edit,'String','0');
-        set(gh.measure_panel_point1_y_unit_edit,'String','0');
-        set(gh.measure_panel_point2_x_index_edit,'String','0');
-        set(gh.measure_panel_point2_x_unit_edit,'String','0');
-        set(gh.measure_panel_point2_y_index_edit,'String','0');
-        set(gh.measure_panel_point2_y_unit_edit,'String','0');
-        set(gh.measure_panel_distance_x_index_edit,'String','0');
-        set(gh.measure_panel_distance_x_unit_edit,'String','0');
-        set(gh.measure_panel_distance_y_index_edit,'String','0');
-        set(gh.measure_panel_distance_y_unit_edit,'String','0');
-        
-        % Clear fields in data structure of currently active dataset
-        active = ad.control.spectra.active;
-        for idx = 1:length(ad.data{active}.display.measure.point)
-            ad.data{active}.display.measure.point(idx).index = [];
-            ad.data{active}.display.measure.point(idx).unit = [];
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+    
+    % Reset edit fields
+    set(gh.measure_panel_point1_x_index_edit,'String','0');
+    set(gh.measure_panel_point1_x_unit_edit,'String','0');
+    set(gh.measure_panel_point1_y_index_edit,'String','0');
+    set(gh.measure_panel_point1_y_unit_edit,'String','0');
+    set(gh.measure_panel_point1_z_unit_edit,'String','0');
+    set(gh.measure_panel_point2_x_index_edit,'String','0');
+    set(gh.measure_panel_point2_x_unit_edit,'String','0');
+    set(gh.measure_panel_point2_y_index_edit,'String','0');
+    set(gh.measure_panel_point2_y_unit_edit,'String','0');
+    set(gh.measure_panel_point2_z_unit_edit,'String','0');
+    set(gh.measure_panel_distance_x_index_edit,'String','0');
+    set(gh.measure_panel_distance_x_unit_edit,'String','0');
+    set(gh.measure_panel_distance_y_index_edit,'String','0');
+    set(gh.measure_panel_distance_y_unit_edit,'String','0');
+    set(gh.measure_panel_distance_z_unit_edit,'String','0');
+    
+    % Clear fields in data structure of currently active dataset
+    active = ad.control.spectra.active;
+    for idx = 1:length(ad.data{active}.display.measure.point)
+        ad.data{active}.display.measure.point(idx).index = [];
+        ad.data{active}.display.measure.point(idx).unit = [];
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+catch exception
+    trEPRexceptionHandling(exception);
+end
+
 end
 
 function switchMeasurePointer(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Depending on nPoints
-        switch ad.control.measure.nPoints
-            case 1
-                assignPointsToDataStructure();
-                measureEnd();
-                return;
-            case 2
-                % Set number of point in appdata
-                switch ad.control.measure.point
-                    case 1
-                        ad.control.measure.point = 2;
-                    case 2
-                        assignPointsToDataStructure();
-                        measureEnd();
-                        return;
-                    otherwise
-                        trEPRoptionUnknown(ad.control.measure.point,...
-                            'point');
-                        return;
-                end
-            otherwise
-                trEPRoptionUnknown(ad.control.measure.nPoints,...
-                    'nPoints');
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
+
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Depending on nPoints
+    switch ad.control.measure.nPoints
+        case 1
+            assignPointsToDataStructure();
+            measureEnd();
+            return;
+        case 2
+            % Set number of point in appdata
+            switch ad.control.measure.point
+                case 1
+                    ad.control.measure.point = 2;
+                case 2
+                    assignPointsToDataStructure();
+                    measureEnd();
+                    return;
+                otherwise
+                    trEPRoptionUnknown(ad.control.measure.point,...
+                        'point');
+                    return;
+            end
+        otherwise
+            trEPRoptionUnknown(ad.control.measure.nPoints,...
+                'nPoints');
+            return;
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+catch exception
+    trEPRexceptionHandling(exception);
+end
+
 end
 
 function measureEnd()
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get guihandles of main window
-        gh = guihandles(mainWindow);
-        
-        % Reset nPoints to measure in appdata
-        ad.control.measure.nPoints = 0;
-        % Reset number of point in appdata
-        ad.control.measure.point = 0;
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Reset pointer callback functions
-        set(mainWindow,'WindowButtonMotionFcn','');
-        set(mainWindow,'WindowButtonDownFcn','');
-        
-        % Reset pointer
-        set(mainWindow,'Pointer','arrow');
-        
-        % Switch off togglebuttons
-        set(gh.measure_panel_point_togglebutton,'Value',0);
-        set(gh.measure_panel_distance_togglebutton,'Value',0);
 
-        % Reset GUI mode
-        trEPRguiSetMode('none');
-        
-        % Update display - REALLY NECESSARY?
-        refresh;
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
-        end
-    end
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+    
+    % Reset nPoints to measure in appdata
+    ad.control.measure.nPoints = 0;
+    % Reset number of point in appdata
+    ad.control.measure.point = 0;
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Reset pointer callback functions
+    set(mainWindow,'WindowButtonMotionFcn','');
+    set(mainWindow,'WindowButtonDownFcn','');
+    
+    % Reset pointer
+    set(mainWindow,'Pointer','arrow');
+    
+    % Switch off togglebuttons
+    set(gh.measure_panel_point_togglebutton,'Value',0);
+    set(gh.measure_panel_distance_togglebutton,'Value',0);
+    
+    % Reset GUI mode
+    trEPRguiSetMode('none');
+    
+    % Update display - REALLY NECESSARY?
+    refresh;
+catch exception
+    trEPRexceptionHandling(exception);
+end
+
 end
 
 function assignPointsToDataStructure()
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-       
-        % Get guihandles of main window
-        gh = guihandles(mainWindow);
-        
-        % To shorten lines, assign id of currently active dataset to var
-        active = ad.control.spectra.active;
-        
-        % Assign index and value to data structure of currently active dataset
-        ad.data{active}.display.measure.point(1).index = [...
-            str2double(get(gh.measure_panel_point1_x_index_edit,'String'))...
-            str2double(get(gh.measure_panel_point1_y_index_edit,'String'))...
-            ];
-        ad.data{active}.display.measure.point(1).unit = [...
-            str2double(get(gh.measure_panel_point1_x_unit_edit,'String'))...
-            str2double(get(gh.measure_panel_point1_y_unit_edit,'String'))...
-            ];
-        if (ad.control.measure.nPoints == 2)
-            ad.data{active}.display.measure.point(2).index = [...
-                str2double(get(gh.measure_panel_point2_x_index_edit,'String'))...
-                str2double(get(gh.measure_panel_point2_y_index_edit,'String'))...
-                ];
-            ad.data{active}.display.measure.point(2).unit = [...
-                str2double(get(gh.measure_panel_point2_x_unit_edit,'String'))...
-                str2double(get(gh.measure_panel_point2_y_unit_edit,'String'))...
-                ];
-        end
-        
-        % Set slider values accordingly, if configured to do so
-        if (ad.control.measure.setslider)
-            switch ad.control.axis.displayType
-                case '2D plot'
-                    ad.data{active}.display.position.x = ...
-                        ad.data{active}.display.measure.point(1).index(1);
-                    ad.data{active}.display.position.y = ...
-                        ad.data{active}.display.measure.point(1).index(2);
-                case '1D along x'
-                    ad.data{active}.display.position.x = ...
-                        ad.data{active}.display.measure.point(1).index(1);
-                case '1D along y'
-                    ad.data{active}.display.position.y = ...
-                        ad.data{active}.display.measure.point(1).index(1);
-                otherwise
-                    trEPRoptionUnknown(ad.control.axis.displayType,...
-                        'display type');
-                    return;
-            end
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
 
-        % Set POI and DOI if configured to do so
-        % IMPORTANT: Need to do so after data has been updated
-        if (ad.control.measure.setcharacteristics)
-            cmdPoi(trEPRguiGetWindowHandle,cell(0));
-            if (ad.control.measure.nPoints == 2)
-                cmdDoi(trEPRguiGetWindowHandle,cell(0));
-            end
-        end
-    catch exception
-        try
-            msgStr = ['An exception occurred in ' ...
-                exception.stack(1).name  '.'];
-            trEPRmsg(msgStr,'error');
-        catch exception2
-            exception = addCause(exception2, exception);
-            disp(msgStr);
-        end
-        try
-            trEPRgui_bugreportwindow(exception);
-        catch exception3
-            % If even displaying the bug report window fails...
-            exception = addCause(exception3, exception);
-            throw(exception);
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get guihandles of main window
+    gh = guihandles(mainWindow);
+    
+    % To shorten lines, assign id of currently active dataset to var
+    active = ad.control.spectra.active;
+    
+    % Assign index and value to data structure of currently active dataset
+    ad.data{active}.display.measure.point(1).index = [...
+        str2double(get(gh.measure_panel_point1_x_index_edit,'String'))...
+        str2double(get(gh.measure_panel_point1_y_index_edit,'String'))...
+        ];
+    ad.data{active}.display.measure.point(1).unit = [...
+        str2double(get(gh.measure_panel_point1_x_unit_edit,'String'))...
+        str2double(get(gh.measure_panel_point1_y_unit_edit,'String'))...
+        ];
+    if (ad.control.measure.nPoints == 2)
+        ad.data{active}.display.measure.point(2).index = [...
+            str2double(get(gh.measure_panel_point2_x_index_edit,'String'))...
+            str2double(get(gh.measure_panel_point2_y_index_edit,'String'))...
+            ];
+        ad.data{active}.display.measure.point(2).unit = [...
+            str2double(get(gh.measure_panel_point2_x_unit_edit,'String'))...
+            str2double(get(gh.measure_panel_point2_y_unit_edit,'String'))...
+            ];
+    end
+    
+    % Set slider values accordingly, if configured to do so
+    if (ad.control.measure.setslider)
+        switch ad.control.axis.displayType
+            case '2D plot'
+                ad.data{active}.display.position.x = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+                ad.data{active}.display.position.y = ...
+                    ad.data{active}.display.measure.point(1).index(2);
+            case '1D along x'
+                ad.data{active}.display.position.x = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+            case '1D along y'
+                ad.data{active}.display.position.y = ...
+                    ad.data{active}.display.measure.point(1).index(1);
+            otherwise
+                trEPRoptionUnknown(ad.control.axis.displayType,...
+                    'display type');
+                return;
         end
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Set POI and DOI if configured to do so
+    % IMPORTANT: Need to do so after data has been updated
+    if (ad.control.measure.setcharacteristics)
+        if (ad.control.measure.nPoints == 1)
+            cmdPoi(trEPRguiGetWindowHandle,cell(0));
+        end
+        if (ad.control.measure.nPoints == 2)
+            cmdDoi(trEPRguiGetWindowHandle,cell(0));
+        end
+    end
+catch exception
+    trEPRexceptionHandling(exception);
+end
+
 end

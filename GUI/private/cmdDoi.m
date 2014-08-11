@@ -22,20 +22,25 @@ function [status,warnings] = cmdDoi(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-07
+% 2014-08-11
 
 status = 0;
 warnings = cell(0);
 
 % Parse input arguments using the inputParser functionality
-p = inputParser;            % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Include function name in error messages
-p.KeepUnmatched = true;     % Enable errors on unmatched arguments
-p.StructExpand = true;      % Enable passing arguments in a structure
+try
+    p = inputParser;            % Create inputParser object.
+    p.FunctionName = mfilename; % Function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('handle', @(x)ishandle(x));
+    p.addRequired('opt', @(x)iscell(x));
+    p.parse(handle,opt,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
-p.addRequired('handle', @(x)ishandle(x));
-p.addRequired('opt', @(x)iscell(x));
-p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
@@ -72,6 +77,14 @@ doi = S.characteristics.doi;
 % Set coordinates
 doi.parameters.coordinates = [ ad.data{active}.display.measure.point(1).index ; ...
     ad.data{active}.display.measure.point(2).index ];
+
+% Set default label
+doi.label = sprintf('Dx = %e %s; Dy = %e %s',...
+    diff(ad.data{active}.axes.x.values(doi.parameters.coordinates(:,1))),...
+    ad.data{active}.axes.x.unit,...
+    diff(ad.data{active}.axes.y.values(doi.parameters.coordinates(:,2))),...
+    ad.data{active}.axes.y.unit...
+    );
 
 doiIndex = 0;
 % Get number of current doi entries
