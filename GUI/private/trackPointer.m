@@ -243,6 +243,9 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 newYindex,...
                 pointerPositionInAxis(2),'nearest');
             valz = ad.data{active}.data(indy,indx);
+            % Get value (in units) of current point in dataset
+            valx = xdata(indx);
+            valy = ydata(indy);
         case '1D along x'
             % Get index of current point in dataset
             indx=interp1(...
@@ -251,14 +254,20 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 pointerPositionInAxis(1),'nearest');
             indy=ad.data{active}.display.position.y;
             valz = ad.data{active}.data(indy,indx);
+            % Get value (in units) of current point in dataset
+            valx = xdata(indx);
+            valy = ydata(indy);
         case '1D along y'
             % Get index of current point in dataset
-            indx=interp1(...
+            indy=interp1(...
                 linspace(1,axisPosition(3),length(newXdata)),...
                 newXindex,...
                 pointerPositionInAxis(1),'nearest');
-            indy=ad.data{active}.display.position.x;
-            valz = ad.data{active}.data(indx,indy);
+            indx=ad.data{active}.display.position.x;
+            valz = ad.data{active}.data(indy,indx);
+            % Get value (in units) of current point in dataset
+            valx = ydata(indx);
+            valy = xdata(indy);
         otherwise
             % That shall never happen!
             disp('trackPointer(): Unrecognised displayType');
@@ -266,9 +275,6 @@ if pointerPosition(1) > axisCoordinates(1) && ...
             return;
     end
     
-    % Get value (in units) of current point in dataset
-    valx = xdata(indx);
-    valy = ydata(indy);
     
     % Set display
     switch ad.control.measure.point
