@@ -434,11 +434,22 @@ end
 
 % Set 3D export panel
 if ad.control.spectra.active
-    [dimx,dimy] = size(ad.data{ad.control.spectra.active}.data);
-    set(gh.display_panel_3D_original_x_edit,'String',num2str(dimy));
-    set(gh.display_panel_3D_original_y_edit,'String',num2str(dimx));
-    set(gh.display_panel_3D_size_x_edit,'String',num2str(dimy));
-    set(gh.display_panel_3D_size_y_edit,'String',num2str(dimx));
+    [dimy,dimx] = size(ad.data{ad.control.spectra.active}.data);
+    if get(gh.display_panel_reducing_auto_checkbox,'Value')
+        ad.control.axis.vis3d.reduction.x = floor(dimx/50);
+        ad.control.axis.vis3d.reduction.y = floor(dimy/50);
+    end
+    set(gh.display_panel_3D_original_x_edit,'String',num2str(dimx));
+    set(gh.display_panel_3D_original_y_edit,'String',num2str(dimy));
+    set(gh.display_panel_3D_factor_x_edit,'String',...
+        num2str(ad.control.axis.vis3d.reduction.x));
+    set(gh.display_panel_3D_factor_y_edit,'String',...
+        num2str(ad.control.axis.vis3d.reduction.y));
+    set(gh.display_panel_3D_size_x_edit,'String',...
+        num2str(floor(dimx/ad.control.axis.vis3d.reduction.x)));
+    set(gh.display_panel_3D_size_y_edit,'String',...
+        num2str(floor(dimy/ad.control.axis.vis3d.reduction.y)));
+    setappdata(mainWindow,'control',ad.control);
 end
 
 status = 0;

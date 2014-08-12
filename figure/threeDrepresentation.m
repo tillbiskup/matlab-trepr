@@ -34,7 +34,10 @@ try
     end
 
     % Reduce data points if necessary
-    if isfield(parameters,'size') && ~isempty(parameters.size)
+    if isfield(parameters,'reduction') && ~isempty(parameters.reduction.x)
+        [dimy,dimx] = size(data.data);
+        parameters.size.x = floor(dimx/parameters.reduction.x);
+        parameters.size.y = floor(dimy/parameters.reduction.y);
         % If size is too small, return
         if (parameters.size.x < 10) || (parameters.size.y < 10)
             figHandle = 0;

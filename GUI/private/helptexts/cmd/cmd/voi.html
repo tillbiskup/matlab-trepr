@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../../help.css" />
+    </head>
+    <body>
+		<h1>voi</h1>
+		<p class="intro">
+			Setting &quot;view of interest&quot; (VOI) in characteristics of dataset.
+		</p>
+		<h2>Description</h2>
+		<p>
+			The <tt>voi</tt> command works in all display modes, but to see what you actually save as VOI, open the 3D representation window using the respective page of the display panel. Without options it adds the currently selected parameters for the 3D representation of the currently active dataset as &quot;view of interest&quot; (VOI) to the list of characteristics of this dataset.
+		</p>
+		<p>
+			If used with additional options, the <tt>voi</tt> command sets the particular field of the VOI structure.
+		</p>
+		<h2>Syntax</h2>
+		<p>
+			<tt>voi</tt>
+		</p>
+		<p>
+			<tt>voi [&lt;label&gt;]</tt>
+		</p>
+		<p>
+			<tt>voi &lt;label|comment&gt; &lt;option&gt;</tt>
+		</p>
+		<h3>Options</h3>
+		<p>
+			Currently, the <tt>voi</tt> command takes the following options:
+		</p>
+		<dl>
+			<dt>label</dt>
+			<dd>Set the label of the current VOI.</dd>
+			<dt>comment</dt>
+			<dd>Set the comment of the current VOI.</dd>
+		</dl>
+		<p>
+			If none of the above listed options is provided, additional text will be handled as label for the VOI.
+		</p>
+		<p>
+			The command automatically checks whether a VOI for this dataset with the identical parameters has already been created, and if so, it will update the parameters as specified by the options. Therefore, for each set of parameters only one VOI will exist.
+		</p>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2014, Till Biskup
+		</p>
+		<p class="lastchange">
+			2014-08-12
+		</p>
+		</div>
+	</body>
+</html>

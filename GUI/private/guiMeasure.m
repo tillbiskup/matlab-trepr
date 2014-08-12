@@ -262,7 +262,7 @@ try
                     ad.data{active}.display.measure.point(1).index(1);
             case '1D along y'
                 ad.data{active}.display.position.y = ...
-                    ad.data{active}.display.measure.point(1).index(1);
+                    ad.data{active}.display.measure.point(1).index(2);
             otherwise
                 trEPRoptionUnknown(ad.control.axis.displayType,...
                     'display type');
