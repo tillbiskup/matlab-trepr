@@ -62,7 +62,7 @@ if isempty(ad.data)
 end
 
 if isempty(opt)
-    if ~isempty(ad.control.spectra.visible)
+    if ~isempty(ad.control.data.visible)
         % Get selected item of listbox
         selected = get(gh.data_panel_visible_listbox,'Value');
         
@@ -72,62 +72,62 @@ if isempty(opt)
         end
         
         % Move to invisible
-        ad.control.spectra.invisible = [...
-            ad.control.spectra.invisible ...
-            ad.control.spectra.visible(selected) ...
+        ad.control.data.invisible = [...
+            ad.control.data.invisible ...
+            ad.control.data.visible(selected) ...
             ];
         
         % Delete in visible
-        ad.control.spectra.visible(selected) = [];
+        ad.control.data.visible(selected) = [];
         
         % Toggle active entry
-        if (selected > length(ad.control.spectra.visible))
+        if (selected > length(ad.control.data.visible))
             if (selected == 1)
-                ad.control.spectra.active = 0;
+                ad.control.data.active = 0;
             else
-                ad.control.spectra.active = ad.control.spectra.visible(end);
+                ad.control.data.active = ad.control.data.visible(end);
             end
         else
-            ad.control.spectra.active = ad.control.spectra.visible(selected);
+            ad.control.data.active = ad.control.data.visible(selected);
         end
     end
 elseif strcmpi(opt{1},'all')
     % If there are no visible datasets, return immediately
-    if isempty(ad.control.spectra.visible)
+    if isempty(ad.control.data.visible)
         return;
     end
     % Move to invisible
-    ad.control.spectra.invisible = [...
-        ad.control.spectra.invisible ...
-        ad.control.spectra.visible ...
+    ad.control.data.invisible = [...
+        ad.control.data.invisible ...
+        ad.control.data.visible ...
         ];
     
     % Delete in visible
-    ad.control.spectra.visible = [];
+    ad.control.data.visible = [];
     
     % Reset active entry
-    ad.control.spectra.active = 0;
+    ad.control.data.active = 0;
 elseif ~isnan(str2double(opt{1}))
-    if any(ad.control.spectra.visible==str2double(opt{1}))
+    if any(ad.control.data.visible==str2double(opt{1}))
         % Move to invisible
         selected = str2double(opt{1});
-        ad.control.spectra.invisible = [...
-            ad.control.spectra.invisible ...
+        ad.control.data.invisible = [...
+            ad.control.data.invisible ...
             selected ...
             ];
         
         % Delete in visible
-        ad.control.spectra.visible(ad.control.spectra.visible==selected) = [];
+        ad.control.data.visible(ad.control.data.visible==selected) = [];
         
         % Toggle active entry
-        if (selected > length(ad.control.spectra.visible))
+        if (selected > length(ad.control.data.visible))
             if (selected == 1)
-                ad.control.spectra.active = 0;
+                ad.control.data.active = 0;
             else
-                ad.control.spectra.active = ad.control.spectra.visible(end);
+                ad.control.data.active = ad.control.data.visible(end);
             end
         else
-            ad.control.spectra.active = ad.control.spectra.visible(...
+            ad.control.data.active = ad.control.data.visible(...
                 get(gh.data_panel_visible_listbox,'Value'));
         end
     else
@@ -148,8 +148,8 @@ setappdata(handle,'control',ad.control);
 % IMPORTANT: Has to go AFTER setappdata
 msgStr = cell(0,1);
 msgStr{end+1} = 'Moved all datasets to invisible';
-invStr = sprintf('%i ',ad.control.spectra.invisible);
-visStr = sprintf('%i ',ad.control.spectra.visible);
+invStr = sprintf('%i ',ad.control.data.invisible);
+visStr = sprintf('%i ',ad.control.data.visible);
 msgStr{end+1} = sprintf(...
     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
     invStr,visStr,length(ad.data));

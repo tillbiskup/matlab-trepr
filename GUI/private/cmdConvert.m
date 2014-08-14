@@ -55,7 +55,7 @@ end
 ad = getappdata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % If there is no active dataset, return
 if ~active
@@ -87,10 +87,10 @@ switch lower(opt{1})
         dataset = 1:length(ad.data);
         opt(1) = [];
     case {'visible','vis'}
-        dataset = ad.control.spectra.visible;
+        dataset = ad.control.data.visible;
         opt(1) = [];
     case {'invisible','invis','inv'}
-        dataset = ad.control.spectra.invisible;
+        dataset = ad.control.data.invisible;
         opt(1) = [];
 end
 

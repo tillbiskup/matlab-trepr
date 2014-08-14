@@ -155,38 +155,38 @@ try
             trEPRgui_statuswindow();
             return;
         case 'delete'
-            if ~ad.control.spectra.active
+            if ~ad.control.data.active
                 return;
             end
             if src == gh.data_panel_visible_listbox
                 if ~isempty(evt.Modifier) && (strcmpi(evt.Modifier{1},'shift'))
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
-                        ad.control.spectra.active,'force',true);
+                        ad.control.data.active,'force',true);
                     if status
                         trEPRmsg(message,'warning');
                     end
                 else
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
-                        ad.control.spectra.active);
+                        ad.control.data.active);
                     if status
                         trEPRmsg(message,'warning');
                     end
                 end
             end
         case 'backspace'
-            if ~ad.control.spectra.active
+            if ~ad.control.data.active
                 return;
             end
             if src == gh.data_panel_visible_listbox
                 if ~isempty(evt.Modifier) && (strcmpi(evt.Modifier{1},'shift'))
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
-                        ad.control.spectra.active,'force',true);
+                        ad.control.data.active,'force',true);
                     if status
                         trEPRmsg(message,'warning');
                     end
                 else
                     [status,message] = trEPRremoveDatasetFromMainGUI(...
-                        ad.control.spectra.active);
+                        ad.control.data.active);
                     if status
                         trEPRmsg(message,'warning');
                     end
@@ -198,13 +198,13 @@ try
             cmdShow(mainWindow,{'prev'});
         % Keys for mode switching
         case {'c','d'}
-            if ad.control.spectra.active && ...
+            if ad.control.data.active && ...
                     ~strcmpi(ad.control.mode,'command') && ...
                     ~strcmpi(ad.control.axis.displayType,'2D plot')
                 trEPRguiSetMode(evt.Key);
             end
         case {'s','z','m','p'}
-            if ad.control.spectra.active && ...
+            if ad.control.data.active && ...
                     ~strcmpi(ad.control.mode,'command')
                 trEPRguiSetMode(evt.Key);
             end

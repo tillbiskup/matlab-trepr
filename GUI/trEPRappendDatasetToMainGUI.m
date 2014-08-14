@@ -61,17 +61,17 @@ try
     newId = length(ad.data);
     
     % Make new dataset immediately visible
-    ad.control.spectra.visible(end+1) = newId;
+    ad.control.data.visible(end+1) = newId;
     
     % Handle whether it should go to modified as well
     if (p.Results.modified)
-        ad.control.spectra.modified(end+1) = newId;
+        ad.control.data.modified(end+1) = newId;
     end
     
     % In case there is currently no active spectrum, make the newly
     % appended one the active one
-    if ~(ad.control.spectra.active)
-        ad.control.spectra.active = newId;
+    if ~(ad.control.data.active)
+        ad.control.data.active = newId;
     end
     
     % Write appdata

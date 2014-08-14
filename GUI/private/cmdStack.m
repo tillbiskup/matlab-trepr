@@ -55,7 +55,7 @@ percentage = 10;
 
 ad = getappdata(handle);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
@@ -63,7 +63,7 @@ end
 
 if strcmpi(ad.control.axis.displayType,'2d plot')
     warnings{end+1} = sprintf('%s: Cannot operate in "%s" display type.',...
-        cmd,ad.control.spectra.displayType);
+        cmd,ad.control.data.displayType);
     status = -3;
     return;
 end
@@ -72,17 +72,17 @@ end
 switch lower(ad.control.axis.displayType)
     case '1d along x'
         % Preallocation
-        xValues = zeros(length(ad.control.spectra.visible),...
-            length(ad.data{ad.control.spectra.visible(1)}.axes.x.values));
+        xValues = zeros(length(ad.control.data.visible),...
+            length(ad.data{ad.control.data.visible(1)}.axes.x.values));
         yValues = zeros(length(xValues));
-        for idx=1:length(ad.control.spectra.visible)
+        for idx=1:length(ad.control.data.visible)
             xValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.axes.x.values;
+                ad.data{ad.control.data.visible(idx)}.axes.x.values;
             yValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.data(...
-                ad.data{ad.control.spectra.visible(idx)}.display.position.y,:);
+                ad.data{ad.control.data.visible(idx)}.data(...
+                ad.data{ad.control.data.visible(idx)}.display.position.y,:);
         end
-        if length(ad.control.spectra.visible) > 1 ...
+        if length(ad.control.data.visible) > 1 ...
                 && ~isequal(...
                 repmat(xValues(1,:),[],size(xValues,1)),xValues)
             warnings{end+1} = sprintf('%s: Axes are not identical.',cmd);
@@ -91,17 +91,17 @@ switch lower(ad.control.axis.displayType)
         end
     case '1d along y'
         % Preallocation
-        xValues = zeros(length(ad.control.spectra.visible),...
-            length(ad.data{ad.control.spectra.visible(1)}.axes.y.values));
+        xValues = zeros(length(ad.control.data.visible),...
+            length(ad.data{ad.control.data.visible(1)}.axes.y.values));
         yValues = zeros(size(xValues));
-        for idx=1:length(ad.control.spectra.visible)
+        for idx=1:length(ad.control.data.visible)
             xValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.axes.y.values;
+                ad.data{ad.control.data.visible(idx)}.axes.y.values;
             yValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.data(:,...
-                ad.data{ad.control.spectra.visible(idx)}.display.position.x);
+                ad.data{ad.control.data.visible(idx)}.data(:,...
+                ad.data{ad.control.data.visible(idx)}.display.position.x);
         end
-        if length(ad.control.spectra.visible) > 1 ...
+        if length(ad.control.data.visible) > 1 ...
                 && ~isequal(...
                 repmat(xValues(1,:),[],size(xValues,1)),xValues)
             warnings{end+1} = sprintf('%s: Axes are not identical.',cmd);
@@ -121,7 +121,7 @@ additionalDelta = ...
 
 % Add deltas and additionalDelta to traces
 for delta = 1:length(deltas)
-    ad.data{ad.control.spectra.visible(delta+1)}.display.displacement.z = ...
+    ad.data{ad.control.data.visible(delta+1)}.display.displacement.z = ...
         sum(deltas(1:delta)) + delta*additionalDelta;
 end
 

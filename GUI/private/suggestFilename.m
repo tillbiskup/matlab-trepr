@@ -41,13 +41,13 @@ else
     startDir = pwd;
 end
 
-if ad.control.spectra.visible
+if ad.control.data.visible
     if isfield(ad.configuration,'filenames') && ...
             ad.configuration.filenames.useLabel
-        filename = ad.data{ad.control.spectra.active}.label;
+        filename = ad.data{ad.control.data.active}.label;
     else
         [~,filename,~] = ...
-            fileparts(ad.data{ad.control.spectra.active}.file.name);
+            fileparts(ad.data{ad.control.data.active}.file.name);
     end
     if isfield(ad.configuration,'filenames') && ...
             ad.configuration.filenames.sanitise

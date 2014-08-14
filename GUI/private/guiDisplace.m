@@ -17,7 +17,7 @@ try
     gh = guihandles(mainWindow);
     
     % For convenience and shorter lines
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     
     % Get dimension of active dataset
     [y,x] = size(ad.data{active}.data);

@@ -56,7 +56,7 @@ ad = getappdata(handle);
 gh = guidata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 if isempty(ad.data)
     warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
@@ -70,7 +70,7 @@ try
             selected = get(gh.data_panel_visible_listbox,'Value');
             
             % Get id of selected spectrum
-            selectedId = ad.control.spectra.visible(selected);
+            selectedId = ad.control.data.visible(selected);
             
             trEPRremoveDatasetFromMainGUI(selectedId);
             return;
@@ -81,10 +81,10 @@ try
     
     switch lower(opt{1})
         case 'visible'
-            if isempty(ad.control.spectra.visible)
+            if isempty(ad.control.data.visible)
                 return;
             end
-            visible = sort(ad.control.spectra.visible,'descend');
+            visible = sort(ad.control.data.visible,'descend');
             if length(opt) > 1 &&  strcmpi(opt{2},'force')
                 trEPRremoveDatasetFromMainGUI(visible,'force',true);
             else
@@ -92,10 +92,10 @@ try
             end
             return;
         case 'invisible'
-            if isempty(ad.control.spectra.invisible)
+            if isempty(ad.control.data.invisible)
                 return;
             end
-            invisible = sort(ad.control.spectra.invisible,'descend');
+            invisible = sort(ad.control.data.invisible,'descend');
             if length(opt) > 1 && strcmpi(opt{2},'force')
                 trEPRremoveDatasetFromMainGUI(invisible,'force',true);
             else
@@ -123,7 +123,7 @@ try
                 selected = get(gh.data_panel_visible_listbox,'Value');
                 
                 % Get id of selected spectrum
-                selectedId = ad.control.spectra.visible(selected);
+                selectedId = ad.control.data.visible(selected);
                 
                 trEPRremoveDatasetFromMainGUI(selectedId,'force',true);
                 return;

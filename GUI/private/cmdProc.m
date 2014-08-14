@@ -54,7 +54,7 @@ end
 ad = getappdata(handle);
 
 if ~isempty(opt)
-    numDataset = ad.control.spectra.active;
+    numDataset = ad.control.data.active;
     % Check whether first option is numeric (-> dataset no) or char (dim)
     if ~isnan(str2double(opt{1})) && str2double(opt{1}) <= length(ad.data)
         numDataset = str2double(opt{1});

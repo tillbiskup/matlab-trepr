@@ -1114,10 +1114,10 @@ if (mainGuiWindow)
     if (isfield(admain,'control') ~= 0)
         %ad.control = admain.control;
         % Move (in)visible -> (not)accumulated
-        ad.control.spectra.accumulated = admain.control.spectra.visible;
-        ad.control.spectra.notaccumulated = admain.control.spectra.invisible;
-        ad.control.spectra = rmfield(ad.control.spectra,'visible');
-        ad.control.spectra = rmfield(ad.control.spectra,'invisible');
+        ad.control.data.accumulated = admain.control.data.visible;
+        ad.control.data.notaccumulated = admain.control.data.invisible;
+        ad.control.data = rmfield(ad.control.data,'visible');
+        ad.control.data = rmfield(ad.control.data,'invisible');
         ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
         ad.control.axis.grid.x = ad.configuration.axis.grid.x;
         ad.control.axis.grid.y = ad.configuration.axis.grid.y;
@@ -1208,7 +1208,7 @@ function slider_Callback(source,~)
                     ad.acc.data.display.position.y = ...
                         int16(get(source,'Value'));
                 else
-                    ad.data{ad.control.spectra.active}.display.position.y = ...
+                    ad.data{ad.control.data.active}.display.position.y = ...
                         int16(get(source,'Value'));
                 end
             case '1D along y'
@@ -1216,7 +1216,7 @@ function slider_Callback(source,~)
                     ad.acc.data.display.position.x = ...
                         int16(get(source,'Value'));
                 else
-                    ad.data{ad.control.spectra.active}.display.position.x = ...
+                    ad.data{ad.control.data.active}.display.position.x = ...
                         int16(get(source,'Value'));
                 end
             otherwise
@@ -1247,7 +1247,7 @@ function accumulated_listbox_Callback(~,~)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        ad.control.spectra.active = ad.control.spectra.accumulated(...
+        ad.control.data.active = ad.control.data.accumulated(...
             get(gh.accumulated_listbox,'Value')...
             );
         
@@ -1286,7 +1286,7 @@ function position_edit_Callback(source,~,position)
         ad = getappdata(mainWindow);
         
         % Be as robust as possible: if there is no axes, default is indices
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        [y,x] = size(ad.data{ad.control.data.active}.data);
         x = linspace(1,x,x);
         y = linspace(1,y,y);
         if (isfield(ad.acc.data,'axes') ...
@@ -1546,63 +1546,63 @@ function pushbutton_Callback(~,~,action)
         
         switch action
             case 'add'
-                if isempty(ad.control.spectra.notaccumulated)
+                if isempty(ad.control.data.notaccumulated)
                     return;
                 end
                 selected = get(gh.notaccumulated_listbox,'Value');
-                ad.control.spectra.accumulated(end+1) = ...
-                    ad.control.spectra.notaccumulated(selected);
-                ad.control.spectra.notaccumulated(selected) = [];
+                ad.control.data.accumulated(end+1) = ...
+                    ad.control.data.notaccumulated(selected);
+                ad.control.data.notaccumulated(selected) = [];
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
                 updateDimensionPanel('Datasets');
                 updateAxes();
             case 'remove'
-                if isempty(ad.control.spectra.accumulated)
+                if isempty(ad.control.data.accumulated)
                     return;
                 end
                 selected = get(gh.accumulated_listbox,'Value');
-                ad.control.spectra.notaccumulated(end+1) = ...
-                    ad.control.spectra.accumulated(selected);
-                ad.control.spectra.accumulated(selected) = [];
+                ad.control.data.notaccumulated(end+1) = ...
+                    ad.control.data.accumulated(selected);
+                ad.control.data.accumulated(selected) = [];
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
                 updateDimensionPanel('Datasets');
                 updateAxes();
             case 'addall'
-                if isempty(ad.control.spectra.notaccumulated)
+                if isempty(ad.control.data.notaccumulated)
                     return;
                 end
-                ad.control.spectra.accumulated = [...
-                    ad.control.spectra.accumulated ...
-                    ad.control.spectra.notaccumulated ];
-                ad.control.spectra.notaccumulated = [];
+                ad.control.data.accumulated = [...
+                    ad.control.data.accumulated ...
+                    ad.control.data.notaccumulated ];
+                ad.control.data.notaccumulated = [];
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
                 updateDimensionPanel('Datasets');
                 updateAxes();
             case 'removeall'
-                if isempty(ad.control.spectra.accumulated)
+                if isempty(ad.control.data.accumulated)
                     return;
                 end
-                ad.control.spectra.notaccumulated = [...
-                    ad.control.spectra.notaccumulated ...
-                    ad.control.spectra.accumulated ];
-                ad.control.spectra.accumulated = [];
+                ad.control.data.notaccumulated = [...
+                    ad.control.data.notaccumulated ...
+                    ad.control.data.accumulated ];
+                ad.control.data.accumulated = [];
                 % Set appdata
                 setappdata(mainWindow,'control',ad.control);
                 updateSpectra();
                 updateDimensionPanel('Datasets');
                 updateAxes();
             case 'next'
-                if isempty(ad.control.spectra.accumulated)
+                if isempty(ad.control.data.accumulated)
                     return;
                 end
                 selected = get(gh.accumulated_listbox,'Value');
-                if selected == length(ad.control.spectra.accumulated)
+                if selected == length(ad.control.data.accumulated)
                     selected = 1;
                 else
                     selected = selected + 1;
@@ -1612,12 +1612,12 @@ function pushbutton_Callback(~,~,action)
                 updateDimensionPanel('Datasets');
                 updateAxes();
             case 'prev'
-                if isempty(ad.control.spectra.accumulated)
+                if isempty(ad.control.data.accumulated)
                     return;
                 end
                 selected = get(gh.accumulated_listbox,'Value');
                 if selected == 1
-                    selected = length(ad.control.spectra.accumulated);
+                    selected = length(ad.control.data.accumulated);
                 else
                     selected = selected - 1;
                 end
@@ -1632,10 +1632,10 @@ function pushbutton_Callback(~,~,action)
                     return;
                 end
 
-                accDatasets = cell(length(ad.control.spectra.accumulated),1);
-                for k=1:length(ad.control.spectra.accumulated)
+                accDatasets = cell(length(ad.control.data.accumulated),1);
+                for k=1:length(ad.control.data.accumulated)
                     accDatasets{k} = ...
-                        ad.data{ad.control.spectra.accumulated(k)};
+                        ad.data{ad.control.data.accumulated(k)};
                 end
                 
                 [accData,accReport] = trEPRACC(accDatasets,ad.acc);
@@ -1697,10 +1697,10 @@ function pushbutton_Callback(~,~,action)
                     return;
                 end
 
-                accDatasets = cell(length(ad.control.spectra.accumulated),1);
-                for k=1:length(ad.control.spectra.accumulated)
+                accDatasets = cell(length(ad.control.data.accumulated),1);
+                for k=1:length(ad.control.data.accumulated)
                     accDatasets{k} = ...
-                        ad.data{ad.control.spectra.accumulated(k)};
+                        ad.data{ad.control.data.accumulated(k)};
                 end
                 
                 [accData,accReport] = trEPRACC(accDatasets,ad.acc);
@@ -1970,32 +1970,32 @@ function updateDimensionPanel(panel)
         
         switch panel
             case 'Datasets'
-                if isempty(ad.control.spectra.active) || ...
-                        (ad.control.spectra.active == 0)
+                if isempty(ad.control.data.active) || ...
+                        (ad.control.data.active == 0)
                     set(findall(...
                         allchild(gh.dataset_dimensions_panel),...
                         'Style','Edit'),'String','1');
                 else
-                    [ydim,xdim] = size(ad.data{ad.control.spectra.active}.data);
+                    [ydim,xdim] = size(ad.data{ad.control.data.active}.data);
                     set(gh.dataset_dimensions_size_x_edit,'String',...
                         num2str(xdim));
                     set(gh.dataset_dimensions_size_y_edit,'String',...
                         num2str(ydim));
                     set(gh.dataset_dimensions_min_x_edit,'String',...
-                        num2str(ad.data{ad.control.spectra.active}.axes.x.values(1)));
+                        num2str(ad.data{ad.control.data.active}.axes.x.values(1)));
                     set(gh.dataset_dimensions_min_y_edit,'String',...
-                        num2str(ad.data{ad.control.spectra.active}.axes.y.values(1)));
+                        num2str(ad.data{ad.control.data.active}.axes.y.values(1)));
                     set(gh.dataset_dimensions_max_x_edit,'String',...
-                        num2str(ad.data{ad.control.spectra.active}.axes.x.values(end)));
+                        num2str(ad.data{ad.control.data.active}.axes.x.values(end)));
                     set(gh.dataset_dimensions_max_y_edit,'String',...
-                        num2str(ad.data{ad.control.spectra.active}.axes.y.values(end)));
+                        num2str(ad.data{ad.control.data.active}.axes.y.values(end)));
                     set(gh.dataset_dimensions_step_x_edit,'String',...
-                        num2str(ad.data{ad.control.spectra.active}.axes.x.values(2)-...
-                        ad.data{ad.control.spectra.active}.axes.x.values(1)));
+                        num2str(ad.data{ad.control.data.active}.axes.x.values(2)-...
+                        ad.data{ad.control.data.active}.axes.x.values(1)));
                     if ydim > 1
                         set(gh.dataset_dimensions_step_y_edit,'String',...
-                            num2str(ad.data{ad.control.spectra.active}.axes.y.values(2)-...
-                            ad.data{ad.control.spectra.active}.axes.y.values(1)));
+                            num2str(ad.data{ad.control.data.active}.axes.y.values(2)-...
+                            ad.data{ad.control.data.active}.axes.y.values(1)));
                     else
                         set(gh.dataset_dimensions_step_y_edit,'String','0');
                     end
@@ -2057,8 +2057,8 @@ function updateSpectra()
         accLbox = gh.accumulated_listbox;
         
         % Get indices of (in)visible spectra
-        acc = ad.control.spectra.accumulated;
-        nacc = ad.control.spectra.notaccumulated;
+        acc = ad.control.data.accumulated;
+        nacc = ad.control.data.notaccumulated;
         
         % Get names for display in listbox
         if ~isempty(acc)
@@ -2075,7 +2075,7 @@ function updateSpectra()
             if ((get(accLbox,'Value')==0) && (~isempty(acc)))
                 set(accLbox,'Value',1);
             end
-            ad.control.spectra.active = acc(get(accLbox,'Value'));
+            ad.control.data.active = acc(get(accLbox,'Value'));
             % Set string for "master dataset" popupmenu
             masterDatasetString = accLabels{1};
             if length(acc)>1
@@ -2089,15 +2089,15 @@ function updateSpectra()
             end
             set(gh.master_popupmenu,'String',masterDatasetString);
             set(gh.master_popupmenu,...
-                'Value',find(acc==ad.control.spectra.active));
+                'Value',find(acc==ad.control.data.active));
             set(gh.master_popupmenu,'Enable','on');
             % Set label for accumulated data
             set(gh.label_edit,'String',sprintf('%s (ACC)',...
-                ad.data{ad.control.spectra.active}.label));
+                ad.data{ad.control.data.active}.label));
         else
             set(accLbox,'String','');
             set(accLbox,'Enable','off');
-            ad.control.spectra.active = [];
+            ad.control.data.active = [];
             set(gh.master_popupmenu,'String','none');
             set(gh.master_popupmenu,'Value',1);
             set(gh.master_popupmenu,'Enable','off');
@@ -2122,8 +2122,8 @@ function updateSpectra()
         end
         
         % Highlight currently active
-        if ad.control.spectra.active
-            set(accLbox,'Value',find(acc==ad.control.spectra.active));
+        if ad.control.data.active
+            set(accLbox,'Value',find(acc==ad.control.data.active));
         end
         
         % Set appdata of ACC GUI
@@ -2152,20 +2152,20 @@ function updateSliderPanel()
         end
 
         % Get dimensions and axes of current dataset
-        [y,x] = size(ad.data{ad.control.spectra.active}.data);
+        [y,x] = size(ad.data{ad.control.data.active}.data);
         x = linspace(1,x,x);
         y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'x') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.x,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.x.values)))
-            x = ad.data{ad.control.spectra.active}.axes.x.values;
+        if (isfield(ad.data{ad.control.data.active},'axes') ...
+                && isfield(ad.data{ad.control.data.active}.axes,'x') ...
+                && isfield(ad.data{ad.control.data.active}.axes.x,'values') ...
+                && not (isempty(ad.data{ad.control.data.active}.axes.x.values)))
+            x = ad.data{ad.control.data.active}.axes.x.values;
         end
-        if (isfield(ad.data{ad.control.spectra.active},'axes') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes,'y') ...
-                && isfield(ad.data{ad.control.spectra.active}.axes.y,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.active}.axes.y.values)))
-            y = ad.data{ad.control.spectra.active}.axes.y.values;
+        if (isfield(ad.data{ad.control.data.active},'axes') ...
+                && isfield(ad.data{ad.control.data.active}.axes,'y') ...
+                && isfield(ad.data{ad.control.data.active}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.data.active}.axes.y.values)))
+            y = ad.data{ad.control.data.active}.axes.y.values;
         end
         % In case that we loaded 1D data...
         if isscalar(x)
@@ -2225,7 +2225,7 @@ function updateAxes()
         % If there are no data at all, neither accumulated nor to
         % accumulate, don't show anything
         if (~isfield(ad.acc,'data') || isempty(ad.acc.data)) && ...
-                isempty(ad.control.spectra.accumulated)
+                isempty(ad.control.data.accumulated)
             cla(gca,'reset');
             return;
         end
@@ -2410,7 +2410,7 @@ function updateAxes()
         % In case that there are no accumulated data, but those to
         % accumulate, show those
         else
-            active = ad.control.spectra.active;
+            active = ad.control.data.active;
             if isempty(active) || active == 0
                 return;
             end
@@ -2498,8 +2498,8 @@ function updateAxes()
                             'LineWidth',ad.data{active}.line.width...
                             );
                     else
-                        for idx=1:length(ad.control.spectra.accumulated)
-                            k = ad.control.spectra.accumulated(idx);
+                        for idx=1:length(ad.control.data.accumulated)
+                            k = ad.control.data.accumulated(idx);
                             x = size(ad.data{k},2);
                             x = linspace(1,x,x);
                             if (isfield(ad.data{k},'axes') ...
@@ -2615,8 +2615,8 @@ function updateAxes()
                             'LineWidth',ad.data{active}.line.width...
                             );
                     else
-                        for idx=1:length(ad.control.spectra.accumulated)
-                            k = ad.control.spectra.accumulated(idx);
+                        for idx=1:length(ad.control.data.accumulated)
+                            k = ad.control.data.accumulated(idx);
                             y = size(ad.data{k},1);
                             y = linspace(1,y,y);
                             if (isfield(ad.data{k},'axes') ...
@@ -2712,7 +2712,7 @@ function setAccParameters()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
-        if isempty(ad.control.spectra.accumulated)
+        if isempty(ad.control.data.accumulated)
             return;
         end
         
@@ -2720,10 +2720,10 @@ function setAccParameters()
         gh = guihandles(mainWindow);
         
         % Ids of datasets to accumulate
-        ad.acc.datasets = ad.control.spectra.accumulated;
+        ad.acc.datasets = ad.control.data.accumulated;
         
         % Id of master dataset
-        ad.acc.master = ad.control.spectra.accumulated(...
+        ad.acc.master = ad.control.data.accumulated(...
             get(gh.master_popupmenu,'Value'));
         
         % Accumulation method

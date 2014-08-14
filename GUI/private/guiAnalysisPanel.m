@@ -471,7 +471,7 @@ try
     % Get handles of main window
     gh = guihandles(mainWindow);
     
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     
     switch lower(action)
         case 'export'
@@ -485,10 +485,10 @@ try
                 TAmsg(warnings,'warning');
             end
         case 'mwfreqdriftplot'
-            if ~ad.control.spectra.active
+            if ~ad.control.data.active
                 return;
             end
-            active = ad.control.spectra.active;
+            active = ad.control.data.active;
             if isscalar(ad.data{active}.parameters.bridge.MWfrequency.value) && ...
                     ~isfield(ad.data{active}.parameters.bridge.MWfrequency,'values') && ...
                     (~isfield(ad.data{active}.parameters.bridge.calibration,'values') || ...
@@ -502,10 +502,10 @@ try
             end
             trEPRgui_MWfrequencyDriftwindow();
         case 'netpolarisationplot'
-            if ~ad.control.spectra.active
+            if ~ad.control.data.active
                 return;
             end
-            active = ad.control.spectra.active;
+            active = ad.control.data.active;
             if isscalar(ad.data{active}.axes.x.values) || ...
                     isscalar(ad.data{active}.axes.y.values)
                 msgbox('Currently active dataset has insufficient dimensions for net polarisation analysis.',...
@@ -575,7 +575,7 @@ try
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     if isempty(active) && ~active
         return;
     end

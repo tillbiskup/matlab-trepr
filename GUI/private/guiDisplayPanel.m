@@ -1935,7 +1935,7 @@ function popupmenu_Callback(source,~,action)
         values = cellstr(get(source,'String'));
         value = values{get(source,'Value')};
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         switch action
             case 'line'
@@ -2020,7 +2020,7 @@ function edit_Callback(source,~,action)
         ad = getappdata(mainWindow);
         gh = guihandles(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         if isempty(active) && ~active
             return;
         end
@@ -2076,7 +2076,7 @@ function pushbutton_Callback(~,~,action)
         gh = guihandles(mainWindow);
 
         % Make life easier
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % Return immediately if there is no active dataset
         if active == 0 && ~strcmpi(action,'zerolinecolourpalette') 
@@ -2335,7 +2335,7 @@ function pushbutton_Callback(~,~,action)
                 end
                 
                 figHandle = threeDrepresentation(...
-                    ad.data{ad.control.spectra.active},...
+                    ad.data{ad.control.data.active},...
                     ad.control.axis.vis3d);
                 
                 % Set tag for figure window containing 3D representation
@@ -2380,40 +2380,40 @@ function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
         
-        if (isempty(ad.control.spectra.active))
+        if (isempty(ad.control.data.active))
             return;
         end
         
-        if (isfield(ad.data{ad.control.spectra.active},'axes'))
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.x,'measure'))
+        if (isfield(ad.data{ad.control.data.active},'axes'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.x,'measure'))
                 ad.control.axis.labels.x.measure = ...
-                    ad.data{ad.control.spectra.active}.axes.x.measure;
+                    ad.data{ad.control.data.active}.axes.x.measure;
             end
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.x,'unit'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.x,'unit'))
                 ad.control.axis.labels.x.unit = ...
-                    ad.data{ad.control.spectra.active}.axes.x.unit;
+                    ad.data{ad.control.data.active}.axes.x.unit;
             end
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.y,'measure'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.y,'measure'))
                 ad.control.axis.labels.y.measure = ...
-                    ad.data{ad.control.spectra.active}.axes.y.measure;
+                    ad.data{ad.control.data.active}.axes.y.measure;
             end
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.y,'unit'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.y,'unit'))
                 ad.control.axis.labels.y.unit = ...
-                    ad.data{ad.control.spectra.active}.axes.y.unit;
+                    ad.data{ad.control.data.active}.axes.y.unit;
             end
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.z,'measure'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.z,'measure'))
                 ad.control.axis.labels.z.measure = ...
-                    ad.data{ad.control.spectra.active}.axes.z.measure;
+                    ad.data{ad.control.data.active}.axes.z.measure;
             end
-            if (isfield(ad.data{ad.control.spectra.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.spectra.active}.axes.z,'unit'))
+            if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
+                    isfield(ad.data{ad.control.data.active}.axes.z,'unit'))
                 ad.control.axis.labels.z.unit = ...
-                    ad.data{ad.control.spectra.active}.axes.z.unit;
+                    ad.data{ad.control.data.active}.axes.z.unit;
             end
         end
         
@@ -2903,7 +2903,7 @@ function datasets_listbox_Callback(~,~)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        ad.control.spectra.active = ad.control.spectra.visible(...
+        ad.control.data.active = ad.control.data.visible(...
             get(gh.display_panel_datasets_listbox,'Value')...
             );
         
@@ -2946,8 +2946,8 @@ function linewidth_popupmenu_Callback(~,~)
         lineWidth = ...
             lineWidths{get(gh.display_panel_linewidth_popupmenu,'Value')};
                 
-        if ad.control.spectra.active
-            active = ad.control.spectra.active;
+        if ad.control.data.active
+            active = ad.control.data.active;
             % Make settings depending on the line selected
             lineTypes = cellstr(...
                 get(gh.display_panel_line_popupmenu,'String'));
@@ -2988,8 +2988,8 @@ function linestyle_popupmenu_Callback(source,~,action)
 
         switch lower(action)
             case 'line'
-                if ad.control.spectra.active
-                    active = ad.control.spectra.active;
+                if ad.control.data.active
+                    active = ad.control.data.active;
                     % Make settings depending on the line selected
                     lineTypes = cellstr(...
                         get(gh.display_panel_line_popupmenu,'String'));
@@ -3074,9 +3074,9 @@ function linemarker_popupmenu_Callback(~,~)
         lineMarker = ...
             lineMarkers{get(gh.display_panel_linemarker_popupmenu,'Value')};
 
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
                         
-        if ad.control.spectra.active
+        if ad.control.data.active
             % Make settings depending on the line selected
             lineTypes = cellstr(...
                 get(gh.display_panel_line_popupmenu,'String'));
@@ -3173,7 +3173,7 @@ function show3d_edit_Callback(source,~,label)
         
         value = get(source,'String');
        
-        [dimy,dimx] = size(ad.data{ad.control.spectra.active}.data);
+        [dimy,dimx] = size(ad.data{ad.control.data.active}.data);
         
         switch label
             case 'xfactor'
@@ -3237,9 +3237,9 @@ function export3d_pushbutton_Callback(~,~)
             get(gh.display_panel_3D_filetype_popupmenu,'Value')};
         
         % Generate default file name if possible, be very defensive
-        if ad.control.spectra.visible
+        if ad.control.data.visible
             [~,fileNameSuggested,~] = ...
-                fileparts(ad.data{ad.control.spectra.active}.file.name);
+                fileparts(ad.data{ad.control.data.active}.file.name);
             fileNameSuggested = [fileNameSuggested '-3D'];
         else
             fileNameSuggested = '';

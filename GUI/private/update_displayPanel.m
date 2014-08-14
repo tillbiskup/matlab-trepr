@@ -49,7 +49,7 @@ set(gh.display_panel_axislabels_z_unit_edit,'String',...
     ad.control.axis.labels.z.unit);
 
 % Toggle state of "get axislabels from current dataset"
-if (ad.control.spectra.active)
+if (ad.control.data.active)
     set(...
         gh.display_panel_axislabels_getfromactivedataset_pushbutton,...
         'Enable','on'...
@@ -126,8 +126,8 @@ set(gh.display_panel_zerolinestyle_popupmenu,'Value',zeroLineStyleIndex);
 
 
 % Set line settings
-if ad.control.spectra.active
-    active = ad.control.spectra.active;
+if ad.control.data.active
+    active = ad.control.data.active;
     
     % Make settings depending on the line selected
     lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
@@ -433,8 +433,8 @@ if ad.control.spectra.active
 end
 
 % Set 3D export panel
-if ad.control.spectra.active
-    [dimy,dimx] = size(ad.data{ad.control.spectra.active}.data);
+if ad.control.data.active
+    [dimy,dimx] = size(ad.data{ad.control.data.active}.data);
     if get(gh.display_panel_reducing_auto_checkbox,'Value')
         ad.control.axis.vis3d.reduction.x = floor(dimx/50);
         ad.control.axis.vis3d.reduction.y = floor(dimy/50);

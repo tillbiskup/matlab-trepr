@@ -25,12 +25,12 @@ invLbox = gh.data_panel_invisible_listbox;
 ad = getappdata(mainWindow);
 
 % Get indices of invisible spectra
-inv = ad.control.spectra.invisible;
+inv = ad.control.data.invisible;
 
 % Get names for display in listbox
 labels = cell(0);
 for k=1:length(inv)
-    if (find(inv(k)==ad.control.spectra.modified))
+    if (find(inv(k)==ad.control.data.modified))
         labels{k} = sprintf('%02.0f: *%s',inv(k),ad.data{inv(k)}.label);
     else
         labels{k} = sprintf('%02.0f: %s',inv(k),ad.data{inv(k)}.label);
@@ -48,7 +48,7 @@ end
 
 % Change enable status of pushbuttons and other elements
 invPanelChildren = findobj('Parent',gh.data_panel_invisible_panel);
-if isempty(ad.control.spectra.invisible)
+if isempty(ad.control.data.invisible)
     set(gh.data_panel_show_pushbutton,'Enable','off');
     set(gh.data_panel_showall_pushbutton,'Enable','off');
     set(invPanelChildren,'Enable','off');

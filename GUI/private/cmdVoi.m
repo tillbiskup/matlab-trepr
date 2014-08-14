@@ -57,7 +57,7 @@ end
 
 ad = getappdata(handle);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
@@ -65,12 +65,12 @@ end
 
 % if strcmpi(ad.control.axis.displayType,'2d plot')
 %     warnings{end+1} = sprintf('%s: Cannot operate in "%s" display type.',...
-%         cmd,ad.control.spectra.displayType);
+%         cmd,ad.control.data.displayType);
 %     status = -3;
 %     return;
 % end
 
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % Get empty VOI structure
 S = trEPRdataStructure();

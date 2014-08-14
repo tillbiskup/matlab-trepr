@@ -22,12 +22,12 @@ gh = guidata(mainWindow);
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
 
-if (isempty(ad.control.spectra.visible))
+if (isempty(ad.control.data.visible))
     return;
 end
 
 % Make lines shorter and life easier
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 data = getData(ad.data{active});
 

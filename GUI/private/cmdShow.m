@@ -57,7 +57,7 @@ ad = getappdata(handle);
 gh = guidata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 if isempty(ad.data)
     warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
@@ -65,7 +65,7 @@ if isempty(ad.data)
 end
 
 if isempty(opt)
-    if ~isempty(ad.control.spectra.invisible)
+    if ~isempty(ad.control.data.invisible)
         % Get selected item of listbox
         selected = get(gh.data_panel_invisible_listbox,'Value');
         
@@ -75,16 +75,16 @@ if isempty(opt)
         end
         
         % Move to visible
-        ad.control.spectra.visible = [...
-            ad.control.spectra.visible ...
-            ad.control.spectra.invisible(selected) ...
+        ad.control.data.visible = [...
+            ad.control.data.visible ...
+            ad.control.data.invisible(selected) ...
             ];
         
         % Make moved entry active one
-        ad.control.spectra.active = ad.control.spectra.invisible(selected);
+        ad.control.data.active = ad.control.data.invisible(selected);
         
         % Delete in invisible
-        ad.control.spectra.invisible(selected) = [];
+        ad.control.data.invisible(selected) = [];
         
         % Update appdata of main window
         setappdata(handle,'control',ad.control);
@@ -94,11 +94,11 @@ if isempty(opt)
         msgStr = cell(0,1);
         msgStr{end+1} = sprintf(...
             'Moved dataset %i to visible',...
-            ad.control.spectra.active);
+            ad.control.data.active);
         msgStr{end+1} = ['Label: ' ...
-            ad.data{ad.control.spectra.active}.label];
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
+            ad.data{ad.control.data.active}.label];
+        invStr = sprintf('%i ',ad.control.data.invisible);
+        visStr = sprintf('%i ',ad.control.data.visible);
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
@@ -116,19 +116,19 @@ if isempty(opt)
         return;
     end
 elseif ~isnan(str2double(opt{1}))
-    if any(ad.control.spectra.invisible==str2double(opt{1}))
+    if any(ad.control.data.invisible==str2double(opt{1}))
         selected = str2double(opt{1});
         % Move to visible
-        ad.control.spectra.visible = [...
-            ad.control.spectra.visible ...
+        ad.control.data.visible = [...
+            ad.control.data.visible ...
             selected ...
             ];
         
         % Make moved entry active one
-        ad.control.spectra.active = selected;
+        ad.control.data.active = selected;
         
         % Delete in invisible
-        ad.control.spectra.invisible(ad.control.spectra.invisible==selected) = [];
+        ad.control.data.invisible(ad.control.data.invisible==selected) = [];
         
         % Update appdata of main window
         setappdata(handle,'control',ad.control);
@@ -138,11 +138,11 @@ elseif ~isnan(str2double(opt{1}))
         msgStr = cell(0,1);
         msgStr{end+1} = sprintf(...
             'Moved dataset %i to visible',...
-            ad.control.spectra.active);
+            ad.control.data.active);
         msgStr{end+1} = ['Label: ' ...
-            ad.data{ad.control.spectra.active}.label];
-        invStr = sprintf('%i ',ad.control.spectra.invisible);
-        visStr = sprintf('%i ',ad.control.spectra.visible);
+            ad.data{ad.control.data.active}.label];
+        invStr = sprintf('%i ',ad.control.data.invisible);
+        visStr = sprintf('%i ',ad.control.data.visible);
         msgStr{end+1} = sprintf(...
             'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
             invStr,visStr,length(ad.data));
@@ -155,9 +155,9 @@ elseif ~isnan(str2double(opt{1}))
         %Update main axis
         update_mainAxis();
         return;
-    elseif any(ad.control.spectra.visible==str2double(opt{1}))
+    elseif any(ad.control.data.visible==str2double(opt{1}))
         % Make dataset active one
-        ad.control.spectra.active = str2double(opt{1});
+        ad.control.data.active = str2double(opt{1});
 
         % Update appdata of main window
         setappdata(handle,'control',ad.control);
@@ -189,27 +189,27 @@ else
                         return;
                 end
             end
-            if ~isempty(ad.control.spectra.invisible)
+            if ~isempty(ad.control.data.invisible)
                 % Move to visible
-                ad.control.spectra.visible = [...
-                    ad.control.spectra.visible ...
-                    ad.control.spectra.invisible ...
+                ad.control.data.visible = [...
+                    ad.control.data.visible ...
+                    ad.control.data.invisible ...
                     ];
                 
                 % Delete in invisible
-                ad.control.spectra.invisible = [];
+                ad.control.data.invisible = [];
                 
                 % Set active if not done
                 if isempty(active) || (active < 1)
-                    ad.control.spectra.active = 1;
+                    ad.control.data.active = 1;
                 end
                 
                 % Add status message (mainly for debug reasons)
                 % IMPORTANT: Has to go AFTER setappdata
                 msgStr = cell(0,1);
                 msgStr{end+1} = 'Moved all datasets to visible';
-                invStr = sprintf('%i ',ad.control.spectra.invisible);
-                visStr = sprintf('%i ',ad.control.spectra.visible);
+                invStr = sprintf('%i ',ad.control.data.invisible);
+                visStr = sprintf('%i ',ad.control.data.visible);
                 msgStr{end+1} = sprintf(...
                     'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
                     invStr,visStr,length(ad.data));
@@ -253,15 +253,15 @@ else
                     return;
             end
         case {'next','n'}
-            if ~ad.control.spectra.active || ...
-                    length(ad.control.spectra.visible) == 1
+            if ~ad.control.data.active || ...
+                    length(ad.control.data.visible) == 1
                 return;
             end
-            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
-            if idx < length(ad.control.spectra.visible)
-                ad.control.spectra.active = ad.control.spectra.visible(idx+1);
+            idx = find(ad.control.data.visible==ad.control.data.active);
+            if idx < length(ad.control.data.visible)
+                ad.control.data.active = ad.control.data.visible(idx+1);
             else
-                ad.control.spectra.active = ad.control.spectra.visible(1);
+                ad.control.data.active = ad.control.data.visible(1);
             end
             setappdata(handle,'control',ad.control);
             update_mainAxis();
@@ -269,15 +269,15 @@ else
             update_processingPanel();
             update_sliderPanel();
         case {'prev','previous','p'}
-            if ~ad.control.spectra.active || ...
-                    length(ad.control.spectra.visible) == 1
+            if ~ad.control.data.active || ...
+                    length(ad.control.data.visible) == 1
                 return;
             end
-            idx = find(ad.control.spectra.visible==ad.control.spectra.active);
+            idx = find(ad.control.data.visible==ad.control.data.active);
             if idx == 1
-                ad.control.spectra.active = ad.control.spectra.visible(end);
+                ad.control.data.active = ad.control.data.visible(end);
             else
-                ad.control.spectra.active = ad.control.spectra.visible(idx-1);
+                ad.control.data.active = ad.control.data.visible(idx-1);
             end
             setappdata(handle,'control',ad.control);
             update_mainAxis();

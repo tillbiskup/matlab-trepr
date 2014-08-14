@@ -54,7 +54,7 @@ end
 ad = getappdata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % Create some structure for AVG parameters
 avg = struct();

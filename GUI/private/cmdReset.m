@@ -54,13 +54,13 @@ end
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
 end
 
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % Reset displacement and scaling for current spectrum
 ad.data{active}.display.displacement.data.x = 0;

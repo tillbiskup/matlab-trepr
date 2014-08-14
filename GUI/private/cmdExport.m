@@ -55,7 +55,7 @@ end
 ad = getappdata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % If there is no active dataset, return
 if ~active
@@ -369,17 +369,17 @@ end
 if multipleFiles
 
     % Iterate over each visible dataset
-    for idx = 1:length(ad.control.spectra.visible)
+    for idx = 1:length(ad.control.data.visible)
         % Ask user for filename
         [~,f,~] = ...
-            fileparts(ad.data{ad.control.spectra.visible(idx)}.file.name);
+            fileparts(ad.data{ad.control.data.visible(idx)}.file.name);
         fileNameSuggested = fullfile(startDir,[f '-1D']);
         clear f;
         % Ask user for file name
         [fileName,pathName] = uiputfile(...
             sprintf('*.%s',fileExtension),...
             sprintf('Filename for dataset "%s"',...
-            ad.data{ad.control.spectra.visible(idx)}.label),...
+            ad.data{ad.control.data.visible(idx)}.label),...
             fileNameSuggested);
         % If user aborts process, return
         if fileName == 0
@@ -400,11 +400,11 @@ if multipleFiles
             case '1D along x'
                 export1Dparameters.crosssection.direction = 'x';
                 export1Dparameters.crosssection.position = ...
-                    ad.data{ad.control.spectra.visible(idx)}.display.position.y;
+                    ad.data{ad.control.data.visible(idx)}.display.position.y;
             case '1D along y'
                 export1Dparameters.crosssection.direction = 'y';
                 export1Dparameters.crosssection.position = ...
-                    ad.data{ad.control.spectra.visible(idx)}.display.position.x;
+                    ad.data{ad.control.data.visible(idx)}.display.position.x;
             otherwise
                 msg = 'Cannot determine cross section direction (2D mode)';
                 trEPRmsg(msg,'error');
@@ -422,7 +422,7 @@ if multipleFiles
         % Save 1D cross section, depending on settings for file type and
         % additional parameters
         status = trEPRexport1D(...
-            ad.data{ad.control.spectra.visible(idx)},...
+            ad.data{ad.control.data.visible(idx)},...
             fileName,export1Dparameters);
         if status
             trEPRmsg(status,'warning');
@@ -441,7 +441,7 @@ else
     if ~exist('fileName','var')
         % Suggest file name if possible
         [~,f,~] = ...
-            fileparts(ad.data{ad.control.spectra.active}.file.name);
+            fileparts(ad.data{ad.control.data.active}.file.name);
         fileNameSuggested = fullfile(startDir,[f '-1D']);
         clear f;
         % Ask user for file name
@@ -469,11 +469,11 @@ else
         case '1D along x'
             export1Dparameters.crosssection.direction = 'x';
             export1Dparameters.crosssection.position = ...
-                ad.data{ad.control.spectra.active}.display.position.y;
+                ad.data{ad.control.data.active}.display.position.y;
         case '1D along y'
             export1Dparameters.crosssection.direction = 'y';
             export1Dparameters.crosssection.position = ...
-                ad.data{ad.control.spectra.active}.display.position.x;
+                ad.data{ad.control.data.active}.display.position.x;
         otherwise
             msg = 'Cannot determine cross section direction (2D mode)';
             trEPRmsg(msg,'error');
@@ -491,7 +491,7 @@ else
     % Save 1D cross section, depending on settings for file type and
     % additional parameters
     status = trEPRexport1D(...
-        ad.data{ad.control.spectra.active},fileName,export1Dparameters);
+        ad.data{ad.control.data.active},fileName,export1Dparameters);
     if status
         trEPRmsg(status,'warning');
         msgbox(status,'Problems with exporting 1D','warn');
@@ -580,7 +580,7 @@ end
 if ~exist('fileName','var')
     % Suggest file name if possible
     [~,f,~] = ...
-        fileparts(ad.data{ad.control.spectra.active}.file.name);
+        fileparts(ad.data{ad.control.data.active}.file.name);
     fileNameSuggested = fullfile(startDir,[f '-2D' exportFormat]);
     clear f;
     % Ask user for file name
@@ -609,7 +609,7 @@ trEPRbusyWindow('start',...
 
 % Export using export4glotaran
 status = exportFunction(...
-    ad.data{ad.control.spectra.active},fileName,...
+    ad.data{ad.control.data.active},fileName,...
     exportParameters);
 if status
     trEPRmsg(status,'error');
@@ -624,7 +624,7 @@ end
 % Add status message (mainly for debug reasons)
 % IMPORTANT: Has to go AFTER setappdata
 msgStr = sprintf('Exported dataset %i to format %s',...
-    ad.control.spectra.active,exportFormat);
+    ad.control.data.active,exportFormat);
 trEPRmsg(msgStr,'info');
 
 end

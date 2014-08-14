@@ -1149,7 +1149,7 @@ function edit_Callback(source,~,action)
         filterType = filterTypes{...
             get(gh.display_panel_smoothing_type_popupmenu,'Value')};
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         NP = sum(ad.data{active}.data);
         [~,x] = size(NP);
         
@@ -1233,7 +1233,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.display.lines.data.width = value;
+                        ad.data{ad.control.data.active}.display.lines.data.width = value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
                         ad.NP.line.width = value;
@@ -1254,7 +1254,7 @@ function edit_Callback(source,~,action)
                 lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
                 switch lower(lineType)
                     case 'main'
-                        ad.data{ad.control.spectra.active}.display.lines.data.marker.size = ...
+                        ad.data{ad.control.data.active}.display.lines.data.marker.size = ...
                             value;
                         setappdata(mainWindow,'data',ad.data);
                     case 'average pretrig np'
@@ -1423,7 +1423,7 @@ function pushbutton_Callback(~,~,action)
         gh = guihandles(mainWindow);
 
         % Make life easier
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % Return immediately if there is no active dataset
         if isempty(active) || active == 0
@@ -1455,7 +1455,7 @@ function pushbutton_Callback(~,~,action)
                     get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
                 
                 % Generate default file name if possible, be very defensive
-                if ad.control.spectra.visible
+                if ad.control.data.visible
                     [~,fileNameSuggested,~] = ...
                         fileparts(ad.data{active}.file.name);
                 else
@@ -1712,7 +1712,7 @@ function popupmenu_Callback(source,~,action)
             case 'linestyle'
                 switch lower(lineType)
                     case 'main'
-                        active = ad.control.spectra.active;
+                        active = ad.control.data.active;
                         switch value
                             case 'solid'
                                 ad.data{active}.display.lines.data.style = '-';
@@ -1774,7 +1774,7 @@ function popupmenu_Callback(source,~,action)
             case 'linemarker'
                 switch lower(lineType)
                     case 'main'
-                        active = ad.control.spectra.active;
+                        active = ad.control.data.active;
                         switch value
                             case 'none'
                                 ad.data{active}.display.lines.data.marker.type = 'none';
@@ -1890,7 +1890,7 @@ function popupmenu_Callback(source,~,action)
             case 'markerEdgeColour'
                 switch lower(lineType)
                     case 'main'
-                        active = ad.control.spectra.active;
+                        active = ad.control.data.active;
                         if strcmpi(value,'colour')
                             ad.data{active}.display.lines.data.marker.edgeColor = ...
                                 ad.data{active}.display.lines.data.color;
@@ -1915,7 +1915,7 @@ function popupmenu_Callback(source,~,action)
             case 'markerFaceColour'
                 switch lower(lineType)
                     case 'main'
-                        active = ad.control.spectra.active;
+                        active = ad.control.data.active;
                         if strcmpi(value,'colour')
                             ad.data{active}.display.lines.data.marker.faceColor = ...
                                 ad.data{active}.display.lines.data.color;
@@ -2076,7 +2076,7 @@ function updateAnalysisPanel()
         % Get handles from main window
         gh = guidata(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         if isempty(active) || active == 0
             return;
         end
@@ -2145,7 +2145,7 @@ function updateSettingsPanel(varargin)
         ad = getappdata(mainWindow);
         gh = guidata(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         if isempty(active) || active == 0
             return;
         end
@@ -2405,7 +2405,7 @@ function updateAxes(varargin)
         ad = getappdata(mainWindow);
 
         % See whether we have a currently active dataset, otherwise return
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         if isempty(active) || active == 0
             return;
         end

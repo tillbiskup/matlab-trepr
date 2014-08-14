@@ -64,7 +64,7 @@ try
                 ad.control.axis.zoom.x = [0 0];
                 ad.control.axis.zoom.y = [0 0];
                 ad.control.axis.zoom.z = [0 0];
-            elseif ad.control.spectra.active
+            elseif ad.control.data.active
                 ad.control.axis.zoom.enable = true;
             else
                 ad.control.axis.zoom.enable = false;

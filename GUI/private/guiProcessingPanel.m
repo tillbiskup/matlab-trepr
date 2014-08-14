@@ -533,7 +533,7 @@ function pushbutton_Callback(~,~,action)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         if isempty(active) || ~active
             return;
@@ -542,9 +542,9 @@ function pushbutton_Callback(~,~,action)
         switch lower(action)
             case 'algebrashow'
                 % Get primary and secondary dataset
-                primary = ad.control.spectra.visible(...
+                primary = ad.control.data.visible(...
                     get(gh.processing_panel_primary_listbox,'Value'));
-                secondary = ad.control.spectra.visible(...
+                secondary = ad.control.data.visible(...
                     get(gh.processing_panel_secondary_listbox,'Value'));
                 % Get operation
                 operations = cellstr(...
@@ -552,24 +552,24 @@ function pushbutton_Callback(~,~,action)
                 operation = operations{...
                     get(gh.processing_panel_function_popupmenu,'Value')};
                 % Set "temporary" structure in appdata
-                ad.control.spectra.temporary.visible = true;
-                ad.control.spectra.temporary.function = 'trEPRalgebra';
-                ad.control.spectra.temporary.datasets = [primary secondary];
-                ad.control.spectra.temporary.parameters.operation = ...
+                ad.control.data.temporary.visible = true;
+                ad.control.data.temporary.function = 'trEPRalgebra';
+                ad.control.data.temporary.datasets = [primary secondary];
+                ad.control.data.temporary.parameters.operation = ...
                     operation;
                 setappdata(mainWindow,'control',ad.control);
                 update_mainAxis();
             case 'algebradiscard'
                 guiDataStructure = trEPRguiDataStructure();
-                ad.control.spectra.temporary = ...
-                    guiDataStructure.control.spectra.temporary;
+                ad.control.data.temporary = ...
+                    guiDataStructure.control.data.temporary;
                 setappdata(mainWindow,'control',ad.control);
                 update_mainAxis();
             case 'algebraapply'
                 % Get primary and secondary dataset
-                primary = ad.control.spectra.visible(...
+                primary = ad.control.data.visible(...
                     get(gh.processing_panel_primary_listbox,'Value'));
-                secondary = ad.control.spectra.visible(...
+                secondary = ad.control.data.visible(...
                     get(gh.processing_panel_secondary_listbox,'Value'));
                 % Get operation
                 operations = cellstr(...
@@ -600,8 +600,8 @@ function pushbutton_Callback(~,~,action)
                 % If result is not empty, assign
                 if ~isempty(resdata)
                     ad.data{active} = resdata;
-                    if ~any(ad.control.spectra.modified==active)
-                        ad.control.spectra.modified(end+1) = active;
+                    if ~any(ad.control.data.modified==active)
+                        ad.control.data.modified(end+1) = active;
                     end
                     setappdata(mainWindow,'data',ad.data);
                     setappdata(mainWindow,'control',ad.control);
@@ -630,16 +630,16 @@ function corrections_pushbutton_Callback(~,~,correction)
         ad = getappdata(mainWindow);
         
         % If no dataset is selected
-        if isempty(ad.control.spectra.active) || ...
-                (ad.control.spectra.active == 0)
+        if isempty(ad.control.data.active) || ...
+                (ad.control.data.active == 0)
             return;
         end
         
         switch correction
             case 'POC'
-                guiProcessingPOC(ad.control.spectra.active);
+                guiProcessingPOC(ad.control.data.active);
             case 'BGC'
-                guiProcessingBGC(ad.control.spectra.active);
+                guiProcessingBGC(ad.control.data.active);
             case 'ACC'
                 trEPRgui_ACCwindow();
             case 'BLC'
@@ -666,11 +666,11 @@ function listbox_Callback(~,~,action)
         
         switch action
             case 'datasets'
-                ad.control.spectra.active = ad.control.spectra.visible(...
+                ad.control.data.active = ad.control.data.visible(...
                     get(gh.processing_panel_datasets_listbox,'Value')...
                     );
             case 'datasets2'
-                ad.control.spectra.active = ad.control.spectra.visible(...
+                ad.control.data.active = ad.control.data.visible(...
                     get(gh.processing_panel_datasets2_listbox,'Value')...
                     );
         end
@@ -708,7 +708,7 @@ function edit_Callback(source,~,action)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         if isempty(active) || ~active
             return;
         end
@@ -839,7 +839,7 @@ function popupmenu_Callback(source,~,action)
         values = cellstr(get(source,'String'));
         value = values{get(source,'Value')};
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         switch action
             case 'smoothingType'

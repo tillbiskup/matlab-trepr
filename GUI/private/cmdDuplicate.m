@@ -57,7 +57,7 @@ ad = getappdata(handle);
 gh = guidata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 if isempty(ad.data)
     warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
@@ -75,9 +75,9 @@ if isempty(opt)
     expression = sprintf('\\((\\d+)\\)$',ad.data{selected}.label);
     l = 0;
     token = [];
-    for k=1:length(ad.control.spectra.visible)
+    for k=1:length(ad.control.data.visible)
         tokens = regexp(...
-            ad.data{ad.control.spectra.visible(k)}.label,...
+            ad.data{ad.control.data.visible(k)}.label,...
             expression,'tokens');
         if ~isempty(tokens)
             l=l+1;
@@ -109,8 +109,8 @@ if isempty(opt)
     ad.data{end+1} = duplicate;
     ad.origdata{end+1} = duplicate;
     
-    ad.control.spectra.visible(end+1) = nSpectra+1;
-    ad.control.spectra.modified(end+1) = nSpectra+1;
+    ad.control.data.visible(end+1) = nSpectra+1;
+    ad.control.data.modified(end+1) = nSpectra+1;
     
     % Update appdata of main window
     setappdata(handle,'control',ad.control);
@@ -125,8 +125,8 @@ if isempty(opt)
         'Data set "%s" duplicated as %s',...
         ad.data{selected}.label,...
         duplicateLabel);
-    invStr = sprintf('%i ',ad.control.spectra.invisible);
-    visStr = sprintf('%i ',ad.control.spectra.visible);
+    invStr = sprintf('%i ',ad.control.data.invisible);
+    visStr = sprintf('%i ',ad.control.data.visible);
     msgStr{end+1} = sprintf(...
         'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
         invStr,visStr,length(ad.data));

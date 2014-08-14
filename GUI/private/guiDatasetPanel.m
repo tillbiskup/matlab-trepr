@@ -278,7 +278,7 @@ function pushbutton_Callback(~,~,action)
                 selected = get(gh.data_panel_visible_listbox,'Value');
                 
                 % Get id of selected spectrum
-                selectedId = ad.control.spectra.visible(selected);
+                selectedId = ad.control.data.visible(selected);
                 
                 trEPRsaveDatasetInMainGUI(selectedId);
             case 'SaveAs'
@@ -286,7 +286,7 @@ function pushbutton_Callback(~,~,action)
                 selected = get(gh.data_panel_visible_listbox,'Value');
                 
                 % Get id of selected spectrum
-                selectedId = ad.control.spectra.visible(selected);
+                selectedId = ad.control.data.visible(selected);
                 
                 trEPRsaveAsDatasetInMainGUI(selectedId);
             case 'Remove'
@@ -294,7 +294,7 @@ function pushbutton_Callback(~,~,action)
                 selected = get(gh.data_panel_visible_listbox,'Value');
                 
                 % Get id of selected spectrum
-                selectedId = ad.control.spectra.visible(selected);
+                selectedId = ad.control.data.visible(selected);
                 
                 trEPRremoveDatasetFromMainGUI(selectedId);
             case 'Duplicate'
@@ -317,7 +317,7 @@ function visible_listbox_Callback(~,~)
         % Get handles of main window
         gh = guihandles(mainWindow);
         
-        ad.control.spectra.active = ad.control.spectra.visible(...
+        ad.control.data.active = ad.control.data.visible(...
             get(gh.data_panel_visible_listbox,'Value')...
             );
         
@@ -353,7 +353,7 @@ function invisible_listbox_Callback(source,~)
         
         % If user double clicked on list entry
         if strcmp(get(gcf,'SelectionType'),'open')
-            cmdLabel(mainWindow,{num2str(ad.control.spectra.invisible(...
+            cmdLabel(mainWindow,{num2str(ad.control.data.invisible(...
                 get(source,'Value')))});
         end
         update_invisibleSpectra();

@@ -47,7 +47,7 @@ if (isfield(ad,'control') == 0) || (isfield(ad.control,'status') == 0)
 end
 
 % If there is no spectrum currently displayed, return immediately
-if (isempty(ad.control.spectra.active)) || (ad.control.spectra.active == 0)
+if (isempty(ad.control.data.active)) || (ad.control.data.active == 0)
     status = -4;
     return;
 end
@@ -94,7 +94,7 @@ if pointerPosition(1) > axisCoordinates(1) && ...
         'PointerShapeHotSpot',[9 9]);
     
     % Get id of current spectrum (to shorten lines afterwards)
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     
     % Get xdata and ydata of currently active dataset
     switch ad.control.axis.displayType
@@ -114,11 +114,11 @@ if pointerPosition(1) > axisCoordinates(1) && ...
     if any(strcmp(ad.control.axis.displayType,{'1D along x','1D along y'}))
         if iscell(xdata) && length(xdata) > 1
             xdata = xdata{length(xdata)-...
-                find(ad.control.spectra.visible==active)+1};
+                find(ad.control.data.visible==active)+1};
         end
         if iscell(ydata) && length(ydata) > 1
             ydata = ydata{length(ydata)-...
-                find(ad.control.spectra.visible==active)+1};
+                find(ad.control.data.visible==active)+1};
         end
     end
     

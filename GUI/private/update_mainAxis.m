@@ -65,7 +65,7 @@ mainAxisChildren = findobj(...
     'Parent',gh.mainAxes_panel,...
     '-not','Type','uipanel',...
     '-not','Type','axes');
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     set(mainAxisChildren,'Enable','off');
     [path,~,~] = fileparts(mfilename('fullpath'));
     splash = imread(fullfile(path,'splashes','trEPRtoolboxSplash.png'),'png');
@@ -85,7 +85,7 @@ ad = getappdata(mainWindow);
 
 % Just to be on the save side, check whether we have a currently active
 % spectrum
-if ~(ad.control.spectra.active)
+if ~(ad.control.data.active)
     if showTitle
         % Set title to empty string
         title('');
@@ -95,10 +95,10 @@ if ~(ad.control.spectra.active)
 end
 
 % For shorter and easier to read code:
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % Set units if only one visible dataset
-if length(ad.control.spectra.visible) == 1
+if length(ad.control.data.visible) == 1
     ad.control.axis.labels.x.unit = ad.data{active}.axes.x.unit;
     ad.control.axis.labels.y.unit = ad.data{active}.axes.y.unit;
     ad.control.axis.labels.z.unit = ad.data{active}.axes.z.unit;
@@ -106,7 +106,7 @@ end
 
 % Plot depending on display type settings
 % Be as robust as possible: if there is no axes, default is indices
-[y,x] = size(ad.data{ad.control.spectra.active}.data);
+[y,x] = size(ad.data{ad.control.data.active}.data);
 x = linspace(1,x,x);
 y = linspace(1,y,y);
 if (isfield(ad.data{active},'axes') ...
@@ -274,7 +274,7 @@ switch ad.control.axis.displayType
         cla(mainAxes,'reset');
         hold(mainAxes,'on');
         if ad.control.axis.onlyActive
-            k = ad.control.spectra.active;
+            k = ad.control.data.active;
             data = getData(ad.data{k});
             x = linspace(1,size(data,2),size(data,2));
             if (isfield(ad.data{k},'axes') ...
@@ -370,8 +370,8 @@ switch ad.control.axis.displayType
                     );
             end
         else
-            for l = 1 : length(ad.control.spectra.visible)
-                k = ad.control.spectra.visible(l);
+            for l = 1 : length(ad.control.data.visible)
+                k = ad.control.data.visible(l);
                 data = getData(ad.data{k});
                 x = linspace(1,size(data,2),size(data,2));
                 if (isfield(ad.data{k},'axes') ...
@@ -474,7 +474,7 @@ switch ad.control.axis.displayType
                         );
                     if (k == active) && ...
                             ~isempty(ad.control.axis.highlight.method) && ...
-                            length(ad.control.spectra.visible) > 1
+                            length(ad.control.data.visible) > 1
                         set(currLine,...
                             ad.control.axis.highlight.method,...
                             ad.control.axis.highlight.value...
@@ -484,10 +484,10 @@ switch ad.control.axis.displayType
                 clear data;
             end
         end
-        if ad.control.spectra.temporary.visible
+        if ad.control.data.temporary.visible
             tmpData = trEPRalgebra(...
-                ad.data(ad.control.spectra.temporary.datasets),...
-                ad.control.spectra.temporary.parameters);
+                ad.data(ad.control.data.temporary.datasets),...
+                ad.control.data.temporary.parameters);
             plot(...
                 mainAxes,...
                 tmpData.axes.x.values,...
@@ -610,7 +610,7 @@ switch ad.control.axis.displayType
         cla(mainAxes,'reset');
         hold(mainAxes,'on');
         if ad.control.axis.onlyActive
-            k = ad.control.spectra.active;
+            k = ad.control.data.active;
             data = getData(ad.data{k});
             y = linspace(1,size(data,1),size(data,1));
             if (isfield(ad.data{k},'axes') ...
@@ -722,8 +722,8 @@ switch ad.control.axis.displayType
                     );
             end
         else % onlyActive
-            for l = 1 : length(ad.control.spectra.visible)
-                k = ad.control.spectra.visible(l);
+            for l = 1 : length(ad.control.data.visible)
+                k = ad.control.data.visible(l);
                 data = getData(ad.data{k});
                 y = linspace(1,size(data,1),size(data,1));
                 if (isfield(ad.data{k},'axes') ...
@@ -826,7 +826,7 @@ switch ad.control.axis.displayType
                         );
                     if (k == active) && ...
                             ~isempty(ad.control.axis.highlight.method) && ...
-                            length(ad.control.spectra.visible) > 1 
+                            length(ad.control.data.visible) > 1 
                         set(currLine,...
                             ad.control.axis.highlight.method,...
                             ad.control.axis.highlight.value...
@@ -852,10 +852,10 @@ switch ad.control.axis.displayType
                 end
             end
         end
-        if ad.control.spectra.temporary.visible
+        if ad.control.data.temporary.visible
             tmpData = trEPRalgebra(...
-                ad.data(ad.control.spectra.temporary.datasets),...
-                ad.control.spectra.temporary.parameters);
+                ad.data(ad.control.data.temporary.datasets),...
+                ad.control.data.temporary.parameters);
             plot(...
                 mainAxes,...
                 tmpData.axes.y.values,...
@@ -1007,12 +1007,12 @@ end
 
 if ad.control.axis.onlyActive
     legendLabels = strrep(...
-            ad.data{ad.control.spectra.active}.label,'_','\_');
+            ad.data{ad.control.data.active}.label,'_','\_');
 else
-    legendLabels = cell(1,length(ad.control.spectra.visible));
-    for k = 1 : length(ad.control.spectra.visible)
+    legendLabels = cell(1,length(ad.control.data.visible));
+    for k = 1 : length(ad.control.data.visible)
         legendLabels{k} = strrep(...
-            ad.data{ad.control.spectra.visible(k)}.label,'_','\_');
+            ad.data{ad.control.data.visible(k)}.label,'_','\_');
     end
 end
 
@@ -1042,35 +1042,35 @@ function setMinMax()
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 
-if (isempty(ad.control.spectra.visible))
+if (isempty(ad.control.data.visible))
     return;
 end
 
 % set min and max for spectra
 if (ad.control.axis.limits.auto)
-    xmin = zeros(length(ad.control.spectra.visible),1);
-    xmax = zeros(length(ad.control.spectra.visible),1);
-    ymin = zeros(length(ad.control.spectra.visible),1);
-    ymax = zeros(length(ad.control.spectra.visible),1);
-    zmin = zeros(length(ad.control.spectra.visible),1);
-    zmax = zeros(length(ad.control.spectra.visible),1);
-    for k=1:length(ad.control.spectra.visible)
-        data = getData(ad.data{ad.control.spectra.visible(k)});
+    xmin = zeros(length(ad.control.data.visible),1);
+    xmax = zeros(length(ad.control.data.visible),1);
+    ymin = zeros(length(ad.control.data.visible),1);
+    ymax = zeros(length(ad.control.data.visible),1);
+    zmin = zeros(length(ad.control.data.visible),1);
+    zmax = zeros(length(ad.control.data.visible),1);
+    for k=1:length(ad.control.data.visible)
+        data = getData(ad.data{ad.control.data.visible(k)});
         % be as robust as possible: if there is no axes, default is indices
         [y,x] = size(data);
         x = linspace(1,x,x);
         y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.spectra.visible(k)},'axes') ...
-                && isfield(ad.data{ad.control.spectra.visible(k)}.axes,'x') ...
-                && isfield(ad.data{ad.control.spectra.visible(k)}.axes.x,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.visible(k)}.axes.x.values)))
-            x = ad.data{ad.control.spectra.visible(k)}.axes.x.values;
+        if (isfield(ad.data{ad.control.data.visible(k)},'axes') ...
+                && isfield(ad.data{ad.control.data.visible(k)}.axes,'x') ...
+                && isfield(ad.data{ad.control.data.visible(k)}.axes.x,'values') ...
+                && not (isempty(ad.data{ad.control.data.visible(k)}.axes.x.values)))
+            x = ad.data{ad.control.data.visible(k)}.axes.x.values;
         end
-        if (isfield(ad.data{ad.control.spectra.visible(k)},'axes') ...
-                && isfield(ad.data{ad.control.spectra.visible(k)}.axes,'y') ...
-                && isfield(ad.data{ad.control.spectra.visible(k)}.axes.y,'values') ...
-                && not (isempty(ad.data{ad.control.spectra.visible(k)}.axes.y.values)))
-            y = ad.data{ad.control.spectra.visible(k)}.axes.y.values;
+        if (isfield(ad.data{ad.control.data.visible(k)},'axes') ...
+                && isfield(ad.data{ad.control.data.visible(k)}.axes,'y') ...
+                && isfield(ad.data{ad.control.data.visible(k)}.axes.y,'values') ...
+                && not (isempty(ad.data{ad.control.data.visible(k)}.axes.y.values)))
+            y = ad.data{ad.control.data.visible(k)}.axes.y.values;
         end
         xmin(k) = x(1);
         xmax(k) = x(end);
@@ -1081,10 +1081,10 @@ if (ad.control.axis.limits.auto)
                 switch lower(ad.control.axis.displayType)
                     case '1d along x'
                         data = data(ad.data{...
-                            ad.control.spectra.visible(k)}.display.position.y,:);
+                            ad.control.data.visible(k)}.display.position.y,:);
                     case '1d along y'
                         data = data(:,ad.data{...
-                            ad.control.spectra.visible(k)}.display.position.x);
+                            ad.control.data.visible(k)}.display.position.x);
                 end
                 switch ad.control.axis.normalisation.type
                     case 'pk-pk'
@@ -1167,37 +1167,37 @@ if (ad.control.axis.limits.auto)
     clear data;
 else
 %     ad.control.axis.limits.x.min = ...
-%         ad.data{ad.control.spectra.active}.axes.x.values(1);
+%         ad.data{ad.control.data.active}.axes.x.values(1);
 %     ad.control.axis.limits.x.max = ...
-%         ad.data{ad.control.spectra.active}.axes.x.values(end);
+%         ad.data{ad.control.data.active}.axes.x.values(end);
 %     ad.control.axis.limits.y.min = ...
-%         ad.data{ad.control.spectra.active}.axes.y.values(1);
+%         ad.data{ad.control.data.active}.axes.y.values(1);
 %     ad.control.axis.limits.y.max = ...
-%         ad.data{ad.control.spectra.active}.axes.y.values(end);
+%         ad.data{ad.control.data.active}.axes.y.values(end);
 %     switch ad.control.axis.normalisation
 %         case 'pk-pk'
 %             ad.control.axis.limits.z.min = ...
 %                 min(min(...
-%                 ad.data{ad.control.spectra.active}.data/...
-%                 (max(max(ad.data{ad.control.spectra.active}.data))-...
-%                 min(min(ad.data{ad.control.spectra.active}.data)))));
+%                 ad.data{ad.control.data.active}.data/...
+%                 (max(max(ad.data{ad.control.data.active}.data))-...
+%                 min(min(ad.data{ad.control.data.active}.data)))));
 %             ad.control.axis.limits.z.max = ...
 %                 max(max(...
-%                 ad.data{ad.control.spectra.active}.data/...
-%                 (max(max(ad.data{ad.control.spectra.active}.data))-...
-%                 min(min(ad.data{ad.control.spectra.active}.data)))));
+%                 ad.data{ad.control.data.active}.data/...
+%                 (max(max(ad.data{ad.control.data.active}.data))-...
+%                 min(min(ad.data{ad.control.data.active}.data)))));
 %         case 'amplitude'
 %             ad.control.axis.limits.z.min = ...
-%                 min(min(ad.data{ad.control.spectra.active}.data/...
-%                 max(max(ad.data{ad.control.spectra.active}.data))));
+%                 min(min(ad.data{ad.control.data.active}.data/...
+%                 max(max(ad.data{ad.control.data.active}.data))));
 %             ad.control.axis.limits.z.max = ...
-%                 max(max(ad.data{ad.control.spectra.active}.data/...
-%                 max(max(ad.data{ad.control.spectra.active}.data))));
+%                 max(max(ad.data{ad.control.data.active}.data/...
+%                 max(max(ad.data{ad.control.data.active}.data))));
 %         otherwise
 %             ad.control.axis.limits.z.min = ...
-%                 min(min(ad.data{ad.control.spectra.active}.data));
+%                 min(min(ad.data{ad.control.data.active}.data));
 %             ad.control.axis.limits.z.max = ...
-%                 max(max(ad.data{ad.control.spectra.active}.data));
+%                 max(max(ad.data{ad.control.data.active}.data));
 %     end
 end
 
@@ -1211,15 +1211,15 @@ function minmax = allMinMax()
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     minmax = [];
     return;
 end
 
-minmax = zeros(length(ad.control.spectra.visible),2);
-for idx = 1:length(ad.control.spectra.visible)
-    minmax(idx,1) = min(min(ad.data{ad.control.spectra.visible(idx)}.data));
-    minmax(idx,2) = max(max(ad.data{ad.control.spectra.visible(idx)}.data));
+minmax = zeros(length(ad.control.data.visible),2);
+for idx = 1:length(ad.control.data.visible)
+    minmax(idx,1) = min(min(ad.data{ad.control.data.visible(idx)}.data));
+    minmax(idx,2) = max(max(ad.data{ad.control.data.visible(idx)}.data));
 end
 
 end

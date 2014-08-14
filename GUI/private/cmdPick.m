@@ -63,7 +63,7 @@ ad = getappdata(handle);
 % gh = guidata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 data = getData(ad.data{active});
 

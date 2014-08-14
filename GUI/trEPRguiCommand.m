@@ -177,7 +177,7 @@ for optIdx = 1:length(opt)
                 case {'ndatasets','numberofdatasets'}
                     opt{optIdx} = length(ad.data);
                 case 'current'
-                    opt{optIdx} = ad.control.spectra.active;
+                    opt{optIdx} = ad.control.data.active;
                 case 'pwd'
                     opt{optIdx} = evalin('base','pwd');
                 case 'label'
@@ -186,7 +186,7 @@ for optIdx = 1:length(opt)
                         opt{optIdx} = ad.data{datasetIdx}.label;
                     else
                         opt{optIdx} = ...
-                            ad.data{ad.control.spectra.active}.label;
+                            ad.data{ad.control.data.active}.label;
                     end
                 otherwise
                     % DEBUG FOR NOW

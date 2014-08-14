@@ -23,7 +23,7 @@ gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
 
 % Toggle state of the measure buttons
-if ~ad.control.spectra.active
+if ~ad.control.data.active
     set(gh.measure_panel_point_togglebutton,'Enable','off');
     set(gh.measure_panel_distance_togglebutton,'Enable','off');
     set(gh.measure_panel_clear_pushbutton,'Enable','off');
@@ -37,7 +37,7 @@ set(gh.measure_panel_distance_togglebutton,'Enable','on');
 set(gh.measure_panel_clear_pushbutton,'Enable','on');
 
 % Set values accordingly - if they exist
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 if isfield(ad.data{active}.display,'measure') && ...
         ~isempty(ad.data{active}.display.measure.point(1).index)
     set(gh.measure_panel_point1_x_index_edit,'String',...

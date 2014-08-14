@@ -414,15 +414,15 @@ function updateWindow()
         end
         adm = getappdata(mainGuiWindow);
         % If there is no active dataset, return
-        if isempty(adm.control.spectra.active) || ...
-                ~adm.control.spectra.active
+        if isempty(adm.control.data.active) || ...
+                ~adm.control.data.active
             return;
         end
         infoText = cell(0);
         % Check whether "Show only active" is set or only one active
         % dataset
         if adm.control.axis.onlyActive || ...
-                length(adm.control.spectra.visible) == 1
+                length(adm.control.data.visible) == 1
             infoText{end+1,1} = sprintf('No. of datasets: %i',1);
             infoText{end+1,1} = '';
             infoText{end+1,1} = 'DATASET #1';
@@ -430,7 +430,7 @@ function updateWindow()
             % Get info file output for currently active dataset and apply
             % it to the respective edit field
             datasetInfo = trEPRinfoFileCreate(...
-                adm.data{adm.control.spectra.active});
+                adm.data{adm.control.data.active});
             % Remove info file identification header
             datasetInfo(1:2) = [];
             datasetInfo = ...
@@ -440,13 +440,13 @@ function updateWindow()
         else
             infoText = cell(0);
             infoText{end+1,1} = sprintf('No. of datasets: %i',...
-                length(adm.control.spectra.visible));
+                length(adm.control.data.visible));
             infoText{end+1,1} = '';
-            for idx=1:length(adm.control.spectra.visible)
+            for idx=1:length(adm.control.data.visible)
                 infoText{end+1,1} = sprintf('DATASET #%i',idx); %#ok<*AGROW>
                 infoText{end+1,1} = '';
                 datasetInfo = trEPRinfoFileCreate(...
-                    adm.data{adm.control.spectra.visible(idx)});
+                    adm.data{adm.control.data.visible(idx)});
                 % Remove info file identification header
                 datasetInfo(1:2) = [];
                 datasetInfo = ...

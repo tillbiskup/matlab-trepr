@@ -4629,12 +4629,12 @@ ad = trEPRguiDataStructure('guiappdatastructure');
 
 % Set modified to empty array - as at the beginning, no dataset has
 % been modified in terms of its information
-ad.control.spectra.modified = [];
+ad.control.data.modified = [];
 % Add additional field "unsaved" for datasets that have been
 % changed but not saved (hit "Apply") yet - "saved" means here only
 % within the info GUI window. The final transfer to the main GUI
 % window is done when the info GUI is closed.
-ad.control.spectra.unsaved = [];
+ad.control.data.unsaved = [];
 
 setappdata(hMainFigure,'data',ad.data);
 setappdata(hMainFigure,'origdata',ad.origdata);
@@ -4679,17 +4679,17 @@ if (mainGuiWindow)
     if (isfield(admain,'control') ~= 0)
         ad.control = admain.control;
         % Move (in)visible -> loaded
-        ad.control.spectra.loaded = [ ...
-            admain.control.spectra.visible ...
-        	admain.control.spectra.invisible ...
+        ad.control.data.loaded = [ ...
+            admain.control.data.visible ...
+        	admain.control.data.invisible ...
             ];
-        ad.control.spectra = rmfield(ad.control.spectra,'visible');
-        ad.control.spectra = rmfield(ad.control.spectra,'invisible');
+        ad.control.data = rmfield(ad.control.data,'visible');
+        ad.control.data = rmfield(ad.control.data,'invisible');
         % Set history record cell array to default value
-        for m=1:length(ad.control.spectra.loaded)
-            ad.control.spectra.history{m} = 0;
+        for m=1:length(ad.control.data.loaded)
+            ad.control.data.history{m} = 0;
             % Set info file cell array to default values
-            ad.control.spectra.infoFile{m} = struct(...
+            ad.control.data.infoFile{m} = struct(...
                 'input',struct(...
                     'name','',...
                     'format',''...
@@ -4700,15 +4700,15 @@ if (mainGuiWindow)
                     )...
                 );
         end
-        if isempty(ad.control.spectra.active) || ...
-                (ad.control.spectra.active == 0)
-            ad.control.spectra.active = 1;
+        if isempty(ad.control.data.active) || ...
+                (ad.control.data.active == 0)
+            ad.control.data.active = 1;
         end
         % Add additional field "unsaved" for datasets that have been
         % changed but not saved (hit "Apply") yet - "saved" means here only
         % within the info GUI window. The final transfer to the main GUI
         % window is done when the info GUI is closed.
-        ad.control.spectra.unsaved = [];
+        ad.control.data.unsaved = [];
         setappdata(hMainFigure,'control',ad.control);
     end
     
@@ -4729,8 +4729,8 @@ elseif nargin && (isstruct(varargin{1}) || iscell(varargin{1}))
         inputParameterName = 'trEPRgui_infowindow_dataset';
     end
     
-    ad.control.spectra.loaded = 1:length(ad.data);
-    for m=1:length(ad.control.spectra.loaded)
+    ad.control.data.loaded = 1:length(ad.data);
+    for m=1:length(ad.control.data.loaded)
         % If there is no history field, add one
         if ~isfield(ad.data{m},'history')
             ad.data{m}.history = cell(0);
@@ -4742,11 +4742,11 @@ elseif nargin && (isstruct(varargin{1}) || iscell(varargin{1}))
             ad.data{m}.label = label;
             ad.origdata{m}.label = label;
         end
-        ad.control.spectra.history{m} = 0;
+        ad.control.data.history{m} = 0;
     end
-    if isempty(ad.control.spectra.active) || ...
-            (ad.control.spectra.active == 0)
-        ad.control.spectra.active = 1;
+    if isempty(ad.control.data.active) || ...
+            (ad.control.data.active == 0)
+        ad.control.data.active = 1;
     end
     setappdata(hMainFigure,'data',ad.data);
     setappdata(hMainFigure,'origdata',ad.origdata);
@@ -4815,7 +4815,7 @@ function dataset_listbox_Callback(source,~)
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
-        ad.control.spectra.active = ad.control.spectra.loaded(...
+        ad.control.data.active = ad.control.data.loaded(...
             get(source,'Value')...
             );
         
@@ -4847,55 +4847,55 @@ function general_edit_Callback(source,~,value)
         
         switch value
             case 'label'
-                oldValue = ad.data{ad.control.spectra.active}.label;
+                oldValue = ad.data{ad.control.data.active}.label;
                 if ~strcmp(oldValue,get(source,'String'))
-                    ad.data{ad.control.spectra.active}.label = ...
+                    ad.data{ad.control.data.active}.label = ...
                         get(source,'String');
                     % If current active spectrum is not labeled "modified", do so
-                    if isempty(find(ad.control.spectra.modified==ad.control.spectra.active,1))
-                        ad.control.spectra.modified(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.modified==ad.control.data.active,1))
+                        ad.control.data.modified(end+1) = ...
+                            ad.control.data.active;
                     end
                     % If current active spectrum is not labeled "unsaved", do so
-                    if isempty(find(ad.control.spectra.unsaved==ad.control.spectra.active,1))
-                        ad.control.spectra.unsaved(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.unsaved==ad.control.data.active,1))
+                        ad.control.data.unsaved(end+1) = ...
+                            ad.control.data.active;
                     end
                 end
             case 'purpose'
-                oldValue = ad.data{ad.control.spectra.active}.parameters.purpose;
+                oldValue = ad.data{ad.control.data.active}.parameters.purpose;
                 if length(oldValue') ~= length(get(source,'String')) || ...
                         (iscell(oldValue) && isempty(oldValue)) || ...
                         ~all(strcmp(oldValue',get(source,'String')))
-                    ad.data{ad.control.spectra.active}.parameters.purpose = ...
+                    ad.data{ad.control.data.active}.parameters.purpose = ...
                         get(source,'String');
                     % If current active spectrum is not labeled "modified", do so
-                    if isempty(find(ad.control.spectra.modified==ad.control.spectra.active,1))
-                        ad.control.spectra.modified(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.modified==ad.control.data.active,1))
+                        ad.control.data.modified(end+1) = ...
+                            ad.control.data.active;
                     end
                     % If current active spectrum is not labeled "unsaved", do so
-                    if isempty(find(ad.control.spectra.unsaved==ad.control.spectra.active,1))
-                        ad.control.spectra.unsaved(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.unsaved==ad.control.data.active,1))
+                        ad.control.data.unsaved(end+1) = ...
+                            ad.control.data.active;
                     end
                 end
             case 'comment'
-                oldValue = ad.data{ad.control.spectra.active}.comment;
+                oldValue = ad.data{ad.control.data.active}.comment;
                 if length(oldValue') ~= length(get(source,'String')) || ...
                         (iscell(oldValue) && isempty(oldValue)) || ...
                         ~all(strcmp(oldValue',get(source,'String')))
-                    ad.data{ad.control.spectra.active}.comment = ...
+                    ad.data{ad.control.data.active}.comment = ...
                         transpose(get(source,'String'));
                     % If current active spectrum is not labeled "modified", do so
-                    if isempty(find(ad.control.spectra.modified==ad.control.spectra.active,1))
-                        ad.control.spectra.modified(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.modified==ad.control.data.active,1))
+                        ad.control.data.modified(end+1) = ...
+                            ad.control.data.active;
                     end
                     % If current active spectrum is not labeled "unsaved", do so
-                    if isempty(find(ad.control.spectra.unsaved==ad.control.spectra.active,1))
-                        ad.control.spectra.unsaved(end+1) = ...
-                            ad.control.spectra.active;
+                    if isempty(find(ad.control.data.unsaved==ad.control.data.active,1))
+                        ad.control.data.unsaved(end+1) = ...
+                            ad.control.data.active;
                     end
                 end
             otherwise
@@ -4930,7 +4930,7 @@ function parameter_edit_Callback(source,~,value)
         % Get handles from info GUI
         gh = guidata(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % Cell array matching values to data structure
         % The first column contains the value (third input parameter).
@@ -5067,7 +5067,7 @@ function parameter_edit_Callback(source,~,value)
                 fieldValue = fieldValue(matching{index,4});
             end
             oldFieldValue = getCascadedField(...
-                ad.data{ad.control.spectra.active},...
+                ad.data{ad.control.data.active},...
                 matching{index,2});
             % Workaround in case that oldFieldValue is an empty cell
             if iscell(oldFieldValue) && isempty(oldFieldValue)
@@ -5092,12 +5092,12 @@ function parameter_edit_Callback(source,~,value)
                     matching{index,2}, ...
                     fieldValue);
                 % If current active spectrum is not labeled "modified", do so
-                if isempty(find(ad.control.spectra.modified==active,1))
-                    ad.control.spectra.modified(end+1) = active;
+                if isempty(find(ad.control.data.modified==active,1))
+                    ad.control.data.modified(end+1) = active;
                 end
                 % If current active spectrum is not labeled "unsaved", do so
-                if isempty(find(ad.control.spectra.unsaved==active,1))
-                    ad.control.spectra.unsaved(end+1) = active;
+                if isempty(find(ad.control.data.unsaved==active,1))
+                    ad.control.data.unsaved(end+1) = active;
                 end
             end
             % If value is NaN, change colour of field accordingly
@@ -5194,7 +5194,7 @@ function history_listbox_Callback(source,~)
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
         
-        ad.control.spectra.history{ad.control.spectra.active} = ... 
+        ad.control.data.history{ad.control.data.active} = ... 
             get(source,'Value');
         
         % Update appdata of main window
@@ -5222,7 +5222,7 @@ function pushbutton_Callback(~,~,action)
         if (strncmpi(action,'poi',3) || ...
                 strncmpi(action,'characteristics',15))
             % For shorter lines and better overview
-            active = ad.control.spectra.active;
+            active = ad.control.data.active;
             type = ad.info.characteristics.type;
             idx = ad.info.characteristics.(type).idx;
 
@@ -5240,14 +5240,14 @@ function pushbutton_Callback(~,~,action)
                 end
                 FilterSpec = '*.info';
                 [filePath,~,~] = fileparts(...
-                    ad.data{ad.control.spectra.active}.file.name);
+                    ad.data{ad.control.data.active}.file.name);
                 [infoFileName,infoPathName] = uigetfile(...
                     FilterSpec,'Get Info File Name',...
                     'MultiSelect','off',...
                     filePath);
                 if ischar(infoFileName)
-                    ad.control.spectra.infoFile{...
-                        ad.control.spectra.active}.input.name = ...
+                    ad.control.data.infoFile{...
+                        ad.control.data.active}.input.name = ...
                         fullfile(infoPathName,infoFileName);
                     setappdata(mainWindow,'control',ad.control);
                     infoFileText = textFileRead(...
@@ -5262,29 +5262,29 @@ function pushbutton_Callback(~,~,action)
                 if isempty(ad.data)
                     return;
                 end
-                if isempty(ad.control.spectra.infoFile{...
-                        ad.control.spectra.active}.input.name)
+                if isempty(ad.control.data.infoFile{...
+                        ad.control.data.active}.input.name)
                     return;
                 end
-                infoFileText = textFileRead(ad.control.spectra.infoFile{...
-                    ad.control.spectra.active}.input.name,...
+                infoFileText = textFileRead(ad.control.data.infoFile{...
+                    ad.control.data.active}.input.name,...
                     'LineNumbers',logical(false));
                 set(gh.tools_panel_infofiledisplay_edit,...
                     'String',infoFileText);
-                [~,fn,ext] = fileparts(ad.control.spectra.infoFile{...
-                    ad.control.spectra.active}.input.name);
+                [~,fn,ext] = fileparts(ad.control.data.infoFile{...
+                    ad.control.data.active}.input.name);
                 set(gh.tools_panel_infofileread_format_edit,...
                     'String',[fn ext]);
             case 'infofilereadapply'
                 if isempty(ad.data)
                     return;
                 end
-                active = ad.control.spectra.active;
-                if isempty(ad.control.spectra.infoFile{active}.input.name)
+                active = ad.control.data.active;
+                if isempty(ad.control.data.infoFile{active}.input.name)
                     return;
                 end
                 [parameters,warnings] = trEPRinfoFileParse(...
-                    ad.control.spectra.infoFile{active}.input.name,'map');
+                    ad.control.data.infoFile{active}.input.name,'map');
                 if isempty(warnings)
                     % Handle situation with MWfrequency parameters
                     if length(ad.data{active}.parameters.bridge.MWfrequency.value) > 1
@@ -5293,11 +5293,11 @@ function pushbutton_Callback(~,~,action)
                     end
                     ad.data{active} = structcopy(ad.data{active},parameters);
                     setappdata(mainWindow,'data',ad.data);
-                    if ~any(ad.control.spectra.unsaved==active)
-                        ad.control.spectra.unsaved(end+1) = active;
+                    if ~any(ad.control.data.unsaved==active)
+                        ad.control.data.unsaved(end+1) = active;
                     end
-                    if ~any(ad.control.spectra.modified==active)
-                        ad.control.spectra.modified(end+1) = active;
+                    if ~any(ad.control.data.modified==active)
+                        ad.control.data.modified(end+1) = active;
                     end
                     setappdata(mainWindow,'control',ad.control);
                     updateParameterPanel();
@@ -5312,13 +5312,13 @@ function pushbutton_Callback(~,~,action)
                 end
                 FilterSpec = '*.info';
                 [filePath,~,~] = fileparts(...
-                    ad.data{ad.control.spectra.active}.file.name);
+                    ad.data{ad.control.data.active}.file.name);
                 [infoFileName,infoPathName] = uiputfile(...
                     FilterSpec,'Get Info File Name',...
                     filePath);
                 if ischar(infoFileName)
-                    ad.control.spectra.infoFile{...
-                        ad.control.spectra.active}.output.name = ...
+                    ad.control.data.infoFile{...
+                        ad.control.data.active}.output.name = ...
                         fullfile(infoPathName,infoFileName);
                     setappdata(mainWindow,'control',ad.control);
                     set(gh.tools_panel_infofilewrite_format_edit,...
@@ -5329,28 +5329,28 @@ function pushbutton_Callback(~,~,action)
                     return;
                 end
                 [infoFileText,warnings] = trEPRinfoFileCreate(...
-                    ad.data{ad.control.spectra.active});
+                    ad.data{ad.control.data.active});
                 if ~isempty(warnings)
                     add2status(warnings);
                 end
                 set(gh.tools_panel_infofiledisplay_edit,...
                     'String',infoFileText);
             case 'infofilewritesave'
-                active = ad.control.spectra.active;
+                active = ad.control.data.active;
                 if isempty(ad.data)
                     return;
                 end
                 % Check whether there is a filename to save to
-                if isempty(ad.control.spectra.infoFile{active}.output.name)
+                if isempty(ad.control.data.infoFile{active}.output.name)
                     FilterSpec = '*.info';
                     [filePath,~,~] = fileparts(...
-                        ad.data{ad.control.spectra.active}.file.name);
+                        ad.data{ad.control.data.active}.file.name);
                     [infoFileName,infoPathName] = uiputfile(...
                         FilterSpec,'Get Info File Name',...
                         filePath);
                     if ischar(infoFileName)
-                        ad.control.spectra.infoFile{...
-                            ad.control.spectra.active}.output.name = ...
+                        ad.control.data.infoFile{...
+                            ad.control.data.active}.output.name = ...
                             fullfile(infoPathName,infoFileName);
                         setappdata(mainWindow,'control',ad.control);
                         set(gh.tools_panel_infofilewrite_format_edit,...
@@ -5360,11 +5360,11 @@ function pushbutton_Callback(~,~,action)
                     end
                 end
                 % Check whether file exists already
-                if exist(ad.control.spectra.infoFile{active}.output.name,'file')
+                if exist(ad.control.data.infoFile{active}.output.name,'file')
                     while 1
                         button = questdlg(...
                             sprintf('File\n  %s\n exists already. Overwrite?',...
-                            ad.control.spectra.infoFile{active}.output.name),...
+                            ad.control.data.infoFile{active}.output.name),...
                             'File exists...',...
                             'Yes','No','Cancel','No');
                         switch lower(button)
@@ -5372,7 +5372,7 @@ function pushbutton_Callback(~,~,action)
                                 [FileName,PathName] = uiputfile('*.info',...
                                     'Select filename for info file');
                                 if ~isempty(FileName) && FileName ~= 0;
-                                    ad.control.spectra.infoFile{active}.output.name = ...
+                                    ad.control.data.infoFile{active}.output.name = ...
                                         fullfile(PathName,FileName);
                                     break;
                                 end
@@ -5392,16 +5392,16 @@ function pushbutton_Callback(~,~,action)
                         gh.tools_panel_infofiledisplay_edit,'String');
                 end
                 % Write to file
-                fh = fopen(ad.control.spectra.infoFile{active}.output.name,'w');
+                fh = fopen(ad.control.data.infoFile{active}.output.name,'w');
                 cellfun(@(x)fprintf(fh,'%s\n',x),infoFileText);
                 fclose(fh);
             case 'Apply'
                 % In case the current dataset is unsaved, remove it from
                 % "unsaved", thus preventing the dialogue when closing
                 % asking for modified, but unsaved datasets
-                if find(ad.control.spectra.unsaved==ad.control.spectra.active)
-                    ad.control.spectra.unsaved(...
-                        ad.control.spectra.unsaved==ad.control.spectra.active) = [];
+                if find(ad.control.data.unsaved==ad.control.data.active)
+                    ad.control.data.unsaved(...
+                        ad.control.data.unsaved==ad.control.data.active) = [];
                 end
                 % Update appdata of main window
                 setappdata(mainWindow,'control',ad.control);
@@ -5409,12 +5409,12 @@ function pushbutton_Callback(~,~,action)
                 updateDatasets();
             case 'Revert'
                 % If there is no active spectrum, silently return
-                if ~ad.control.spectra.active
+                if ~ad.control.data.active
                     return;
                 end
                 % If there are no changes made to the currently active
                 % dataset, silently return
-                if ~find(ad.control.spectra.modified==ad.control.spectra.active)
+                if ~find(ad.control.data.modified==ad.control.data.active)
                     return;
                 end
                 % TODO: Show dialogue asking the user whether he/she really
@@ -5423,18 +5423,18 @@ function pushbutton_Callback(~,~,action)
                 
                 % Revert dataset to "original" dataset as loaded to the
                 % info GUI
-                ad.data{ad.control.spectra.active} = ...
-                    ad.origdata{ad.control.spectra.active};
+                ad.data{ad.control.data.active} = ...
+                    ad.origdata{ad.control.data.active};
                 % In case the current dataset is unsaved, remove it from
                 % "unsaved".
-                if find(ad.control.spectra.unsaved==ad.control.spectra.active)
-                    ad.control.spectra.unsaved(...
-                        ad.control.spectra.unsaved==ad.control.spectra.active) = [];
+                if find(ad.control.data.unsaved==ad.control.data.active)
+                    ad.control.data.unsaved(...
+                        ad.control.data.unsaved==ad.control.data.active) = [];
                 end
                 % Remove the current dataset from modified. (If it were not
                 % modified, we should never end up here, see above.)
-                ad.control.spectra.modified(...
-                    ad.control.spectra.modified==ad.control.spectra.active) = [];
+                ad.control.data.modified(...
+                    ad.control.data.modified==ad.control.data.active) = [];
                 % Update appdata of main window
                 setappdata(mainWindow,'control',ad.control);
                 setappdata(mainWindow,'data',ad.data);
@@ -5446,7 +5446,7 @@ function pushbutton_Callback(~,~,action)
                 updateHistoryPanel();
             case 'Close'
                 % In case there are unsaved datasets, display dialogue
-                if ~isempty(ad.control.spectra.unsaved)
+                if ~isempty(ad.control.data.unsaved)
                     answer = questdlg(...
                         {'There are modified and still unsaved datasets. Close anyway?'...
                         ' '...
@@ -5484,8 +5484,8 @@ function pushbutton_Callback(~,~,action)
                 end
                 % In case there are modified datasets, write them back to
                 % main GUI
-                if ~isempty(ad.control.spectra.modified)
-                    for k=1:length(ad.control.spectra.modified)
+                if ~isempty(ad.control.data.modified)
+                    for k=1:length(ad.control.data.modified)
                         if isempty(trEPRguiGetWindowHandle())
                             if length(ad.data) == 1
                                 assignin('base',inputParameterName,ad.data{1});
@@ -5494,10 +5494,10 @@ function pushbutton_Callback(~,~,action)
                             end
                         else
                             status = trEPRrefreshDatasetInMainGUI(...
-                                ad.data{ad.control.spectra.modified(k)},...
-                                ad.control.spectra.modified(k),...
+                                ad.data{ad.control.data.modified(k)},...
+                                ad.control.data.modified(k),...
                                 'modified',true,...
-                                'label',ad.origdata{ad.control.spectra.modified(k)}.label);
+                                'label',ad.origdata{ad.control.data.modified(k)}.label);
                             if status
                                 disp('Hmm... some problems with appending modified dataset to main GUI.');
                             end
@@ -5550,7 +5550,7 @@ function colourPalette_Callback(~,~,action)
         ad = getappdata(mainWindow);        
 
         % For shorter lines and better overview
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         type = ad.info.characteristics.type;
         idx = ad.info.characteristics.(type).idx;
         
@@ -5638,8 +5638,8 @@ function colourPalette_Callback(~,~,action)
         
         % Set dataset as modified and unsaved
         if isempty(find(...
-                ad.control.spectra.unsaved==ad.control.spectra.active,1))
-            ad.control.spectra.unsaved(end+1) = ad.control.spectra.active;
+                ad.control.data.unsaved==ad.control.data.active,1))
+            ad.control.data.unsaved(end+1) = ad.control.data.active;
             setappdata(mainWindow,'control',ad.control);
             updateDatasets();
         end
@@ -5666,7 +5666,7 @@ function popupmenu_Callback(source,~,action)
         value = values{get(source,'Value')};
         
         % For shorter lines and better overview
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         type = ad.info.characteristics.type;
         idx = ad.info.characteristics.(ad.info.characteristics.type).idx;
         
@@ -5745,8 +5745,8 @@ function popupmenu_Callback(source,~,action)
         
         % Set dataset as modified and unsaved
         if isempty(find(...
-                ad.control.spectra.unsaved==ad.control.spectra.active,1))
-            ad.control.spectra.unsaved(end+1) = ad.control.spectra.active;
+                ad.control.data.unsaved==ad.control.data.active,1))
+            ad.control.data.unsaved(end+1) = ad.control.data.active;
             setappdata(mainWindow,'control',ad.control);
             updateDatasets();
         end
@@ -5771,7 +5771,7 @@ function edit_Callback(source,~,action)
         end
         
         % For shorter lines and better overview
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         type = ad.info.characteristics.type;
         idx = ad.info.characteristics.(ad.info.characteristics.type).idx;
         
@@ -5946,8 +5946,8 @@ function edit_Callback(source,~,action)
         
         % Set dataset as modified and unsaved
         if isempty(find(...
-                ad.control.spectra.unsaved==ad.control.spectra.active,1))
-            ad.control.spectra.unsaved(end+1) = ad.control.spectra.active;
+                ad.control.data.unsaved==ad.control.data.active,1))
+            ad.control.data.unsaved(end+1) = ad.control.data.active;
             setappdata(mainWindow,'control',ad.control);
             updateDatasets();
         end
@@ -5972,7 +5972,7 @@ function checkbox_Callback(source,~,action)
         
         switch lower(action)
             case 'soiinreport'
-                ad.data{ad.control.spectra.active...
+                ad.data{ad.control.data.active...
                     }.characteristics.(ad.info.characteristics.type)(...
                     ad.info.characteristics.(...
                     ad.info.characteristics.type).idx).display = ...
@@ -5986,8 +5986,8 @@ function checkbox_Callback(source,~,action)
         
         % Set dataset as modified and unsaved
         if isempty(find(...
-                ad.control.spectra.unsaved==ad.control.spectra.active,1))
-            ad.control.spectra.unsaved(end+1) = ad.control.spectra.active;
+                ad.control.data.unsaved==ad.control.data.active,1))
+            ad.control.data.unsaved(end+1) = ad.control.data.active;
             setappdata(mainWindow,'control',ad.control);
             updateDatasets();
         end
@@ -6268,14 +6268,14 @@ function updateDatasets()
         lbox = gh.main_panel_dataset_listbox;
         
         % Get indices of loaded spectra
-        loaded = ad.control.spectra.loaded;
+        loaded = ad.control.data.loaded;
         
         % Get names for display in listbox
         if ~isempty(loaded)
             set(lbox,'Enable','on');
             labels = cell(0);
             for k=1:length(loaded)
-                if find(ad.control.spectra.unsaved==loaded(k))
+                if find(ad.control.data.unsaved==loaded(k))
                     labels{k} = sprintf('%02.0f: *%s',...
                         loaded(k),ad.data{loaded(k)}.label);
                 else
@@ -6294,12 +6294,12 @@ function updateDatasets()
         else
             set(lbox,'String','');
             set(lbox,'Enable','off');
-            ad.control.spectra.active = [];
+            ad.control.data.active = [];
         end
         
         % Highlight currently active
-        if ad.control.spectra.active
-            set(lbox,'Value',find(loaded==ad.control.spectra.active));
+        if ad.control.data.active
+            set(lbox,'Value',find(loaded==ad.control.data.active));
         end
         
         % Set appdata of info GUI
@@ -6324,28 +6324,28 @@ function updateGeneralPanel()
         gh = guidata(mainWindow);
 
         [filepath,filename,fileext] = ...
-            fileparts(ad.data{ad.control.spectra.active}.file.name);
+            fileparts(ad.data{ad.control.data.active}.file.name);
         if filepath
             filepath = [filepath '/'];
         end
         set(gh.general_panel_filepath_edit,'String',filepath);
         set(gh.general_panel_filename_edit,'String',[filename fileext]);
         set(gh.general_panel_fileformat_edit,'String',...
-            ad.data{ad.control.spectra.active}.file.format);
+            ad.data{ad.control.data.active}.file.format);
         set(gh.general_panel_label_edit,'String',...
-            ad.data{ad.control.spectra.active}.label);
+            ad.data{ad.control.data.active}.label);
         
-        for k=1:length(ad.data{ad.control.spectra.active}.header)
-            ad.data{ad.control.spectra.active}.header{k} = ...
+        for k=1:length(ad.data{ad.control.data.active}.header)
+            ad.data{ad.control.data.active}.header{k} = ...
                 sprintf('%03.0f: %s',...
-                k,char(ad.data{ad.control.spectra.active}.header{k}));
+                k,char(ad.data{ad.control.data.active}.header{k}));
         end
         set(gh.general_panel_purpose_edit,'String',...
-            ad.data{ad.control.spectra.active}.parameters.purpose);
+            ad.data{ad.control.data.active}.parameters.purpose);
         set(gh.general_panel_header_edit,'String',...
-            ad.data{ad.control.spectra.active}.header);
+            ad.data{ad.control.data.active}.header);
         set(gh.general_panel_comment_edit,'String',...
-            ad.data{ad.control.spectra.active}.comment);
+            ad.data{ad.control.data.active}.comment);
 
     catch exception
         trEPRexceptionHandling(exception)
@@ -6360,7 +6360,7 @@ function updateParameterPanel()
         gh = guidata(mainWindow);
         
         % Make life easier
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % Cell array matching GUI edit fields to data structure
         % The first column contains the GUI edit field tags.
@@ -6629,7 +6629,7 @@ function updateCharacteristicsPanel()
             return;
         end
         
-        getCharacteristicsEntriesNumbers(ad.data{ad.control.spectra.active});
+        getCharacteristicsEntriesNumbers(ad.data{ad.control.data.active});
         ad = getappdata(mainWindow);
         
         % Update "Types of characteristics" listbox
@@ -6653,7 +6653,7 @@ function updateCharacteristicsPanel()
 
         % For shorter lines
         type = ad.info.characteristics.type;
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % If no characteristics of selected type are available, set
         % defaults and exit
@@ -7112,7 +7112,7 @@ function updateHistoryPanel()
         gh = guidata(mainWindow);
         
         % To shorten lines, assign Id of currently active dataset
-        selectedId = ad.control.spectra.active;
+        selectedId = ad.control.data.active;
         
         % If no data or no history
         if isempty(ad.data) || isempty(ad.data{selectedId}.history)
@@ -7131,10 +7131,10 @@ function updateHistoryPanel()
         end
         
         % Set selected history record for currently active dataset
-        if ~(ad.control.spectra.history{selectedId})
-            ad.control.spectra.history{selectedId} = 1;
+        if ~(ad.control.data.history{selectedId})
+            ad.control.data.history{selectedId} = 1;
         end
-        historyId = ad.control.spectra.history{selectedId};
+        historyId = ad.control.data.history{selectedId};
         
         % Get labels for history records listbox
         recordLabels = ...
@@ -7146,7 +7146,7 @@ function updateHistoryPanel()
         set(gh.history_panel_records_listbox,'Enable','on');
         set(gh.history_panel_records_listbox,'String',recordLabels);
         set(gh.history_panel_records_listbox,'Value',...
-            ad.control.spectra.history{selectedId});
+            ad.control.data.history{selectedId});
         
         % Set summary panel strings
         set(gh.history_panel_date_text,'String',...

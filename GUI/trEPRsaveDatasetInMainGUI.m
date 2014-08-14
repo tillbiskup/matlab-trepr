@@ -130,7 +130,7 @@ try
     end
     
     % Remove from modified
-    ad.control.spectra.modified(ad.control.spectra.modified == id) = [];
+    ad.control.data.modified(ad.control.data.modified == id) = [];
     
     % Set last save dir
     ad.control.dirs.lastSave = fpath;

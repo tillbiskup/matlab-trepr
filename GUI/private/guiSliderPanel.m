@@ -374,7 +374,7 @@ function edit_Callback(source,~,action)
         ad = getappdata(mainWindow);
         gh = guidata(mainWindow);
 
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         if ~active || isempty(active)
             return;
@@ -566,14 +566,14 @@ function edit_Callback(source,~,action)
                         end
                     end
                 else
-                    z(1) = min(min(ad.data{ad.control.spectra.active}.data));
-                    z(2) = max(max(ad.data{ad.control.spectra.active}.data));
+                    z(1) = min(min(ad.data{ad.control.data.active}.data));
+                    z(2) = max(max(ad.data{ad.control.data.active}.data));
                     
                 end
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [-(z(2)-z(1))/(get(gh.vert2_slider,'Max')*2),...
                     (z(2)-z(1)*(get(gh.vert2_slider,'Max')))]);
-                ad.data{ad.control.spectra.active}.display.scaling.z = ...
+                ad.data{ad.control.data.active}.display.scaling.z = ...
                     1+value/(z(2)-z(1));
             otherwise
                 trEPRoptionUnknown(action);

@@ -52,7 +52,7 @@ end
 
 ad = getappdata(handle);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
@@ -62,27 +62,27 @@ end
 switch lower(ad.control.axis.displayType)
     case '1d along x'
         % Preallocation
-        yValues = zeros(length(ad.control.spectra.visible),...
-            length(ad.data{ad.control.spectra.visible(1)}.axes.x.values));
-        for idx=1:length(ad.control.spectra.visible)
+        yValues = zeros(length(ad.control.data.visible),...
+            length(ad.data{ad.control.data.visible(1)}.axes.x.values));
+        for idx=1:length(ad.control.data.visible)
             yValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.data(...
-                ad.data{ad.control.spectra.visible(idx)}.display.position.y,:);
+                ad.data{ad.control.data.visible(idx)}.data(...
+                ad.data{ad.control.data.visible(idx)}.display.position.y,:);
         end
     case '1d along y'
         % Preallocation
-        yValues = zeros(length(ad.control.spectra.visible),...
-            length(ad.data{ad.control.spectra.visible(1)}.axes.y.values));
-        for idx=1:length(ad.control.spectra.visible)
+        yValues = zeros(length(ad.control.data.visible),...
+            length(ad.data{ad.control.data.visible(1)}.axes.y.values));
+        for idx=1:length(ad.control.data.visible)
             yValues(idx,:) = ...
-                ad.data{ad.control.spectra.visible(idx)}.data(:,...
-                ad.data{ad.control.spectra.visible(idx)}.display.position.x);
+                ad.data{ad.control.data.visible(idx)}.data(:,...
+                ad.data{ad.control.data.visible(idx)}.display.position.x);
         end
 end
 
 % Reset displacement to zero for all traces
-for idx = 1:length(ad.control.spectra.visible)
-    ad.data{ad.control.spectra.visible(idx)}.display.displacement.z = 0;
+for idx = 1:length(ad.control.data.visible)
+    ad.data{ad.control.data.visible(idx)}.display.displacement.z = 0;
 end
 
 % Set new axis limits

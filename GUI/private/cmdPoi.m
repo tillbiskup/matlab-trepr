@@ -57,13 +57,13 @@ end
 
 ad = getappdata(handle);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
 end
 
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 if isempty(ad.data{active}.display.measure.point(1).index)
     warnings{end+1} = 'Active dataset contains no measurement.';
     status = -3;

@@ -17,7 +17,7 @@ try
     gh = guihandles(mainWindow);
     
     % For convenience and shorter lines
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     
     vMax = [0.5 2];
     vStep = 0.001;

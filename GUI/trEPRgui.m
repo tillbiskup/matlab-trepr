@@ -887,7 +887,7 @@ function slider_Callback(source,~,action)
 
         guiZoom('off');
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
         
         % Depending on display type settings
         switch lower(action)
@@ -1006,7 +1006,7 @@ function pushbutton_Callback(source,~,action)
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
         
-        active = ad.control.spectra.active;
+        active = ad.control.data.active;
 
         switch lower(action)
             case 'fullscale'

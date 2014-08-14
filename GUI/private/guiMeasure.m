@@ -122,7 +122,7 @@ try
     set(gh.measure_panel_distance_z_unit_edit,'String','0');
     
     % Clear fields in data structure of currently active dataset
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     for idx = 1:length(ad.data{active}.display.measure.point)
         ad.data{active}.display.measure.point(idx).index = [];
         ad.data{active}.display.measure.point(idx).unit = [];
@@ -227,7 +227,7 @@ try
     gh = guihandles(mainWindow);
     
     % To shorten lines, assign id of currently active dataset to var
-    active = ad.control.spectra.active;
+    active = ad.control.data.active;
     
     % Assign index and value to data structure of currently active dataset
     ad.data{active}.display.measure.point(1).index = [...

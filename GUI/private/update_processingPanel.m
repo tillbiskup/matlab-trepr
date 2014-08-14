@@ -20,13 +20,13 @@ end
 gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
         'Enable','Inactive');
     return;
 end
 
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
     'Enable','On');

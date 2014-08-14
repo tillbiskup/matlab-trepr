@@ -28,18 +28,18 @@ visLbox = gh.data_panel_visible_listbox;
 ad = getappdata(mainWindow);
 
 % Get indices of visible spectra
-vis = ad.control.spectra.visible;
+vis = ad.control.data.visible;
 
-if ~isempty(vis) && (isempty(ad.control.spectra.active) ...
-        || ~ad.control.spectra.active)
-    ad.control.spectra.active = vis(1);
+if ~isempty(vis) && (isempty(ad.control.data.active) ...
+        || ~ad.control.data.active)
+    ad.control.data.active = vis(1);
     setappdata(mainWindow,'control',ad.control)
 end
 
 % Get names for display in listbox
 labels = cell(0);
 for k=1:length(vis)
-    if (find(vis(k)==ad.control.spectra.modified))
+    if (find(vis(k)==ad.control.data.modified))
         labels{k} = sprintf('%02.0f: *%s',vis(k),ad.data{vis(k)}.label);
     else
         labels{k} = sprintf('%02.0f: %s',vis(k),ad.data{vis(k)}.label);
@@ -56,8 +56,8 @@ if (get(visLbox,'Value')==0) %&& (~isempty(vis)))
 end
 
 % Highlight currently active
-if ad.control.spectra.active
-    set(visLbox,'Value',find(vis==ad.control.spectra.active));
+if ad.control.data.active
+    set(visLbox,'Value',find(vis==ad.control.data.active));
 end
 
 % Change enable status of pushbuttons and other elements
@@ -74,7 +74,7 @@ else
 end
 
 currActiveButtons = findobj('Parent',gh.data_panel_currentlyactive_panel);
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     set(gh.data_panel_hide_pushbutton,'Enable','off');
     set(gh.data_panel_hideall_pushbutton,'Enable','off');
     set(currActiveButtons,'Enable','off');
@@ -92,7 +92,7 @@ else
 
     % Make "Save" button active only if currently active spectrum is
     % modified
-    if (find(ad.control.spectra.modified==ad.control.spectra.active))
+    if (find(ad.control.data.modified==ad.control.data.active))
         set(gh.data_panel_save_pushbutton,'Enable','On');
     else
         set(gh.data_panel_save_pushbutton,'Enable','Off');
@@ -119,9 +119,9 @@ set(procPLboxPrim,'String',labels);
 set(procPLboxSec,'String',labels);
 
 % Highlight currently active
-if ad.control.spectra.active
-    set(procPLbox,'Value',find(vis==ad.control.spectra.active));
-    set(procPLbox2,'Value',find(vis==ad.control.spectra.active));
+if ad.control.data.active
+    set(procPLbox,'Value',find(vis==ad.control.data.active));
+    set(procPLbox2,'Value',find(vis==ad.control.data.active));
 end
 
 % Update list of spectra of the display panel
@@ -129,8 +129,8 @@ dispPLbox = gh.display_panel_datasets_listbox;
 set(dispPLbox,'String',labels);
 
 % Highlight currently active
-if ad.control.spectra.active
-    set(dispPLbox,'Value',find(vis==ad.control.spectra.active));
+if ad.control.data.active
+    set(dispPLbox,'Value',find(vis==ad.control.data.active));
 end
 
 

@@ -88,8 +88,8 @@ try
     ad.data{id} = dataset;
     
     % Handle whether it should go to modified as well
-    if (p.Results.modified) && isempty(find(ad.control.spectra.modified==id,1))
-        ad.control.spectra.modified(end+1) = id;
+    if (p.Results.modified) && isempty(find(ad.control.data.modified==id,1))
+        ad.control.data.modified(end+1) = id;
     end
     
     % Write appdata

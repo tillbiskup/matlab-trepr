@@ -58,13 +58,13 @@ end
 
 ad = getappdata(handle);
 
-if isempty(ad.control.spectra.visible)
+if isempty(ad.control.data.visible)
     warnings{end+1} = 'No visible datasets.';
     status = -3;
     return;
 end
 
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 % Handle options as positions
 positions = str2num(strtrim(sprintf('%s ',opt{:}))); %#ok<ST2NM>

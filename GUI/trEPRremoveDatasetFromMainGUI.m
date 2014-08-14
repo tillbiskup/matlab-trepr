@@ -51,7 +51,7 @@ try
     % Remove dataset(s) from main GUI
     for k=1:length(dataset)
         if ~p.Results.force
-            if ~any(ad.control.spectra.modified==dataset(k))
+            if ~any(ad.control.data.modified==dataset(k))
                 [removedDatasetsLabels{k},ad] = removeDataset(dataset(k),ad);
             else
                 remove = false;
@@ -100,8 +100,8 @@ try
         msg{k+1} = sprintf('  Label: %s',removedDatasetsLabels{k});
     end
     status = trEPRmsg(msg,'info');
-    invStr = sprintf('%i ',ad.control.spectra.invisible);
-    visStr = sprintf('%i ',ad.control.spectra.visible);
+    invStr = sprintf('%i ',ad.control.data.invisible);
+    visStr = sprintf('%i ',ad.control.data.visible);
     msgStr = sprintf(...
         'Currently invisible: [ %s]; currently visible: [ %s]; total: %i',...
         invStr,visStr,length(ad.data));
@@ -132,29 +132,29 @@ ad.data(datasetIdx) = [];
 ad.origdata(datasetIdx) = [];
 
 % Remove dataset index from visible, invisible, modified
-ad.control.spectra.visible(ad.control.spectra.visible==datasetIdx) = [];
-ad.control.spectra.invisible(ad.control.spectra.invisible==datasetIdx) = [];
-ad.control.spectra.modified(ad.control.spectra.modified==datasetIdx) = [];
+ad.control.data.visible(ad.control.data.visible==datasetIdx) = [];
+ad.control.data.invisible(ad.control.data.invisible==datasetIdx) = [];
+ad.control.data.modified(ad.control.data.modified==datasetIdx) = [];
 
 % Renumber indices in visible, invisible, modified
-ad.control.spectra.visible(ad.control.spectra.visible>datasetIdx) = ...
-    ad.control.spectra.visible(ad.control.spectra.visible>datasetIdx) -1;
-ad.control.spectra.invisible(ad.control.spectra.invisible>datasetIdx) = ...
-    ad.control.spectra.invisible(ad.control.spectra.invisible>datasetIdx) -1;
-ad.control.spectra.modified(ad.control.spectra.modified>datasetIdx) = ...
-    ad.control.spectra.modified(ad.control.spectra.modified>datasetIdx) -1;
+ad.control.data.visible(ad.control.data.visible>datasetIdx) = ...
+    ad.control.data.visible(ad.control.data.visible>datasetIdx) -1;
+ad.control.data.invisible(ad.control.data.invisible>datasetIdx) = ...
+    ad.control.data.invisible(ad.control.data.invisible>datasetIdx) -1;
+ad.control.data.modified(ad.control.data.modified>datasetIdx) = ...
+    ad.control.data.modified(ad.control.data.modified>datasetIdx) -1;
 
 % Handle active dataset
 % Get handles from handle
 gh = guidata(ad.UsedByGUIData_m.trEPRgui);
 visSelected = get(gh.data_panel_visible_listbox,'Value');
 
-if isempty(ad.control.spectra.visible)
-    ad.control.spectra.active = 0;
-elseif visSelected > length(ad.control.spectra.visible)
-    ad.control.spectra.active = ad.control.spectra.visible(end);
+if isempty(ad.control.data.visible)
+    ad.control.data.active = 0;
+elseif visSelected > length(ad.control.data.visible)
+    ad.control.data.active = ad.control.data.visible(end);
 else
-    ad.control.spectra.active = ad.control.spectra.visible(visSelected);
+    ad.control.data.active = ad.control.data.visible(visSelected);
 end
 
 end

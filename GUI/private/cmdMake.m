@@ -63,7 +63,7 @@ ad = getappdata(handle);
 % gh = guidata(handle);
 
 % For convenience and shorter lines
-active = ad.control.spectra.active;
+active = ad.control.data.active;
 
 if ~active
     warnings{end+1} = ['Command "' lower(cmd) '" needs an active dataset.'];
