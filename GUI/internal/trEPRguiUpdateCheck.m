@@ -11,7 +11,7 @@ function trEPRguiUpdateCheck
 % See also: trEPRupdateCheck
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-30
+% 2014-08-14
 
 % Ensure there is only one timer for checking for updates
 timerHandle = timerfind('Name','trEPRupdateCheckTimer');
@@ -21,6 +21,7 @@ if isempty(timerHandle)
         'Name','trEPRupdateCheckTimer', ...
         'TimerFcn',@timerExecuteFunction,...
         'StopFcn',@timerStopFunction,...
+        'StartDelay',5, ...
         'ExecutionMode','singleShot' ...
         );
 end

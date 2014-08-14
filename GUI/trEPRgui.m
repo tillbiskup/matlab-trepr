@@ -1172,7 +1172,7 @@ try
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
     
-    trEPRgui_helpwindow('page',['panels/' ad.control.panel])
+    trEPRgui_helpwindow('page',['panels/' ad.control.panels.active])
 catch exception
     trEPRexceptionHandling(exception)
 end

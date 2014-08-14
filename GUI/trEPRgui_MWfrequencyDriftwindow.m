@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-08-10
+% 2014-08-14
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -56,7 +56,7 @@ axes(...         % the axes for plotting selected plot
 	'Parent', hMainFigure, ...
     'FontUnit','Pixel','Fontsize',14,...
     'Units', 'Pixels', ...
-    'Position',[80 70 570 450]);
+    'Position',[100 70 550 450]);
 
 % Create button group, toggle buttons for switching btw. panels
 hButtonGroup = uibuttongroup('Tag','mainButtonGroup',...
@@ -2155,7 +2155,20 @@ function updateAxes(varargin)
             sprintf('{\\it %s} / %s',...
             'MW frequency',...
             ad.data{active}.parameters.bridge.MWfrequency.unit));
-        
+        % Force more digits on frequency axis ticks if necessary
+        ylabels = get(gca,'YTickLabel');
+        if size(ylabels,2) > 1
+            for k = 2:size(ylabels,2)
+                if strcmp(ylabels(k,end-1:end),ylabels(k-1,end-1:end))
+                    set(gca,'YTickLabel',...
+                        sprintf(['%' num2str(size(ylabels,2)+1) '.' ...
+                        num2str(size(ylabels,2)-find(ylabels(1,:)=='.',1,'first')+1) ...
+                        'f|'],get(gca,'YTick'))...
+                        )
+                    break
+                end
+            end
+        end
         % Set grid for main axis
         set(mainAxes,'XGrid',ad.control.axis.grid.x);
         set(mainAxes,'YGrid',ad.control.axis.grid.y);

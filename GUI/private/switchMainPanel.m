@@ -8,7 +8,7 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-12
+% 2014-08-14
 
 try
     % Get handles of main window
@@ -105,7 +105,7 @@ try
     end
     
     ad = getappdata(mainWindow);
-    ad.control.panel = panelName;
+    ad.control.panels.active = lower(panelName);
     setappdata(mainWindow,'control',ad.control);
     
     status = 0;

@@ -129,7 +129,7 @@ try
     end
     switch evt.Key
         case 'f1'
-            trEPRgui_helpwindow('page',['panels/' ad.control.panel]);
+            trEPRgui_helpwindow('page',['panels/' ad.control.panels.active]);
             return;
         case 'f2'
             trEPRgui_aboutwindow();

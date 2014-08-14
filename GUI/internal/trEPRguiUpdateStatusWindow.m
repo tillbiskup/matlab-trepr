@@ -39,7 +39,8 @@ try
     jEdit.setCaretPosition(jEdit.getDocument.getLength);
     % jEdit.setContentType('text/html');
 catch exception
-    trEPRmsg(exception.message,'warning');
+    trEPRmsg(getReport(exception, 'extended', 'hyperlinks', 'off'),...
+        'warning');
 end
 
 status = 0;
