@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-13
+% 2014-08-14
 
 status = 0;
 warnings = cell(0);
@@ -72,7 +72,7 @@ if isempty(opt)
 end
 
 % Check for correct first option
-firstOption = {'fig','figure','axis','axes','1D'};
+firstOption = {'fig','figure','axis','axes','1D','2D'};
 if ~any(strcmpi(opt{1},firstOption))
     warnings{end+1} = sprintf(...
         'Command "%s": Option "%s" not understood.',cmd,opt{1});
@@ -98,10 +98,21 @@ switch lower(opt{1})
         end
         return;
     case '1d'
-        % TODO: Handle additional optional parameters
-        %       Call function saving the current axis
         % Handle actual work in an internal function
         [if_status,if_warnings] = if_export1Ddata(handle,opt(2:end));
+        % Deal with status and warnings from internal function
+        if if_status
+            status = if_status;
+        end
+        if ~isempty(if_warnings)
+            for k=1:length(if_warnings)
+                warnings{end+1} = if_warnings{k}; %#ok<AGROW>
+            end
+        end
+        return;
+    case '2d'
+        % Handle actual work in an internal function
+        [if_status,if_warnings] = if_export2Ddata(handle,opt(2:end));
         % Deal with status and warnings from internal function
         if if_status
             status = if_status;
@@ -252,7 +263,7 @@ close(newFig);
 end
 
 function [if_status,if_warnings] = if_export1Ddata(handle,opt)
-% IF_EXPORTFIGURE Internal function used to handle exporting data.
+% IF_EXPORT1DDATA Internal function used to handle exporting 1D data.
 %
 % Please note: This internal function itself only prepares the function
 % call for the actual function used to export the data.
@@ -266,11 +277,11 @@ gh = guihandles(handle);
 
 % Set default options
 multipleFiles = get(...
-    gh.display_panel_dataexport_multiplefiles_checkbox,'value');
+    gh.analysis_panel_dataexport1D_multiplefiles_checkbox,'value');
 
 allTraces = any(cell2mat(...
-    get([gh.display_panel_dataexport_multiplefiles_checkbox,...
-    gh.display_panel_dataexport_multiple1file_checkbox],'value')));
+    get([gh.analysis_panel_dataexport1D_multiplefiles_checkbox,...
+    gh.analysis_panel_dataexport1D_multiple1file_checkbox],'value')));
 
 % Handle additional options
 % Please note: These options of the internal function are a subset of the
@@ -332,9 +343,9 @@ end
 if ~exist('fileType','var')
     % Get file type to save to
     fileTypes = cellstr(...
-        get(gh.display_panel_dataexport_filetype_popupmenu,'String'));
+        get(gh.analysis_panel_dataexport1D_filetype_popupmenu,'String'));
     fileType = fileTypes{...
-        get(gh.display_panel_dataexport_filetype_popupmenu,'Value')};
+        get(gh.analysis_panel_dataexport1D_filetype_popupmenu,'Value')};
 end
 
 % Set directory where to save files to
@@ -400,11 +411,11 @@ if multipleFiles
                 msgbox(msg,'Error with exporting 1D','error');
         end
         export1Dparameters.header.character = ...
-            get(gh.display_panel_dataexport_header_edit,'String');
+            get(gh.analysis_panel_dataexport1D_header_edit,'String');
         export1Dparameters.axis.include = ...
-            get(gh.display_panel_dataexport_includeaxis_checkbox,'Value');
+            get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
         export1Dparameters.stdev.include = ...
-            get(gh.display_panel_dataexport_includestdev_checkbox,'Value');
+            get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
         export1Dparameters.file.type = fileType;
         export1Dparameters.file.overwrite = 1;
         
@@ -469,11 +480,11 @@ else
             msgbox(msg,'Error with exporting 1D','error');
     end
     export1Dparameters.header.character = ...
-        get(gh.display_panel_dataexport_header_edit,'String');
+        get(gh.analysis_panel_dataexport1D_header_edit,'String');
     export1Dparameters.axis.include = ...
-        get(gh.display_panel_dataexport_includeaxis_checkbox,'Value');
+        get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
     export1Dparameters.stdev.include = ...
-        get(gh.display_panel_dataexport_includestdev_checkbox,'Value');
+        get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
     export1Dparameters.file.type = fileType;
     export1Dparameters.file.overwrite = 1;
     
@@ -495,3 +506,125 @@ end
 
 end
 
+function [if_status,if_warnings] = if_export2Ddata(handle,opt)
+% IF_EXPORT2DDATA Internal function used to handle exporting 2D data.
+%
+% Please note: This internal function itself only prepares the function
+% call for the actual function used to export the data.
+
+if_status = 0;
+if_warnings = cell(0);
+
+% Get appdata and handles of handle
+ad = getappdata(handle);
+gh = guihandles(handle);
+
+% Handle additional options
+% Please note: These options of the internal function are a subset of the
+%              original options the command was called with.
+% Order of checking does matter to a certain extend, as the last remaining
+% option is used as a filename, if any.
+if ~isempty(opt)
+    
+    % Check for file type
+    typeidx = strncmpi('type=',opt,6);
+    typestr = opt(typeidx);
+    % Remove respective entries from opt cell array
+    opt(typeidx) = [];
+    if ~isempty(typestr)
+        exportFormat = typestr{1}(8:end);
+    end
+    
+    % Finally, take remaining options as file name
+    if ~isempty(opt)
+        fileName = strtrim('%s_',opt{:});
+    end
+end
+
+if ~exist('fileType','var')
+    % Get file type to save to
+    exportFormats = cellstr(...
+        get(gh.analysis_panel_dataexport2D_format_popupmenu,'String'));
+    exportFormat = exportFormats{...
+        get(gh.analysis_panel_dataexport2D_format_popupmenu,'Value')};
+end
+
+% Set directory where to save files to
+if isfield(ad,'control') && isfield(ad.control,'dir') && ...
+        isfield(ad.control.dir,'lastExport')  && ...
+        ~isempty(ad.control.dir.lastExport)
+    startDir = ad.control.dir.lastExport;
+else
+    startDir = pwd;
+end
+
+exportParameters = struct();
+
+switch exportFormat
+    case 'glotaran'
+        fileExtension = 'ascii';
+        exportFunctionName = 'trEPRexport4glotaran';
+    case 'ASCII'
+        fileExtension = 'ascii';
+        exportFunctionName = 'trEPRexport2D';
+        exportParameters.includeAxes = logical(...
+            get(gh.analysis_panel_dataexport2D_includeaxes_checkbox,'Value'));
+        exportParameters.commentChar = ...
+            get(gh.analysis_panel_dataexport2D_header_edit,'String');
+    otherwise
+        trEPRoptionUnknown(exportFormat);
+        return;
+end
+
+% If no filename is provided, ask user for filename
+if ~exist('fileName','var')
+    % Suggest file name if possible
+    [~,f,~] = ...
+        fileparts(ad.data{ad.control.spectra.active}.file.name);
+    fileNameSuggested = fullfile(startDir,[f '-2D' exportFormat]);
+    clear f;
+    % Ask user for file name
+    [fileName,pathName] = uiputfile(...
+        sprintf('*.%s',fileExtension),...
+        'Get filename to save 2D data currently active dataset to',...
+        fileNameSuggested);
+    % If user aborts process, return
+    if fileName == 0
+        return;
+    end
+    % Create filename with full path
+    fileName = fullfile(pathName,fileName);
+end
+
+% set lastExport Dir in appdata
+if exist(pathName,'dir')
+    ad.control.dir.lastExport = pathName;
+end
+setappdata(handle,'control',ad.control);
+
+exportFunction = str2func(exportFunctionName);
+
+trEPRbusyWindow('start',...
+    'Trying to export dataset...<br />please wait.');
+
+% Export using export4glotaran
+status = exportFunction(...
+    ad.data{ad.control.spectra.active},fileName,...
+    exportParameters);
+if status
+    trEPRmsg(status,'error');
+    trEPRbusyWindow('stop',...
+        'Trying to export dataset...<br /><b>failed</b>.');
+else
+    trEPRbusyWindow('stop',...
+        'Trying to export dataset...<br /><b>done</b>.');
+    trEPRbusyWindow('deletedelayed');
+end
+
+% Add status message (mainly for debug reasons)
+% IMPORTANT: Has to go AFTER setappdata
+msgStr = sprintf('Exported dataset %i to format %s',...
+    ad.control.spectra.active,exportFormat);
+trEPRmsg(msgStr,'info');
+
+end
