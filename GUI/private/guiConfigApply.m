@@ -64,48 +64,44 @@ try
             
             % Set load panel's settings
             if isfield(ad.configuration.load,'combine')
-                set(gh.load_panel_files_combine_checkbox,...
+                set(gh.load_combine_checkbox,...
                     'Value',ad.configuration.load.combine);
             end
             if isfield(ad.configuration.load,'loaddir')
-                set(gh.load_panel_files_directory_checkbox,...
+                set(gh.load_loadDir_checkbox,...
                     'Value',ad.configuration.load.loaddir);
             end
             if isfield(ad.configuration.load,'infofile')
-                set(gh.load_panel_infofile_checkbox,...
+                set(gh.load_loadInfoFile_checkbox,...
                     'Value',ad.configuration.load.infofile);
             end
             if isfield(ad.configuration.load,'unitconversion')
-                set(gh.load_panel_unitconversion_checkbox,...
+                set(gh.load_convertUnits_checkbox,...
                     'Value',ad.configuration.load.unitconversion);
             end
             if isfield(ad.configuration.load,'POC')
-                set(gh.load_panel_preprocessing_offset_checkbox,...
+                set(gh.load_POC_checkbox,...
                     'Value',ad.configuration.load.POC);
             end
             if isfield(ad.configuration.load,'BGC')
-                set(gh.load_panel_preprocessing_background_checkbox,...
+                set(gh.load_BGC_checkbox,...
                     'Value',ad.configuration.load.BGC);
             end
             if isfield(ad.configuration.load,'labels')
-                set(gh.load_panel_axislabels_checkbox,...
+                set(gh.load_determineAxisLabels_checkbox,...
                     'Value',ad.configuration.load.labels);
             end
             if isfield(ad.configuration.load,'visible')
-                set(gh.load_panel_visible_checkbox,...
+                set(gh.load_visibleUponLoad_checkbox,...
                     'Value',ad.configuration.load.visible);
             end
-            if isfield(ad.configuration.load,'unitconversion')
-                set(gh.load_panel_unitconversion_checkbox,...
-                    'Value',ad.configuration.load.unitconversion);
-            end
             if isfield(ad.configuration.load,'format')
-                % Get value from load_panel_filetype_popupmenu
+                % Get value from load_filetype_popupmenu
                 fileTypes = ...
-                    cellstr(get(gh.load_panel_filetype_popupmenu,'String'));
+                    cellstr(get(gh.load_filetype_popupmenu,'String'));
                 for k=1:length(fileTypes)
                     if strcmpi(fileTypes{k},ad.configuration.load.format)
-                        set(gh.load_panel_filetype_popupmenu,'Value',k);
+                        set(gh.load_filetype_popupmenu,'Value',k);
                     end
                 end
             end

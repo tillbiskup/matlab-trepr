@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-27
+% 2014-08-15
 
 status = 0;
 warnings = cell(0);
@@ -68,20 +68,9 @@ end
 mainWindow = handle;
 
 if isempty(FileName)
-    warnings{end+1} = ['Command "' lower(cmd) '" needs at least one filename.'];
+    warnings{end+1} = ['Command "' lower(cmd) ...
+        '" needs at least one filename.'];
     return;
-end
-
-if get(gh.load_panel_files_combine_checkbox,'Value')
-    state.comb = true;
-else
-    state.comb = false;
-end
-
-if get(gh.load_panel_infofile_checkbox,'Value')
-    loadInfoFile = true;
-else
-    loadInfoFile = false;
 end
 
 [path,name,ext] = fileparts(FileName{1});
@@ -101,8 +90,11 @@ trEPRmsg([{'Calling trEPRload and trying to load:'} FileName],'info');
 
 trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
 
-[data,warnings] = trEPRload(FileName,'combine',state.comb,...
-    'loadInfoFile',loadInfoFile);
+fileType = ad.control.panels.load.fileType;
+
+[data,warnings] = trEPRload(FileName,...
+    'combine',ad.control.panels.load.fileTypes(fileType).combine,...
+    'loadInfoFile',ad.control.panels.load.fileTypes(fileType).loadInfoFile);
 
 % Get appdata, to make sure not to skip any messages that might be
 % written by trEPRload
@@ -243,7 +235,7 @@ trEPRbusyWindow('deletedelayed');
 ad = getappdata(mainWindow);
 
 % Check whether dataset shall be made visible upon load
-if get(gh.load_panel_visible_checkbox,'Value')
+if ad.control.panels.load.fileTypes(fileType).visibleUponLoad
     % Add new loaded spectra to "visible"
     ad.control.data.visible = [...
         ad.control.data.visible ...
@@ -262,7 +254,7 @@ setappdata(mainWindow,'control',ad.control);
 
 % Handle dataset corrections when checked
 % pretrigger offset compensation
-if get(gh.load_panel_preprocessing_offset_checkbox,'Value')
+if ad.control.panels.load.fileTypes(fileType).POC
     for k=1:length(newDataIdx)
         guiProcessingPOC(newDataIdx(k));
     end
@@ -271,7 +263,7 @@ if get(gh.load_panel_preprocessing_offset_checkbox,'Value')
 end
 
 % background subtraction
-if get(gh.load_panel_preprocessing_background_checkbox,'Value')
+if ad.control.panels.load.fileTypes(fileType).BGC
     for k=1:length(newDataIdx)
         guiProcessingBGC(newDataIdx(k));
     end
@@ -280,7 +272,7 @@ if get(gh.load_panel_preprocessing_background_checkbox,'Value')
 end
 
 % TODO: Include unitConversion here
-if get(gh.load_panel_unitconversion_checkbox,'Value')
+if ad.control.panels.load.fileTypes(fileType).convertUnits
     conversions = regexp(ad.configuration.load.convert,',','split');
     for k=1:length(newDataIdx)
         for conversion = 1:length(conversions)
@@ -291,7 +283,7 @@ if get(gh.load_panel_unitconversion_checkbox,'Value')
 end
 
 % Try to load axis labels from file
-if get(gh.load_panel_axislabels_checkbox,'Value')
+if ad.control.panels.load.fileTypes(fileType).determineAxisLabels
     if (isfield(ad.data{newDataIdx(end)},'axes'))
         if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
                 isfield(ad.data{newDataIdx(end)}.axes.x,'measure'))
@@ -352,7 +344,9 @@ else
     startDir = pwd;
 end
 
-if get(gh.load_panel_files_directory_checkbox,'Value')
+fileType = ad.control.panels.load.fileType;
+
+if ad.control.panels.load.fileTypes(fileType).loadDir
     FileName = uigetdir(...
         startDir,...
         'Select directory to load'...

@@ -1,0 +1,40 @@
+% Sample configuration file for the trEPRgui loadpanel of the trEPR toolbox
+%
+% This file serves as an example and documentation for the real
+% configuration in the file "trEPRgui_load_fileTypes.ini" in the same
+% directory.
+%
+% To automatically generate a valid config file from this file, 
+% use trEPRconf('create') at the MATLAB(r) command line.
+% Alternatively, you may use the functions provided by the "Configuration" 
+% panel of the GUI.
+
+% Copyright (c) 2014, Till Biskup <till@till-biskup.de>
+% 2014-08-14
+
+[tez]
+name = Toolbox format
+extensions = *.tez;*.zip
+loadFunction = trEPRload
+combine = 0
+loadDir = 0
+loadInfoFile = 0
+POC = 0
+BGC = 0
+determineAxisLabels = 1
+visibleUponLoad = 1
+convertUnits = 1
+
+[speksim]
+name = Freiburg (speksim)
+extensions = 
+loadFunction = trEPRload
+combine = 1
+loadDir = 1
+loadInfoFile = 1
+POC = 1
+BGC = 0
+determineAxisLabels = 1
+visibleUponLoad = 1
+convertUnits = 1
+

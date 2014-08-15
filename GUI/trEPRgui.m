@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-10
+% 2014-08-14
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -50,8 +50,8 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
     'Color',defaultBackground,...
-    'KeyPressFcn',@keyBindings,...
-    'CloseRequestFcn',@closeGUI);
+    'KeyPressFcn',@guiKeyBindings,...
+    'CloseRequestFcn',@(~,~)guiClose);
 
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
@@ -764,7 +764,6 @@ ylabel(hPlotAxes,'intensity / a.u.');
 % For test purposes, set axis limits
 set(hPlotAxes,'YLim',[-.01,0.02]);
 set(hPlotAxes,'XLim',[-.0001,0.0002]);
-% set(hPlotAxes,'XLim',[-10 20000]);
 
 % Display splash
 try
@@ -1061,22 +1060,6 @@ function tbg_Callback(source,~)
                 'Something went wrong with switching the panels.'],...
                 'warning');
         end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function closeGUI(~,~)
-    try
-        guiClose();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function keyBindings(src,evt)
-    try
-        guiKeyBindings(src,evt);
     catch exception
         trEPRexceptionHandling(exception)
     end
