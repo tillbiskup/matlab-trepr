@@ -8,9 +8,50 @@
 % use trEPRconf('create') at the MATLAB(r) command line.
 % Alternatively, you may use the functions provided by the "Configuration" 
 % panel of the GUI.
+%
+% For each file format/type, you can create an own block. Each block needs 
+% to have a unique name. Basically, you set the popupmenu for the file 
+% types and the options of the checkboxes for each format.
+%
+% Description of the fields of a block:
+%
+%   name
+%       Name of the format as it appears in the popupmenu
+%
+%   extensions
+%       List (separated with semicolons) of file extensions
+%
+%   loadFunction
+%       Function used for loading the specified file type
+%       Currently (2014-08-15) not in use
+%
+%   combine
+%       Whether to combine several files
+%
+%   loadDir
+%       Whether to load entire directory
+%
+%   loadInfoFile
+%       Whether to load the corresponding info file
+%
+%   POC
+%       Whether to apply a pretrigger offset compensation upon load
+%
+%   BGC
+%       Whether to apply a basic background correction upon load
+%
+%   determineAxisLabels
+%       Whether to try to determine axis labels from the loaded file(s)
+%
+%   visibleUponLoad
+%       Whether to make dataset visible upon load
+%
+%   convertUnits
+%       Whether to automatically convert the units
+%
 
 % Copyright (c) 2014, Till Biskup <till@till-biskup.de>
-% 2014-08-14
+% 2014-08-15
 
 [tez]
 name = Toolbox format
@@ -34,6 +75,19 @@ loadDir = 1
 loadInfoFile = 1
 POC = 1
 BGC = 0
+determineAxisLabels = 1
+visibleUponLoad = 1
+convertUnits = 1
+
+[fsc2]
+name = Berlin (fsc2)
+extensions = 
+loadFunction = trEPRload
+combine = 0
+loadDir = 0
+loadInfoFile = 0
+POC = 1
+BGC = 1
 determineAxisLabels = 1
 visibleUponLoad = 1
 convertUnits = 1
