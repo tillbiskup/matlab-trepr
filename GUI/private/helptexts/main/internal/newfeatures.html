@@ -19,7 +19,7 @@
 		<ul>
 		    <li>New features</li>
 		    <ul>
-		    	<li><tt>trEPRexport2D</tt>: 2D ASCII export of datasets<li>
+		    	<li><tt>trEPRexport2D</tt>: 2D ASCII export of datasets</li>
 		    	<li>Z values for measurements now consistently visible.<br/>Consistent use of x,y,z throughout the ui controls.</li>
 			    <li>Characteristics can be viewed (and modified) using the info GUI.</li>
 		    </ul>
@@ -31,7 +31,7 @@
 		    </ul>
 		    <li>GUI layout and usability</li>
 		    <ul>
-		    	<li>GUI help window centered horizontally on top of the main GUI.</li>
+		    	<li>(Newly designed) GUI help window centered horizontally on top of the main GUI.</li>
 		    	<li>Welcome panel removed, displays help window with welcome message instead.</li>
 		    	<li>Load panel: Configurable different file types with different presets of checkboxes.</li>
 		    	<li>Analysis panel: Moved data export from display panel. New 2D export options.</li>
@@ -41,7 +41,12 @@
 		    </ul>
 		    <li>Compatibility</li>
 		    <ul>
-			    <li><b>GUI appdata version 1.12.</b><br />Added <tt>vis3d</tt> structure to <tt>control.axis</tt>.</li>
+			    <li><b>GUI appdata version 1.12.</b></li>
+				<ul>
+			    	<li>Added <tt>panels</tt> structure to <tt>control</tt>.</li>
+			    	<li>Renamed <tt>control.spectra</tt> to <tt>control.data</tt>.</li>
+			    	<li>Added <tt>vis3d</tt> structure to <tt>control.axis</tt>.</li>
+			    </ul>
 			    <li><b>trEPR dataset structure version 1.11.</b><br />Reorganised characteristics structure.</li>
 		    </ul>
 		    <li>Internals</li>
