@@ -17,7 +17,7 @@ function [accData,accReport] = trEPRACC(data,parameters)
 %              a copy is copied to the history.info field
 
 % Copyright (c) 2011-14, Till Biskup, Bernd Paulus
-% 2014-07-26
+% 2014-08-16
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -92,16 +92,9 @@ try
     accData = trEPRdataStructure;
     % label - string
     accData.label = parameters.label;
-    
-    % Additional fields for dataset in GUI
-    addFields = trEPRguiDataStructure('datastructure');
-    addFieldsNames = fieldnames(addFields);
-    for k=1:length(addFieldsNames)
-        accData.(addFieldsNames{k}) = addFields.(addFieldsNames{k});
-    end
 
     % Set fields that can be taken from master dataset
-    accData.line = data{masterId}.line;
+    accData.display.lines.data = data{masterId}.display.lines.data;
     accData.parameters = data{masterId}.parameters;
     accData.sample = data{masterId}.sample;
     accData.display.position = data{masterId}.display.position;
