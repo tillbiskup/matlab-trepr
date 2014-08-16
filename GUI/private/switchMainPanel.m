@@ -8,7 +8,7 @@ function status = switchMainPanel(panelName)
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-14
+% 2014-08-16
 
 try
     % Get handles of main window
@@ -17,7 +17,6 @@ try
     gh = guihandles(mainWindow);
     
     panels = [...
-        gh.welcome_panel ...
         gh.load_panel ...
         gh.data_panel ...
         gh.slider_panel ...
@@ -110,21 +109,7 @@ try
     
     status = 0;
 catch exception
-    try
-        msgStr = ['An exception occurred in ' ...
-            exception.stack(1).name  '.'];
-        trEPRmsg(msgStr,'error');
-    catch exception2
-        exception = addCause(exception2, exception);
-        disp(msgStr);
-    end
-    try
-        trEPRgui_bugreportwindow(exception);
-    catch exception3
-        % If even displaying the bug report window fails...
-        exception = addCause(exception3, exception);
-        throw(exception);
-    end
+    trEPRexceptionHandling(exception);
     status = -1;
 end
 

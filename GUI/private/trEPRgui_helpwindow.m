@@ -24,7 +24,7 @@ function varargout = trEPRgui_helpwindow(varargin)
 % See also: helpWindow
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-10
+% 2014-08-16
 
 % Parse input arguments using the inputParser functionality
 try
@@ -42,11 +42,16 @@ end
 % Get basedir
 [basedir,~,~] = fileparts(mfilename('fullpath'));
 
+hMainGui = trEPRguiGetWindowHandle();
+mainGuiPosition = get(hMainGui,'Position');
+position = [mainGuiPosition(1)+15 mainGuiPosition(2)+165];
+
 hMainFigure = helpWindow(...
     'tag',mfilename,...
     'title','trEPR GUI',...
     'basedir',fullfile(basedir,'helptexts','main'),...
     'page',p.Results.page,...
+    'position',position,...
     'visible',false ...
     );
 

@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-14
+% 2014-08-16
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -496,10 +496,6 @@ uicontrol('Tag','tbConfigure',...
 % Create the main control panels
 
 try
-    hp0 = guiWelcomePanel(...
-        hMainFigure,...
-        [guiSize(1)-mainPanelWidth-20 100 mainPanelWidth guiSize(2)-220]);
-    
     guiLoadPanel(...
         hMainFigure,...
         [guiSize(1)-mainPanelWidth-20 100 mainPanelWidth guiSize(2)-220]);
@@ -744,19 +740,6 @@ set(hbg,'SelectedObject',[]);  % None selected
 set(hbg,'Visible','on');
     
 set(hbg_fb,'Visible','on');
-    
-% Be very careful, such as not to break old installations without updated
-% config files
-if isfield(ad.configuration,'start') && ...
-        isfield(ad.configuration.start,'welcome')
-    if ad.configuration.start.welcome
-        set(hp0,'Visible','on');
-    else
-        switchMainPanel('Load');
-    end
-else
-    set(hp0,'Visible','on');
-end
 
 xlabel(hPlotAxes,'time / s');
 ylabel(hPlotAxes,'intensity / a.u.');
@@ -765,7 +748,7 @@ ylabel(hPlotAxes,'intensity / a.u.');
 set(hPlotAxes,'YLim',[-.01,0.02]);
 set(hPlotAxes,'XLim',[-.0001,0.0002]);
 
-% Display splash
+% Display splash image in main axes
 try
     set(hMainFigure,'CurrentAxes',hPlotAxes);
     [path,~,~] = fileparts(mfilename('fullpath'));
@@ -784,6 +767,8 @@ guidata(hMainFigure,gh);
 if (nargout == 1)
     varargout{1} = hMainFigure;
 end
+
+set(gh.load_panel,'Visible','on');
 
 % Set status message
 trEPRmsg('trEPR GUI main window initialised successfully.','info');
@@ -819,37 +804,8 @@ for k=1:length(dirs)
 end
 setappdata(hMainFigure,'control',ad.control);
 
-% Make the GUI visible.
-set(hMainFigure,'Visible','on');
-if ishandle(hSplash)
-    delete(hSplash);
-end
-
 % Start garbage collector
 guiGarbageCollector('start');
-
-% Be very careful, such as not to break old installations without updated
-% config files
-if isfield(ad.configuration,'start')
-    if isfield(ad.configuration.start,'tip') && ...
-            ad.configuration.start.tip
-        showTips = showTip('File',fullfile(...
-            trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'),...
-            'ShowTip',logical(ad.configuration.start.tip));
-        if ~showTips
-            conf = trEPRguiConfigLoad(mfilename);
-            conf.start.tip = showTips;
-            warnings = guiConfigWrite(mfilename,conf);
-            if warnings
-                trEPRmsg(warnings,'warning');
-            end
-        end
-    end
-    if isfield(ad.configuration.start,'statuswindow') && ...
-            ad.configuration.start.statuswindow
-        trEPRgui_statuswindow();
-    end
-end
 
 % Check for saved history
 if exist(trEPRparseDir(ad.control.cmd.historyfile),'file')
@@ -866,6 +822,39 @@ if ad.control.cmd.historysave
     end
 end
 
+% Make the GUI visible.
+set(hMainFigure,'Visible','on');
+if ishandle(hSplash)
+    delete(hSplash);
+end
+
+% Be very careful, such as not to break old installations without updated
+% config files
+if isfield(ad.configuration,'start')
+    if isfield(ad.configuration.start,'statuswindow') && ...
+            ad.configuration.start.statuswindow
+        trEPRgui_statuswindow();
+    end
+    if isfield(ad.configuration.start,'welcome') ...
+            && ad.configuration.start.welcome
+        trEPRgui_helpwindow('page','welcome');
+    end
+    if isfield(ad.configuration.start,'tip') && ...
+            ad.configuration.start.tip
+        showTips = showTip('File',fullfile(...
+            trEPRinfo('dir'),'GUI','private','helptexts','tips.txt'),...
+            'ShowTip',logical(ad.configuration.start.tip));
+        if ~showTips
+            conf = trEPRguiConfigLoad(mfilename);
+            conf.start.tip = showTips;
+            warnings = guiConfigWrite(mfilename,conf);
+            if warnings
+                trEPRmsg(warnings,'warning');
+            end
+        end
+    end
+end
+    
 setappdata(hMainFigure,'control',ad.control);
 
 % Check for updates - use special function with timer to prevent slow or
