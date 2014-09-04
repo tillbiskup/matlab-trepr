@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-08-15
+% 2014-09-04
 
 status = 0;
 warnings = cell(0);
@@ -241,7 +241,7 @@ if ad.control.panels.load.fileTypes(fileType).visibleUponLoad
         ad.control.data.visible ...
         newDataIdx...
         ];
-    ad.control.data.active = newDataIdx;
+    ad.control.data.active = newDataIdx(end);
 else
     % Add new loaded spectra to "invisible"
     ad.control.data.invisible = [...
