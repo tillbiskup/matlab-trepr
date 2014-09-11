@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-04
+% 2014-09-10
 
 status = 0;
 warnings = cell(0);
@@ -93,8 +93,9 @@ trEPRbusyWindow('start','Trying to load spectra...<br />please wait.');
 fileType = ad.control.panels.load.fileType;
 
 [data,warnings] = trEPRload(FileName,...
-    'combine',ad.control.panels.load.fileTypes(fileType).combine,...
-    'loadInfoFile',ad.control.panels.load.fileTypes(fileType).loadInfoFile);
+    'combine',logical(ad.control.panels.load.fileTypes(fileType).combine),...
+    'loadInfoFile',...
+    logical(ad.control.panels.load.fileTypes(fileType).loadInfoFile));
 
 % Get appdata, to make sure not to skip any messages that might be
 % written by trEPRload
