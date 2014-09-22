@@ -1,9 +1,9 @@
-function [status,warnings] = cmdEnv(handle,opt,varargin)
-% CMDENV Command line command of the trEPR GUI.
+function [status,warnings] = cmdClear(handle,opt,varargin)
+% CMDCLEAR Command line command of the trEPR GUI.
 %
 % Usage:
-%   cmdEnv(handle,opt)
-%   [status,warnings] = cmdEnv(handle,opt)
+%   cmdClear(handle,opt)
+%   [status,warnings] = cmdClear(handle,opt)
 %
 %   handle  - handle
 %             Handle of the window the command should be performed for
@@ -38,7 +38,7 @@ p.addRequired('opt', @(x)iscell(x));
 %p.addOptional('opt',cell(0),@(x)iscell(x));
 p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
-% opt = p.Results.opt;
+opt = p.Results.opt;
 
 % % Get command name from mfilename
 % cmd = mfilename;
@@ -54,13 +54,26 @@ end
 % Get appdata from handle
 ad = getappdata(handle);
 
-if isempty(fieldnames(ad.control.cmd.variables))
-    trEPRmsg('No variables defined currently','info');
+if isempty(opt)
     return;
 end
 
-trEPRmsg(sprintf('Variables currently defined:\n%s', ...
-    deblank(evalc('disp(ad.control.cmd.variables)'))),'info');
-
+% If option "all" is given, remove all variables
+if strcmpi(opt{1},'all')
+    ad.control.cmd.variables = struct();
+    setappdata(handle,'control',ad.control);
+    return;
 end
 
+for optIdx = 1:length(opt)
+    if isfield(ad.control.cmd.variables,opt{optIdx})
+        ad.control.cmd.variables = ...
+            rmfield(ad.control.cmd.variables,opt{optIdx});
+    else
+        warnings{end+1} = ['Variable "' opt{optIdx} '" doesn''t exist.']; %#ok<AGROW>
+    end
+end
+
+setappdata(handle,'control',ad.control);
+
+end

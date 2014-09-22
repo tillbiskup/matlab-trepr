@@ -188,6 +188,8 @@ for optIdx = 1:length(opt)
                         replacement = num2str(ad.control.data.active);
                     case 'pwd'
                         replacement = evalin('base','pwd');
+                    case 'today'
+                        replacement = datestr(now,'yyyymmdd');
                     case 'label'
                         if exist('datasetIdx','var') && ~isempty(datasetIdx) ...
                                 && datasetIdx <= length(ad.data)
@@ -195,6 +197,17 @@ for optIdx = 1:length(opt)
                         else
                             replacement = ...
                                 ad.data{ad.control.data.active}.label;
+                        end
+                    case 'date'
+                        if exist('datasetIdx','var') && ~isempty(datasetIdx) ...
+                                && datasetIdx <= length(ad.data)
+                            replacement = ...
+                                datestr(ad.data{datasetIdx...
+                                }.parameters.date.start,'yyyymmdd');
+                        else
+                            replacement = ...
+                                datestr(ad.data{ad.control.data.active...
+                                }.parameters.date.start,'yyyymmdd');
                         end
                     otherwise
                         % DEBUG FOR NOW
