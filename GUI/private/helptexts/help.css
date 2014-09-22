@@ -3,10 +3,13 @@ html {
 	line-height:1.4em;
 }
 /* Define single elements */
+h1,h2,h3,h4,h5,h6 {
+	color:#333;
+}
 h1 {
 	font-size:160%;
 	background:#eee;
-	padding:5px 10px;
+	padding:45px 10px 15px 25px;
 	border-bottom:1px solid #ccc;
 	}
 h2 {
@@ -47,7 +50,15 @@ a.fnmark {
 	}
 .hurry {
 	background:#ffd;
+	background-image: url(watch.png);
+	background-position: 10px 15px;
+	background-repeat: no-repeat;
+        padding-left:70px;
+	min-height:100px;
 	}
+div.hurry h2 {
+	margin-top: 15px;
+}
 div.footer {
 	border-top:1px solid #ccc
 	padding-top:2em;
