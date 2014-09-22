@@ -12,7 +12,7 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           wrong.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-09-22
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -21,6 +21,7 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('id', @(x)isnumeric(x));
+p.addOptional('filename','',@(x)ischar(x));
 p.parse(id,varargin{:});
 
 try
@@ -44,7 +45,12 @@ try
     ad = getappdata(mainWindow);
     
     % Create default filename
-    filename = suggestFilename(mainWindow,'Type','file');
+    if isempty(p.Results.filename)
+        filename = suggestFilename(mainWindow,'Type','file');
+    else
+        [path,name,~] = fileparts(p.Results.filename);
+        filename = fullfile(path,name);
+    end
     ad.data{id}.file.name = [filename zipext];
 
     % Need to test for existing file and in case, change default name
@@ -62,13 +68,13 @@ try
         else
             filesInDir = dir(sprintf('%s*',fullfile(fpath,fname)));
         end
-        l=0;
+        increment=0;
         numbers = [];
-        for k=1:length(filesInDir)
-            token = regexp(filesInDir(k).name,'_(\d+)\..*$','tokens');
+        for idx=1:length(filesInDir)
+            token = regexp(filesInDir(idx).name,'_(\d+)\..*$','tokens');
             if ~isempty(token)
-                l=l+1;
-                numbers(l) = str2double(token{1});
+                increment=increment+1;
+                numbers(increment) = str2double(token{1});
             end
         end
         if (~isempty(numbers));
@@ -81,22 +87,24 @@ try
             sprintf('%s_%i%s',fname,number,zipext));
     end
     
-    % Show dialog for file selection
-    [FileName,PathName,~] = uiputfile(...
-        zipext,...
-        'Save dataset in a new file',...
-        ad.data{id}.file.name);
-    
-    if (FileName == 0)
-        status = -1;
-        return;
+    if isempty(p.Results.filename)
+        % Show dialog for file selection
+        [FileName,PathName,~] = uiputfile(...
+            zipext,...
+            'Save dataset in a new file',...
+            ad.data{id}.file.name);
+        
+        if (FileName == 0)
+            status = -1;
+            return;
+        end
+        
+        % Set filename to save in
+        ad.data{id}.file.name = fullfile(PathName, FileName);
     end
     
-    % Set filename to save in
-    ad.data{id}.file.name = fullfile(PathName, FileName);
-    
-    for k = 1:length(ad.data)
-        if (strcmp(ad.data{k}.file.name,ad.data{id}.file.name)) && (k ~= id)
+    for idx = 1:length(ad.data)
+        if (strcmp(ad.data{idx}.file.name,ad.data{id}.file.name)) && (idx ~= id)
             answer = questdlg(...
                 {'WARNING: You''re about to save the current dataset to the file'...
                 ad.data{id}.file.name ...
@@ -149,7 +157,7 @@ try
         (ad.control.data.modified == id)) = [];
     
     % Set last save dir
-    ad.control.dirs.lastSave = PathName;
+    [ad.control.dirs.lastSave,~,~] = fileparts(ad.data{id}.file.name);
     
     % Write appdata
     setappdata(mainWindow,'data',ad.data);

@@ -22,7 +22,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-15
+% 2014-09-19
 
 status = 0;
 warnings = cell(0);
@@ -162,36 +162,47 @@ ad = getappdata(mainWindow);
 
 % Expand variables
 for optIdx = 1:length(opt)
-    if strncmp(opt{optIdx},'$',1)
-        % Handle special case that additional index is provided with
-        % variable
-        if any(strfind(opt{optIdx},'#'))
-            parts = regexp(opt{optIdx},'#','split');
-            opt{optIdx} = parts{1};
-            datasetIdx = str2double(parts{2});
-        end
-        if isfield(ad.control.cmd.variables,opt{optIdx}(2:end))
-            opt{optIdx} = ad.control.cmd.variables.(opt{optIdx}(2:end));
-        else
-            switch opt{optIdx}(2:end)
-                case {'ndatasets','numberofdatasets'}
-                    opt{optIdx} = length(ad.data);
-                case 'current'
-                    opt{optIdx} = ad.control.data.active;
-                case 'pwd'
-                    opt{optIdx} = evalin('base','pwd');
-                case 'label'
-                    if exist('datasetIdx','var') && ~isempty(datasetIdx) ...
-                            && datasetIdx <= length(ad.data)
-                        opt{optIdx} = ad.data{datasetIdx}.label;
-                    else
-                        opt{optIdx} = ...
-                            ad.data{ad.control.data.active}.label;
-                    end
-                otherwise
-                    % DEBUG FOR NOW
-                    disp(opt{optIdx}(2:end));
+    % Check whether the option contains any variable, as apparent from
+    % apperance of "$" character(s)
+    if any(strfind(opt{optIdx},'$')) % strncmp(opt{optIdx},'$',1)
+        % Get any variable in string, even if there are more than one and
+        % even if they may contain a "#" character indicating dataset
+        % indices.
+        variables = regexp(opt{optIdx},'\$\w*\#?\d*','match');
+        for variable = 1:length(variables)
+            % Handle special case that additional index is provided with
+            % variable
+            if any(strfind(variables{variable},'#'))
+                parts = regexp(variables{variable},'#','split');
+                replacement = parts{1};
+                datasetIdx = str2double(parts{2});
             end
+            if isfield(ad.control.cmd.variables,variables{variable}(2:end))
+                replacement = ...
+                    ad.control.cmd.variables.(variables{variable}(2:end));
+            else
+                switch opt{optIdx}(2:end)
+                    case {'ndatasets','numberofdatasets'}
+                        replacement = num2str(length(ad.data));
+                    case 'current'
+                        replacement = num2str(ad.control.data.active);
+                    case 'pwd'
+                        replacement = evalin('base','pwd');
+                    case 'label'
+                        if exist('datasetIdx','var') && ~isempty(datasetIdx) ...
+                                && datasetIdx <= length(ad.data)
+                            replacement = ad.data{datasetIdx}.label;
+                        else
+                            replacement = ...
+                                ad.data{ad.control.data.active}.label;
+                        end
+                    otherwise
+                        % DEBUG FOR NOW
+                        disp(opt{optIdx}(2:end));
+                end
+            end
+            opt{optIdx} = strrep(opt{optIdx},...
+                variables{variable},replacement);
         end
     end
 end

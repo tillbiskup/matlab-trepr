@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-16
+% 2014-09-19
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -1091,7 +1091,7 @@ function command_Callback(source,~)
         if isempty(trEPRguiGetWindowHandle)
             return;
         end
-        if status
+        if status && ~isempty(warning)
             trEPRmsg(warning,'warning');
         end
         set(source,'String','');
