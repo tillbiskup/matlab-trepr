@@ -22,7 +22,7 @@ function [status,warnings] = cmdInput(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-07
+% 2014-09-22
 
 status = 0;
 warnings = cell(0);
@@ -57,23 +57,29 @@ if isempty(opt)
     return;
 end
 
-% Check for variable type
+% Check for variable type and preset
+varPreset = '';
 if length(opt) > 1
     for optidx = 2:length(opt)
-        if strncmpi(opt{optidx},5,'type=')
+        if length(opt{optidx})>4 && strncmpi(opt{optidx},'type=',5)
             varType = opt{optidx}(6:end);
+            opt(optidx) = [];
+        end
+        if length(opt{optidx})>6 && strncmpi(opt{optidx},'preset=',7)
+            varPreset = opt{optidx}(8:end);
             opt(optidx) = [];
         end
     end
 end
 
-% Check for preset
-varPreset = '';
+% Check for prompt
 if length(opt) > 1
-    varPreset = opt{2};
+    varPrompt = cellfun(@(x)[x ' '],opt(2:end),'UniformOutput',false);
+    value = inputWindow([strtrim([varPrompt{:}]) ':'],'preset',varPreset);
+else
+    value = inputWindow([opt{1} ':'],'preset',varPreset);
 end
 
-value = inputWindow([opt{1} ':'],'preset',varPreset);
 
 if exist('varType','var')
     try

@@ -22,7 +22,7 @@ function [status,warnings] = cmdEnv(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-09-18
+% 2014-09-22
 
 status = 0;
 warnings = cell(0);
@@ -54,7 +54,8 @@ end
 % Get appdata from handle
 ad = getappdata(handle);
 
-trEPRmsg(strtrim(evalc('disp(ad.control.cmd.variables)')),'info');
+trEPRmsg(sprintf('Variables currently defined:\n%s', ...
+    deblank(evalc('disp(ad.control.cmd.variables)'))),'info');
 
 end
 

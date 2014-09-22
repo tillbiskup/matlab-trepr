@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="../../help.css" />
+    </head>
+    <body>
+		<h1>input</h1>
+		<p class="intro">
+			input dataset.
+		</p>
+		<h2>Description</h2>
+		<p>
+			The <tt>input</tt> command is used to prompt the user interactively for values, mainly in context of scripting.
+		</p>
+		<h2>Syntax</h2>
+		<p>
+			<tt>input &lt;variablename&gt;</tt>
+		</p>
+		<p>
+			<tt>input &lt;variablename&gt; [type=&lt;type&gt;]</tt>
+		</p>
+		<p>
+			<tt>input &lt;variablename&gt; [preset=&lt;default value&gt;]</tt>
+		</p>
+		<p>
+			<tt>input &lt;variablename&gt; [&lt;prompt&gt;]</tt>
+		</p>
+		<p>
+			The command needs at least a variable name.
+		</p>
+		<h3>Options</h3>
+		<dl>
+			<dt><tt>variablename</tt></dt>
+			<dd>Name of the variable.</dd>
+			<dd>The variable may only contain alphanumeric characters and the underscore and needs to start with an alphabetic character (as any Matlab&reg; variable).</dd>
+			<dt><tt>type</tt></dt>
+			<dd>Any Matlab&reg; variable type the variable should be casted to.</dd>
+			<dt><tt>default value</tt></dt>
+			<dd>Default value that gets displayed in the edit field of the prompt</dd>
+			<dt><tt>prompt</tt></dt>
+			<dd>Text shown above the edit field of the prompt (default: variable name).</dd>
+		</dl>
+		<div class="footer">
+		<p class="copyright">
+			&copy; 2014, Till Biskup
+		</p>
+		<p class="lastchange">
+			2014-09-22
+		</p>
+		</div>
+	</body>
+</html>
