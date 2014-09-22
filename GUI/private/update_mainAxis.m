@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-09-22
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -302,7 +302,7 @@ switch ad.control.axis.displayType
             if ad.control.axis.normalisation.enable
                 if strcmpi(ad.control.axis.normalisation.dimension,'1D')
                     switch lower(ad.control.axis.normalisation.type)
-                        case 'pk-pk'
+                        case {'pk-pk','pk2pk'}
                             y = y/(max(y)-min(y));
                         case 'area'
                             y = y/abs(sum(y));
@@ -313,7 +313,7 @@ switch ad.control.axis.displayType
                     end
                 else
                     switch lower(ad.control.axis.normalisation.type)
-                        case 'pk-pk'
+                        case {'pk-pk','pk2pk'}
                             y = y/(max(max(ad.data{k}.data))-...
                                 min(min(ad.data{k}.data)));
                         case 'area'
@@ -399,7 +399,7 @@ switch ad.control.axis.displayType
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
                         switch lower(ad.control.axis.normalisation.type)
-                            case 'pk-pk'
+                            case {'pk-pk','pk2pk'}
                                 y = y/(max(y)-min(y));
                             case 'area'
                                 y = y/abs(sum(y));
@@ -410,7 +410,7 @@ switch ad.control.axis.displayType
                         end
                     else
                         switch lower(ad.control.axis.normalisation.type)
-                            case 'pk-pk'
+                            case {'pk-pk','pk2pk'}
                                 y = y/(max(max(ad.data{k}.data))-...
                                     min(min(ad.data{k}.data)));
                             case 'area'
@@ -638,7 +638,7 @@ switch ad.control.axis.displayType
             if ad.control.axis.normalisation.enable
                 if strcmpi(ad.control.axis.normalisation.dimension,'1D')
                     switch lower(ad.control.axis.normalisation.type)
-                        case 'pk-pk'
+                        case {'pk-pk','pk2pk'}
                             x = x/(max(x)-min(x));
                         case 'area'
                             x = x/abs(sum(x));
@@ -649,7 +649,7 @@ switch ad.control.axis.displayType
                     end
                 else
                     switch lower(ad.control.axis.normalisation.type)
-                        case 'pk-pk'
+                        case {'pk-pk','pk2pk'}
                             x = x/(max(max(data))-min(min(data)));
                         case 'area'
                             x = x/abs(sum(sum(data)));
@@ -751,7 +751,7 @@ switch ad.control.axis.displayType
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
                         switch lower(ad.control.axis.normalisation.type)
-                            case 'pk-pk'
+                            case {'pk-pk','pk2pk'}
                                 x = x/(max(x)-min(x));
                             case 'area'
                                 x = x/abs(sum(x));
@@ -762,7 +762,7 @@ switch ad.control.axis.displayType
                         end
                     else
                         switch lower(ad.control.axis.normalisation.type)
-                            case 'pk-pk'
+                            case {'pk-pk','pk2pk'}
                                 x = x/(max(max(ad.data{k}.data))-...
                                     min(min(ad.data{k}.data)));
                             case 'area'
@@ -1087,7 +1087,7 @@ if (ad.control.axis.limits.auto)
                             ad.control.data.visible(k)}.display.position.x);
                 end
                 switch ad.control.axis.normalisation.type
-                    case 'pk-pk'
+                    case {'pk-pk','pk2pk'}
                         zmin(k) = min(min(data/...
                             (max(max(data))-...
                             min(min(data)))));
@@ -1112,7 +1112,7 @@ if (ad.control.axis.limits.auto)
                 end
             else % This is the 2D case
                 switch ad.control.axis.normalisation.type
-                    case 'pk-pk'
+                    case {'pk-pk','pk2pk'}
                         zmin(k) = min(min(data/...
                             (max(max(data))-...
                             min(min(data)))));

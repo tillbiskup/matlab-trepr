@@ -1,9 +1,9 @@
-function [status,warnings] = cmdHelp(handle,opt,varargin)
-% CMDHELP Command line command of the trEPR GUI.
+function [status,warnings] = cmdEnv(handle,opt,varargin)
+% CMDENV Command line command of the trEPR GUI.
 %
 % Usage:
-%   cmdHelp(handle,opt)
-%   [status,warnings] = cmdHelp(handle,opt)
+%   cmdEnv(handle,opt)
+%   [status,warnings] = cmdEnv(handle,opt)
 %
 %   handle  - handle
 %             Handle of the window the command should be performed for
@@ -21,7 +21,7 @@ function [status,warnings] = cmdHelp(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-09-22
 
 status = 0;
@@ -38,7 +38,7 @@ p.addRequired('opt', @(x)iscell(x));
 %p.addOptional('opt',cell(0),@(x)iscell(x));
 p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
-opt = p.Results.opt;
+% opt = p.Results.opt;
 
 % % Get command name from mfilename
 % cmd = mfilename;
@@ -51,20 +51,16 @@ if (isempty(handle))
     return;
 end
 
-if ~isempty(opt)
-    switch lower(opt{1})
-        case 'help'
-            trEPRgui_helpwindow();
-        case 'about'
-            trEPRgui_aboutwindow();
-        case 'modules'
-            trEPRgui_moduleswindow();
-        otherwise
-            trEPRgui_cmd_helpwindow('page',opt{1});
-    end
-else
-    trEPRgui_cmd_helpwindow('page','introduction');
+% Get appdata from handle
+ad = getappdata(handle);
+
+if isempty(fieldnames(ad.control.cmd.variables))
+    trEPRmsg('No variables defined currently','info');
+    return;
 end
+
+trEPRmsg(sprintf('Variables currently defined:\n%s', ...
+    deblank(evalc('disp(ad.control.cmd.variables)'))),'info');
 
 end
 

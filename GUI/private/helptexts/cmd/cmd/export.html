@@ -17,7 +17,7 @@
 		</p>
 		<h2>Syntax</h2>
 		<p>
-			<tt>export fig[ure]|axis|axes [format=&lt;format&gt;] [type=&lt;filetype&gt;] [&lt;filename&gt;]</tt>
+			<tt>export fig[ure]|axis|axes [format=&lt;format&gt;] [type=&lt;filetype&gt;] [caption=yes|no|y|n|true|false] [&lt;filename&gt;]</tt>
 		</p>
 		<p>
 			<tt>export 1D [&lt;current|all&gt;] [&lt;single|multiple&gt;] [type=&lt;filetype&gt;] [&lt;filename&gt;]</tt>
@@ -41,6 +41,9 @@
 			<dd>Figure export: File type the figure should be saved to, such as &quot;pdf&quot; or &quot;fig&quot;.</dd>
 			<dd>1D/2D data export: File type the data should be exported to, such as &quot;ASCII&quot; or &quot;glotaran&quot;.</dd>
 			<dd>Needs to be preceded by &quot;type=&quot;.</dd>
+			<dt>caption option (OPTIONAL)</dt>
+			<dd>Figure export: Whether to save a caption together with the figure (and for that purpose display the caption GUI).</dd>
+			<dd>Needs to be preceded by &quot;caption=&quot;.</dd>
 			<dt>filename (OPTIONAL)</dt>
 			<dd>Name of the file the figure or data should be saved to.</dd>
 			<dd>If no filename is provided, the user gets asked for a filename using the standard file selection dialogue boxes.</dd>

@@ -7,7 +7,7 @@ function status = update_sliderPanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-09-22
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -89,7 +89,7 @@ set(...
 if ad.control.axis.normalisation.enable
     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
         switch lower(ad.control.axis.normalisation.type)
-            case 'pk-pk'
+            case {'pk2pk','pk-pk'}
                 z = [0 1];
             case 'area'
                 z(1) = min(min(data/...
@@ -109,7 +109,7 @@ if ad.control.axis.normalisation.enable
         end
     else
         switch lower(ad.control.axis.normalisation.type)
-            case 'pk-pk'
+            case {'pk2pk','pk-pk'}
                 z = [0 1];
             case 'area'
                 z(1) = min(min(data/...
@@ -131,7 +131,6 @@ if ad.control.axis.normalisation.enable
 else
     z(1) = min(min(data));
     z(2) = max(max(data));
-    
 end
 
 set(...

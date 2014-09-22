@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui
 
 % Copyright (c) 2011-14, Till Biskup
-% 2013-07-26
+% 2014-09-22
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -16,9 +16,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % Reset colour of main GUI window status display
 mainGuiWindow = trEPRguiGetWindowHandle();
 if (mainGuiWindow)
-    gh = guidata(mainGuiWindow);
-    set(gh.status_panel_status_text,'String','OK');
-    set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
+    resetStatusDisplayInMainGUIWindow(mainGuiWindow);
 end
 
 % Make GUI effectively a singleton
@@ -48,6 +46,7 @@ hMainFigure = figure('Tag',mfilename,...
     'NumberTitle','off', ...
     'Menu','none','Toolbar','none',...
     'KeyPressFcn',@keyBindings,...
+    'WindowButtonDownFcn',@windowButtonDownFunction,...
     'CloseRequestFcn',@closeGUI);
 
 guiSize = get(hMainFigure,'Position');
@@ -77,7 +76,7 @@ guidata(hMainFigure,guihandles);
 % Apply configuration
 guiConfigApply(mfilename);
 
-% Set fomt size depending on OS (12 pt seems a bit huge with linux)
+% Set font size depending on OS (12 pt seems a bit huge with linux)
 if isunix && ~ismac
     set(textdisplay,'FontSize',10);
 end
@@ -198,8 +197,21 @@ function keyBindings(~,evt)
     end
 end
 
+    function windowButtonDownFunction(~,~)
+        resetStatusDisplayInMainGUIWindow(mainGuiWindow);
+    end
+
+end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+function resetStatusDisplayInMainGUIWindow(mainGuiWindow)
+
+gh = guidata(mainGuiWindow);
+set(gh.status_panel_status_text,'String','OK');
+set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
 
 end
