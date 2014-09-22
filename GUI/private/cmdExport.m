@@ -187,7 +187,7 @@ if ~isempty(opt)
     
     % Check for caption options
     captionidx = strncmpi('caption=',opt,7);
-    captionstr = opt{captionidx}(8:end);
+    captionstr = opt{captionidx}(9:end);
     % Remove respective entries from opt cell array
     opt(captionidx) = [];
     if ~isempty(captionstr)
