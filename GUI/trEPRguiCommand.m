@@ -22,7 +22,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-19
+% 2014-09-22
 
 status = 0;
 warnings = cell(0);
@@ -112,6 +112,7 @@ elseif exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
 else
     % For debug purposes.
     disp(cmd);
+    trEPRmsg(['Command "' cmd '" not understood.'],'warn')
     if ~isempty(opt)
         celldisp(opt);
     end
