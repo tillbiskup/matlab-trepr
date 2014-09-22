@@ -158,6 +158,9 @@ try
     
     % Set last save dir
     [ad.control.dirs.lastSave,~,~] = fileparts(ad.data{id}.file.name);
+    if isempty(ad.control.dirs.lastSave)
+        ad.control.dirs.lastSave = pwd;
+    end
     
     % Write appdata
     setappdata(mainWindow,'data',ad.data);

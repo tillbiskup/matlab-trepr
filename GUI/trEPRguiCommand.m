@@ -105,7 +105,7 @@ if find(strcmpi(cmdMatch(:,1),cmd))
 elseif exist(['cmd' upper(cmd(1)) lower(cmd(2:end))],'file')
     fun = str2func(['cmd' upper(cmd(1)) lower(cmd(2:end))]);
     [cmdStatus,cmdWarnings] = fun(mainWindow,opt);
-    if cmdStatus
+    if cmdStatus && ~isempty(cmdWarnings);
         warnings = [warnings cmdWarnings];
         status = -3;
     end
@@ -170,6 +170,8 @@ for optIdx = 1:length(opt)
         % indices.
         variables = regexp(opt{optIdx},'\$\w*\#?\d*','match');
         for variable = 1:length(variables)
+            % Set replacement string to default value
+            replacement = '';
             % Handle special case that additional index is provided with
             % variable
             if any(strfind(variables{variable},'#'))
@@ -181,7 +183,7 @@ for optIdx = 1:length(opt)
                 replacement = ...
                     ad.control.cmd.variables.(variables{variable}(2:end));
             else
-                switch opt{optIdx}(2:end)
+                switch variables{variable}(2:end)
                     case {'ndatasets','numberofdatasets'}
                         replacement = num2str(length(ad.data));
                     case 'current'
@@ -210,8 +212,8 @@ for optIdx = 1:length(opt)
                                 }.parameters.date.start,'yyyymmdd');
                         end
                     otherwise
-                        % DEBUG FOR NOW
-                        disp(opt{optIdx}(2:end));
+                        trEPRmsg(['Variable "' variables{variable} ...
+                            '" seems not to exist.'],'warning');
                 end
             end
             opt{optIdx} = strrep(opt{optIdx},...

@@ -20,7 +20,7 @@ function [status,warnings] = trEPRguiRunScript(script,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-26
+% 2014-09-22
 
 status = 0;
 warnings = cell(0);
@@ -65,7 +65,7 @@ commands = textFileRead(script);
 for k=1:length(commands)
     if ~strncmp(commands{k},'%',1)
         [cmdStat,cmdWarn] = trEPRguiCommand(commands{k});
-        if cmdStat
+        if cmdStat && ~isempty(cmdWarn)
             warnings{end+1} = cmdWarn; %#ok<AGROW>
         end
     end

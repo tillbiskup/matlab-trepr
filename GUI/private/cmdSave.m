@@ -85,7 +85,15 @@ end
 if isempty(opt)
     trEPRsaveDatasetInMainGUI(selected);
 else
-    trEPRsaveAsDatasetInMainGUI(selected,opt{1});
+    % Check for path in filename and if none exists, add default path
+    [path,name,ext] = fileparts(opt{1});
+    if isempty(path)
+        filename = fullfile(ad.control.dirs.lastSave,[name ext]);
+    else
+        filename = opt{1};
+    end
+    
+    trEPRsaveAsDatasetInMainGUI(selected,filename);
 end
 
 end
