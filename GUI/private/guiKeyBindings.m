@@ -7,7 +7,7 @@ function guiKeyBindings(src,evt)
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-10
+% 2014-09-22
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -23,6 +23,18 @@ try
     
     % Use "src" to distinguish between callers - may be helpful later on
     
+    panels = {...
+        'Load' ...
+        'Datasets' ...
+        'Slider' ...
+        'Measure' ...
+        'Display' ...
+        'Processing' ...
+        'Analysis' ...
+        'Internal' ...
+        'Configure' ...
+        };
+    
     if ~isempty(evt.Modifier)
         if (strcmpi(evt.Modifier{1},'command')) || ...
                 (strcmpi(evt.Modifier{1},'control'))
@@ -32,72 +44,8 @@ try
                     guiClose();
                     return;
                 % SWITCH PANEL: Ctrl/Cmd+1..9
-                case '1'
-                    status = switchMainPanel('Load');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '2'
-                    status = switchMainPanel('Datasets');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '3'
-                    status = switchMainPanel('Slider');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '4'
-                    status = switchMainPanel('Measure');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '5'
-                    status = switchMainPanel('Display');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '6'
-                    status = switchMainPanel('Processing');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '7'
-                    status = switchMainPanel('Analysis');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '8'
-                    status = switchMainPanel('Internal');
-                    if status
-                        % Something went wrong...
-                        trEPRmsg('Problems with switching panels.',...
-                            'error');
-                    end
-                    return;
-                case '9'
-                    status = switchMainPanel('Configure');
+                case {'1','2','3','4','5','6','7','8','9'}
+                    status = switchMainPanel(panels{str2double(evt.Key)});
                     if status
                         % Something went wrong...
                         trEPRmsg('Problems with switching panels.',...
@@ -123,6 +71,9 @@ try
                     return;
                 case 'o'
                     cmdLoad(mainWindow);
+                    return;
+                case 's'
+                    cmdSave(mainWindow,cell(0));
                     return;
             end
         end

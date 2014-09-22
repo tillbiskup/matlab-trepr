@@ -65,6 +65,9 @@ if isempty(ad.data)
 end
 
 if isempty(opt)
+    if isempty(active) || ~active
+        return;
+    end
     trEPRsaveDatasetInMainGUI(active);
     return;
 end
