@@ -71,14 +71,6 @@ div.footer p.lastchange {
 acronym {
 	border-bottom: dotted 1px #333;
 }
-code {
-	display: block;
-	padding: 1em;
-	background-color: #ffd;
-	border: 1px solid #ccc;
-	margin: 1.5em 1ex;
-	white-space:pre;
-}
 pre {
 	display: block;
 	padding: 1em;
@@ -86,7 +78,6 @@ pre {
 	border: 1px solid #ccc;
 	margin: 1.5em 0;
 	white-space:pre;
-	font-size:80%;
 }
 div.figure {
 	margin: 1em 0;
