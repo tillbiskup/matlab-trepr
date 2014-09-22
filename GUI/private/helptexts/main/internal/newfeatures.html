@@ -15,6 +15,42 @@
 		<p>
 			Basically, the complete toolbox got reimplemented for version 0.3, and the GUI rewritten with a complete new layout (and underlying code).
 		</p>
+		<h2>v.0.3.49</h2>
+		<ul>
+		    <li>New features</li>
+		    <ul>
+		    	<li></li>
+		    </ul>
+		    <li>CMD</li>
+		    <ul>
+		    	<li>CMD now understands multiple variables within one option.<br />(Changed parsing for variables)</li>
+		    	<li>Command <tt>export</tt> with new option <tt>caption</tt> allowing to control whether the figure caption GUI window gets displayed during export of figures.</li>
+			    <li>New command <tt>save</tt> for saving datasets in toolbox format.</li>
+			    <li>New command <tt>input</tt> for interactively ask user for values assigned to variables (mainly in context of scripting)</li>
+			    <li>New command <tt>env</tt> displaying all currently defined variables.</li>
+			    <li>New command <tt>clear</tt> for removing variables from the CMD workspace.</li>
+		    </ul>
+		    <li>GUI layout and usability</li>
+		    <ul>
+		        <li>&quot;Show/set directories window&quot; now includes script directory.</li>
+		    	<li>GUI status (OK/WW/EE) is reset to &quot;OK&quot; when status window gets focus (on click).</li>
+		    </ul>
+		    <li>Compatibility</li>
+		    <ul>
+			    <li><b>GUI appdata version 1.xx.</b></li>
+				<ul>
+			    	<li>...</li>
+			    </ul>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		        <li><tt>inputWindow</tt>: Function analog to Matlab&reg;'s <tt>inputdlg</tt>, but with easier control of display and larger fonts.</li>
+		    </ul>
+		    <li>Bug fixes</li>
+		    <ul>
+		    	<li>Fixed problems with pk2pk normalisation mode.</li>
+		    </ul>
+		</ul>
 		<h2>v.0.3.48</h2>
 		<ul>
 		    <li>New features</li>
@@ -558,7 +594,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-16
+			2014-09-22
 		</p>
 		</div>
 	</body>
