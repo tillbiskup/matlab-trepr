@@ -2,6 +2,11 @@
 html {
 	line-height:1.4em;
 }
+body {
+	margin: 0ex;
+	padding: 1.5ex;
+	font-family: sans-serif;
+}
 /* Define single elements */
 h1,h2,h3,h4,h5,h6 {
 	color:#333;
@@ -14,6 +19,8 @@ h1 {
 	}
 h2 {
 	font-size:140%;
+	background:#eee;
+	padding:4px 2px 2px 2px;
 	border-bottom:1px solid #ccc;
 	margin-top:1.5em;
 	}
@@ -57,6 +64,7 @@ a.fnmark {
 	min-height:100px;
 	}
 div.hurry h2 {
+	background:#ffd;
 	margin-top: 15px;
 }
 div.footer {
