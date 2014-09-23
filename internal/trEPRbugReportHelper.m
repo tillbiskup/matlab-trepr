@@ -10,8 +10,8 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    status    - number (0 = OK, -1 = failed)
 %    bugReport - cell array of strings containing the bug report
 
-% Copyright (c) 2011-13, Till Biskup
-% 2013-02-21
+% Copyright (c) 2011-14, Till Biskup
+% 2014-09-23
 
 % Set name and version of Toolbox (makes it easier to reuse this script
 % later on) 
@@ -55,7 +55,7 @@ if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
     if (isfield(ad,'control') ~= 0) && (isfield(ad.control,'status') ~= 0)
-        tbStatusMessages = ad.control.status;
+        tbStatusMessages = ad.control.status.messages;
     end
 else
     tbStatusMessages = {...

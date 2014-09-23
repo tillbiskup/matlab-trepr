@@ -4,10 +4,10 @@ function varargout = trEPRgui_statuswindow(varargin)
 %
 % Normally, this window is called from within the trEPRgui window.
 %
-% See also trEPRgui
+% See also trEPRgui, trEPRmsg
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-22
+% 2014-09-23
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -117,7 +117,7 @@ if (mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
     if (isfield(ad,'control') ~= 0) && (isfield(ad.control,'status') ~= 0)
-        statusstring = ad.control.status;
+        statusstring = ad.control.status.messages;
     end
 else
     statusstring = {...
@@ -210,8 +210,9 @@ end
 
 function resetStatusDisplayInMainGUIWindow(mainGuiWindow)
 
-gh = guidata(mainGuiWindow);
-set(gh.status_panel_status_text,'String','OK');
-set(gh.status_panel_status_text,'BackgroundColor',[.7 .9 .7]);
+ad = getappdata(mainGuiWindow);
+ad.control.status.code = 'OK';
+setappdata(mainGuiWindow,'control',ad.control);
+trEPRguiUpdate('mainWindow');
 
 end

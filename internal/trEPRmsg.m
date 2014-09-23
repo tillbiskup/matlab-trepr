@@ -24,7 +24,7 @@ function status = trEPRmsg(message,varargin)
 % get displayed on the Matlab(tm) command line.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-09-23
 
 if isempty(message)
     return;
@@ -128,21 +128,19 @@ if isfield(ad.control,'messages') && ~isempty(logLevel)
     % levels.
     if find(strcmpi(logLevels,ad.control.messages.debug.level)) >= ...
             find(strcmpi(logLevels,logLevel))
-        ad.control.status = [ ad.control.status message ];
+        ad.control.status.messages = [ ad.control.status.messages message ];
     end
 else
-    ad.control.status = [ ad.control.status message ];
+    ad.control.status.messages = [ ad.control.status.messages message ];
 end
 
 % Update main gui status lights if necessary
 if ~isempty(logLevel)
     switch lower(logLevel)
         case 'warning'
-            set(gh.status_panel_status_text,'String','WW');
-            set(gh.status_panel_status_text,'BackgroundColor',[.9 .9 .7]);
+            ad.control.status.code = 'WW';
         case 'error'
-            set(gh.status_panel_status_text,'String','EE');
-            set(gh.status_panel_status_text,'BackgroundColor',[.9 .7 .7]);
+            ad.control.status.code = 'EE';
     end
 end
 
@@ -150,7 +148,10 @@ end
 setappdata(mainWindow,'control',ad.control);
 
 % Update status window
-trEPRguiUpdateStatusWindow(ad.control.status);
+trEPRguiUpdateStatusWindow(ad.control.status.messages);
+
+% Update main GUI window
+trEPRguiUpdate('mainWindow');
 
 status = 0;
 
