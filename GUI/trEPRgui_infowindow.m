@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-16
+% 2014-09-23
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -7077,7 +7077,8 @@ function getCharacteristicsEntriesNumbers(dataset)
                 length(dataset.characteristics.(types{type}));
             if any(strcmpi(types{type},{'soi','poi','doi'})) && ...
                     numberOfEntries < 2 && ...
-                    isempty(dataset.characteristics.(types{type}).coordinates)
+                    isempty(dataset.characteristics.(types{type}...
+                    ).parameters.coordinates)
                 numberOfEntries = 0;
             elseif any(strcmpi(types{type},'voi')) && ...
                     numberOfEntries < 2 && ...

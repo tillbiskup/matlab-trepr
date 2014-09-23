@@ -225,6 +225,8 @@ try
     end
 
     uicontrol(caption);
+    
+    uiwait;
 catch exception
     trEPRexceptionHandling(exception);
 end
