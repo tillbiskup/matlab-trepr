@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-10
+% 2014-09-23
 
 status = 0;
 warnings = cell(0);
@@ -225,8 +225,9 @@ setappdata(mainWindow,'data',ad.data);
 setappdata(mainWindow,'origdata',ad.origdata);
 
 % Adding status line
-msgStr = sprintf('%i data set(s) successfully loaded:',length(data));
-trEPRmsg([msgStr fileNames],'info');
+if length(data)>1 plural='s';else plural='';end %#ok<SEPEX>
+msgStr = sprintf('%i dataset%s successfully loaded:',length(data),plural);
+trEPRmsg([{msgStr} fileNames],'info');
 clear msgStr;
 
 trEPRbusyWindow('stop','Trying to load spectra...<br /><b>done</b>.');

@@ -324,17 +324,17 @@ switch lower(opt{1})
         end
     case {'bgpositions','bg'}
         if length(opt) < 2
-            if ad.control.axis.BGpositions
-                ad.control.axis.BGpositions = 0;
+            if ad.control.axis.BGpositions.enable
+                ad.control.axis.BGpositions.enable = 0;
             else
-                ad.control.axis.BGpositions = 1;
+                ad.control.axis.BGpositions.enable = 1;
             end
         else
             switch lower(opt{2})
                 case 'on'
-                    ad.control.axis.BGpositions = 1;
+                    ad.control.axis.BGpositions.enable = 1;
                 case 'off'
-                    ad.control.axis.BGpositions = 0;
+                    ad.control.axis.BGpositions.enable = 0;
                 otherwise
                     status = -3;
                     warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
