@@ -31,7 +31,7 @@ function data = trEPRfilter_SavitzkyGolay(data,varargin)
 % See also: trEPRfilter_binomial, trEPRfilter_boxcar
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-28
+% 2014-09-23
 
 % Based on code written by Cleiton A. Nunes, UFLA,MG,Brazil
 
@@ -53,7 +53,7 @@ if nargin>=3
     order = varargin{2};
 end
 if nargin>=2
-    if isscalar(varargin{1})
+    if isnumeric(varargin{1}) && isscalar(varargin{1})
         width=varargin{1};
     elseif isstruct(varargin{1})
         parameters = varargin{1};

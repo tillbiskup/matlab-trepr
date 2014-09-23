@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-22
+% 2014-09-23
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -171,6 +171,21 @@ switch ad.control.axis.displayType
                 clims = [min(minmax(:,1)) max(minmax(:,2))];
             end
         end
+        % Apply filter if necessary
+        if (ad.data{active}.display.smoothing.data.x.parameters.width > 0)
+            filterfun = str2func(ad.data{active}.display.smoothing.data.x.filterfun);
+            for yidx = 1:size(data,1)
+                data(yidx,:) = filterfun(data(yidx,:),...
+                    ad.data{active}.display.smoothing.data.x.parameters);
+            end
+        end
+        if (ad.data{active}.display.smoothing.data.y.parameters.width > 0)
+            filterfun = str2func(ad.data{active}.display.smoothing.data.y.filterfun);
+            for xidx = 1:size(data,2)
+                data(:,xidx) = filterfun(data(:,xidx),...
+                    ad.data{active}.display.smoothing.data.y.parameters);
+            end
+        end
         % For very special cases where limits are identical
         % (example: user subtracted dataset from itself)
         if min(clims) == max(clims)
@@ -328,7 +343,7 @@ switch ad.control.axis.displayType
             % Apply filter if necessary
             if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
                 filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters.width);
+                y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters);
             end
             % Apply scaling if necessary
             if (ad.data{k}.display.scaling.data.x ~= 0)
@@ -425,7 +440,7 @@ switch ad.control.axis.displayType
                 % Apply filter if necessary
                 if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
                     filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                    y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters.width);
+                    y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters);
                 end
                 % Apply scaling if necessary
                 if (ad.data{k}.display.scaling.data.x ~= 0)

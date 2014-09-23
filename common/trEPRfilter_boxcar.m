@@ -27,12 +27,12 @@ function data = trEPRfilter_boxcar(data,varargin)
 % See also: trEPRfilter_binomial, trEPRfilter_SavitzkyGolay
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-28
+% 2014-09-23
 
 % Set default
 width = 2;
 
-if isscalar(varargin{1})
+if isnumeric(varargin{1}) && isscalar(varargin{1})
     width = varargin{1};
 elseif isstruct(varargin{1})
     parameters = varargin{1};
