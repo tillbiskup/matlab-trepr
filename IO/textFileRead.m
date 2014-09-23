@@ -10,36 +10,34 @@ function text = textFileRead(filename,varargin)
 %   text     - cell array
 %              contains all lines of the textfile
 %
+% See also: fileread
 
-% Copyright (c) 2011, Till Biskup
-% 2011-11-05
+% Copyright (c) 2011-14, Till Biskup
+% 2014-09-23
 
-% Parse input arguments using the inputParser functionality
-parser = inputParser;   % Create an instance of the inputParser class.
-parser.FunctionName = mfilename; % Function name included in error messages
-parser.KeepUnmatched = true; % Enable errors on unmatched arguments
-parser.StructExpand = true; % Enable passing arguments in a structure
-parser.addRequired('filename', @ischar);
-parser.addParamValue('LineNumbers',logical(false),@islogical);
-parser.parse(filename,varargin{:});
+text = cell(0);
 
-text = {};
-fid = fopen(filename);
-if fid < 0
-    return
+try
+    % Parse input arguments using the inputParser functionality
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Include function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('filename', @(x)ischar(x) || exist(x,'file'));
+    p.addParamValue('LineNumbers',logical(false),@islogical);
+    p.parse(filename,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
 end
 
-k=1;
-while 1
-    if feof(fid)
-        break
+text = regexp(fileread(filename),'\n','split');
+
+if p.Results.LineNumbers
+    lineNumbers = cellstr(num2str((1:length(text))'));
+    for line = 1:length(text)
+        text{line} = sprintf('%s: %s',lineNumbers{line},text{line});
     end
-    %tline = fgetl(fid);
-    if parser.Results.LineNumbers
-        text{k} = sprintf('%i: %s',k,fgetl(fid));
-    else
-        text{k} = fgetl(fid);
-    end
-    k=k+1;
 end
-fclose(fid);
+
+end

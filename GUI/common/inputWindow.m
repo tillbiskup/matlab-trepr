@@ -66,7 +66,7 @@ try
     p.addParamValue('html',false,@(x)islogical(x));
     p.parse(prompt,varargin{:});
 catch exception
-    disp(['(EE) ' exception.prompt]);
+    disp(['(EE) ' exception.message]);
     return;
 end
 
