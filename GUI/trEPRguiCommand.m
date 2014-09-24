@@ -22,7 +22,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-22
+% 2014-09-24
 
 status = 0;
 warnings = cell(0);
@@ -207,7 +207,7 @@ for optIdx = 1:length(opt)
                             replacement = ...
                                 datestr(ad.data{datasetIdx...
                                 }.parameters.date.start,'yyyymmdd');
-                        else
+                        elseif ad.control.data.active
                             replacement = ...
                                 datestr(ad.data{ad.control.data.active...
                                 }.parameters.date.start,'yyyymmdd');

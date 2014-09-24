@@ -22,7 +22,7 @@ function [status,warnings] = cmdAvg(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-12
+% 2014-09-24
 
 status = 0;
 warnings = cell(0);
@@ -55,6 +55,11 @@ ad = getappdata(handle);
 
 % For convenience and shorter lines
 active = ad.control.data.active;
+
+if isempty(ad.data)
+    warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
+    return;
+end
 
 % Create some structure for AVG parameters
 avg = struct();

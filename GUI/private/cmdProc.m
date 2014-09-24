@@ -22,7 +22,7 @@ function [status,warnings] = cmdProc(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-06-12
+% 2014-09-24
 
 status = 0;
 warnings = cell(0);
@@ -39,9 +39,9 @@ p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
-% % Get command name from mfilename
-% cmd = mfilename;
-% cmd = cmd(4:end);
+% Get command name from mfilename
+cmd = mfilename;
+cmd = cmd(4:end);
 
 % Is there the GUI requested?
 if (isempty(handle))
@@ -52,6 +52,11 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
+
+if isempty(ad.data)
+    warnings{end+1} = ['Command "' lower(cmd) '" needs datasets.'];
+    return;
+end
 
 if ~isempty(opt)
     numDataset = ad.control.data.active;
