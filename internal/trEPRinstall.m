@@ -9,8 +9,8 @@ function varargout = trEPRinstall()
 %               Empty if everything went fine, otherwise contains message.
 %
 
-% Copyright (c) 2012-13, Till Biskup
-% 2013-07-16
+% Copyright (c) 2012-14, Till Biskup
+% 2014-09-24
 
 status = 0;
 
@@ -135,6 +135,10 @@ end
 snapshotDir = trEPRparseDir(fullfile(confDir,'snapshots'));
 if ~exist(snapshotDir,'dir')
     mkdir(snapshotDir);
+end
+scriptDir = trEPRparseDir(fullfile(confDir,'scripts'));
+if ~exist(scriptDir,'dir')
+    mkdir(scriptDir);
 end
 
 fprintf('\nCongratulations! The trEPR Toolbox has been ')
