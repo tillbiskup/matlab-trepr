@@ -1,13 +1,13 @@
-function varargout = trEPRgui_scriptSelectWindow(varargin)
-% TREPRGUI_SCRIPTSELECTWINDOW Help window for the trEPR GUI.
+function varargout = trEPRgui_cmd_scriptSelectWindow(varargin)
+% TREPRGUI_CMD_SCRIPTSELECTWINDOW Help window for the trEPR GUI.
 %
 % This window provides the user with "online" help included within the GUI.
 % Besides that, it gives access to all the other sources of additional
 % help, such as the Matlab Help Browser and the toolbox website.
 %
 % Usage:
-%   trEPRgui_scriptSelectWindow
-%   trEPRgui_scriptSelectWindow(<parameter>,<value>,...)
+%   trEPRgui_cmd_scriptSelectWindow
+%   trEPRgui_cmd_scriptSelectWindow(<parameter>,<value>,...)
 %
 %
 % Optional parameters that can be set:
@@ -16,7 +16,7 @@ function varargout = trEPRgui_scriptSelectWindow(varargin)
 %            	position of the window relative to the screen.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-09-23
+% 2014-09-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -72,6 +72,9 @@ directoryPopupmenu = uicontrol('Tag','directories_popupmenu',...
     'Units','Pixels',...
     'Position',[10 guiSize(2)-30 240 20],...
     'String','',...
+    'TooltipString',['<html>Set current directory<br/>'...
+    '(Gives a hierarchical list of the current path<br/>'...
+    'with the current directory on top)</html>'],...
     'Callback', {@popupmenu_Callback,'dir'}...
     );
 
@@ -101,6 +104,33 @@ textdisplay = uicontrol('Tag','text_edit',...
     'FontName','Monospaced',...
     'String','');
 
+% Create checkbox
+closeonrun = uicontrol('Tag','closeonrun_checkbox',...
+    'Style','checkbox',...
+    'Parent',hMainFigure,...
+    'BackgroundColor',defaultBackground,...
+    'FontUnit','Pixel','Fontsize',12,...
+    'Units','Pixels',...
+    'Position',[260 15 250 20],...
+    'String',' Close window on executing script',...
+    'TooltipString',['<html>Determine whether this window should be '...
+    'closed automatically<br/>when executing the selected script ',...
+    'hitting the &quot;Execute&quot; button on the right.</html>'] ...
+    );
+ 
+% Create buttons
+uicontrol('Tag','edit_pushbutton',...
+    'Style','pushbutton',...
+	'Parent', hMainFigure, ...
+    'BackgroundColor',defaultBackground,...
+    'FontUnit','Pixel','Fontsize',12,...
+    'String','Edit',...
+    'TooltipString','Edit selected script in Matlab editor',...
+    'pos',[guiSize(1)-190 10 60 30],...
+    'Enable','on',...
+    'Callback',{@pushbutton_Callback,'edit'} ...
+    );
+
 uicontrol('Tag','execute_pushbutton',...
     'Style','pushbutton',...
 	'Parent', hMainFigure, ...
@@ -119,7 +149,7 @@ uicontrol('Tag','close_pushbutton',...
     'BackgroundColor',defaultBackground,...
     'FontUnit','Pixel','Fontsize',12,...
     'String','Close',...
-    'TooltipString','Close window',...
+    'TooltipString','Close window (not running any script)',...
     'pos',[guiSize(1)-70 10 60 30],...
     'Enable','on',...
     'Callback',{@closeGUI}...
@@ -135,6 +165,7 @@ try
     
     adMain = getappdata(mainGuiWindow);
     scriptDir = adMain.control.dirs.lastScript;
+    scriptFile = '';
     
     % Fill directory popupmenu
     set(directoryPopupmenu,'String',getDirectoryList(scriptDir));
@@ -218,8 +249,8 @@ function listbox_Callback(source,~,action)
             scriptDir = fullfile(scriptDir,value);
         elseif strcmpi(value(end-2:end),'cmd')
             % Load text file
-            scriptFileContent = textFileRead(fullfile(scriptDir,value));
-            set(textdisplay,'String',scriptFileContent);
+            scriptFile = fullfile(scriptDir,value);
+            set(textdisplay,'String',textFileRead(scriptFile));
             return;
         end
         
@@ -230,6 +261,7 @@ function listbox_Callback(source,~,action)
             'String',getFiles(scriptDir),...
             'Value',1);
         set(textdisplay,'String','');
+        scriptFile = '';
         
     catch exception
         trEPRexceptionHandling(exception);
@@ -242,7 +274,24 @@ function pushbutton_Callback(~,~,action)
             return;
         end
         switch action
-            case ''
+            case 'edit'
+                if isempty(scriptFile)
+                    return;
+                end
+                edit(scriptFile);
+            case 'execute'
+                if isempty(scriptFile)
+                    return;
+                end
+                [~,runScriptWarnings] = trEPRguiRunScript(scriptFile);
+                if ~isempty(runScriptWarnings)
+                    trEPRmsg(runScriptWarnings,'warning');
+                end
+                if get(closeonrun,'Value')
+                    closeGUI();
+                end
+            otherwise
+                trEPRoptionUnknown(action);
         end
     catch exception
         trEPRexceptionHandling(exception);
@@ -252,8 +301,8 @@ end
 function keypress_Callback(~,evt)
     try
         if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier key
-            % was pressed...
+            % In case "Character" is the empty string, i.e. only modifier
+            % key was pressed...
             return;
         end
         if ~isempty(evt.Modifier)
@@ -287,6 +336,8 @@ end
 
     function directories = getDirectoryList(directory)
         directories = fliplr(regexp(directory(2:end),filesep,'split'));
+        directories = directories(~cellfun('isempty', directories));
+        directories{end+1} = '/';
     end
 
 end
@@ -297,15 +348,19 @@ end
 
 function filesList = getFiles(baseDir)
 
-filesList = cell(0);
-
 files = dir(fullfile(baseDir,'*'));
+filesList = cell(length(files),1);
 for file = 1:length(files)
     if (files(file).isdir && ~strcmp(files(file).name,'.')) || ...
             (length(files(file).name)>4 && ...
             strcmpi(files(file).name(end-2:end),'cmd'))
-        filesList{end+1,1} = files(file).name; %#ok<AGROW>
+        filesList{file,1} = files(file).name;
     end
+end
+filesList = filesList(~cellfun('isempty', filesList));
+% Remove ".." from contents of "/"
+if strcmp(baseDir,'//')
+    filesList(strcmp(filesList,'..')) = [];
 end
 
 end
