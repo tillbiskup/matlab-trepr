@@ -23,7 +23,7 @@ function [status,warnings] = cmdRun(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-15
+% 2014-09-24
 
 status = 0;
 warnings = cell(0);
@@ -52,7 +52,8 @@ if (isempty(handle))
 end
 
 if isempty(opt)
-    [~,runScriptWarnings] = trEPRguiRunScript('');
+    trEPRgui_cmd_scriptSelectWindow();
+    return;
 else
     [~,runScriptWarnings] = trEPRguiRunScript(opt{1});
 end
