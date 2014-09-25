@@ -16,7 +16,7 @@ function varargout = trEPRgui_cmd_scriptSelectWindow(varargin)
 %            	position of the window relative to the screen.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-09-24
+% 2014-09-25
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -335,6 +335,7 @@ function closeGUI(~,~)
 end
 
     function directories = getDirectoryList(directory)
+        directory = trEPRparseDir(directory);
         directories = fliplr(regexp(directory(2:end),filesep,'split'));
         directories = directories(~cellfun('isempty', directories));
         directories{end+1} = '/';
