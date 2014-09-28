@@ -16,7 +16,7 @@ function status = trackPointer(varargin)
 %            0: successful
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-11
+% 2014-09-28
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -113,12 +113,20 @@ if pointerPosition(1) > axisCoordinates(1) && ...
     % and/or a zero line displayed
     if any(strcmp(ad.control.axis.displayType,{'1D along x','1D along y'}))
         if iscell(xdata) && length(xdata) > 1
-            xdata = xdata{length(xdata)-...
-                find(ad.control.data.visible==active)+1};
+            if ad.control.axis.onlyActive
+                xdata = xdata{2};
+            else
+                xdata = xdata{length(xdata)-...
+                    find(ad.control.data.visible==active)+1};
+            end
         end
         if iscell(ydata) && length(ydata) > 1
-            ydata = ydata{length(ydata)-...
-                find(ad.control.data.visible==active)+1};
+            if ad.control.axis.onlyActive
+                ydata = ydata{2};
+            else
+                ydata = ydata{length(ydata)-...
+                    find(ad.control.data.visible==active)+1};
+            end
         end
     end
     
