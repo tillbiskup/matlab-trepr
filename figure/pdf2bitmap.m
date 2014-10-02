@@ -10,7 +10,7 @@ function status = pdf2bitmap(pdfFile,varargin)
 % supported.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-13
+% 2014-09-23
 
 % Set status
 if nargout
@@ -28,6 +28,7 @@ if ispc
     return;
 end
 
+[pdfFilePath,pdfFileName,~] = fileparts(pdfFile);
 % Check whether PDF file exists
 if ~exist(pdfFile,'file')
     pdfFile = fullfile(pdfFilePath,[pdfFileName '.pdf']);
@@ -44,7 +45,10 @@ if ~imageMagickInstalled
     return;
 end
 
-convertCommand = fullfile(locateConvertTool,'convert');
+% Add path of convert tool to PATH variable of MATLAB shell
+setenv('PATH',[getenv('PATH') ':' locateConvertTool]);
+%convertCommand = fullfile(locateConvertTool,'convert');
+convertCommand = 'convert';
 
 convertOptions1 = '-density 600x600 -quality 90 -alpha remove';
 convertOptions2 = '-resize 680';

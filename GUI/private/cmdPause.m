@@ -1,9 +1,9 @@
-function [status,warnings] = cmdHelp(handle,opt,varargin)
-% CMDHELP Command line command of the trEPR GUI.
+function [status,warnings] = cmdPause(handle,opt,varargin)
+% cmdPause Command line command of the trEPR GUI.
 %
 % Usage:
-%   cmdHelp(handle,opt)
-%   [status,warnings] = cmdHelp(handle,opt)
+%   cmdPause(handle,opt)
+%   [status,warnings] = cmdPause(handle,opt)
 %
 %   handle  - handle
 %             Handle of the window the command should be performed for
@@ -14,15 +14,15 @@ function [status,warnings] = cmdHelp(handle,opt,varargin)
 %   status  - scalar
 %             Return value for the exit status:
 %              0: command successfully performed
-%             -1: GUI window found
+%             -1: no GUI window found
 %             -2: missing options
 %             -3: some other problems
 %
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-09-22
+% Copyright (c) 2014, Till Biskup
+% 2014-09-24
 
 status = 0;
 warnings = cell(0);
@@ -40,9 +40,9 @@ p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
-% % Get command name from mfilename
-% cmd = mfilename;
-% cmd = cmd(4:end);
+% Get command name from mfilename
+cmd = mfilename;
+cmd = lower(cmd(4:end));
 
 % Is there the GUI requested?
 if (isempty(handle))
@@ -51,20 +51,34 @@ if (isempty(handle))
     return;
 end
 
-if ~isempty(opt)
-    switch lower(opt{1})
-        case 'help'
-            trEPRgui_helpwindow();
-        case 'about'
-            trEPRgui_aboutwindow();
-        case 'modules'
-            trEPRgui_moduleswindow();
-        otherwise
-            trEPRgui_cmd_helpwindow('page',opt{1});
-    end
-else
-    trEPRgui_cmd_helpwindow('page','introduction');
+if isempty(opt)
+    warnings{end+1} = sprintf(...
+        'Command "%s": Not enough options. Use "help %s" to get some help.',cmd,cmd);
+    status = -2;
+    return;
+end
+
+% Check state of "pause" to restore it afterwards
+state = pause('query');
+if ~strcmpi(state,'on')
+    pause on;
+end
+
+% Check option
+delayTime = str2double(opt{1});
+
+if isnan(delayTime) || delayTime < 0
+    warnings{end+1} = sprintf(...
+        'Command "%s": Option "%s" not understood.',cmd,opt{1});
+    status = -3;
+    return;
+end
+
+pause(delayTime);
+
+% Restore "pause" state to restore it if necessary
+if ~strcmpi(state,'on');
+    pause off;
 end
 
 end
-

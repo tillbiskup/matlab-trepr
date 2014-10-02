@@ -22,7 +22,7 @@ function [status,warnings] = cmdGet(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-30
+% 2014-09-25
 
 status = 0;
 warnings = cell(0);
@@ -79,6 +79,6 @@ end
 
 function str = anything2string(thing) %#ok<INUSD>
 str = evalc('disp(thing)');
-str = str(1:end-2); % Manually remove newline character at end
+str = deblank(str);
 end
 

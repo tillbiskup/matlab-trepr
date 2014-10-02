@@ -10,11 +10,53 @@
     <body>
 		<h1>What's new in the trEPR toolbox?</h1>
 		<p class="intro">
-			A rather short list of new features for each version.
+			An increasingly detailed list of new features for each version.
 		</p>
 		<p>
-			Basically, the complete toolbox got reimplemented for version 0.3, and the GUI rewritten with a complete new layout (and underlying code).
+			Basically, the complete toolbox got reimplemented for version 0.3 (back in 2011), and the GUI rewritten with a complete new layout (and underlying code). Currently, besides adding new functionality, major reorganisation of the underlying code is taking place, aiming at a much more robust (and in certain aspects faster) code basis.
 		</p>
+		<h2>v.0.3.49</h2>
+		<ul>
+		    <li>New features</li>
+		    <ul>
+		    	<li>GUI for displaying (and running) scripts for the CMD.</li>
+		    </ul>
+		    <li>CMD</li>
+		    <ul>
+		    	<li>CMD now understands multiple variables within one option.<br />(Changed parsing of variables)</li>
+		    	<li>Command <tt>export</tt> with new option <tt>caption</tt> allowing to control whether the figure caption GUI window gets displayed during export of figures.</li>
+			    <li>New (EXPERIMENTAL) command <tt>pdf2bitmap</tt> for converting PDF figures into bitmap (PNG) files.<br />Relies on a working ImageMagick installation and is currently not available for the Windows platform.</li>
+			    <li>New command <tt>save</tt> for saving datasets in toolbox format.</li>
+			    <li>New command <tt>input</tt> for interactively ask user for values assigned to variables (mainly in context of scripting)</li>
+			    <li>New command <tt>env</tt> displaying all currently defined variables.</li>
+			    <li>New command <tt>clear</tt> for removing variables from the CMD workspace.</li>
+		    </ul>
+		    <li>GUI layout and usability</li>
+		    <ul>
+			    <li>New keyboard shortcut: <tt>Ctrl/Cmd+s</tt> for saving the currently active dataset (in toolbox format).</li>
+		    	<li>Unknown commands typed at the GUI CMD now issue a warning (visible in the status window).</li>
+		        <li>&quot;Show/set directories window&quot; now includes script directory.</li>
+		    	<li>GUI status (OK/WW/EE) is reset to &quot;OK&quot; when status window gets focus (on click).</li>
+		    </ul>
+		    <li>Compatibility</li>
+		    <ul>
+			    <li><b>GUI appdata version 1.13.</b></li>
+				<ul>
+			    	<li>Changed field &quot;<tt>control.status</tt>&quot; (cell &rarr; struct)</li>
+			    	<li>Added fields to &quot;<tt>control.panel</tt>&quot;</li>
+			    </ul>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		        <li>New directory <tt>~.trepr/scripts</tt> as default location for scripts.</li>
+		        <li><tt>inputWindow</tt>: Function analog to Matlab&reg;'s <tt>inputdlg</tt>, but with easier control of display and larger fonts.</li>
+		    </ul>
+		    <li>Bug fixes</li>
+		    <ul>
+		    	<li>Fixed error with characteristics when loading info window.</li>
+		    	<li>Fixed problems with pk2pk normalisation mode.</li>
+		    </ul>
+		</ul>
 		<h2>v.0.3.48</h2>
 		<ul>
 		    <li>New features</li>
@@ -558,7 +600,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-16
+			2014-09-24
 		</p>
 		</div>
 	</body>

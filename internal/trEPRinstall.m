@@ -9,8 +9,8 @@ function varargout = trEPRinstall()
 %               Empty if everything went fine, otherwise contains message.
 %
 
-% Copyright (c) 2012-13, Till Biskup
-% 2013-07-16
+% Copyright (c) 2012-14, Till Biskup
+% 2014-09-30
 
 status = 0;
 
@@ -129,12 +129,30 @@ if ~exist(confDir,'dir')
         fprintf('done.\n');
     catch exception
         status = exception.message;
-        fprintf('failed!\n');
+        fprintf('failed! Perhaps no write permission?\n');
     end
 end
 snapshotDir = trEPRparseDir(fullfile(confDir,'snapshots'));
 if ~exist(snapshotDir,'dir')
-    mkdir(snapshotDir);
+    try
+        fprintf('\nCreating directory for snapshots... ');
+        mkdir(snapshotDir);
+        fprintf('done.\n');
+    catch exception
+        status = exception.message;
+        fprintf('failed! Perhaps no write permission?\n');
+    end
+end
+scriptDir = trEPRparseDir(fullfile(confDir,'scripts'));
+if ~exist(scriptDir,'dir')
+    try
+        fprintf('\nCreating directory for CMD scripts... ');
+        mkdir(scriptDir);
+        fprintf('done.\n');
+    catch exception
+        status = exception.message;
+        fprintf('failed! Perhaps no write permission?\n');
+    end
 end
 
 fprintf('\nCongratulations! The trEPR Toolbox has been ')

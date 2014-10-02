@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-16
+% 2014-09-24
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -626,8 +626,9 @@ uicontrol('Tag','command_panel_execute_pushbutton',...
     'FontWeight','normal',...
     'String','E',...
     'TooltipString',sprintf('%s\n%s',...
-    'Execute script on the CMD','(Opens file selection dialogue box)'),...
-    'Callback',{@pushbutton_Callback,'executeScript'}...
+    'Execute script on the CMD',...
+    '(Opens GUI allowing to select the appropriate script)'),...
+    'Callback',{@pushbutton_Callback,'cmdExecuteScript'}...
     );
 uicontrol('Tag','command_panel_help_pushbutton',...
     'Style','pushbutton',...
@@ -1020,12 +1021,8 @@ function pushbutton_Callback(source,~,action)
             case 'previous'
                 cmdShow(mainWindow,{'prev'});
                 return;
-            case 'executescript'
-                [~,runScriptWarnings] = trEPRguiRunScript('');
-                if ~isempty(runScriptWarnings)
-                    trEPRmsg(runScriptWarnings,'warning');
-                end
-                return;
+            case 'cmdexecutescript'
+                trEPRgui_cmd_scriptSelectWindow();
             case 'cmdhelpwindow'
                 trEPRgui_cmd_helpwindow();
                 return;
@@ -1091,7 +1088,7 @@ function command_Callback(source,~)
         if isempty(trEPRguiGetWindowHandle)
             return;
         end
-        if status
+        if status && ~isempty(warning)
             trEPRmsg(warning,'warning');
         end
         set(source,'String','');

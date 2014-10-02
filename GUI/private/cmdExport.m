@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-08-14
+% 2014-09-19
 
 status = 0;
 warnings = cell(0);
@@ -157,6 +157,10 @@ fileTypes = cellstr(...
 fileType = fileTypes{...
     get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
 
+% Check whether to save caption
+% TODO: Replace with lookup in ad.control.panels.display.xxx
+caption = get(gh.display_panel_axesexport_includecaption_checkbox,'Value');
+
 % Handle additional options
 % Please note: These options of the internal function are a subset of the
 %              original options the command was called with.
@@ -181,9 +185,23 @@ if ~isempty(opt)
         fileType = typestr{1}(6:end);
     end
     
+    % Check for caption options
+    captionidx = strncmpi('caption=',opt,7);
+    captionstr = opt{captionidx}(9:end);
+    % Remove respective entries from opt cell array
+    opt(captionidx) = [];
+    if ~isempty(captionstr)
+        switch lower(captionstr)
+            case {'yes','y','true','1'}
+                caption = true;
+            case {'no','n','false','0'}
+                caption = false;
+        end
+    end
+    
     % Finally, take remaining options as file name
     if ~isempty(opt)
-        fileName = strtrim(sprintf('%s_',opt{:}));
+        fileName = strtrim(sprintf('%s',opt{:}));
     end
 end
 
@@ -246,7 +264,7 @@ if strcmpi(ad.control.axis.displayType,'2d plot') && ...
 end
 
 % Check whether to open caption GUI
-if get(gh.display_panel_axesexport_includecaption_checkbox,'Value')
+if caption
     trEPRgui_figureCaptionwindow(fileName);
 end
 
@@ -537,7 +555,7 @@ if ~isempty(opt)
     
     % Finally, take remaining options as file name
     if ~isempty(opt)
-        fileName = strtrim('%s_',opt{:});
+        fileName = strtrim('%s',opt{:});
     end
 end
 

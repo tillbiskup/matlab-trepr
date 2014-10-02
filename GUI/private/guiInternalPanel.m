@@ -7,7 +7,7 @@ function handle = guiInternalPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-08-14
+% 2014-09-24
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -282,10 +282,7 @@ function pushbutton_Callback(~,~,action)
             case 'cmdhistory'
                 trEPRgui_cmd_historywindow();
             case 'cmdrun'
-                [status,warnings] = trEPRguiRunScript('');
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
+                trEPRgui_cmd_scriptSelectWindow();
             case 'snapshotsave'
                 fileNameSuggested = fullfile(...
                     ad.control.dirs.lastSnapshot,[datestr(now,30) '.mat']);

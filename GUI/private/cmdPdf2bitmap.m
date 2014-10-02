@@ -1,9 +1,9 @@
-function [status,warnings] = cmdHelp(handle,opt,varargin)
-% CMDHELP Command line command of the trEPR GUI.
+function [status,warnings] = cmdPdf2bitmap(handle,opt,varargin)
+% CMDPDF2BITMAP Command line command of the trEPR GUI.
 %
 % Usage:
-%   cmdHelp(handle,opt)
-%   [status,warnings] = cmdHelp(handle,opt)
+%   cmdPdf2bitmap(handle,opt)
+%   [status,warnings] = cmdPdf2bitmap(handle,opt)
 %
 %   handle  - handle
 %             Handle of the window the command should be performed for
@@ -21,7 +21,7 @@ function [status,warnings] = cmdHelp(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
+% Copyright (c) 2014, Till Biskup
 % 2014-09-22
 
 status = 0;
@@ -40,9 +40,9 @@ p.parse(handle,opt,varargin{:});
 handle = p.Results.handle;
 opt = p.Results.opt;
 
-% % Get command name from mfilename
-% cmd = mfilename;
-% cmd = cmd(4:end);
+% Get command name from mfilename
+cmd = mfilename;
+cmd = cmd(4:end);
 
 % Is there the GUI requested?
 if (isempty(handle))
@@ -51,20 +51,13 @@ if (isempty(handle))
     return;
 end
 
-if ~isempty(opt)
-    switch lower(opt{1})
-        case 'help'
-            trEPRgui_helpwindow();
-        case 'about'
-            trEPRgui_aboutwindow();
-        case 'modules'
-            trEPRgui_moduleswindow();
-        otherwise
-            trEPRgui_cmd_helpwindow('page',opt{1});
-    end
-else
-    trEPRgui_cmd_helpwindow('page','introduction');
+% Get appdata from handle
+ad = getappdata(handle);
+
+if isempty(opt)
+    return;
 end
 
-end
+pdf2bitmap(opt{1});
 
+end

@@ -42,6 +42,8 @@
 		<dl>
 			<dt>current</dt>
 			<dd>Index of the currently active dataset.</dd>
+			<dt>date</dt>
+			<dd>Date the currently active dataset has been recorded.</dd>
 			<dt>label</dt>
 			<dd>Label of the currently active dataset.</dd>
 			<dd>If you append <tt>#&lt;index&gt;</tt>, the label of the dataset corresponding to <tt>index</tt> will be returned. For details, see below.</dd>
@@ -50,6 +52,8 @@
 			<dd>(The command is issued in the Matlab &quot;base&quot; workspace.)</dd>
 			<dt>ndatasets|numberofdatasets</dt>
 			<dd>Number of currently loaded datasets (sum of invisible and visible)</dd>
+			<dt>today</dt>
+			<dd>Current date.</dd>
 		</dl>
 		<h3>Special case: dataset-specific variables</h3>
 		<p>
@@ -59,14 +63,14 @@
 			But what if you want to refer to a label of a specific dataset? All you need to know is the internal index of the dataset, as (now) displayed in the listboxes of datasets. To get the label of, let's say, the second dataset (if there is such thing as a second dataset), just type <tt>$label#2</tt>. Here, it doesn't matter whether you prepend the index with zeros, <tt>$label#002</tt> will do the same for you.
 		</p>
 		<p>
-			Currently (version 0.3.39) this works only with <tt>label</tt>, but it will most probably be expanded as soon as there is some need for other variables as well.
+			Currently (version 0.3.49) this works only with <tt>label</tt> and <tt>date</tt>, but it will most probably be expanded as soon as there is some need for other variables as well.
 		</p>
 		<div class="footer">
 		<p class="copyright">
 			&copy; 2014, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-06-12
+			2014-09-22
 		</p>
 		</div>
 	</body>

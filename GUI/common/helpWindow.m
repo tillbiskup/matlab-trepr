@@ -199,7 +199,7 @@ function varargout = helpWindow(varargin)
 %
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-10
+% 2014-09-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -609,7 +609,7 @@ PWD = pwd;
 cd(baseDir);
 
 for topic = 1:length(topics)
-    if isdir(topics{topic})
+    if exist(fullfile(pwd,topics{topic}),'file') && isdir(topics{topic})
         pagesTree.(topics{topic}) = getPages(fullfile(pwd,topics{topic}));
     else
         pagesTree.(topics{topic}) = getPages(pwd);

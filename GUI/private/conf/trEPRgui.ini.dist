@@ -40,6 +40,7 @@ lastLoad = pwd
 lastSave = pwd
 lastFigSave = pwd
 lastExport = pwd
+lastScript = ~/.trepr/scripts
 lastSnapshot = ~/.trepr/snapshots
 
 % Configuration of the behaviour when saving data or figures

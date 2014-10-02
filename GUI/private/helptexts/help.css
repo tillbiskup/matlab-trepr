@@ -2,15 +2,25 @@
 html {
 	line-height:1.4em;
 }
+body {
+	margin: 0ex;
+	padding: 1.5ex;
+	font-family: sans-serif;
+}
 /* Define single elements */
+h1,h2,h3,h4,h5,h6 {
+	color:#333;
+}
 h1 {
 	font-size:160%;
 	background:#eee;
-	padding:5px 10px;
+	padding:45px 10px 15px 25px;
 	border-bottom:1px solid #ccc;
 	}
 h2 {
 	font-size:140%;
+	background:#eee;
+	padding:4px 2px 2px 2px;
 	border-bottom:1px solid #ccc;
 	margin-top:1.5em;
 	}
@@ -47,7 +57,16 @@ a.fnmark {
 	}
 .hurry {
 	background:#ffd;
+	background-image: url(watch.png);
+	background-position: 10px 15px;
+	background-repeat: no-repeat;
+        padding-left:70px;
+	min-height:100px;
 	}
+div.hurry h2 {
+	background:#ffd;
+	margin-top: 15px;
+}
 div.footer {
 	border-top:1px solid #ccc
 	padding-top:2em;
@@ -71,14 +90,6 @@ div.footer p.lastchange {
 acronym {
 	border-bottom: dotted 1px #333;
 }
-code {
-	display: block;
-	padding: 1em;
-	background-color: #ffd;
-	border: 1px solid #ccc;
-	margin: 1.5em 1ex;
-	white-space:pre;
-}
 pre {
 	display: block;
 	padding: 1em;
@@ -86,7 +97,6 @@ pre {
 	border: 1px solid #ccc;
 	margin: 1.5em 0;
 	white-space:pre;
-	font-size:80%;
 }
 div.figure {
 	margin: 1em 0;
