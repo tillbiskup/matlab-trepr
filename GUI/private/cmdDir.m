@@ -21,8 +21,8 @@ function [status,warnings] = cmdDir(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-04-07
+% Copyright (c) 2013-14, Till Biskup
+% 2014-10-05
 
 status = 0;
 warnings = cell(0);
@@ -100,6 +100,16 @@ switch lower(opt{1})
             opt{2} = trEPRparseDir(opt{2});
             if exist(opt{2},'dir')
                 ad.control.dirs.lastExport = opt{2};
+            end
+        end
+    case {'script','scriptdir'}
+        if size(opt) < 2
+            trEPRmsg(['Script dir: ' ad.control.dirs.lastScript],'info');
+            return;
+        else
+            opt{2} = trEPRparseDir(opt{2});
+            if exist(opt{2},'dir')
+                ad.control.dirs.lastScript = opt{2};
             end
         end
     case {'snapshot','snapshotdir'}
