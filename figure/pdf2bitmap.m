@@ -36,6 +36,8 @@ if ~exist(pdfFile,'file')
         disp(['File ' pdfFile ' seems not to exist.']);
         return;
     end
+else
+    [pdfFilePath,pdfFileName,~] = fileparts(pdfFile);
 end
 
 if ~imageMagickInstalled
