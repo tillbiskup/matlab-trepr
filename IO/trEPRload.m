@@ -32,8 +32,8 @@ function varargout = trEPRload(filename, varargin)
 %
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
-% Copyright (c) 2009-2013, Till Biskup
-% 2013-12-13
+% Copyright (c) 2009-2014, Till Biskup
+% 2014-10-08
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -297,8 +297,15 @@ end
 if exist('content','var') && p.Results.loadInfoFile ...
         && ~strcmpi(content.file.format,'xmlzip')
     % Try to load info file
-    [fpath,fname,~] = fileparts(filename);
-    infoFileName = fullfile(fpath,[fname '.info']);
+    if isdir(filename)
+        directoryListing = dir(fullfile(filename,'*.info'));
+        if ~isempty(directoryListing)
+            infoFileName = fullfile(filename,directoryListing(1).name);
+        end
+    else
+        [fpath,fname,~] = fileparts(filename);
+        infoFileName = fullfile(fpath,[fname '.info']);
+    end
     if exist(infoFileName,'file')
         [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
         if isempty(ifpwarnings)
