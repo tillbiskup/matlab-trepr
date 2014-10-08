@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-14
+% 2014-10-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2312,12 +2312,12 @@ function pushbutton_Callback(~,~,action)
             case 'dataExport'
                 [status,warnings] = cmdExport(mainWindow,{'1D'});
                 if status
-                    TAmsg(warnings,'warning');
+                    trEPRmsg(warnings,'warning');
                 end
             case 'axisExport'
                 [status,warnings] = cmdExport(mainWindow,{'axis'});
                 if status
-                    TAmsg(warnings,'warning');
+                    trEPRmsg(warnings,'warning');
                 end
             case 'setvoi'
                 cmdVoi(trEPRguiGetWindowHandle,cell(0));

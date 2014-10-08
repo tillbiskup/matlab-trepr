@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-19
+% 2014-10-08
 
 status = 0;
 warnings = cell(0);
@@ -230,7 +230,7 @@ end
 
 % set lastFigSave Dir in appdata
 if exist(pathName,'dir')
-    ad.control.dir.lastFigSave = pathName;
+    ad.control.dirs.lastFigSave = pathName;
 end
 setappdata(handle,'control',ad.control);
 
