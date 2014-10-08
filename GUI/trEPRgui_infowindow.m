@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-23
+% 2014-10-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -6593,16 +6593,20 @@ function updateParameterPanel()
         end
         
         % Account for "duration" field ("General")
-        if ~any(strfind(ad.data{active}.parameters.date.start,'x')) && ...
-                ~any(strfind(ad.data{active}.parameters.date.end,'x')) && ...
-                ~isempty(ad.data{active}.parameters.date.start) && ...
-                ~isempty(ad.data{active}.parameters.date.end)
-            set(gh.parameter_duration_edit,'String',datestr(...
+        % NOTE: Need to be defensive, as it relies on user input in info
+        %       file - and that might well be corrupted
+        try
+            duration = datestr(...
                 datenum(ad.data{active}.parameters.date.end,...
                 'yyyy-mm-dd HH:MM:SS') - ...
                 datenum(ad.data{active}.parameters.date.start,...
-                'yyyy-mm-dd HH:MM:SS'), 'HH:MM:SS'));
+                'yyyy-mm-dd HH:MM:SS'), 'HH:MM:SS');
+        catch durationException
+            trEPRmsg(['Problem calculating duration: ' ...
+                durationException.message],'warn');
+            duration = '00:00:00';
         end
+        set(gh.parameter_duration_edit,'String',duration);
     catch exception
         trEPRexceptionHandling(exception)
     end 
