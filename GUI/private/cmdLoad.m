@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-23
+% 2014-10-08
 
 status = 0;
 warnings = cell(0);
@@ -383,11 +383,14 @@ if exist('PathName','var') && exist(PathName,'file')
 end
 
 % Set lastLoadDir in appdata
-if exist(PathName,'dir')
+if exist(PathName,'dir')    
     ad.control.dirs.lastLoad = PathName;
 else
     if iscell(FileName)
         ad.control.dirs.lastLoad = FileName{1};
+    elseif ad.control.panels.load.fileTypes(fileType).loadDir
+        ad.control.dirs.lastLoad = ...
+            FileName(1:find(FileName==filesep,1,'last')-1);
     else
         ad.control.dirs.lastLoad = FileName;
     end

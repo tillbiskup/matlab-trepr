@@ -604,7 +604,7 @@ function [content,warnings] = combineFile(filename)
                     else
                         fn = sprintf('%s-%s.%s',firstFileName,lastFileName,lastExt(2:end));
                     end
-                    content.file.name = fullfile(path,fn);
+                    content.file.name = path; %fullfile(path,fn);
                     content.file.format = asciiFileFormats{k};
                 end
                 break;

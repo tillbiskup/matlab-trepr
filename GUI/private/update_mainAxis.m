@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-23
+% 2014-10-08
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -97,8 +97,8 @@ end
 % For shorter and easier to read code:
 active = ad.control.data.active;
 
-% Set units if only one visible dataset
-if length(ad.control.data.visible) == 1
+% Set units if only one visible dataset or only active visible
+if length(ad.control.data.visible) == 1 || ad.control.axis.onlyActive
     ad.control.axis.labels.x.unit = ad.data{active}.axes.x.unit;
     ad.control.axis.labels.y.unit = ad.data{active}.axes.y.unit;
     ad.control.axis.labels.z.unit = ad.data{active}.axes.z.unit;
