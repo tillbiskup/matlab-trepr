@@ -15,7 +15,7 @@ function status = guiConfigApply(guiname)
 % See also GUICONFIGLOAD, INIFILEREAD
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-10-08
 
 status = 0;
 
@@ -63,38 +63,21 @@ try
             end
             
             % Set load panel's settings
-            if isfield(ad.configuration.load,'combine')
-                set(gh.load_combine_checkbox,...
-                    'Value',ad.configuration.load.combine);
-            end
-            if isfield(ad.configuration.load,'loaddir')
-                set(gh.load_loadDir_checkbox,...
-                    'Value',ad.configuration.load.loaddir);
-            end
-            if isfield(ad.configuration.load,'infofile')
-                set(gh.load_loadInfoFile_checkbox,...
-                    'Value',ad.configuration.load.infofile);
-            end
-            if isfield(ad.configuration.load,'unitconversion')
-                set(gh.load_convertUnits_checkbox,...
-                    'Value',ad.configuration.load.unitconversion);
-            end
-            if isfield(ad.configuration.load,'POC')
-                set(gh.load_POC_checkbox,...
-                    'Value',ad.configuration.load.POC);
-            end
-            if isfield(ad.configuration.load,'BGC')
-                set(gh.load_BGC_checkbox,...
-                    'Value',ad.configuration.load.BGC);
-            end
-            if isfield(ad.configuration.load,'labels')
-                set(gh.load_determineAxisLabels_checkbox,...
-                    'Value',ad.configuration.load.labels);
-            end
-            if isfield(ad.configuration.load,'visible')
-                set(gh.load_visibleUponLoad_checkbox,...
-                    'Value',ad.configuration.load.visible);
-            end
+            fieldNames = {'combine','loaddir','infofile',...
+                'unitconversion','POC','BGC','labels','visible'};
+            % 2014-10-08: (Temporary) trick to compensate for inconsistent
+            %             field names in different config files...
+            % TODO: Rename configuration settings in trEPRgui.conf
+            fieldNames2 = {'combine','loadDir','loadInfoFile',...
+                'convertUnits','POC','BGC','determineAxisLabels',...
+                'visibleUponLoad'};
+            for fieldName = 1:length(fieldNames)
+                if isfield(ad.configuration.load,fieldNames{fieldName})
+                    set(gh.(['load_' fieldNames2{fieldName} '_checkbox']),...
+                        'Value',...
+                        ad.configuration.load.(fieldNames{fieldName}));
+                end
+            end                
             if isfield(ad.configuration.load,'format')
                 % Get value from load_filetype_popupmenu
                 fileTypes = ...

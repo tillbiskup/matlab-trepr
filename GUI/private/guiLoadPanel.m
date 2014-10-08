@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-15
+% 2014-10-08
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -220,6 +220,7 @@ if ~isempty(fileTypes)
         end
     end
     setappdata(mainWindow,'control',ad.control);
+    update_loadPanel();
 end
 
 % Set fileTypes popupmenu
