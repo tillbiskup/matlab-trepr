@@ -13,11 +13,11 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-24
+% 2014-10-09
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
-if (singleton)
+if ishandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;

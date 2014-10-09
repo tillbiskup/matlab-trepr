@@ -4,7 +4,7 @@ function trEPRgui_bugreportwindow(varargin)
 % proper bug report.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-10
+% 2014-10-09
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -27,7 +27,7 @@ end
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle(mfilename);
-if (singleton)
+if ishandle(singleton)
     figure(singleton);
     return;
 end

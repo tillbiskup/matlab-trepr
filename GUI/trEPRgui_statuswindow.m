@@ -7,7 +7,7 @@ function varargout = trEPRgui_statuswindow(varargin)
 % See also trEPRgui, trEPRmsg
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-23
+% 2014-10-09
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -15,13 +15,13 @@ function varargout = trEPRgui_statuswindow(varargin)
 
 % Reset colour of main GUI window status display
 mainGuiWindow = trEPRguiGetWindowHandle();
-if (mainGuiWindow)
+if ishandle(mainGuiWindow)
     resetStatusDisplayInMainGUIWindow(mainGuiWindow);
 end
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle(mfilename);
-if (singleton)
+if ishandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;
@@ -113,7 +113,7 @@ if (nargout == 1)
 end
 
 % Set string
-if (mainGuiWindow)
+if ishandle(mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
     if (isfield(ad,'control') ~= 0) && (isfield(ad.control,'status') ~= 0)

@@ -7,7 +7,7 @@ function status = update_processingPanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-10-09
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -21,14 +21,16 @@ gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
 
 if isempty(ad.control.data.visible)
-    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
+    set(findobj(allchild(gh.processing_panel),'-not','type','uipanel',...
+        '-not','type','uibuttongroup'),...
         'Enable','Inactive');
     return;
 end
 
 active = ad.control.data.active;
 
-set(findobj(allchild(gh.processing_panel),'-not','type','uipanel'),...
+set(findobj(allchild(gh.processing_panel),'-not','type','uipanel',...
+        '-not','type','uibuttongroup'),...
     'Enable','On');
 % Disable Savitzky-Golay-specific fields if not needed
 smoothingTypes = cellstr(...
