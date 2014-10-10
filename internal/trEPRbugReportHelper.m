@@ -11,7 +11,7 @@ function [status,bugReport] = trEPRbugReportHelper(exception)
 %    bugReport - cell array of strings containing the bug report
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-09-23
+% 2014-10-10
 
 % Set name and version of Toolbox (makes it easier to reuse this script
 % later on) 
@@ -51,7 +51,7 @@ msgString = getReport(exception, 'extended', 'hyperlinks', 'off');
 
 % Try to get status message from toolbox GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
-if (mainGuiWindow)
+if ishandle(mainGuiWindow)
     ad = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
     if (isfield(ad,'control') ~= 0) && (isfield(ad.control,'status') ~= 0)

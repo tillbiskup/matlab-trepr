@@ -7,7 +7,7 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-22
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -15,7 +15,7 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     if nargout
         varargout{1} = singleton;

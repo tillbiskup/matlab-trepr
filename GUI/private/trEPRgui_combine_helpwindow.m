@@ -4,7 +4,7 @@ function varargout = trEPRgui_combine_helpwindow(varargin)
 %          to the help command. 
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -12,7 +12,7 @@ function varargout = trEPRgui_combine_helpwindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     return;
 end

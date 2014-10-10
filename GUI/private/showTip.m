@@ -9,11 +9,11 @@ function varargout = showTip(varargin)
 % See also msgbox
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-08-16
+% 2014-10-10
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag','showTip');
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     varargout{1} = get(hShowCheckbox,'Value');
     return;

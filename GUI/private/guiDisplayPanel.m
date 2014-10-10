@@ -8,7 +8,7 @@ function handle = guiDisplayPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-08
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2324,7 +2324,7 @@ function pushbutton_Callback(~,~,action)
             case 'show3D'
                 % Make 3D representation window effectively a singleton
                 singleton = findobj('Tag','trEPRgui_3Drepresentation');
-                if (singleton)
+                if ishghandle(singleton)
                     figure(singleton);
                     return;
                 end

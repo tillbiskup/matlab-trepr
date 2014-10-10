@@ -4,7 +4,7 @@ function varargout = trEPRgui_moduleswindow()
 % homepage.
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-07-26
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -12,7 +12,7 @@ function varargout = trEPRgui_moduleswindow()
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     varargout{1} = figure(singleton);
     return;
 end

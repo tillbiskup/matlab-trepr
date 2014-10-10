@@ -199,7 +199,7 @@ function varargout = helpWindow(varargin)
 %
 
 % Copyright (c) 2014, Till Biskup
-% 2014-09-07
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -225,7 +225,7 @@ end
 
 % Make GUI effectively a singleton
 singleton = findobj('Type','figure','Tag',p.Results.tag);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     return;
 end

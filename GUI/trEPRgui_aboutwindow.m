@@ -3,7 +3,7 @@ function varargout = trEPRgui_aboutwindow()
 % including links to the toolbox homepage and a list of contributors.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-10
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -11,7 +11,7 @@ function varargout = trEPRgui_aboutwindow()
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     varargout{1} = figure(singleton);
     return;
 end

@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-08
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -30,7 +30,7 @@ function varargout = trEPRgui_infowindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle(mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;

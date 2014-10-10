@@ -8,7 +8,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -16,7 +16,7 @@ function varargout = trEPRgui_combinewindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle('trEPRgui_combinewindow');
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;

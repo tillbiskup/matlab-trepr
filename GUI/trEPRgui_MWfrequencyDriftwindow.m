@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-08-14
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -16,7 +16,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;

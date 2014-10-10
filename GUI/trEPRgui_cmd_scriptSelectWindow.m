@@ -16,7 +16,7 @@ function varargout = trEPRgui_cmd_scriptSelectWindow(varargin)
 %            	position of the window relative to the screen.
 
 % Copyright (c) 2014, Till Biskup
-% 2014-09-25
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -43,7 +43,7 @@ end
 
 % Make GUI effectively a singleton
 singleton = findobj('Type','figure','Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     return;
 end

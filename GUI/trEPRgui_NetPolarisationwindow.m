@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-08-10
+% 2014-10-10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -15,7 +15,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 
 % Make GUI effectively a singleton
 singleton = findobj('Tag',mfilename);
-if (singleton)
+if ishghandle(singleton)
     figure(singleton);
     varargout{1} = singleton;
     return;
