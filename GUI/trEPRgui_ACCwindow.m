@@ -1102,7 +1102,7 @@ trEPRmsg('ACC GUI window opened','debug');
 
 % Load data from Main GUI
 mainGuiWindow = trEPRguiGetWindowHandle();
-if (mainGuiWindow)
+if ishghandle(mainGuiWindow)
     admain = getappdata(mainGuiWindow);
     % Check for availability of necessary fields in appdata
     if (isfield(admain,'data') ~= 0)

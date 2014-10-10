@@ -351,7 +351,7 @@ function saveCaption()
         gh = guihandles(hMainFigure);
         % Get appdata of main GUI
         mainGuiWindow = trEPRguiGetWindowHandle();
-        if (mainGuiWindow)
+        if ishghandle(mainGuiWindow)
             admain = getappdata(mainGuiWindow);
             sysinfo = admain.control.system;
         else
