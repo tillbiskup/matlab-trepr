@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-08
+% 2014-10-13
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -722,7 +722,8 @@ switch ad.control.axis.displayType
             % WARNING: Quick and dirty fix to display calculated data along
             %          with measured data. Needs to be rewritten soon!
             % TB 2013/11/28
-            if ad.control.axis.sim && isfield(ad.data{k},'calculated')
+            if ad.control.axis.sim && isfield(ad.data{k},'calculated') && ...
+                    ~isempty(ad.data{k}.calculated)
                 plot(...
                     mainAxes,...
                     y,...
@@ -851,7 +852,8 @@ switch ad.control.axis.displayType
                 % WARNING: Quick and dirty fix to display calculated data along
                 %          with measured data. Needs to be rewritten soon!
                 % TB 2013/11/28
-                if ad.control.axis.sim && isfield(ad.data{k},'calculated')
+                if ad.control.axis.sim && isfield(ad.data{k},'calculated') ...
+                        && ~isempty(ad.data{k}.calculated)
                     plot(...
                         mainAxes,...
                         y,...
