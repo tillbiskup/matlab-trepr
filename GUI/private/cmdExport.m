@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-10-08
+% 2014-10-13
 
 status = 0;
 warnings = cell(0);
@@ -434,6 +434,9 @@ if multipleFiles
             get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
         export1Dparameters.stdev.include = ...
             get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
+        export1Dparameters.calculated.include = ...
+            get(gh.analysis_panel_dataexport1D_includesimulation_checkbox,...
+            'Value');
         export1Dparameters.file.type = fileType;
         export1Dparameters.file.overwrite = 1;
         
@@ -503,6 +506,9 @@ else
         get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
     export1Dparameters.stdev.include = ...
         get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
+    export1Dparameters.calculated.include = ...
+        get(gh.analysis_panel_dataexport1D_includesimulation_checkbox,...
+        'Value');
     export1Dparameters.file.type = fileType;
     export1Dparameters.file.overwrite = 1;
     

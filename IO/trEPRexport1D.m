@@ -21,8 +21,8 @@
 %              Otherwise it contains an error description
 %
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-04-22
+% Copyright (c) 2011-14, Till Biskup
+% 2014-10-13
 
 function status = trEPRexport1D(data,fileName,parameters)
 
@@ -66,6 +66,10 @@ try
     if ~isfield(parameters,'stdev') ...
             || ~isfield(parameters.stdev,'include')
         parameters.stdev.include = 0;
+    end
+    if ~isfield(parameters,'calculated') ...
+            || ~isfield(parameters.calculated,'include')
+        parameters.calculated.include = 0;
     end
     if ~isfield(parameters,'file') || ~isfield(parameters.file,'type')
         parameters.file.type = 'ASCII';
@@ -205,10 +209,24 @@ try
                 fprintf(fid,'%s\n',header{k});
             end
             if parameters.axis.include && parameters.stdev.include && ...
+                    isfield(data,'avg') && isfield(data.avg,'stdev') && ...
+                    parameters.calculated.include && ~isempty(data.calculated)
+                for l=1:length(crosssection)
+                    fprintf(fid,'%20.12f %20.12f %20.12f %20.12f\n',...
+                        axis(l),crosssection(l),data.avg.stdev(l),...
+                        data.calculated(l));
+                end
+            elseif parameters.axis.include && parameters.stdev.include && ...
                     isfield(data,'avg') && isfield(data.avg,'stdev')
                 for l=1:length(crosssection)
                     fprintf(fid,'%20.12f %20.12f %20.12f\n',axis(l),...
                         crosssection(l),data.avg.stdev(l));
+                end
+            elseif parameters.axis.include && parameters.calculated.include && ...
+                    ~isempty(data.calculated)
+                for l=1:length(crosssection)
+                    fprintf(fid,'%20.12f %20.12f %20.12f\n',axis(l),...
+                        crosssection(l),data.calculated(l));
                 end
             elseif parameters.axis.include
                 for l=1:length(crosssection)
@@ -219,6 +237,11 @@ try
                 for l=1:length(crosssection)
                     fprintf(fid,'%20.12f %20.12f\n',...
                         crosssection(l),data.avg.stdev(l));
+                end
+            elseif parameters.calculated.include && ~isempty(data.calculated)
+                for l=1:length(crosssection)
+                    fprintf(fid,'%20.12f %20.12f\n',...
+                        crosssection(l),data.calculated(l));
                 end
             else
                 for l=1:length(crosssection)
