@@ -10,7 +10,7 @@ function varargout = trEPRinstall()
 %
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-09-30
+% 2014-10-14
 
 status = 0;
 
@@ -177,7 +177,7 @@ end
 function directories = getToolboxPaths(path)
 % GETTOOLBOXPATHS Internal function returning all subdirectories of the
 % current toolbox installation.
-directories = cell(0);
+directories = {path};
 traverse(path);
     function traverse(directory)
         list = dir(directory);

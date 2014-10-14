@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2014, Till Biskup
-% 2014-10-08
+% 2014-10-14
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -85,14 +85,16 @@ if iscell(filename)
         if p.Results.combine
             [~, name, ext] = fileparts(filename{1});
             name = cleanFileName([name ext]);
-            assignin('base',name,content);
+            assignVariableInWorkspace(name,content);
+            %assignin('base',name,content);
             assignin('base','warnings',warnings);
         else
             for k=1:length(content)
                 [~, name, ext] = fileparts(...
                     content{k}.file.name);
                 name = cleanFileName([name ext]);
-                assignin('base',name,content{k});
+                assignVariableInWorkspace(name,content{k});
+                %assignin('base',name,content{k});
                 assignin('base','warnings',warnings);
             end
         end
@@ -157,14 +159,16 @@ elseif isstruct(filename) && isfield(filename,'name')
         if p.Results.combine
             [~, name, ext] = fileparts(filenames{1});
             name = cleanFileName([name ext]);
-            assignin('base',name,content);
+            assignVariableInWorkspace(name,content);
+            %assignin('base',name,content);
             assignin('base','warnings',warnings);
         else
             for k=1:length(content)
                 [~, name, ext] = fileparts(...
                     content{k}.file.name);
                 name = cleanFileName([name ext]);
-                assignin('base',name,content{k});
+                assignVariableInWorkspace(name,content{k});
+                %assignin('base',name,content{k});
                 assignin('base','warnings',warnings);
             end
         end
@@ -199,7 +203,8 @@ else    % -> if iscell(filename)
                     % the file
                     [~, name, ext] = fileparts(filename);
                     name = cleanFileName([name ext]);
-                    assignin('base',name,content);
+                    assignVariableInWorkspace(name,content);
+                    %assignin('base',name,content);
                     assignin('base','warnings',warnings);
                 else
                     varargout{1} = content;
@@ -217,7 +222,8 @@ else    % -> if iscell(filename)
                         % the file
                         [~, name, ext] = fileparts(filename);
                         name = cleanFileName([name ext]);
-                        assignin('base',name,content);
+                        assignVariableInWorkspace(name,content);
+                        %assignin('base',name,content);
                         assignin('base','warnings',warnings);
                     else
                         varargout{1} = content;
@@ -237,7 +243,8 @@ else    % -> if iscell(filename)
                 % file
                 [~, name, ext] = fileparts(filename);
                 name = cleanFileName([name ext]);
-                assignin('base',name,content);
+                assignVariableInWorkspace(name,content);
+                %assignin('base',name,content);
                 assignin('base','warnings',warnings);
             else
                 varargout{1} = content;
@@ -255,12 +262,14 @@ else    % -> if iscell(filename)
                         [~, name, ext] = fileparts(...
                             content{k}.file.name);
                         name = cleanFileName([name ext]);
-                        assignin('base',name,content{k});
+                        assignVariableInWorkspace(name,content{k});
+                        %assignin('base',name,content{k});
                     end
                 else
                     [~, name, ext] = fileparts(filename);
                     name = cleanFileName([name ext]);
-                    assignin('base',name,content);
+                    %assignin('base',name,content);
+                    assignVariableInWorkspace(name,content);
                     assignin('base','warnings',warnings);
                 end
             else
@@ -632,4 +641,25 @@ function cleanName = cleanFileName(filename)
     if ~isletter(cleanName(1))
         cleanName = sprintf('a%s',cleanName);
     end
+end
+
+% --- Assign loaded data to variable in workspace
+function assignVariableInWorkspace(variableName,variableContent)
+
+evalString = sprintf('who(''%s'')',variableName);
+
+if ~isempty(evalin('base',evalString))
+    promptString = sprintf('%s "%s" %s\n%s\n',...
+        'A variable named',variableName,...
+        'exists already in your workspace.',...
+        'Please provide an alternative name (hit Enter to overwrite):');
+    answer = input(promptString,'s');
+    
+    if ~isempty(answer)
+        variableName = cleanFileName(variableName);
+    end
+end
+
+assignin('base',variableName,variableContent);
+
 end
