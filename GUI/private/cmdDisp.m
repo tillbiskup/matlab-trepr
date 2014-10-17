@@ -57,6 +57,9 @@ if isempty(opt)
     return;
 end
 
+% Set some switches
+callAxesResize = false;
+
 % Get appdata from handle
 ad = getappdata(handle);
 % Get handles from handle
@@ -342,6 +345,54 @@ switch lower(opt{1})
                     return;
             end
         end
+    case {'residuals','res'}
+        if length(opt) < 2
+            if ad.control.axis.residualsAxes.enable
+                ad.control.axis.residualsAxes.enable = 0;
+            else
+                ad.control.axis.residualsAxes.enable = 1;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.residualsAxes.enable = 1;
+                case 'off'
+                    ad.control.axis.residualsAxes.enable = 0;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
+        callAxesResize = true;
+    case {'projection','proj'}
+        if length(opt) < 2
+            if ad.control.axis.projectionAxes.enable
+                ad.control.axis.projectionAxes.enable = 0;
+            else
+                ad.control.axis.projectionAxes.enable = 1;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.projectionAxes.enable = 1;
+                case 'off'
+                    ad.control.axis.projectionAxes.enable = 0;
+                case 'sum'
+                    ad.control.axis.projectionAxes.enable = 1;
+                    ad.control.axis.projectionAxes.mode = 'sum';
+                case 'slice'
+                    ad.control.axis.projectionAxes.enable = 1;
+                    ad.control.axis.projectionAxes.mode = 'slice';
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
+        callAxesResize = true;
     case {'colormap','colourmap'}
         if length(opt) < 2
             status = -3;
@@ -372,6 +423,10 @@ end
 setappdata(handle,'control',ad.control);
 update_displayPanel();
 update_mainAxis();
+
+if callAxesResize
+    axesResize();
+end
 
 end
 

@@ -251,6 +251,9 @@ switch ad.control.axis.displayType
                 set(mainAxes,'YLim',ad.control.axis.zoom.y);
             end
         end
+        if ad.control.axis.projectionAxes.enable
+            plotProjection();
+        end
     case '1D along x' % time profile
         % Enable sliders
         sliderHandles = findobj(...
@@ -1237,6 +1240,81 @@ minmax = zeros(length(ad.control.data.visible),2);
 for idx = 1:length(ad.control.data.visible)
     minmax(idx,1) = min(min(ad.data{ad.control.data.visible(idx)}.data));
     minmax(idx,2) = max(max(ad.data{ad.control.data.visible(idx)}.data));
+end
+
+end
+
+
+function plotProjection()
+% Get appdata from main GUI
+mainWindow = trEPRguiGetWindowHandle();
+ad = getappdata(mainWindow);
+gh = ad.UsedByGUIData_m;
+
+active = ad.control.data.active;
+
+switch lower(ad.control.axis.projectionAxes.mode)
+    case 'slice'
+        plot(gh.horizontalAxis,...
+            ad.data{active}.axes.x.values,...
+            ad.data{active}.data(ad.data{active}.display.position.y,:),...
+            'k-');
+        plot(gh.verticalAxis,...
+            ad.data{active}.data(:,ad.data{active}.display.position.x),...
+            ad.data{active}.axes.y.values,...
+            'k-');
+    case 'sum'
+        plot(gh.horizontalAxis,...
+            ad.data{active}.axes.x.values,sum(ad.data{active}.data,1));
+        plot(gh.verticalAxis,...
+            sum(ad.data{active}.data,2),ad.data{active}.axes.y.values);
+    otherwise
+        trEPRoptionUnknown(option,'projection axis mode');
+end
+
+set(gh.horizontalAxis,'XLim',get(gh.mainAxis,'XLim'));
+set(gh.verticalAxis,'YLim',get(gh.mainAxis,'YLim'));
+set(gh.mainAxis,'XTickLabel',{''});
+set(gh.mainAxis,'YTickLabel',{''});
+set(gh.verticalAxis,'XTickLabel',{''});
+set(gh.horizontalAxis,'YTickLabel',{''});
+set(gh.horizontalAxis,'Visible','on');
+set(gh.verticalAxis,'Visible','on');
+xlabel(gh.horizontalAxis,sprintf('{\\it %s} / %s',...
+    ad.control.axis.labels.x.measure,...
+    ad.control.axis.labels.x.unit));
+ylabel(gh.verticalAxis,sprintf('{\\it %s} / %s',...
+    ad.control.axis.labels.y.measure,...
+    ad.control.axis.labels.y.unit));
+xlabel(gh.mainAxis,'');
+ylabel(gh.mainAxis,'');
+
+if (ad.control.axis.grid.zero.visible)
+    line(...
+        [0 0],...
+        [ad.control.axis.limits.y.min ad.control.axis.limits.y.max],...
+        'Color',ad.control.axis.grid.zero.color,...
+        'LineWidth',ad.control.axis.grid.zero.width,...
+        'LineStyle',ad.control.axis.grid.zero.style,...
+        'Parent',gh.verticalAxis);
+    line(...
+        [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
+        [0 0],...
+        'Color',ad.control.axis.grid.zero.color,...
+        'LineWidth',ad.control.axis.grid.zero.width,...
+        'LineStyle',ad.control.axis.grid.zero.style,...
+        'Parent',gh.horizontalAxis);
+end
+
+set([gh.horizontalAxis,gh.verticalAxis],'XGrid',ad.control.axis.grid.x);
+set([gh.horizontalAxis,gh.verticalAxis],'YGrid',ad.control.axis.grid.y);
+if (isequal(ad.control.axis.grid.x,'on'))
+    set([gh.horizontalAxis,gh.verticalAxis],...
+        'XMinorGrid',ad.control.axis.grid.minor);
+end
+if (isequal(ad.control.axis.grid.y,'on'))
+    set([gh.horizontalAxis,gh.verticalAxis],...
+        'YMinorGrid',ad.control.axis.grid.minor);
 end
 
 end
