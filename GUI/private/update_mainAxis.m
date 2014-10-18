@@ -1267,7 +1267,7 @@ switch lower(ad.control.axis.projectionAxes.mode)
         plot(gh.horizontalAxis,...
             ad.data{active}.axes.x.values,sum(ad.data{active}.data,1));
         plot(gh.verticalAxis,...
-            sum(ad.data{active}.data,2),ad.data{active}.axes.y.values);
+            -sum(ad.data{active}.data,2),ad.data{active}.axes.y.values);
     otherwise
         trEPRoptionUnknown(option,'projection axis mode');
 end
