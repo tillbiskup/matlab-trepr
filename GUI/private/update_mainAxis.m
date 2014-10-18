@@ -27,10 +27,10 @@ mainAxes = gh.mainAxis;
 set(mainWindow,'CurrentAxes',gh.mainAxis);
 
 % Set defaults
-showTitle = true;
-showYTicks = true;
-showYAxis = true;
-showBox = true;
+showTitle = ad.control.axis.title;
+showYTicks = ad.control.axis.yticks;
+showYAxis = ad.control.axis.yaxis;
+showBox = ad.control.axis.box;
 
 % Check for additional input parameters
 if (nargin > 0)
@@ -102,6 +102,7 @@ if length(ad.control.data.visible) == 1 || ad.control.axis.onlyActive
     ad.control.axis.labels.x.unit = ad.data{active}.axes.x.unit;
     ad.control.axis.labels.y.unit = ad.data{active}.axes.y.unit;
     ad.control.axis.labels.z.unit = ad.data{active}.axes.z.unit;
+    setappdata(mainWindow,'control',ad.control);
 end
 
 % Plot depending on display type settings
@@ -1009,6 +1010,8 @@ end
 if ~showBox
     % Remove box
     set(gca,'Box','off');
+else
+    set(gca,'Box','on');
 end
 
 status = 0;
