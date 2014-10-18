@@ -1,5 +1,5 @@
-function handle = guiSliderPanel(parentHandle,position)
-% GUIWELCOMEPANEL Add a panel for slider value display to a gui
+function handle = panelSlider(parentHandle,position)
+% PANELSLIDER Add a panel for slider value display to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -8,7 +8,7 @@ function handle = guiSliderPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

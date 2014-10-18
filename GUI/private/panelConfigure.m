@@ -1,5 +1,5 @@
-function handle = guiConfigurePanel(parentHandle,position)
-% GUICONFIGUREPANEL Add a panel for configuring tasks of a GUI to a gui
+function handle = panelConfigure(parentHandle,position)
+% PANELCONFIGURE Add a panel for configuring tasks of a GUI to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiConfigurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

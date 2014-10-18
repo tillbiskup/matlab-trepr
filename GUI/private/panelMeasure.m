@@ -1,5 +1,5 @@
-function handle = guiMeasurePanel(parentHandle,position)
-% GUIMEASUREPANEL Add a panel for measurements to a gui
+function handle = panelMeasure(parentHandle,position)
+% PANELMEASURE Add a panel for measurements to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -8,7 +8,7 @@ function handle = guiMeasurePanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-08-11
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

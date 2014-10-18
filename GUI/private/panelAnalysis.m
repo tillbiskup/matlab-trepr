@@ -1,5 +1,5 @@
-function handle = guiAnalysisPanel(parentHandle,position)
-% GUIANALYSISPANEL Add a panel displaying some analysis controls to a gui
+function handle = panelAnalysis(parentHandle,position)
+% PANELANALYSIS Add a panel displaying some analysis controls to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiAnalysisPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-13
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

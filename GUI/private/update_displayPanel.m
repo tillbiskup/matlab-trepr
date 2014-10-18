@@ -452,6 +452,22 @@ if ad.control.data.active
     setappdata(mainWindow,'control',ad.control);
 end
 
+% Set projection axes settings
+set(gh.display_panel_projectionaxes_checkbox,'value',...
+    ad.control.axis.projectionAxes.enable);
+set(gh.display_panel_projectionaxes_hheight_edit,'String',num2str(...
+    ad.control.axis.projectionAxes.horizontal.height));
+set(gh.display_panel_projectionaxes_vheight_edit,'String',num2str(...
+    ad.control.axis.projectionAxes.vertical.height));
+
+% Set residuals axis settings
+set(gh.display_panel_residualsaxis_checkbox,'value',...
+    ad.control.axis.residualsAxes.enable);
+set(gh.display_panel_residualsaxis_height_edit,'String',num2str(...
+    ad.control.axis.residualsAxes.height));
+set(gh.display_panel_residualsaxis_gap_edit,'String',num2str(...
+    ad.control.axis.residualsAxes.gap));
+
 status = 0;
 
 end

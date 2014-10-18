@@ -590,6 +590,9 @@ switch ad.control.axis.displayType
                 set(mainAxes,'YLim',ad.control.axis.zoom.z);
             end
         end
+        if ad.control.axis.residualsAxes.enable
+            plotResiduals();
+        end
     case '1D along y' % B0 spectrum
         % Enable sliders
         sliderHandles = findobj(...
@@ -965,6 +968,9 @@ switch ad.control.axis.displayType
                 set(mainAxes,'YLim',ad.control.axis.zoom.z);
             end
         end
+        if ad.control.axis.residualsAxes.enable
+            plotResiduals();
+        end
     otherwise
         trEPRoptionUnknown(ad.control.axis.displayType,'display type');
         return;
@@ -1265,9 +1271,11 @@ switch lower(ad.control.axis.projectionAxes.mode)
             'k-');
     case 'sum'
         plot(gh.horizontalAxis,...
-            ad.data{active}.axes.x.values,sum(ad.data{active}.data,1));
+            ad.data{active}.axes.x.values,sum(ad.data{active}.data,1),...
+            'k-');
         plot(gh.verticalAxis,...
-            -sum(ad.data{active}.data,2),ad.data{active}.axes.y.values);
+            -sum(ad.data{active}.data,2),ad.data{active}.axes.y.values,...
+            'k-');
     otherwise
         trEPRoptionUnknown(option,'projection axis mode');
 end
@@ -1318,3 +1326,53 @@ if (isequal(ad.control.axis.grid.y,'on'))
 end
 
 end
+
+
+function plotResiduals()
+% Get appdata from main GUI
+mainWindow = trEPRguiGetWindowHandle();
+ad = getappdata(mainWindow);
+gh = ad.UsedByGUIData_m;
+
+%active = ad.control.data.active;
+
+set(gh.residualsAxis,'XLim',get(gh.mainAxis,'XLim'));
+set(gh.mainAxis,'XTickLabel',{''});
+if strfind(ad.control.axis.displayType,'x')
+    xlabel(gh.residualsAxis,sprintf('%s / %s',...
+        ad.control.axis.labels.x.measure,...
+        ad.control.axis.labels.x.unit));
+else
+    xlabel(gh.residualsAxis,sprintf('%s / %s',...
+        ad.control.axis.labels.y.measure,...
+        ad.control.axis.labels.y.unit));
+end
+xlabel(gh.mainAxis,'');
+
+set(gh.residualsAxis,'YLim',[-1 1]);
+
+if (ad.control.axis.grid.zero.visible)
+    line(...
+        get(gh.residualsAxis,'XLim'),...
+        [0 0],...
+        'Color',ad.control.axis.grid.zero.color,...
+        'LineWidth',ad.control.axis.grid.zero.width,...
+        'LineStyle',ad.control.axis.grid.zero.style,...
+        'Parent',gh.residualsAxis);
+end
+
+set(gh.residualsAxis,'XGrid',ad.control.axis.grid.x);
+set(gh.residualsAxis,'YGrid',ad.control.axis.grid.y);
+if (isequal(ad.control.axis.grid.x,'on'))
+    set(gh.residualsAxis,'XMinorGrid',ad.control.axis.grid.minor);
+else
+    set(gh.residualsAxis,'XMinorGrid','off');
+end
+if (isequal(ad.control.axis.grid.y,'on'))
+    set(gh.residualsAxis,'YMinorGrid',ad.control.axis.grid.minor);
+else
+    set(gh.residualsAxis,'YMinorGrid','off');
+end
+
+end
+

@@ -1,5 +1,5 @@
-function handle = guiLoadPanel(parentHandle,position)
-% GUILOADPANEL Add a panel for loading files to a gui
+function handle = panelLoad(parentHandle,position)
+% PANELLOAD Add a panel for loading files to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiLoadPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-08
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

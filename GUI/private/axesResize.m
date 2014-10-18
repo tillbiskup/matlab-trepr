@@ -6,7 +6,7 @@ function axesResize
 %   axesResize
 
 % Copyright (c) 2014, Till Biskup
-% 2014-10-17
+% 2014-10-18
 
 % Get appdata and handles from main figure
 ad = getappdata(trEPRguiGetWindowHandle);
@@ -16,6 +16,7 @@ gh = ad.UsedByGUIData_m;
 mainAxisPosition = [70 95 500 500];
 
 if strcmpi(ad.control.axis.displayType,'2d plot')
+    set(gh.residualsAxis,'Visible','off');
     if ad.control.axis.projectionAxes.enable
         set(gh.mainAxis,'Position',[...
             mainAxisPosition(1) + ad.control.axis.projectionAxes.vertical.height ...
@@ -42,39 +43,25 @@ if strcmpi(ad.control.axis.displayType,'2d plot')
 end
 
 if strfind(ad.control.axis.displayType,'1D')
+    cla(gh.horizontalAxis,'reset');
+    cla(gh.verticalAxis,'reset');
+    set(gh.horizontalAxis,'Visible','off');
+    set(gh.verticalAxis,'Visible','off');
     if ad.control.axis.residualsAxes.enable
         set(gh.mainAxis,'Position',[...
             mainAxisPosition(1) ...
-            mainAxisPosition(2)+20+ad.control.axis.residualsAxes.height ...
+            mainAxisPosition(2)+ad.control.axis.residualsAxes.gap+...
+            ad.control.axis.residualsAxes.height ...
             mainAxisPosition(3) ...
-            mainAxisPosition(4)-20-ad.control.axis.residualsAxes.height]);
-        set(gh.mainAxis,'XTickLabel',{''});
+            mainAxisPosition(4)-ad.control.axis.residualsAxes.gap-...
+            ad.control.axis.residualsAxes.height]);
         set(gh.residualsAxis,'Position',[...
             mainAxisPosition(1:3) ad.control.axis.residualsAxes.height]);
         set(gh.residualsAxis,'Visible','on');
-        if strfind(ad.control.axis.displayType,'x')
-            xlabel(gh.residualsAxis,sprintf('%s / %s',...
-                ad.control.axis.labels.x.measure,...
-                ad.control.axis.labels.x.unit));
-        else
-            xlabel(gh.residualsAxis,sprintf('%s / %s',...
-                ad.control.axis.labels.y.measure,...
-                ad.control.axis.labels.y.unit));
-        end
-        xlabel(gh.mainAxis,'');
     else
         set(gh.mainAxis,'Position',mainAxisPosition);
         set(gh.residualsAxis,'Visible','off');
         set(gh.mainAxis,'XTickLabelMode','auto');
-        if strfind(ad.control.axis.displayType,'x')
-            xlabel(gh.mainAxis,sprintf('%s / %s',...
-                ad.control.axis.labels.x.measure,...
-                ad.control.axis.labels.x.unit));
-        else
-            xlabel(gh.mainAxis,sprintf('%s / %s',...
-                ad.control.axis.labels.y.measure,...
-                ad.control.axis.labels.y.unit));
-        end
     end
     return;
 end

@@ -6,7 +6,7 @@ function status = switchDisplayType(displayType)
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-23
+% 2014-10-18
 
 try
     % Get appdata and handles of main window
@@ -45,6 +45,7 @@ try
     setappdata(mainWindow,'control',ad.control);
     
     update_mainAxis();
+    axesResize();
     
     status = 0;
 catch exception

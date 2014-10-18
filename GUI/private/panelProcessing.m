@@ -1,5 +1,5 @@
-function handle = guiProcessingPanel(parentHandle,position)
-% GUIPROCESSINGPANEL Add a panel for general preprocessing to a gui
+function handle = panelProcessing(parentHandle,position)
+% PANELPROCESSING Add a panel for general preprocessing to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiProcessingPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-27
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

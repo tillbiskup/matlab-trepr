@@ -8,7 +8,7 @@ function guiMeasure(action,nPoints)
 %               Number of points: 1 - pick mode; 2 - measure mode
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-08-11
+% 2014-10-18
 
 try
     % Get appdata of main window
@@ -78,6 +78,8 @@ try
             set(mainWindow,'Pointer','arrow');
             
             update_measurePanel();
+
+            update_mainAxis();
             
             % Update display - REALLY NECESSARY?
             refresh;

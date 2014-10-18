@@ -1,5 +1,5 @@
-function handle = guiInternalPanel(parentHandle,position)
-% GUIINTERNALPANEL Add a panel helping with internal settings of a GUI
+function handle = panelInternal(parentHandle,position)
+% PANELINTERNAL Add a panel helping with internal settings of a GUI
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiInternalPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-09-24
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

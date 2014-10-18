@@ -1,5 +1,5 @@
-function handle = guiDatasetPanel(parentHandle,position)
-% GUIDATASETPANEL Add a panel for dataset control to a gui
+function handle = panelDatasets(parentHandle,position)
+% PANELDATASETS Add a panel for dataset control to a gui
 %       Should only be called from within a GUI defining function.
 %
 %       Arguments: parent Handle and position vector.
@@ -7,7 +7,7 @@ function handle = guiDatasetPanel(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-25
+% 2014-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
