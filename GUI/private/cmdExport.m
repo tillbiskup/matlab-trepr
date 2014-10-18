@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-10-13
+% 2014-10-18
 
 status = 0;
 warnings = cell(0);
@@ -295,11 +295,11 @@ gh = guihandles(handle);
 
 % Set default options
 multipleFiles = get(...
-    gh.analysis_panel_dataexport1D_multiplefiles_checkbox,'value');
+    gh.datasets_panel_dataexport1D_multiplefiles_checkbox,'value');
 
 allTraces = any(cell2mat(...
-    get([gh.analysis_panel_dataexport1D_multiplefiles_checkbox,...
-    gh.analysis_panel_dataexport1D_multiple1file_checkbox],'value')));
+    get([gh.datasets_panel_dataexport1D_multiplefiles_checkbox,...
+    gh.datasets_panel_dataexport1D_multiple1file_checkbox],'value')));
 
 % Handle additional options
 % Please note: These options of the internal function are a subset of the
@@ -361,9 +361,9 @@ end
 if ~exist('fileType','var')
     % Get file type to save to
     fileTypes = cellstr(...
-        get(gh.analysis_panel_dataexport1D_filetype_popupmenu,'String'));
+        get(gh.datasets_panel_dataexport1D_filetype_popupmenu,'String'));
     fileType = fileTypes{...
-        get(gh.analysis_panel_dataexport1D_filetype_popupmenu,'Value')};
+        get(gh.datasets_panel_dataexport1D_filetype_popupmenu,'Value')};
 end
 
 % Set directory where to save files to
@@ -429,13 +429,13 @@ if multipleFiles
                 msgbox(msg,'Error with exporting 1D','error');
         end
         export1Dparameters.header.character = ...
-            get(gh.analysis_panel_dataexport1D_header_edit,'String');
+            get(gh.datasets_panel_dataexport1D_header_edit,'String');
         export1Dparameters.axis.include = ...
-            get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
+            get(gh.datasets_panel_dataexport1D_includeaxis_checkbox,'Value');
         export1Dparameters.stdev.include = ...
-            get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
+            get(gh.datasets_panel_dataexport1D_includestdev_checkbox,'Value');
         export1Dparameters.calculated.include = ...
-            get(gh.analysis_panel_dataexport1D_includesimulation_checkbox,...
+            get(gh.datasets_panel_dataexport1D_includesimulation_checkbox,...
             'Value');
         export1Dparameters.file.type = fileType;
         export1Dparameters.file.overwrite = 1;
@@ -501,13 +501,13 @@ else
             msgbox(msg,'Error with exporting 1D','error');
     end
     export1Dparameters.header.character = ...
-        get(gh.analysis_panel_dataexport1D_header_edit,'String');
+        get(gh.datasets_panel_dataexport1D_header_edit,'String');
     export1Dparameters.axis.include = ...
-        get(gh.analysis_panel_dataexport1D_includeaxis_checkbox,'Value');
+        get(gh.datasets_panel_dataexport1D_includeaxis_checkbox,'Value');
     export1Dparameters.stdev.include = ...
-        get(gh.analysis_panel_dataexport1D_includestdev_checkbox,'Value');
+        get(gh.datasets_panel_dataexport1D_includestdev_checkbox,'Value');
     export1Dparameters.calculated.include = ...
-        get(gh.analysis_panel_dataexport1D_includesimulation_checkbox,...
+        get(gh.datasets_panel_dataexport1D_includesimulation_checkbox,...
         'Value');
     export1Dparameters.file.type = fileType;
     export1Dparameters.file.overwrite = 1;
@@ -568,9 +568,9 @@ end
 if ~exist('fileType','var')
     % Get file type to save to
     exportFormats = cellstr(...
-        get(gh.analysis_panel_dataexport2D_format_popupmenu,'String'));
+        get(gh.datasets_panel_dataexport2D_format_popupmenu,'String'));
     exportFormat = exportFormats{...
-        get(gh.analysis_panel_dataexport2D_format_popupmenu,'Value')};
+        get(gh.datasets_panel_dataexport2D_format_popupmenu,'Value')};
 end
 
 % Set directory where to save files to
@@ -592,9 +592,9 @@ switch exportFormat
         fileExtension = 'ascii';
         exportFunctionName = 'trEPRexport2D';
         exportParameters.includeAxes = logical(...
-            get(gh.analysis_panel_dataexport2D_includeaxes_checkbox,'Value'));
+            get(gh.datasets_panel_dataexport2D_includeaxes_checkbox,'Value'));
         exportParameters.commentChar = ...
-            get(gh.analysis_panel_dataexport2D_header_edit,'String');
+            get(gh.datasets_panel_dataexport2D_header_edit,'String');
     otherwise
         trEPRoptionUnknown(exportFormat);
         return;
