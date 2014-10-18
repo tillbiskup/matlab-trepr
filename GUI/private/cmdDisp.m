@@ -22,7 +22,7 @@ function [status,warnings] = cmdDisp(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-16
+% 2014-10-18
 
 status = 0;
 warnings = cell(0);
@@ -415,6 +415,86 @@ switch lower(opt{1})
                 warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
                     ' not understood.'];
                 return;
+        end
+    case {'yaxis'}
+        if length(opt) < 2
+            if ad.control.axis.yaxis
+                ad.control.axis.yaxis = false;
+            else
+                ad.control.axis.yaxis = true;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.yaxis = true;
+                case 'off'
+                    ad.control.axis.yaxis = false;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
+    case {'yticks'}
+        if length(opt) < 2
+            if ad.control.axis.yticks
+                ad.control.axis.yticks = false;
+            else
+                ad.control.axis.yticks = true;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.yticks = true;
+                case 'off'
+                    ad.control.axis.yticks = false;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
+    case {'title'}
+        if length(opt) < 2
+            if ad.control.axis.title
+                ad.control.axis.title = false;
+            else
+                ad.control.axis.title = true;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.title = true;
+                case 'off'
+                    ad.control.axis.title = false;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
+        end
+    case {'box'}
+        if length(opt) < 2
+            if ad.control.axis.box
+                ad.control.axis.box = false;
+            else
+                ad.control.axis.box = true;
+            end
+        else
+            switch lower(opt{2})
+                case 'on'
+                    ad.control.axis.box = true;
+                case 'off'
+                    ad.control.axis.box = false;
+                otherwise
+                    status = -3;
+                    warnings{end+1} = ['command ' cmd ': option ' opt{2} ...
+                        ' not understood.'];
+                    return;
+            end
         end
     otherwise
         return;
