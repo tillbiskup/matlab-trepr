@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-13
+% 2014-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -1260,7 +1260,7 @@ switch lower(ad.control.axis.projectionAxes.mode)
             ad.data{active}.data(ad.data{active}.display.position.y,:),...
             'k-');
         plot(gh.verticalAxis,...
-            ad.data{active}.data(:,ad.data{active}.display.position.x),...
+            -ad.data{active}.data(:,ad.data{active}.display.position.x),...
             ad.data{active}.axes.y.values,...
             'k-');
     case 'sum'
