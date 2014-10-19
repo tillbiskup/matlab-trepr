@@ -9,7 +9,7 @@ function guiGarbageCollector(varargin)
 %             one of ...
 
 % Copyright (c) 2014, Till Biskup
-% 2014-08-14
+% 2014-10-19
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create instance of the inputParser class
@@ -63,7 +63,7 @@ try
     address = java.net.InetAddress.getLocalHost;
     IPaddress = char(address.getHostAddress);
     
-    if strcmpi(IPaddress,'132.230.18.138')
+    if strcmpi(IPaddress,'10.4.18.34')
         hMainFigure = trEPRguiGetWindowHandle();
         ad = getappdata(hMainFigure);
         ad.control.axis.labels.z.unit = 'Polarisation';

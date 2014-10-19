@@ -38,7 +38,7 @@ dy = 40;
 % Load configuration
 conf = trEPRguiConfigLoad(mfilename);
 % Assign config values from "general" to variables in function workspace
-assignConfigValues(conf)
+assignConfigValues(conf);
 
 % Define main GUI window (figure)
 hMainFigure = figure('Tag',mfilename,...
@@ -767,17 +767,9 @@ ad = getappdata(hMainFigure);
 
 % Initialize some button group properties. 
 set(hbg,'SelectionChangeFcn',{@tbg_Callback});
-set(hbg,'SelectedObject',[]);  % None selected
 set(hbg,'Visible','on');
     
 set(hbg_fb,'Visible','on');
-
-xlabel(hPlotAxes,'time / s');
-ylabel(hPlotAxes,'intensity / a.u.');
-
-% For test purposes, set axis limits
-set(hPlotAxes,'YLim',[-.01,0.02]);
-set(hPlotAxes,'XLim',[-.0001,0.0002]);
 
 % Display splash image in main axes
 try
@@ -800,9 +792,6 @@ if (nargout == 1)
 end
 
 set(gh.load_panel,'Visible','on');
-
-% Set status message
-trEPRmsg('trEPR GUI main window initialised successfully.','info');
 
 % Add keypress function to every element that can have one...
 handles = findall(...
