@@ -15,6 +15,47 @@
 		<p>
 			Basically, the complete toolbox got reimplemented for version 0.3 (back in 2011), and the GUI rewritten with a complete new layout (and underlying code). Currently, besides adding new functionality, major reorganisation of the underlying code is taking place, aiming at a much more robust (and in certain aspects faster) code basis.
 		</p>
+		<h2>v.0.3.50</h2>
+		<ul>
+		    <li>New features</li>
+		    <ul>
+		    	<li>New display gimmicks:</li>
+		    	<ul>
+		    		<li>Projection axes in 2D mode either showing sum projection or slice at current position.</li>
+		    		<li>Residuals projection in 1D mode (currently no display, needs further thinking).</li>
+		    	</ul>
+		    	<li>1D export can now export simulation trace.</li>
+		    </ul>
+		    <li>CMD</li>
+		    <ul>
+		    	<li>Command <tt>disp</tt> with new options <tt>residuals</tt>, <tt>projection</tt>, <tt>yaxis</tt>, <tt>yticks</tt>, <tt>title</tt>, and <tt>box</tt>.</li>
+		    	<li>New command <tt>pause</tt> (necessary for testing switching of panels).</li>
+		    </ul>
+		    <li>GUI layout and usability</li>
+		    <ul>
+			    <li>Moved export from &quot;analysis&quot; to &quot;datasets&quot; panel (to a new second page).</li>
+			    <li>Restructured display panel; new controls for axis display control.</li>
+			    <li>Pimped splash window to show up centered with respect to Matlab main window. Useful with split screens.</li>
+		    </ul>
+		    <li>Compatibility</li>
+		    <ul>
+			    <li><b>GUI appdata version 1.14.</b></li>
+				<ul>
+			    	<li>Added fields <tt>yaxis</tt>, <tt>yticks</tt>, <tt>title</tt>, <tt>box</tt> to &quot;<tt>control.axis</tt>&quot;</li>
+			    	<li>Added structures <tt>projectionAxes</tt>, <tt>residualsAxes</tt> to &quot;<tt>control.axis</tt>&quot;</li>
+			    </ul>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		        <li>Renamed private GUI functions (panel defining functions).</li>
+		        <li>First code fixes to improve compatibility with new Matlab version R2014b (with completely new graphics system).</li>
+		    </ul>
+		    <li>Bug fixes</li>
+		    <ul>
+		    	<li>Fixed bugs #1, #90, #142, #143, #146.</li>
+		    	<li>Fixed display bugs showing up when running under Linux.</li>
+		    </ul>
+		</ul>
 		<h2>v.0.3.49</h2>
 		<ul>
 		    <li>New features</li>
@@ -600,7 +641,7 @@
 			&copy; 2011-14, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-09-24
+			2014-10-20
 		</p>
 		</div>
 	</body>
