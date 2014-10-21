@@ -20,7 +20,7 @@ function [resdata,warnings] = trEPRalgebra(data,operation,varargin)
 %              Empty if everything went well, otherwise contains message.
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-07-27
+% 2014-10-21
 
 warnings = '';
 resdata = [];
@@ -110,10 +110,10 @@ try
                 end
             end
         case 'scaling'
-            if nargin < 3 && ~isfield(parameters.scalingFactor)
+            if nargin < 3 && ~isfield(parameters,'scalingFactor')
                 warnings = 'No scaling factor specified.';
                 return;
-            elseif ~isfield(parameters.scalingFactor)
+            elseif ~isfield(parameters,'scalingFactor')
                 parameters.scalingFactor = varargin{1};
             end
             resdata.data = data{1}.data * parameters.scalingFactor;

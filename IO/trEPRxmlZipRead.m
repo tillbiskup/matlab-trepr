@@ -24,7 +24,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % See also: trEPRxmlZipWrite, trEPRload
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-31
+% 2014-10-21
 
 % Parse input arguments using the inputParser functionality
 try
@@ -166,6 +166,13 @@ end
 cd(PWD);
 % Convert to current toolbox format if necessary
 if p.Results.convertFormat
+    if isfield(struct,'format') && isfield(struct.format,'version')
+        oldversion = struct.format.version;
+    elseif isfield(struct,'version')
+        oldversion = struct.version;
+    else
+        oldversion = '1.0';
+    end
     try
         [struct,convertWarning] = trEPRfileFormatConvert(struct);
     catch exception
@@ -176,6 +183,7 @@ if p.Results.convertFormat
         warning{end+1}.identifier = 'Problems with converting to current toolbox data structure';
         warning{end}.message = convertWarning;
     end
+    struct.format.oldversion = oldversion;
 end
 if nargout
     varargout{1} = struct;

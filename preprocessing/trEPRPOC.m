@@ -36,8 +36,8 @@ function varargout = trEPRPOC (data, varargin)
 %
 % See also: trEPRBGC
 
-% Copyright (c) 2010-13, Till Biskup
-% 2013-09-10
+% Copyright (c) 2010-14, Till Biskup
+% 2014-10-21
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -66,6 +66,11 @@ end
 if ~exist('triggerPosition','var')
     if isempty(p.Results.triggerPosition)
         disp(['(EE) ' mfilename ': Could not determine trigger position.']);
+        if exist('dataset','var')
+            varargout{1} = dataset;
+        else
+            varargout{1} = data;
+        end
         return;
     else
         triggerPosition = p.Results.triggerPosition;
@@ -85,6 +90,38 @@ if triggerPosition < 5 || triggerPosition <= (p.Results.cutRight)
         'trEPRPOC:pretriggerShortage',...
         'The pretrigger part of the signal is too short. Aborted.'...
         );
+    if exist('dataset','var')
+        varargout{1} = dataset;
+    else
+        varargout{1} = data;
+    end
+    return;
+end
+
+% Check whether we've loaded a spectrum rather than a time trace
+if vector && exist('dataset','var')
+    if isscalar(dataset.axes.x.values)
+        trEPRmsg('You loaded a 1D spectrum. POC aborted.','warning');
+        if exist('dataset','var')
+            varargout{1} = dataset;
+        else
+            varargout{1} = data;
+        end
+        return;
+    end        
+end
+
+% Check whether pretrigger is larger than data dimensions
+% (Hint: Maybe we've loaded a 1D spectrum)
+if vector && length(data) < triggerPosition
+    trEPRmsg(['triggerPosition larger than data.' ...
+        'Perhaps you loaded a 1D spectrum?'],'warning');
+    if exist('dataset','var')
+        varargout{1} = dataset;
+    else
+        varargout{1} = data;
+    end
+    varargout{1} = data;
     return;
 end
 

@@ -303,6 +303,18 @@ else
     warnings{end+1} = warnStr;
 end
 
+% Check for datasets with original toolbox format version prior to 1.14
+% that have data in calculated and whose data are 2D. For backwards
+% compatibility to old simulation traces, set calculation.position to
+% maximum of dataset.
+if exist('content','var') && ~isempty(content.calculated) && ...
+        min(size(content.calculated))>1 && isfield(content,'TSim') && ...
+        isfield(content.format,'oldversion') && ...
+        str2double(content.format.oldversion) < 1.14
+    % Get maximum in y
+    [~,content.calculation.position] = max(max(content.data));
+end
+
 if exist('content','var') && p.Results.loadInfoFile ...
         && ~strcmpi(content.file.format,'xmlzip')
     % Try to load info file
@@ -346,6 +358,9 @@ if exist('content','var') && p.Results.loadInfoFile ...
     end
     varargout{1} = content;
     varargout{2} = warnings;
+    if nargout < 2
+        trEPRmsg(warnings,'warning');
+    end
 end
     
 end

@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-14, Till Biskup
-% 2014-08-08
+% 2014-10-21
 
 % Parse input arguments using the inputParser functionality
 try
@@ -200,34 +200,38 @@ switch version
             end
         end
     case '1.8'
-        newdata.display.lines.data = data.line;
-        newdata.display.displacement.data.x = data.display.displacement.x;
-        newdata.display.displacement.data.y = data.display.displacement.y;
-        newdata.display.displacement.data.z = data.display.displacement.z;
-        newdata.display.scaling.data.x = data.display.scaling.x;
-        newdata.display.scaling.data.y = data.display.scaling.y;
-        newdata.display.scaling.data.z = data.display.scaling.z;
-        newdata.display.smoothing.data.x.filterfun = '';
-        newdata.display.smoothing.data.x.parameters.width = ...
-            data.display.smoothing.x.value;
-        newdata.display.smoothing.data.y.filterfun = '';
-        newdata.display.smoothing.data.y.parameters.width = ...
-            data.display.smoothing.y.value;
-        newdata.display.smoothing.calculated.x.parameters.width = 0;
-        newdata.display.smoothing.calculated.y.parameters.width = 0;
-        % Remove old fields
-        newdata.display.displacement = ...
-            rmfield(newdata.display.displacement,{'x','y','z'});
-        newdata.display.scaling = ...
-            rmfield(newdata.display.scaling,{'x','y','z'});
-        newdata.display.smoothing = ...
-            rmfield(newdata.display.smoothing,{'x','y'});
-        newdata = rmfield(newdata,'line');
-        % Change value of filter width
-        newdata.display.smoothing.data.x.parameters.width = floor(...
-            (newdata.display.smoothing.data.x.parameters.width-1)/2);
-        newdata.display.smoothing.data.y.parameters.width = floor(...
-            (newdata.display.smoothing.data.y.parameters.width-1)/2);
+        if isfield(data,'line')
+            newdata.display.lines.data = data.line;
+        end
+        if isfield(data,'display')
+            newdata.display.displacement.data.x = data.display.displacement.x;
+            newdata.display.displacement.data.y = data.display.displacement.y;
+            newdata.display.displacement.data.z = data.display.displacement.z;
+            newdata.display.scaling.data.x = data.display.scaling.x;
+            newdata.display.scaling.data.y = data.display.scaling.y;
+            newdata.display.scaling.data.z = data.display.scaling.z;
+            newdata.display.smoothing.data.x.filterfun = '';
+            newdata.display.smoothing.data.x.parameters.width = ...
+                data.display.smoothing.x.value;
+            newdata.display.smoothing.data.y.filterfun = '';
+            newdata.display.smoothing.data.y.parameters.width = ...
+                data.display.smoothing.y.value;
+            newdata.display.smoothing.calculated.x.parameters.width = 0;
+            newdata.display.smoothing.calculated.y.parameters.width = 0;
+            % Remove old fields
+            newdata.display.displacement = ...
+                rmfield(newdata.display.displacement,{'x','y','z'});
+            newdata.display.scaling = ...
+                rmfield(newdata.display.scaling,{'x','y','z'});
+            newdata.display.smoothing = ...
+                rmfield(newdata.display.smoothing,{'x','y'});
+            newdata = rmfield(newdata,'line');
+            % Change value of filter width
+            newdata.display.smoothing.data.x.parameters.width = floor(...
+                (newdata.display.smoothing.data.x.parameters.width-1)/2);
+            newdata.display.smoothing.data.y.parameters.width = floor(...
+                (newdata.display.smoothing.data.y.parameters.width-1)/2);
+        end
         % Check for wrong field types (was problem with old format)
         if ischar(newdata.parameters.purpose)
             purpose = newdata.parameters.purpose;
