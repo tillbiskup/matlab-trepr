@@ -1331,6 +1331,12 @@ if (isequal(ad.control.axis.grid.y,'on'))
         'YMinorGrid',ad.control.axis.grid.minor);
 end
 
+if ad.control.axis.box
+    set([gh.horizontalAxis,gh.verticalAxis],'Box','on');
+else
+    set([gh.horizontalAxis,gh.verticalAxis],'Box','off');
+end
+
 end
 
 
@@ -1340,9 +1346,15 @@ mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
 gh = ad.UsedByGUIData_m;
 
-%active = ad.control.data.active;
+active = ad.control.data.active;
 
 cla(gh.residualsAxis,'reset');
+
+if ~isempty(ad.data{active}.calculated) && ad.control.axis.sim
+    residuals = ad.data{active}.data(:,ad.data{active}.calculation.position)-...
+        ad.data{active}.calculated;
+    plot(gh.residualsAxis,ad.data{active}.axes.y.values,residuals,'k-');
+end
 
 set(gh.residualsAxis,'XLim',get(gh.mainAxis,'XLim'));
 set(gh.mainAxis,'XTickLabel',{''});
@@ -1356,8 +1368,6 @@ else
         ad.control.axis.labels.y.unit));
 end
 xlabel(gh.mainAxis,'');
-
-set(gh.residualsAxis,'YLim',[-1 1]);
 
 if (ad.control.axis.grid.zero.visible)
     line(...
@@ -1380,6 +1390,21 @@ if (isequal(ad.control.axis.grid.y,'on'))
     set(gh.residualsAxis,'YMinorGrid',ad.control.axis.grid.minor);
 else
     set(gh.residualsAxis,'YMinorGrid','off');
+end
+
+% Set ylimits
+if exist('residuals','var')
+    additionalSpace = abs(max(residuals)-min(residuals))*0.1;
+    set(gh.residualsAxis,'YLim',...
+        [min(residuals)-additionalSpace max(residuals)+additionalSpace]);
+else
+    set(gh.residualsAxis,'YLim',[-1 1]);
+end
+
+if ad.control.axis.box
+    set(gh.residualsAxis,'Box','on');
+else
+    set(gh.residualsAxis,'Box','off');
 end
 
 end
