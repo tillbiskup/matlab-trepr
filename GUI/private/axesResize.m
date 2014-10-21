@@ -16,6 +16,7 @@ gh = ad.UsedByGUIData_m;
 mainAxisPosition = [70 95 500 500];
 
 if strcmpi(ad.control.axis.displayType,'2d plot')
+    cla(gh.residualsAxis,'reset');
     set(gh.residualsAxis,'Visible','off');
     if ad.control.axis.projectionAxes.enable
         set(gh.mainAxis,'Position',[...

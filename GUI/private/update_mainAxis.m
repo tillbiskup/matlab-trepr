@@ -1262,6 +1262,9 @@ gh = ad.UsedByGUIData_m;
 
 active = ad.control.data.active;
 
+cla(gh.horizontalAxis,'reset');
+cla(gh.verticalAxis,'reset');
+
 switch lower(ad.control.axis.projectionAxes.mode)
     case 'slice'
         plot(gh.horizontalAxis,...
@@ -1338,6 +1341,8 @@ ad = getappdata(mainWindow);
 gh = ad.UsedByGUIData_m;
 
 %active = ad.control.data.active;
+
+cla(gh.residualsAxis,'reset');
 
 set(gh.residualsAxis,'XLim',get(gh.mainAxis,'XLim'));
 set(gh.mainAxis,'XTickLabel',{''});
