@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% 2014-11-10
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -324,7 +324,7 @@ switch ad.control.axis.displayType
                         case {'pk-pk','pk2pk'}
                             y = y/(max(y)-min(y));
                         case 'area'
-                            y = y/abs(sum(y));
+                            y = y/sum(abs(y));
                         case 'max'
                             y = y/max(y);
                         case 'min'
@@ -336,7 +336,7 @@ switch ad.control.axis.displayType
                             y = y/(max(max(ad.data{k}.data))-...
                                 min(min(ad.data{k}.data)));
                         case 'area'
-                            y = y/abs(sum(sum(ad.data{k}.data)));
+                            y = y/sum(sum(abs(ad.data{k}.data)));
                         case 'max'
                             y = y/max(max(ad.data{k}.data));
                         case 'min'
@@ -421,7 +421,7 @@ switch ad.control.axis.displayType
                             case {'pk-pk','pk2pk'}
                                 y = y/(max(y)-min(y));
                             case 'area'
-                                y = y/abs(sum(y));
+                                y = y/sum(abs(y));
                             case 'max'
                                 y = y/max(y);
                             case 'min'
@@ -433,7 +433,7 @@ switch ad.control.axis.displayType
                                 y = y/(max(max(ad.data{k}.data))-...
                                     min(min(ad.data{k}.data)));
                             case 'area'
-                                y = y/abs(sum(sum(ad.data{k}.data)));
+                                y = y/sum(sum(abs(ad.data{k}.data)));
                             case 'max'
                                 y = y/max(max(ad.data{k}.data));
                             case 'min'
@@ -663,7 +663,7 @@ switch ad.control.axis.displayType
                         case {'pk-pk','pk2pk'}
                             x = x/(max(x)-min(x));
                         case 'area'
-                            x = x/abs(sum(x));
+                            x = x/sum(abs(x));
                         case 'max'
                             x = x/max(x);
                         case 'min'
@@ -674,7 +674,7 @@ switch ad.control.axis.displayType
                         case {'pk-pk','pk2pk'}
                             x = x/(max(max(data))-min(min(data)));
                         case 'area'
-                            x = x/abs(sum(sum(data)));
+                            x = x/sum(sum(abs(data)));
                         case 'max'
                             x = x/max(max(data));
                         case 'min'
@@ -777,7 +777,7 @@ switch ad.control.axis.displayType
                             case {'pk-pk','pk2pk'}
                                 x = x/(max(x)-min(x));
                             case 'area'
-                                x = x/abs(sum(x));
+                                x = x/sum(abs(x));
                             case 'max'
                                 x = x/max(x);
                             case 'min'
@@ -789,7 +789,7 @@ switch ad.control.axis.displayType
                                 x = x/(max(max(ad.data{k}.data))-...
                                     min(min(ad.data{k}.data)));
                             case 'area'
-                                x = x/abs(sum(sum(ad.data{k}.data)));
+                                x = x/sum(sum(abs(ad.data{k}.data)));
                             case 'max'
                                 x = x/max(max(ad.data{k}.data));
                             case 'min'
@@ -1125,9 +1125,9 @@ if (ad.control.axis.limits.auto)
                             min(min(data)))));
                     case 'area'
                         zmin(k) = min(min(data/...
-                            abs(sum(sum(data)))));
+                            sum(sum(abs(data)))));
                         zmax(k) = max(max(data/...
-                            abs(sum(sum(data)))));
+                            sum(sum(abs(data)))));
                     case 'max'
                         zmin(k) = min(min(data/...
                             max(max(data))));
@@ -1150,9 +1150,9 @@ if (ad.control.axis.limits.auto)
                             min(min(data)))));
                     case 'area'
                         zmin(k) = min(min(data/...
-                            abs(sum(sum(data)))));
+                            sum(sum(abs(data)))));
                         zmax(k) = max(max(data/...
-                            abs(sum(sum(data)))));
+                            sum(sum(abs(data)))));
                     case 'max'
                         zmin(k) = min(min(data/...
                             max(max(data))));

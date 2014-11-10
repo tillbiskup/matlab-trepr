@@ -21,7 +21,7 @@ function data = trEPRdatasetApplyNormalisation(data,varargin)
 % trEPRdatasetApplySmoothing
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-29
+% 2014-11-10
 
 % Parse input arguments using the inputParser functionality
 try
@@ -72,7 +72,7 @@ switch lower(parameters.normalisationType)
         normalisationFactor = ...
             1/(max(max(data4Scaling))-min(min(data4Scaling)));
     case 'area'
-        normalisationFactor = 1/abs(sum(sum(data4Scaling)));
+        normalisationFactor = 1/(sum(sum(abs(data4Scaling))));
     case 'max'
         normalisationFactor = 1/max(max(data4Scaling));
     case 'min'
