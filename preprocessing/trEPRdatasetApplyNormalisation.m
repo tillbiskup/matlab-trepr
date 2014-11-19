@@ -21,7 +21,7 @@ function data = trEPRdatasetApplyNormalisation(data,varargin)
 % trEPRdatasetApplySmoothing
 
 % Copyright (c) 2014, Till Biskup
-% 2014-11-10
+% 2014-11-18
 
 % Parse input arguments using the inputParser functionality
 try
@@ -57,7 +57,7 @@ if isfield(parameters,'enable') && ~parameters.enable
 end
 
 if strcmpi(parameters.dimension,'1D')
-    switch parameters.displayType(1)
+    switch parameters.displayType(end)
         case 'x'
             data4Scaling = data.data(data.display.position.y,:);
         case 'y'
@@ -67,7 +67,7 @@ else
     data4Scaling = data.data;
 end
 
-switch lower(parameters.normalisationType)
+switch lower(parameters.type)
     case 'pk2pk'
         normalisationFactor = ...
             1/(max(max(data4Scaling))-min(min(data4Scaling)));

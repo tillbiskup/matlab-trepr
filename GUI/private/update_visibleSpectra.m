@@ -11,7 +11,7 @@ function status = update_visibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% 2014-11-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -122,6 +122,14 @@ set(procPLboxSec,'String',labels);
 if ad.control.data.active
     set(procPLbox,'Value',find(vis==ad.control.data.active));
     set(procPLbox2,'Value',find(vis==ad.control.data.active));
+end
+
+% Fix problem if value of listbox is larger than number of entries
+if get(procPLbox,'Value')>length(vis)
+    set(procPLbox,'Value',length(vis));
+end
+if get(procPLbox2,'Value')>length(vis)
+    set(procPLbox2,'Value',length(vis));
 end
 
 % Update list of spectra of the display panel
