@@ -15,7 +15,7 @@ function status = trEPRexport4glotaran(dataset,filename,varargin)
 % Copyright (c) 2011, Bernd Paulus
 % Copyright (c) 2011-14, Till Biskup
 % Copyright (c) 2014, Deborah Meyer
-% 2014-11-24
+% 2014-11-26
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -39,7 +39,7 @@ end
 try
     header{1} = dataset.label;
     header{2} = datestr(now);
-    header{3} = 'magnetic field';
+    header{3} = 'wavelength explicit';
     header{4} = sprintf('Intervalnr %s',int2str(size(dataset.data,1)));
     
     % Write header to output file
