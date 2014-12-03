@@ -7,7 +7,7 @@ function handle = panelDatasets(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-14, Till Biskup
-% 2014-10-20
+% 2014-12-03
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -689,6 +689,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
+    gh = guihandles(mainWindow);
     
     switch lower(action)
         case 'showonlyactive'
