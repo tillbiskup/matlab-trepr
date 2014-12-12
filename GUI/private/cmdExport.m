@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-14, Till Biskup
-% 2014-10-18
+% 2014-12-12
 
 status = 0;
 warnings = cell(0);
@@ -169,33 +169,39 @@ caption = get(gh.display_panel_axesexport_includecaption_checkbox,'Value');
 if ~isempty(opt)
     % Check for image format
     formatidx = strncmpi('format=',opt,6);
-    formatstr = opt(formatidx);
-    % Remove respective entries from opt cell array
-    opt(formatidx) = [];
-    if ~isempty(formatstr)
-        exportFormat = formatstr{1}(8:end);
+    if ~isempty(formatidx)
+        formatstr = opt(formatidx);
+        % Remove respective entries from opt cell array
+        opt(formatidx) = [];
+        if ~isempty(formatstr)
+            exportFormat = formatstr{1}(8:end);
+        end
     end
     
     % Check for file type
     typeidx = strncmpi('type=',opt,4);
-    typestr = opt(typeidx);
-    % Remove respective entries from opt cell array
-    opt(typeidx) = [];
-    if ~isempty(typestr)
-        fileType = typestr{1}(6:end);
+    if ~isempty(typeidx)
+        typestr = opt(typeidx);
+        % Remove respective entries from opt cell array
+        opt(typeidx) = [];
+        if ~isempty(typestr)
+            fileType = typestr{1}(6:end);
+        end
     end
     
     % Check for caption options
     captionidx = strncmpi('caption=',opt,7);
-    captionstr = opt{captionidx}(9:end);
-    % Remove respective entries from opt cell array
-    opt(captionidx) = [];
-    if ~isempty(captionstr)
-        switch lower(captionstr)
-            case {'yes','y','true','1'}
-                caption = true;
-            case {'no','n','false','0'}
-                caption = false;
+    if ~isempty(captionidx)
+        captionstr = opt{captionidx}(9:end);
+        % Remove respective entries from opt cell array
+        opt(captionidx) = [];
+        if ~isempty(captionstr)
+            switch lower(captionstr)
+                case {'yes','y','true','1'}
+                    caption = true;
+                case {'no','n','false','0'}
+                    caption = false;
+            end
         end
     end
     
