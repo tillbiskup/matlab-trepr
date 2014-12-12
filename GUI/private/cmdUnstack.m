@@ -22,7 +22,7 @@ function [status,warnings] = cmdUnstack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-14
+% 2014-12-12
 
 status = 0;
 warnings = cell(0);
@@ -82,7 +82,7 @@ end
 
 % Reset displacement to zero for all traces
 for idx = 1:length(ad.control.data.visible)
-    ad.data{ad.control.data.visible(idx)}.display.displacement.z = 0;
+    ad.data{ad.control.data.visible(idx)}.display.displacement.data.z = 0;
 end
 
 % Set new axis limits

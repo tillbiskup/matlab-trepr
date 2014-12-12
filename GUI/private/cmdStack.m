@@ -22,7 +22,7 @@ function [status,warnings] = cmdStack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-14
+% 2014-12-12
 
 status = 0;
 warnings = cell(0);
@@ -121,7 +121,7 @@ additionalDelta = ...
 
 % Add deltas and additionalDelta to traces
 for delta = 1:length(deltas)
-    ad.data{ad.control.data.visible(delta+1)}.display.displacement.z = ...
+    ad.data{ad.control.data.visible(delta+1)}.display.displacement.data.z = ...
         sum(deltas(1:delta)) + delta*additionalDelta;
 end
 
