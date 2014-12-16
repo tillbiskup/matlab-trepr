@@ -101,7 +101,6 @@ end
 deltas = zeros(1,length(ad.control.data.visible)-1);
 for dataset = 1:length(ad.control.data.visible)-1
     % Match datasets in given dimension
-    disp('.')
     tmpDatasets = trEPRdatasetMatch(corrDatasets([dataset,dataset+1]),...
         'dimension',dimension);
     switch dimension
