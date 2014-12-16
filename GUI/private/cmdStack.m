@@ -102,12 +102,8 @@ deltas = zeros(1,length(ad.control.data.visible)-1);
 for dataset = 1:length(ad.control.data.visible)-1
     % Match datasets in given dimension
     disp('.')
-    [corrDatasets{dataset}.axes.y.values(1) corrDatasets{dataset}.axes.y.values(end)]
-    [corrDatasets{dataset+1}.axes.y.values(1) corrDatasets{dataset+1}.axes.y.values(end)]
     tmpDatasets = trEPRdatasetMatch(corrDatasets([dataset,dataset+1]),...
         'dimension',dimension);
-    [tmpDatasets{1}.axes.y.values(1) tmpDatasets{1}.axes.y.values(end)]
-    [tmpDatasets{2}.axes.y.values(1) tmpDatasets{2}.axes.y.values(end)]
     switch dimension
         case 'x'
             deltas(dataset) = abs(min(...
