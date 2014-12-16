@@ -8,7 +8,7 @@ function [data] = trEPRdatasetMatch(data,varargin)
 %   [datasets] = trEPRdatasetMatch(datasets)
 %   [datasets] = trEPRdatasetMatch(datasets,<parameter>,<value>)
 %
-% data - 1x2 struct
+% data - 1x2 cell
 %        Datasets conforming to the trEPR toolbox data format
 %
 % Optional parameters that can be set:
@@ -38,7 +38,7 @@ function [data] = trEPRdatasetMatch(data,varargin)
 % See also: interp1, interp2
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-28
+% 2014-12-16
 
 % Parse input arguments using the inputParser functionality
 try
