@@ -22,7 +22,7 @@ function [status,warnings] = cmdStack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-12-12
+% 2014-12-16
 
 status = 0;
 warnings = cell(0);
@@ -61,63 +61,64 @@ if isempty(ad.control.data.visible)
     return;
 end
 
-if strcmpi(ad.control.axis.displayType,'2d plot')
-    warnings{end+1} = sprintf('%s: Cannot operate in "%s" display type.',...
-        cmd,ad.control.data.displayType);
+% Check for display type
+if ~strncmpi(ad.control.axis.displayType,'1d',2)
+    warnings{end+1} = 'Stacking works only in 1D modes.';
     status = -3;
     return;
 end
 
-% Get x and y values of spectra - FOR NOW assume identical x axes
-switch lower(ad.control.axis.displayType)
-    case '1d along x'
-        % Preallocation
-        xValues = zeros(length(ad.control.data.visible),...
-            length(ad.data{ad.control.data.visible(1)}.axes.x.values));
-        yValues = zeros(length(xValues));
-        for idx=1:length(ad.control.data.visible)
-            xValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.axes.x.values;
-            yValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.data(...
-                ad.data{ad.control.data.visible(idx)}.display.position.y,:);
-        end
-        if length(ad.control.data.visible) > 1 ...
-                && ~isequal(...
-                repmat(xValues(1,:),[],size(xValues,1)),xValues)
-            warnings{end+1} = sprintf('%s: Axes are not identical.',cmd);
-            status = -3;
-            return;
-        end
-    case '1d along y'
-        % Preallocation
-        xValues = zeros(length(ad.control.data.visible),...
-            length(ad.data{ad.control.data.visible(1)}.axes.y.values));
-        yValues = zeros(size(xValues));
-        for idx=1:length(ad.control.data.visible)
-            xValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.axes.y.values;
-            yValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.data(:,...
-                ad.data{ad.control.data.visible(idx)}.display.position.x);
-        end
-        if length(ad.control.data.visible) > 1 ...
-                && ~isequal(...
-                repmat(xValues(1,:),[],size(xValues,1)),xValues)
-            warnings{end+1} = sprintf('%s: Axes are not identical.',cmd);
-            status = -3;
-            return;
-        end
+% Get display dimension (1D along <dimension>)
+dimension = lower(ad.control.axis.displayType(end));
+
+% Apply displacement, normalisation, scaling
+corrDatasets = cell(1,length(ad.control.data.visible));
+for dataset = 1:length(ad.control.data.visible)
+    corrDatasets{dataset} = trEPRdatasetApplyDisplacement(...
+        ad.data{ad.control.data.visible(dataset)});
+    normalisationParameters = ad.control.axis.normalisation;
+    normalisationParameters.displayType = dimension;
+    corrDatasets{dataset} = trEPRdatasetApplyNormalisation(...
+        ad.data{ad.control.data.visible(dataset)},...
+        normalisationParameters);
+    corrDatasets{dataset} = trEPRdatasetApplyScaling(...
+        ad.data{ad.control.data.visible(dataset)});
 end
 
-% Get deltas in y direction
-deltas = abs(min(yValues(2:end,:)-yValues(1:end-1,:),[],2));
+% Get minimum and maximum in z direction (y direction of plot)
+switch dimension
+    case 'x'
+        zMin = min(...
+            corrDatasets{1}.data(corrDatasets{1}.display.position.y,:));
+        zMax = max(...
+            corrDatasets{end}.data(corrDatasets{end}.display.position.y,:));
+    case 'y'
+        zMin = min(...
+            corrDatasets{1}.data(:,corrDatasets{1}.display.position.x));
+        zMax = max(...
+            corrDatasets{end}.data(:,corrDatasets{end}.display.position.x));
+end
+
+deltas = zeros(1,length(ad.control.data.visible)-1);
+for dataset = 1:length(ad.control.data.visible)-1
+    % Match datasets in given dimension
+    tmpDatasets = trEPRdatasetMatch(corrDatasets([dataset,dataset+1]),...
+        'dimension',dimension);
+    switch dimension
+        case 'x'
+            deltas(dataset) = abs(min(...
+                tmpDatasets{2}.data(tmpDatasets{2}.display.position.y,:)- ...
+                tmpDatasets{1}.data(tmpDatasets{1}.display.position.y,:)));
+        case 'y'
+            deltas(dataset) = abs(min(...
+                tmpDatasets{2}.data(:,tmpDatasets{2}.display.position.x)- ...
+                tmpDatasets{1}.data(:,tmpDatasets{1}.display.position.x)));
+    end
+end
 
 % Calculate a proper difference between each trace
 % Therefore, calculate the overall space used and take a percentage of this
-additionalDelta = ...
-    (abs(min(yValues(1,:))) + max(yValues(end,:)) + sum(deltas)) * ...
-    percentage/100;
+additionalDelta = (zMin + zMax + sum(deltas)) * percentage/100;
 
 % Add deltas and additionalDelta to traces
 for delta = 1:length(deltas)
@@ -126,8 +127,9 @@ for delta = 1:length(deltas)
 end
 
 % Set new axis limits
+ad.control.axis.limits.z.min = zMin - additionalDelta;
 ad.control.axis.limits.z.max = ...
-    max(yValues(end,:)) + sum(deltas) + length(deltas)*additionalDelta;
+    zMax + sum(deltas) + (length(deltas)+1)*additionalDelta;
 ad.control.axis.limits.auto = 0;
 
 % Set appdata
