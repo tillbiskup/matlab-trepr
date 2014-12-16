@@ -21,7 +21,7 @@ function data = trEPRdatasetApplyDisplacement(data,varargin)
 % trEPRdatasetApplyNormalisation
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% 2014-12-16
 
 % Parse input arguments using the inputParser functionality
 try
@@ -50,8 +50,14 @@ if ~isempty(fieldnames(p.Results.parameters))
     data.display.displacement = p.Results.parameters;
 end
 
-data.axes.x.values = data.axes.x.values + data.display.displacement.data.x;
-data.axes.y.values = data.axes.y.values + data.display.displacement.data.y;
+if length(data.axes.x.values)>1
+    data.axes.x.values = data.axes.x.values + ...
+        data.display.displacement.data.x*diff(data.axes.x.values([1,2]));
+end
+if length(data.axes.y.values)>1
+    data.axes.y.values = data.axes.y.values + ...
+        data.display.displacement.data.y*diff(data.axes.y.values([1,2]));
+end
 
 data.data = data.data + data.display.displacement.data.z;
 
