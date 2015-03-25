@@ -21,13 +21,8 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-<<<<<<< HEAD
 % Copyright (c) 2013-15, Till Biskup
 % 2015-01-26
-=======
-% Copyright (c) 2013-14, Till Biskup
-% 2014-12-12
->>>>>>> f53f634a930045a026023dd5232daf7c0b7c104d
 
 status = 0;
 warnings = cell(0);
