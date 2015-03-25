@@ -310,13 +310,6 @@ switch ad.control.axis.displayType
             if isscalar(y)
                 y = [y y+1];
             end
-            % Apply displacement if necessary
-            if (ad.data{k}.display.displacement.data.x ~= 0)
-                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
-            end
-            if (ad.data{k}.display.displacement.data.z ~= 0)
-                y = y + ad.data{k}.display.displacement.data.z;
-            end
             % Normalise if necessary
             if ad.control.axis.normalisation.enable
                 if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -343,6 +336,14 @@ switch ad.control.axis.displayType
                             y = y/abs(min(min(ad.data{k}.data)));
                     end
                 end
+            end
+            % Apply displacement if necessary
+            % IMPORTANT: Apply AFTER normalisation
+            if (ad.data{k}.display.displacement.data.x ~= 0)
+                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
+            end
+            if (ad.data{k}.display.displacement.data.z ~= 0)
+                y = y + ad.data{k}.display.displacement.data.z;
             end
             % Apply filter if necessary
             if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
@@ -407,13 +408,6 @@ switch ad.control.axis.displayType
                 if isscalar(y)
                     y = [y y+1]; %#ok<AGROW>
                 end
-                % Apply displacement if necessary
-                if (ad.data{k}.display.displacement.data.x ~= 0)
-                    x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
-                end
-                if (ad.data{k}.display.displacement.data.z ~= 0)
-                    y = y + ad.data{k}.display.displacement.data.z;
-                end
                 % Normalise if necessary
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -440,6 +434,14 @@ switch ad.control.axis.displayType
                                 y = y/abs(min(min(ad.data{k}.data)));
                         end
                     end
+                end
+                % Apply displacement if necessary
+                % IMPORTANT: Apply AFTER normalisation
+                if (ad.data{k}.display.displacement.data.x ~= 0)
+                    x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
+                end
+                if (ad.data{k}.display.displacement.data.z ~= 0)
+                    y = y + ad.data{k}.display.displacement.data.z;
                 end
                 % Apply filter if necessary
                 if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
@@ -649,13 +651,6 @@ switch ad.control.axis.displayType
             if isscalar(y)
                 y = [y y+1];
             end
-            % Apply displacement if necessary
-            if (ad.data{k}.display.displacement.data.y ~= 0)
-                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
-            end
-            if (ad.data{k}.display.displacement.data.z ~= 0)
-                x = x + ad.data{k}.display.displacement.data.z;
-            end
             % Normalise if necessary
             if ad.control.axis.normalisation.enable
                 if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -681,6 +676,14 @@ switch ad.control.axis.displayType
                             x = x/abs(min(min(data)));
                     end
                 end
+            end
+            % Apply displacement if necessary
+            % IMPORTANT: Apply AFTER normalisation
+            if (ad.data{k}.display.displacement.data.y ~= 0)
+                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
+            end
+            if (ad.data{k}.display.displacement.data.z ~= 0)
+                x = x + ad.data{k}.display.displacement.data.z;
             end
             % Apply filter if necessary
             if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)
@@ -763,13 +766,6 @@ switch ad.control.axis.displayType
                 if isscalar(y)
                     y = [y y+1]; %#ok<AGROW>
                 end
-                % Apply displacement if necessary
-                if (ad.data{k}.display.displacement.data.y ~= 0)
-                    y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
-                end
-                if (ad.data{k}.display.displacement.data.z ~= 0)
-                    x = x + ad.data{k}.display.displacement.data.z;
-                end
                 % Normalise if necessary
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -796,6 +792,14 @@ switch ad.control.axis.displayType
                                 x = x/abs(min(min(ad.data{k}.data)));
                         end
                     end
+                end
+                % Apply displacement if necessary
+                % IMPORTANT: Apply AFTER normalisation
+                if (ad.data{k}.display.displacement.data.y ~= 0)
+                    y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
+                end
+                if (ad.data{k}.display.displacement.data.z ~= 0)
+                    x = x + ad.data{k}.display.displacement.data.z;
                 end
                 % Apply filter if necessary
                 if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)

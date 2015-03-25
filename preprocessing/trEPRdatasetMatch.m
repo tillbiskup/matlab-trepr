@@ -8,7 +8,7 @@ function [data] = trEPRdatasetMatch(data,varargin)
 %   [datasets] = trEPRdatasetMatch(datasets)
 %   [datasets] = trEPRdatasetMatch(datasets,<parameter>,<value>)
 %
-% data - 1x2 struct
+% data - 1x2 cell
 %        Datasets conforming to the trEPR toolbox data format
 %
 % Optional parameters that can be set:
@@ -38,7 +38,7 @@ function [data] = trEPRdatasetMatch(data,varargin)
 % See also: interp1, interp2
 
 % Copyright (c) 2014, Till Biskup
-% 2014-07-28
+% 2014-12-16
 
 % Parse input arguments using the inputParser functionality
 try
@@ -68,8 +68,8 @@ end
 % Check for identical dimensions and axis values of the datasets
 % NOTE: Units are *not* checked
 if all(size(data{1}.data) == size(data{2}.data)) && ...
-        all(size(data{1}.axes.x.values) == size(data{2}.axes.x.values)) && ...
-        all(size(data{1}.axes.y.values) == size(data{2}.axes.y.values))
+        all(data{1}.axes.x.values == data{2}.axes.x.values) && ...
+        all(data{1}.axes.y.values == data{2}.axes.y.values)
     trEPRmsg([mfilename ': Datasets have identical dimensions'],'info');
     return;
 end

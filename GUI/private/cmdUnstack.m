@@ -22,7 +22,7 @@ function [status,warnings] = cmdUnstack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014, Till Biskup
-% 2014-06-14
+% 2014-12-16
 
 status = 0;
 warnings = cell(0);
@@ -58,35 +58,30 @@ if isempty(ad.control.data.visible)
     return;
 end
 
-% Get x and y values of spectra - FOR NOW assume identical x axes
-switch lower(ad.control.axis.displayType)
-    case '1d along x'
-        % Preallocation
-        yValues = zeros(length(ad.control.data.visible),...
-            length(ad.data{ad.control.data.visible(1)}.axes.x.values));
-        for idx=1:length(ad.control.data.visible)
-            yValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.data(...
-                ad.data{ad.control.data.visible(idx)}.display.position.y,:);
-        end
-    case '1d along y'
-        % Preallocation
-        yValues = zeros(length(ad.control.data.visible),...
-            length(ad.data{ad.control.data.visible(1)}.axes.y.values));
-        for idx=1:length(ad.control.data.visible)
-            yValues(idx,:) = ...
-                ad.data{ad.control.data.visible(idx)}.data(:,...
-                ad.data{ad.control.data.visible(idx)}.display.position.x);
-        end
+% Check for display type
+if ~strncmpi(ad.control.axis.displayType,'1d',2)
+    warnings{end+1} = 'Stacking works only in 1D modes.';
+    status = -3;
+    return;
+end
+
+% Get maxima of z values
+% Preallocation
+maxima = zeros(length(ad.control.data.visible),1);
+dimension = lower(ad.control.axis.displayType(end));
+for idx=1:length(ad.control.data.visible)
+    maxima(idx) = max(...
+        ad.data{ad.control.data.visible(idx)}.data(...
+        ad.data{ad.control.data.visible(idx)}.display.position.(dimension),:));
 end
 
 % Reset displacement to zero for all traces
 for idx = 1:length(ad.control.data.visible)
-    ad.data{ad.control.data.visible(idx)}.display.displacement.z = 0;
+    ad.data{ad.control.data.visible(idx)}.display.displacement.data.z = 0;
 end
 
 % Set new axis limits
-ad.control.axis.limits.z.max = max(max(yValues));
+ad.control.axis.limits.z.max = max(maxima);
 ad.control.axis.limits.auto = 1;
 
 % Set appdata
