@@ -21,8 +21,8 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2013-15, Till Biskup
+% 2015-01-26
 
 status = 0;
 warnings = cell(0);
@@ -338,12 +338,12 @@ if ~isempty(opt)
     end
     
     % Check for file type
-    typeidx = strncmpi('type=',opt,6);
+    typeidx = strncmpi('type=',opt,5);
     typestr = opt(typeidx);
     % Remove respective entries from opt cell array
     opt(typeidx) = [];
     if ~isempty(typestr)
-        fileType = typestr{1}(8:end);
+        fileType = typestr{1}(6:end);
     end
     
     % Finally, take remaining options as file name
@@ -354,7 +354,11 @@ if ~isempty(opt)
             if_status = -3;
             return;
         end
-        fileName = strtrim('%s_',opt{:});
+        if length(opt) > 1
+            fileName = strtrim(sprintf('%s_',opt{:}));
+        else
+            fileName = strtrim(opt{:});
+        end
     end
 end
 
@@ -380,6 +384,10 @@ switch fileType
         fileExtension = 'dat';
     otherwise
         fileExtension = '';
+end
+
+if ~isempty(fileExtension)
+    fileName = [fileName '.' fileExtension];
 end
 
 % If multipleFiles is set, meaning that multiple visible datasets should be
@@ -479,6 +487,9 @@ else
     end
     
     % set lastExport Dir in appdata
+    if ~exist('pathName','var')
+        pathName = pwd;
+    end
     if exist(pathName,'dir')
         ad.control.dir.lastExport = pathName;
     end

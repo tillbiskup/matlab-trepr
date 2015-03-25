@@ -29,8 +29,8 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 %
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
-% Copyright (c) 2012-14, Till Biskup
-% 2014-07-23
+% Copyright (c) 2012-15, Till Biskup
+% 2015-03-25
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -51,10 +51,7 @@ p.parse(filename,varargin{:});
 warnings = cell(0);
 
 % Define identifierString for Info File format
-identifierString = 'trEPR Info file - ';
-
-% Define comment character
-commentChar = '%';
+identifierString = 'trEPR Info file';
 
 try
     parameters = struct();
@@ -82,98 +79,25 @@ try
         end
     end
     
-    % Read file
-    fh = fopen(filename);
-    % Read content of the par file to cell array
-    metaFile = cell(0);
-    k=1;
-    while 1
-        tline = fgetl(fh);
-        if ~ischar(tline)
-            break
-        end
-        metaFile{k} = tline;
-        k=k+1;
-    end
-    fclose(fh);
-    
-    % Check for correct file format
-    if ~strfind(metaFile{1},identifierString)
-            parameters = struct();
-            warnings{end+1} = struct(...
-                'identifier','trEPRinfoFileParse:fileformat',...
-                'message','File seems to be of wrong format'...
-                );
-            return;
-    end
-    
-    % For convenience and easier parsing, get an overview where the blocks
-    % start in the metafile.
-    
-    % Block names are defined in a cell array.
-    blockNames = {...
-        'GENERAL' ...
-        'SAMPLE' ...
-        'TRANSIENT' ...
-        'MAGNETIC FIELD' ...
-        'BACKGROUND' ...
-        'BRIDGE' ...
-        'VIDEO AMPLIFIER' ...
-        'RECORDER' ...
-        'PROBEHEAD' ...
-        'PUMP' ...
-        'TEMPERATURE' ...
-        'FIELD CALIBRATION' ...
-        'FREQUENCY CALIBRATION' ...
-        'COMMENT' ...
-        };    
-    % Assign block names and line numbers where they start to struct
-    % The field names of the struct consist of the block names in small
-    % letters with spaces removed.
-    %
-    % NOTE: If a block could not be found, its line number defaults to 1
-    %
-    % As it is not possible to do a "reverse lookup" in an array, the
-    % vector "lineNumbers" holds the line numbers for the blocks
-    % separately, if one needs to access them directly, without knowing
-    % which block one is looking for.
-    blocks = struct();
-    lineNumbers = zeros(1,length(blockNames));
-    for k = 1:length(blockNames)
-        [~,lineNumber] = max(cellfun(@(x) ~isempty(x),...
-            strfind(metaFile,blockNames{k})));
-        lineNumbers(k) = lineNumber;
-        blocks.(str2fieldName(blockNames{k})) = lineNumber;
-    end
-
-    % How to access the line number of the next block starting with a given
-    % block (to find out where the current block ends):
-    % min(find(lineNumbers > blocks.blockname))
-    
-    % Parse every single block, using internal function parseBlocks()
-    blocknames = fieldnames(blocks);
-        
-    for k=1:length(blocknames)
-        if strcmpi(blocknames{k},'comment')
-            % Assign comment lines to block.comment field
-            block.comment = metaFile(...
-                blocks.(blocknames{k})+1 : length(metaFile));
-        else
-            % Assign block fields generically
-            block.(blocknames{k}) = parseBlocks(metaFile(...
-                blocks.(blocknames{k})+1 : ...
-                lineNumbers(find(...
-                lineNumbers > blocks.(blocknames{k}), 1 ))-2 ...
-                ),commentChar);
-        end
-    end
-    
-    parameters = block;
+    [parameters,format] = commonInfofileLoad(filename);
     
     if p.Results.command
         switch lower(p.Results.command)
             case 'map'
-                parameters = mapToDataStructure(parameters);
+                if commonVersionLessThan(format.version,'0.1.5')
+                    parameters = mapToDataStructure(parameters);
+                else
+                    dataset = trEPRdataStructure('structure');
+                    parameters = trEPRdatasetMapInfo(...
+                        dataset,parameters,format);
+                    % For now: Remove a few fields that might confuse the
+                    % toolbox, as commonDatasetMapInfo returns a full
+                    % dataset and trEPRinfoFileParse is expected not to do.
+                    fields2remove = {...
+                        'data','axes','calculated','history','format',...
+                        'characteristics','file','display','calculation'};
+                    parameters = rmfield(parameters,fields2remove);
+                end
             otherwise
                 disp(['trEPRinfoFileParse() : Unknown command "'...
                     p.Results.command '"']);
@@ -297,70 +221,72 @@ try
     for k=1:length(matching)
         % For debugging: Print current field name:
         % fprintf('%s\n',matching{k,1});
-        switch matching{k,3}
-            case 'numeric'
-                if ischar(getCascadedField(parameters,matching{k,1}))
-                    dataStructure = setCascadedField(dataStructure,...
-                        matching{k,2},...
-                        num2str(getCascadedField(parameters,matching{k,1})));
-                else
-                    dataStructure = setCascadedField(dataStructure,...
-                        matching{k,2},...
-                        getCascadedField(parameters,matching{k,1}));
-                end
-            case 'valueunit'
-                if ~isempty(getCascadedField(parameters,matching{k,1}))
-                    if isnumeric(getCascadedField(parameters,matching{k,1}))
+        if ~isempty(getCascadedField(parameters,matching{k,1}))
+            switch matching{k,3}
+                case 'numeric'
+                    if ischar(getCascadedField(parameters,matching{k,1}))
                         dataStructure = setCascadedField(dataStructure,...
-                            [matching{k,2} '.value'],...
-                            getCascadedField(parameters,matching{k,1}));
-                        dataStructure = setCascadedField(dataStructure,...
-                            [matching{k,2} '.unit'],'');
+                            matching{k,2},...
+                            num2str(getCascadedField(parameters,matching{k,1})));
                     else
-                        parts = regexp(...
-                            getCascadedField(parameters,matching{k,1}),...
-                            ' ','split','once');
-                        if length(parts) < 2
-                            if isnumeric(parts{1})
+                        dataStructure = setCascadedField(dataStructure,...
+                            matching{k,2},...
+                            getCascadedField(parameters,matching{k,1}));
+                    end
+                case 'valueunit'
+                    if ~isempty(getCascadedField(parameters,matching{k,1}))
+                        if isnumeric(getCascadedField(parameters,matching{k,1}))
+                            dataStructure = setCascadedField(dataStructure,...
+                                [matching{k,2} '.value'],...
+                                getCascadedField(parameters,matching{k,1}));
+                            dataStructure = setCascadedField(dataStructure,...
+                                [matching{k,2} '.unit'],'');
+                        else
+                            parts = regexp(...
+                                getCascadedField(parameters,matching{k,1}),...
+                                ' ','split','once');
+                            if length(parts) < 2
+                                if isnumeric(parts{1})
+                                    dataStructure = setCascadedField(dataStructure,...
+                                        [matching{k,2} '.value'],...
+                                        str2num(parts{1})); %#ok<ST2NM>
+                                    dataStructure = setCascadedField(dataStructure,...
+                                        [matching{k,2} '.unit'],...
+                                        '');
+                                else
+                                    dataStructure = setCascadedField(dataStructure,...
+                                        [matching{k,2} '.value'],...
+                                        []);
+                                    dataStructure = setCascadedField(dataStructure,...
+                                        [matching{k,2} '.unit'],...
+                                        parts{1});
+                                end
+                            else
                                 dataStructure = setCascadedField(dataStructure,...
                                     [matching{k,2} '.value'],...
                                     str2num(parts{1})); %#ok<ST2NM>
                                 dataStructure = setCascadedField(dataStructure,...
                                     [matching{k,2} '.unit'],...
-                                    '');
-                            else
-                                dataStructure = setCascadedField(dataStructure,...
-                                    [matching{k,2} '.value'],...
-                                    []);
-                                dataStructure = setCascadedField(dataStructure,...
-                                    [matching{k,2} '.unit'],...
-                                    parts{1});
+                                    parts{2});
                             end
-                        else
-                            dataStructure = setCascadedField(dataStructure,...
-                                [matching{k,2} '.value'],...
-                                str2num(parts{1})); %#ok<ST2NM>
-                            dataStructure = setCascadedField(dataStructure,...
-                                [matching{k,2} '.unit'],...
-                                parts{2});
                         end
+                    else
+                        dataStructure = setCascadedField(dataStructure,...
+                            [matching{k,2} '.value'],...
+                            []);
+                        dataStructure = setCascadedField(dataStructure,...
+                            [matching{k,2} '.unit'],...
+                            '');
                     end
-                else
+                case 'copy'
                     dataStructure = setCascadedField(dataStructure,...
-                        [matching{k,2} '.value'],...
-                        []);
+                        matching{k,2},...
+                        getCascadedField(parameters,matching{k,1}));
+                case 'copyascell'
                     dataStructure = setCascadedField(dataStructure,...
-                        [matching{k,2} '.unit'],...
-                        '');
-                end
-            case 'copy'
-                dataStructure = setCascadedField(dataStructure,...
-                    matching{k,2},...
-                    getCascadedField(parameters,matching{k,1}));
-            case 'copyascell'
-                dataStructure = setCascadedField(dataStructure,...
-                    matching{k,2},...
-                    cellstr(getCascadedField(parameters,matching{k,1})));
+                        matching{k,2},...
+                        cellstr(getCascadedField(parameters,matching{k,1})));
+            end
         end
     end
     
@@ -377,98 +303,6 @@ end
 
 end
 
-% STR2FIELDNAME Internal function converting strings into valid
-%               field names for structs
-%
-% Currently, spaces are removed, starting with the second word parts of
-% the fieldname capitalised, and parentheses "(" and ")" removed.
-%
-% string    - string
-%             string to be converted into a field name
-% fieldName - string
-%             string containing the valid field name for a struct
-function fieldName = str2fieldName(string)
-
-% Eliminate brackets
-string = strrep(strrep(string,')',''),'(','');
-fieldName = regexp(lower(string),' ','split');
-if length(fieldName) > 1
-    fieldName(2:end) = cellfun(...
-        @(x) [upper(x(1)) x(2:end)],...
-        fieldName(2:end),...
-        'UniformOutput',false);
-    fieldName = [fieldName{:}];
-else
-    fieldName = fieldName{1};
-end
-
-end
-
-% PARSEBLOCKS Internal function parsing blocks of the metafile
-%
-% A given block is parsed, the lines split by the first appearance of the
-% delimiter ":", the first part converted into a field name for a struct
-% and  the second part assigned to that field of the struct.
-%
-% blockData  - cell array of strings
-%              block data to be parsed
-% parameters - struct
-%              structure containing key-value pairs
-function parameters = parseBlocks(blockData,commentChar)
-
-% Assign output parameter
-parameters = struct();
-
-% If we have continued lines (starting with whitespace character), add them
-% to previous line
-continuingLines = find(cellfun(@(x)isspace(x(1)),blockData));
-if any(continuingLines)
-    for k=length(continuingLines):-1:1
-        % Add line to previous line and use "\n" as delimiter (for later
-        % resplitting)
-        blockData{continuingLines(k)-1} = [ ...
-            blockData{continuingLines(k)-1} '\n' ...
-            strtrim(blockData{continuingLines(k)}) ];
-        % Delete element in cell array
-        blockData(continuingLines(k)) = [];
-    end
-end
-blockLines = cellfun(...
-    @(x) regexp(x,':','split','once'),...
-    blockData,...
-    'UniformOutput', false);
-for k=1:length(blockLines)
-    % Fill parameters structure
-    if ~isempty(blockLines{k}{1}) % Prevent empty lines being parsed
-        % Remove comments
-        commentCharPos = regexp(blockLines{k}{2},['  ' commentChar],'start');
-        if ~isempty(commentCharPos)
-            blockLines{k}{2} = blockLines{k}{2}(1:commentCharPos);
-        end
-        commentCharPos = regexp(blockLines{k}{2},['\t' commentChar],'start');
-        if ~isempty(commentCharPos)
-            blockLines{k}{2} = blockLines{k}{2}(1:commentCharPos);
-        end
-        % If not convertible into number - or containing commas
-        if isnan(str2double(blockLines{k}{2})) || ...
-                any(strfind(blockLines{k}{2},','))
-            % If line was concatenated earlier, split it again
-            if strfind(blockLines{k}{2},'\n')
-                parameters.(str2fieldName(blockLines{k}{1})) = ...
-                    regexp(strtrim(blockLines{k}{2}),'\\n','split');
-            else
-                parameters.(str2fieldName(blockLines{k}{1})) = ...
-                    strtrim(blockLines{k}{2});
-            end
-        else
-            parameters.(str2fieldName(blockLines{k}{1})) = ...
-                str2double(strtrim(blockLines{k}{2}));
-        end
-    end
-end
-
-end
-
 % --- Get field of cascaded struct
 function value = getCascadedField (struct, fieldName)
     try
@@ -481,6 +315,10 @@ function value = getCascadedField (struct, fieldName)
                 value = '';
             end
         else
+            if ~isfield(struct,fieldName(1:nDots(1)-1))
+                value = '';
+                return;
+            end
             struct = struct.(fieldName(1:nDots(1)-1));
             value = getCascadedField(...
                 struct,...

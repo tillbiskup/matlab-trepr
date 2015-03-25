@@ -252,7 +252,7 @@ try
         otherwise
             % Handle not supported file types
             status = sprintf('File type %s (currently) not supported',...
-                parameters.filetype);
+                parameters.file.type);
             return;
     end
     
