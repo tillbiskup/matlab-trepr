@@ -188,6 +188,11 @@ for blockLine = 1:length(infoFileBlock)
     else
         % Separate line along delimiter, ":" in this case
         blockLineParts = regexp(infoFileBlock{blockLine},':','split','once');
+        % If there is a percent sign (aka comment), cut comment
+        if strfind(blockLineParts{2},' %')
+            blockLineParts{2} = strtrim(...
+                blockLineParts{2}(1:strfind(blockLineParts{2},' %')-1));
+        end
         if length(blockLineParts) == 2
             parsedBlock.(sanitiseFieldName(strtrim(blockLineParts{1}))) = ...
                 strtrim(blockLineParts{2});
