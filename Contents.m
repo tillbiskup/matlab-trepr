@@ -1,2 +1,2 @@
 % trEPR Toolbox
-% Version 0.3.51 25-Mar-2015
+% Version 0.3.52 12-May-2015
