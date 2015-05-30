@@ -29,8 +29,8 @@ function varargout = trEPRgnuplotLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE, TREPRGNUPLOTLOAD.
 
-% Copyright (c) 2009-2014, Till Biskup
-% 2014-02-20
+% Copyright (c) 2009-2015, Till Biskup
+% 2015-05-30
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -148,13 +148,13 @@ function [content,warnings] = loadFile(filename,varargin)
                             'tokens');
                         switch B0tok{1}{2}
                             case 'Gauss'
-                                content.axes.y.unit = 'G';
+                                content.axes.data(2).unit = 'G';
                                 content.parameters.field.start.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.stop.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.step.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRgnuplotLoad:parseError',...
@@ -163,7 +163,7 @@ function [content,warnings] = loadFile(filename,varargin)
                                     B0tok{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        content.axes.data(2).values(end+1) = str2double(B0tok{1}{1});
                         mwline = cellfun(@(x)any(strfind(x,'mw = ')),...
                             data.textdata);
                         mwtok = regexp(...
@@ -186,11 +186,11 @@ function [content,warnings] = loadFile(filename,varargin)
                 end
                 
                 content.parameters.field.start.value = ...
-                    content.axes.y.values(1);
+                    content.axes.data(2).values(1);
                 content.parameters.field.stop.value = ...
-                    content.axes.y.values(end);
+                    content.axes.data(2).values(end);
                 content.parameters.field.step.value = ...
-                    content.axes.y.values(2) - content.axes.y.values(1);
+                    content.axes.data(2).values(2) - content.axes.data(2).values(1);
             case 'combine'
                 % This is used in case filename is a cell array of file names
                 for k = 1 : length(filename)
@@ -209,13 +209,13 @@ function [content,warnings] = loadFile(filename,varargin)
                             'tokens');
                         switch B0tok{1}{2}
                             case 'Gauss'
-                                content.axes.y.unit = 'G';
+                                content.axes.data(2).unit = 'G';
                                 content.parameters.field.start.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.stop.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.step.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRgnuplotLoad:parseError',...
@@ -224,7 +224,7 @@ function [content,warnings] = loadFile(filename,varargin)
                                     B0tok{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(B0tok{1}{1});
+                        content.axes.data(2).values(end+1) = str2double(B0tok{1}{1});
                         mwline = cellfun(@(x)any(strfind(x,'mw = ')),...
                             data.textdata);
                         mwtok = regexp(...
@@ -246,11 +246,11 @@ function [content,warnings] = loadFile(filename,varargin)
                 end
                 
                 content.parameters.field.start.value = ...
-                    content.axes.y.values(1);
+                    content.axes.data(2).values(1);
                 content.parameters.field.stop.value = ...
-                    content.axes.y.values(end);
+                    content.axes.data(2).values(end);
                 content.parameters.field.step.value = ...
-                    content.axes.y.values(2) - content.axes.y.values(1);
+                    content.axes.data(2).values(2) - content.axes.data(2).values(1);
             otherwise
         end
     else
@@ -273,10 +273,10 @@ function [content,warnings] = loadFile(filename,varargin)
         B0tok = regexp(data.textdata{B0line},'B0 = ([0-9.]*)\s*(\w*)','tokens');
         switch B0tok{1}{2}
             case 'Gauss'
-                content.axes.y.unit = 'G';
-                content.parameters.field.start.unit = content.axes.y.unit;
-                content.parameters.field.stop.unit = content.axes.y.unit;
-                content.parameters.field.step.unit = content.axes.y.unit;
+                content.axes.data(2).unit = 'G';
+                content.parameters.field.start.unit = content.axes.data(2).unit;
+                content.parameters.field.stop.unit = content.axes.data(2).unit;
+                content.parameters.field.step.unit = content.axes.data(2).unit;
             otherwise
                 warnings{end+1} = struct(...
                     'identifier','trEPRspeksimLoad:parseError',...
@@ -288,7 +288,7 @@ function [content,warnings] = loadFile(filename,varargin)
         content.parameters.field.start.value = str2double(B0tok{1}{1});
         content.parameters.field.stop.value = str2double(B0tok{1}{1});
         content.parameters.field.step.value = 0;
-        content.axes.y.values = str2double(B0tok{1}{1});
+        content.axes.data(2).values = str2double(B0tok{1}{1});
         mwline = cellfun(@(x)any(strfind(x,'mw = ')),data.textdata);
         mwtok = regexp(data.textdata{mwline},'mw = ([0-9.]*)\s*(\w*)','tokens');
         content.parameters.bridge.MWfrequency.value = ...
@@ -302,7 +302,7 @@ function [content,warnings] = loadFile(filename,varargin)
     B0tok = regexp(data.textdata{2},'B0 = ([0-9.]*)\s*(\w*)','tokens');
     switch B0tok{1}{2}
         case 'Gauss'
-            content.axes.y.unit = 'G';
+            content.axes.data(2).unit = 'G';
         otherwise
             warnings{end+1} = struct(...
                 'identifier','trEPRgnuplotLoad:parseError',...
@@ -311,7 +311,7 @@ function [content,warnings] = loadFile(filename,varargin)
                 B0tok{1}{2})...
                 );
     end
-    content.axes.y.measure = 'magnetic field';
+    content.axes.data(2).measure = 'magnetic field';
 %     mwtok = regexp(data.textdata{3},'mw = ([0-9.]*)\s*(\w*)','tokens');
 %     content.parameters.bridge.MWfrequency.value = ...
 %         str2double(mwtok{1}{1});
@@ -332,10 +332,10 @@ function [content,warnings] = loadFile(filename,varargin)
         length(data.data(:,1))));
     
     % Create axis informations from parameters
-    content.axes.x.values = data.data(:,1);
-    content.axes.x.measure = 'time';
-    content.axes.x.unit = 's';
-    content.parameters.transient.length.unit = content.axes.x.unit;
+    content.axes.data(1).values = data.data(:,1);
+    content.axes.data(1).measure = 'time';
+    content.axes.data(1).unit = 's';
+    content.parameters.transient.length.unit = content.axes.data(1).unit;
     
     % Get label string from third line of file/header
     content.label = strtrim(content.header{3}(3:end));

@@ -20,8 +20,8 @@ function data = trEPRdatasetApplyNormalisation(data,varargin)
 % See also: trEPRdatasetApplyDisplacement, trEPRdatasetApplyScaling,
 % trEPRdatasetApplySmoothing
 
-% Copyright (c) 2014, Till Biskup
-% 2014-11-18
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -59,9 +59,9 @@ end
 if strcmpi(parameters.dimension,'1D')
     switch parameters.displayType(end)
         case 'x'
-            data4Scaling = data.data(data.display.position.y,:);
+            data4Scaling = data.data(data.display.position.data(2),:);
         case 'y'
-            data4Scaling = data.data(:,data.display.position.x);
+            data4Scaling = data.data(:,data.display.position.data(1));
     end
 else
     data4Scaling = data.data;

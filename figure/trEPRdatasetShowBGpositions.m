@@ -15,8 +15,8 @@ function trEPRdatasetShowBGpositions(varargin)
 %   axisHandle - handle (OPTIONAL)
 %                Handle of axis to plot into
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-21
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % Manual check for input arguments, as first argument is optional
 if nargin < 1
@@ -62,26 +62,26 @@ if ~exist('axisHandle','var')
     figureHandle = figure();
     switch p.Results.DisplayType
         case '2D'
-            imagesc(dataset.axes.x.values,dataset.axes.y.values,dataset.data);
+            imagesc(dataset.axes.data(1).values,dataset.axes.data(2).values,dataset.data);
             axisHandle = findobj(allchild(figureHandle),'Type','axes');
             set(axisHandle,'YDir','normal');
             xlabel(axisHandle,sprintf('{\\it %s} / %s',...
-                dataset.axes.x.measure,dataset.axes.x.unit));
+                dataset.axes.data(1).measure,dataset.axes.data(1).unit));
             ylabel(axisHandle,sprintf('{\\it %s} / %s',...
-                dataset.axes.y.measure,dataset.axes.y.unit));
+                dataset.axes.data(2).measure,dataset.axes.data(2).unit));
         case '1D'
             if min(size(dataset.data)) > 1
                 % Get time position of maximum
                 [~,timePos] = max(max(dataset.data));
-                plot(dataset.axes.y.values,...
+                plot(dataset.axes.data(2).values,...
                     dataset.data(:,timePos));
             else
-                plot(dataset.axes.x.values,dataset.axes.y.values,...
+                plot(dataset.axes.data(1).values,dataset.axes.data(2).values,...
                     dataset.data);
             end
             axisHandle = findobj(allchild(figureHandle),'Type','axes');
             xlabel(axisHandle,sprintf('{\\it %s} / %s',...
-                dataset.axes.y.measure,dataset.axes.y.unit));
+                dataset.axes.data(2).measure,dataset.axes.data(2).unit));
         otherwise
             return;
     end
@@ -92,9 +92,9 @@ xlim = get(axisHandle,'XLim');
 ylim = get(axisHandle,'YLim');
 
 % Check for field units
-if ~strcmpi(dataset.parameters.field.start.unit,dataset.axes.y.unit)
+if ~strcmpi(dataset.parameters.field.start.unit,dataset.axes.data(2).unit)
     if strcmpi(dataset.parameters.field.start.unit,'mT') && ...
-            strcmpi(dataset.axes.y.unit,'G')
+            strcmpi(dataset.axes.data(2).unit,'G')
         BGpositions = BGpositions * 10;
     end
 end

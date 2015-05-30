@@ -36,8 +36,8 @@ function varargout = trEPRPOC (data, varargin)
 %
 % See also: trEPRBGC
 
-% Copyright (c) 2010-14, Till Biskup
-% 2014-10-21
+% Copyright (c) 2010-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -100,7 +100,7 @@ end
 
 % Check whether we've loaded a spectrum rather than a time trace
 if vector && exist('dataset','var')
-    if isscalar(dataset.axes.x.values)
+    if isscalar(dataset.axes.data(1).values)
         trEPRmsg('You loaded a 1D spectrum. POC aborted.','warning');
         if exist('dataset','var')
             varargout{1} = dataset;

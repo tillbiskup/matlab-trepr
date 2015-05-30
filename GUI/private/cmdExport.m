@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-01-26
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -432,11 +432,11 @@ if multipleFiles
             case '1D along x'
                 export1Dparameters.crosssection.direction = 'x';
                 export1Dparameters.crosssection.position = ...
-                    ad.data{ad.control.data.visible(idx)}.display.position.y;
+                    ad.data{ad.control.data.visible(idx)}.display.position.data(2);
             case '1D along y'
                 export1Dparameters.crosssection.direction = 'y';
                 export1Dparameters.crosssection.position = ...
-                    ad.data{ad.control.data.visible(idx)}.display.position.x;
+                    ad.data{ad.control.data.visible(idx)}.display.position.data(1);
             otherwise
                 msg = 'Cannot determine cross section direction (2D mode)';
                 trEPRmsg(msg,'error');
@@ -507,11 +507,11 @@ else
         case '1D along x'
             export1Dparameters.crosssection.direction = 'x';
             export1Dparameters.crosssection.position = ...
-                ad.data{ad.control.data.active}.display.position.y;
+                ad.data{ad.control.data.active}.display.position.data(2);
         case '1D along y'
             export1Dparameters.crosssection.direction = 'y';
             export1Dparameters.crosssection.position = ...
-                ad.data{ad.control.data.active}.display.position.x;
+                ad.data{ad.control.data.active}.display.position.data(1);
         otherwise
             msg = 'Cannot determine cross section direction (2D mode)';
             trEPRmsg(msg,'error');

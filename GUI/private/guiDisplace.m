@@ -34,65 +34,65 @@ try
             switch ad.control.axis.displayType
                 case '1D along x'
                     if ischar(step) && strcmpi(step,'first')
-                        ad.data{active}.display.displacement.data.x = -x;
+                        ad.data{active}.display.displacement.data(1) = -x;
                     elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                        ad.data{active}.display.displacement.data.x = x;
+                        ad.data{active}.display.displacement.data(1) = x;
                     elseif isscalar(step)
-                        ad.data{active}.display.displacement.data.x = ...
-                            ad.data{active}.display.displacement.data.x + step;
+                        ad.data{active}.display.displacement.data(1) = ...
+                            ad.data{active}.display.displacement.data(1) + step;
                         % Check for boundaries
-                        if (ad.data{active}.display.displacement.data.x < -x)
-                            ad.data{active}.display.displacement.data.x = -x;
+                        if (ad.data{active}.display.displacement.data(1) < -x)
+                            ad.data{active}.display.displacement.data(1) = -x;
                         end
-                        if (ad.data{active}.display.displacement.data.x > x)
-                            ad.data{active}.display.displacement.data.x = x;
+                        if (ad.data{active}.display.displacement.data(1) > x)
+                            ad.data{active}.display.displacement.data(1) = x;
                         end
                     else
                         return;
                     end
                     set(gh.horz2_slider,'Value',...
-                        ad.data{active}.display.displacement.data.x);
+                        ad.data{active}.display.displacement.data(1));
                 case '1D along y'
                     if ischar(step) && strcmpi(step,'first')
-                        ad.data{active}.display.displacement.data.y = -y;
+                        ad.data{active}.display.displacement.data(2) = -y;
                     elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                        ad.data{active}.display.displacement.data.y = y;
+                        ad.data{active}.display.displacement.data(2) = y;
                     elseif isscalar(step)
-                        ad.data{active}.display.displacement.data.y = ...
-                            ad.data{active}.display.displacement.data.y + step;
+                        ad.data{active}.display.displacement.data(2) = ...
+                            ad.data{active}.display.displacement.data(2) + step;
                         % Check for boundaries
-                        if (ad.data{active}.display.displacement.data.y < -y)
-                            ad.data{active}.display.displacement.data.y = y;
+                        if (ad.data{active}.display.displacement.data(2) < -y)
+                            ad.data{active}.display.displacement.data(2) = y;
                         end
-                        if (ad.data{active}.display.displacement.data.y > y)
-                            ad.data{active}.display.displacement.data.y = y;
+                        if (ad.data{active}.display.displacement.data(2) > y)
+                            ad.data{active}.display.displacement.data(2) = y;
                         end
                     else
                         return;
                     end
                     set(gh.horz2_slider,'Value',...
-                        ad.data{active}.display.displacement.data.y);
+                        ad.data{active}.display.displacement.data(2));
             end
         case 'y'
             if ischar(step) && strcmpi(step,'first')
-                ad.data{active}.display.displacement.data.z = zMax(1);
+                ad.data{active}.display.displacement.data(3) = zMax(1);
             elseif ischar(step) && strcmpi(step,'last')
-                ad.data{active}.display.displacement.data.z = zMax(2);
+                ad.data{active}.display.displacement.data(3) = zMax(2);
             elseif isscalar(step)
                 ad.data{active}.display.displacement.z = ...
-                    ad.data{active}.display.displacement.data.z + (step*zStep);
+                    ad.data{active}.display.displacement.data(3) + (step*zStep);
                 % Check for boundaries
-                if (ad.data{active}.display.displacement.data.z < zMax(1))
-                    ad.data{active}.display.displacement.data.z = zMax(1);
+                if (ad.data{active}.display.displacement.data(3) < zMax(1))
+                    ad.data{active}.display.displacement.data(3) = zMax(1);
                 end
-                if (ad.data{active}.display.displacement.data.z > zMax(2))
-                    ad.data{active}.display.displacement.data.z = zMax(2);
+                if (ad.data{active}.display.displacement.data(3) > zMax(2))
+                    ad.data{active}.display.displacement.data(3) = zMax(2);
                 end
             else
                 return;
             end
             set(gh.vert3_slider,'Value',...
-                ad.data{active}.display.displacement.data.z);
+                ad.data{active}.display.displacement.data(3));
         case 'z'
     end
         

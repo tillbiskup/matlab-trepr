@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-05-12
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -500,16 +500,12 @@ function [content,warnings] = loadFile(filename)
             content.file.format = 'unspecified ASCII';
             % Create axis informations from dimensions
             [y,x] = size(content.data);
-            content.axes.x.values = linspace(1,x,x);
-            content.axes.x.measure = '';
-            content.axes.x.unit = '';
-            content.axes.y.values = linspace(1,y,y);
-            content.axes.y.measure = '';
-            content.axes.y.unit = '';
-
-            % For backwards compatibility
-            content.axes.xaxis = content.axes.x;
-            content.axes.yaxis = content.axes.y;
+            content.axes.data(1).values = linspace(1,x,x);
+            content.axes.data(1).measure = '';
+            content.axes.data(1).unit = '';
+            content.axes.data(2).values = linspace(1,y,y);
+            content.axes.data(2).measure = '';
+            content.axes.data(2).unit = '';
             
             % Assign warnings
             warnings = [];

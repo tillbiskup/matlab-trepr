@@ -22,8 +22,8 @@ function [data,warnings] = trEPRfsc2MetaLoad(filename)
 %
 % See also TREPRLOAD, TREPRFSC2LOAD.
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-05-09
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -324,7 +324,7 @@ try
             fieldStart = textscan(block.calibrationData(k).fieldStart,'%f');
             fieldStep = textscan(block.calibrationData(k).fieldStep,'%f');
             fieldEnd = textscan(block.calibrationData(k).fieldEnd,'%f');
-            data{k}.axes.y.calibratedValues = ...
+            data{k}.axes.data(2).calibratedValues = ...
                 fieldStart{1} : fieldStep{1} : fieldEnd{1};
             data{k}.parameters.field.calibration.values = [...
                 fieldStart{1} fieldEnd{1} fieldStep{1} ...

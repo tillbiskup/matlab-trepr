@@ -21,8 +21,8 @@ function [status,warnings] = cmdPoi(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014, Till Biskup
-% 2014-08-11
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -79,10 +79,10 @@ poi.parameters.coordinates = ad.data{active}.display.measure.point(1).index;
 
 % Set default label
 poi.label = sprintf('x = %e %s; y = %e %s',...
-    ad.data{active}.axes.x.values(poi.parameters.coordinates(1)),...
-    ad.data{active}.axes.x.unit,...
-    ad.data{active}.axes.y.values(poi.parameters.coordinates(2)),...
-    ad.data{active}.axes.y.unit);
+    ad.data{active}.axes.data(1).values(poi.parameters.coordinates(1)),...
+    ad.data{active}.axes.data(1).unit,...
+    ad.data{active}.axes.data(2).values(poi.parameters.coordinates(2)),...
+    ad.data{active}.axes.data(2).unit);
 
 poiIndex = 0;
 % Get number of current POI entries

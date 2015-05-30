@@ -10,8 +10,8 @@ function data = trEPRconvertUnits(data,conversion,varargin)
 % conversion - string
 %              Conversion to be performed on the dataset.
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-07-26
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create inputParser instance
@@ -33,9 +33,9 @@ try
     switch lower(conversion)
         case 'g2mt'
             % Check axis labels
-            if strcmpi(data.axes.y.unit,'g')
-                data.axes.y.values = data.axes.y.values / 10;
-                data.axes.y.unit = 'mT';
+            if strcmpi(data.axes.data(2).unit,'g')
+                data.axes.data(2).values = data.axes.data(2).values / 10;
+                data.axes.data(2).unit = 'mT';
             end
             % Check parameters
             if strcmpi(data.parameters.field.start.unit,'g')
@@ -55,9 +55,9 @@ try
             end
         case 'mt2g'
             % Check axis labels
-            if strcmpi(data.axes.y.unit,'mt')
-                data.axes.y.values = data.axes.y.values * 10;
-                data.axes.y.unit = 'G';
+            if strcmpi(data.axes.data(2).unit,'mt')
+                data.axes.data(2).values = data.axes.data(2).values * 10;
+                data.axes.data(2).unit = 'G';
             end
             % Check parameters
             if strcmpi(data.parameters.field.start.unit,'mt')
@@ -77,9 +77,9 @@ try
             end
         case 's2us'
             % Check axis labels
-            if strcmpi(data.axes.x.unit,'s')
-                data.axes.x.values = data.axes.x.values * 10e6;
-                data.axes.x.unit = 'us';
+            if strcmpi(data.axes.data(1).unit,'s')
+                data.axes.data(1).values = data.axes.data(1).values * 10e6;
+                data.axes.data(1).unit = 'us';
             end
             % Check parameters
             if strcmpi(data.parameters.transient.length.unit,'s')
@@ -89,9 +89,9 @@ try
             end
         case 'us2s'
             % Check axis labels
-            if strcmpi(data.axes.x.unit,'us')
-                data.axes.x.values = data.axes.x.values * 10e-6;
-                data.axes.x.unit = 's';
+            if strcmpi(data.axes.data(1).unit,'us')
+                data.axes.data(1).values = data.axes.data(1).values * 10e-6;
+                data.axes.data(1).unit = 's';
             end
             % Check parameters
             if strcmpi(data.parameters.transient.length.unit,'us')

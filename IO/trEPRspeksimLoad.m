@@ -29,8 +29,8 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 %                
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
-% Copyright (c) 2009-2013, Till Biskup
-% 2013-05-13
+% Copyright (c) 2009-2015, Till Biskup
+% 2015-05-30
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -179,13 +179,13 @@ function [content,warnings] = loadFile(filename,varargin)
                         end
                         switch tokens{1}{2}
                             case 'Gauss'
-                                content.axes.y.unit = 'G';
+                                content.axes.data(2).unit = 'G';
                                 content.parameters.field.start.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.stop.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.step.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRspeksimLoad:parseError',...
@@ -194,7 +194,7 @@ function [content,warnings] = loadFile(filename,varargin)
                                     tokens{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.axes.data(2).values(end+1) = str2double(tokens{1}{1});
                     end
                 end
                 % In case we have not loaded anything
@@ -205,11 +205,11 @@ function [content,warnings] = loadFile(filename,varargin)
                 end
                 
                 content.parameters.field.start.value = ...
-                    content.axes.y.values(1);
+                    content.axes.data(2).values(1);
                 content.parameters.field.stop.value = ...
-                    content.axes.y.values(end);
+                    content.axes.data(2).values(end);
                 content.parameters.field.step.value = ...
-                    content.axes.y.values(2) - content.axes.y.values(1);
+                    content.axes.data(2).values(2) - content.axes.data(2).values(1);
             case 'combine'
                 % This is used in case filename is a cell array of file names
                 for k = 1 : length(filename)
@@ -259,13 +259,13 @@ function [content,warnings] = loadFile(filename,varargin)
                         end
                         switch tokens{1}{2}
                             case 'Gauss'
-                                content.axes.y.unit = 'G';
+                                content.axes.data(2).unit = 'G';
                                 content.parameters.field.start.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.stop.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                                 content.parameters.field.step.unit = ...
-                                    content.axes.y.unit;
+                                    content.axes.data(2).unit;
                             otherwise
                                 warnings{end+1} = struct(...
                                     'identifier','trEPRspeksimLoad:parseError',...
@@ -274,7 +274,7 @@ function [content,warnings] = loadFile(filename,varargin)
                                     tokens{1}{2})...
                                     ); %#ok<AGROW>
                         end
-                        content.axes.y.values(end+1) = str2double(tokens{1}{1});
+                        content.axes.data(2).values(end+1) = str2double(tokens{1}{1});
                     end
                 end
                 % In case we have not loaded anything
@@ -285,11 +285,11 @@ function [content,warnings] = loadFile(filename,varargin)
                 end
                 
                 content.parameters.field.start.value = ...
-                    content.axes.y.values(1);
+                    content.axes.data(2).values(1);
                 content.parameters.field.stop.value = ...
-                    content.axes.y.values(end);
+                    content.axes.data(2).values(end);
                 content.parameters.field.step.value = ...
-                    content.axes.y.values(2) - content.axes.y.values(1);
+                    content.axes.data(2).values(2) - content.axes.data(2).values(1);
             otherwise
         end
     else
@@ -342,10 +342,10 @@ function [content,warnings] = loadFile(filename,varargin)
         end
         switch tokens{1}{2}
             case 'Gauss'
-                content.axes.y.unit = 'G';
-                content.parameters.field.start.unit = content.axes.y.unit;
-                content.parameters.field.stop.unit = content.axes.y.unit;
-                content.parameters.field.step.unit = content.axes.y.unit;
+                content.axes.data(2).unit = 'G';
+                content.parameters.field.start.unit = content.axes.data(2).unit;
+                content.parameters.field.stop.unit = content.axes.data(2).unit;
+                content.parameters.field.step.unit = content.axes.data(2).unit;
             otherwise
                 warnings{end+1} = struct(...
                     'identifier','trEPRspeksimLoad:parseError',...
@@ -357,11 +357,11 @@ function [content,warnings] = loadFile(filename,varargin)
         content.parameters.field.start.value = str2double(tokens{1}{1});
         content.parameters.field.stop.value = str2double(tokens{1}{1});
         content.parameters.field.step.value = 0;
-        content.axes.y.values = str2double(tokens{1}{1});
+        content.axes.data(2).values = str2double(tokens{1}{1});
     end
     
     % Assign other parameters, as far as possible
-    content.axes.y.measure = 'magnetic field';
+    content.axes.data(2).measure = 'magnetic field';
     timeParams = textscan(content.header{4},'%f %f %f %f %f %f');
     units = textscan(content.header{5},'%s %s');
     content.parameters.transient.points = timeParams{2};
@@ -380,11 +380,11 @@ function [content,warnings] = loadFile(filename,varargin)
         (content.parameters.transient.length.value / timeParams{2}));
     
     % Create axis informations from parameters
-    content.axes.x.values = ...
+    content.axes.data(1).values = ...
         linspace(timeParams{3},timeParams{4},timeParams{2});
-    content.axes.x.measure = 'time';
-    content.axes.x.unit = char(units{1});
-    content.parameters.transient.length.unit = content.axes.x.unit;
+    content.axes.data(1).measure = 'time';
+    content.axes.data(1).unit = char(units{1});
+    content.parameters.transient.length.unit = content.axes.data(1).unit;
     
     % Get label string from third line of file/header
     content.label = strtrim(content.header{3});

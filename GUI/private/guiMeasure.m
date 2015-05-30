@@ -7,8 +7,8 @@ function guiMeasure(action,nPoints)
 %     nPoints - scalar
 %               Number of points: 1 - pick mode; 2 - measure mode
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 try
     % Get appdata of main window
@@ -255,15 +255,15 @@ try
     if (ad.control.measure.setslider)
         switch ad.control.axis.displayType
             case '2D plot'
-                ad.data{active}.display.position.x = ...
+                ad.data{active}.display.position.data(1) = ...
                     ad.data{active}.display.measure.point(1).index(1);
-                ad.data{active}.display.position.y = ...
+                ad.data{active}.display.position.data(2) = ...
                     ad.data{active}.display.measure.point(1).index(2);
             case '1D along x'
-                ad.data{active}.display.position.x = ...
+                ad.data{active}.display.position.data(1) = ...
                     ad.data{active}.display.measure.point(1).index(1);
             case '1D along y'
-                ad.data{active}.display.position.y = ...
+                ad.data{active}.display.position.data(2) = ...
                     ad.data{active}.display.measure.point(1).index(2);
             otherwise
                 trEPRoptionUnknown(ad.control.axis.displayType,...

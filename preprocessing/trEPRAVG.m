@@ -27,8 +27,8 @@ function [avgData] = trEPRAVG(data,parameters)
 %              and all usual parameters of a dataset and the parameters
 %              from the averaging in the history.parameters field
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -54,51 +54,51 @@ try
     
     % Perform averaging...
     switch parameters.dimension
-        case 'x'
+        case {'x',1}
             avgData.data = ...
                 mean(avgData.data(:,...
                 parameters.start.index:parameters.stop.index),2);
             % Adjust parameters
             parameters.start.value = ...
-                avgData.axes.x.values(parameters.start.index);
+                avgData.axes.data(1).values(parameters.start.index);
             parameters.stop.value = ...
-                avgData.axes.x.values(parameters.stop.index);
-            parameters.start.unit = avgData.axes.x.unit;
-            parameters.stop.unit = avgData.axes.x.unit;
+                avgData.axes.data(1).values(parameters.stop.index);
+            parameters.start.unit = avgData.axes.data(1).unit;
+            parameters.stop.unit = avgData.axes.data(1).unit;
             % Calculate standard deviation
             avgData.avg.stdev = ...
                 std(data.data(:,...
                 parameters.start.index:parameters.stop.index),0,2);
             % Adjust axis
-            avgData.axes.x.values = mean(...
-                [avgData.axes.x.values(parameters.start.index) ...
-                avgData.axes.x.values(parameters.stop.index)]);
+            avgData.axes.data(1).values = mean(...
+                [avgData.axes.data(1).values(parameters.start.index) ...
+                avgData.axes.data(1).values(parameters.stop.index)]);
             % Fix problem with time axis in parameters
             avgData.parameters.transient.points = ...
-                length(avgData.axes.x.values);
+                length(avgData.axes.data(1).values);
             % Reset slider position
-            avgData.display.position.x = 1;
-        case 'y'
+            avgData.display.position.data(1) = 1;
+        case {'y',2}
             avgData.data = ...
                 mean(avgData.data(...
                 parameters.start.index:parameters.stop.index,:),1);
             % Adjust parameters
             parameters.start.value = ...
-                avgData.axes.y.values(parameters.start.index);
+                avgData.axes.data(2).values(parameters.start.index);
             parameters.stop.value = ...
-                avgData.axes.y.values(parameters.stop.index);
-            parameters.start.unit = avgData.axes.y.unit;
-            parameters.stop.unit = avgData.axes.y.unit;
+                avgData.axes.data(2).values(parameters.stop.index);
+            parameters.start.unit = avgData.axes.data(2).unit;
+            parameters.stop.unit = avgData.axes.data(2).unit;
             % Calculate standard deviation
             avgData.avg.stdev = ...
                 std(data.data(...
                 parameters.start.index:parameters.stop.index,:),0,2);
             % Adjust axis
-            avgData.axes.y.values = mean(...
-                [avgData.axes.y.values(parameters.start.index) ...
-                avgData.axes.y.values(parameters.stop.index)]);
+            avgData.axes.data(2).values = mean(...
+                [avgData.axes.data(2).values(parameters.start.index) ...
+                avgData.axes.data(2).values(parameters.stop.index)]);
             % Reset slider position
-            avgData.display.position.y = 1;
+            avgData.display.position.data(2) = 1;
         otherwise
             fprintf('\nUnknown dimension to average over: %s\n',...
                 parameters.dimension);

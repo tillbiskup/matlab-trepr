@@ -7,8 +7,8 @@ function handle = panelSlider(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -386,58 +386,58 @@ function edit_Callback(source,~,action)
         y = linspace(1,y,y);
         if (isfield(ad.data{active},'axes') ...
                 && isfield(ad.data{active}.axes,'x') ...
-                && isfield(ad.data{active}.axes.x,'values') ...
-                && not (isempty(ad.data{active}.axes.x.values)))
-            x = ad.data{active}.axes.x.values;
+                && isfield(ad.data{active}.axes.data(1),'values') ...
+                && not (isempty(ad.data{active}.axes.data(1).values)))
+            x = ad.data{active}.axes.data(1).values;
         end
         if (isfield(ad.data{active},'axes') ...
                 && isfield(ad.data{active}.axes,'y') ...
-                && isfield(ad.data{active}.axes.y,'values') ...
-                && not (isempty(ad.data{active}.axes.y.values)))
-            y = ad.data{active}.axes.y.values;
+                && isfield(ad.data{active}.axes.data(2),'values') ...
+                && not (isempty(ad.data{active}.axes.data(2).values)))
+            y = ad.data{active}.axes.data(2).values;
         end
         
         switch lower(action)
             case 'position_xindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),1:length(x),'round',true);
-                ad.data{active}.display.position.x = value;
+                ad.data{active}.display.position.data(1) = value;
             case 'position_xunit'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),x,'map',true);
-                ad.data{active}.display.position.x = find(x==value);
+                ad.data{active}.display.position.data(1) = find(x==value);
             case 'position_yindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),1:length(y),'round',true);
-                ad.data{active}.display.position.y = value;
+                ad.data{active}.display.position.data(2) = value;
             case 'position_yunit'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),y,'map',true);
-                ad.data{active}.display.position.y = find(y==value);
+                ad.data{active}.display.position.data(2) = find(y==value);
             case 'displacement_xindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),-length(x):length(x));
-                ad.data{active}.display.displacement.x = value;
+                ad.data{active}.display.displacement.data(1) = value;
             case 'displacement_xunit'
                 vector = -(x(2)-x(1))*length(x):x(2)-x(1):(x(2)-x(1))*length(x);
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),vector,'map',true);
-                ad.data{active}.display.displacement.x = ...
+                ad.data{active}.display.displacement.data(1) = ...
                     find(vector==value)-(length(vector)+1)/2;
             case 'displacement_yindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),-length(y):length(y));
-                ad.data{active}.display.displacement.y = value;
+                ad.data{active}.display.displacement.data(2) = value;
             case 'displacement_yunit'
                 vector = -(y(2)-y(1))*length(y):y(2)-y(1):(y(2)-y(1))*length(y);
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),vector,'map',true);
-                ad.data{active}.display.displacement.y = ...
+                ad.data{active}.display.displacement.data(2) = ...
                     find(vector==value)-(length(vector)+1)/2;
             case 'displacement_zindex'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [get(gh.vert3_slider,'Min'),get(gh.vert3_slider,'Max')]);
-                ad.data{active}.display.displacement.z = value;
+                ad.data{active}.display.displacement.data(3) = value;
             case 'displacement_zunit'
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')

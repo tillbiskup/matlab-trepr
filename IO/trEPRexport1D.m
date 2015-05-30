@@ -21,8 +21,8 @@
 %              Otherwise it contains an error description
 %
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-13
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 function status = trEPRexport1D(data,fileName,parameters)
 
@@ -92,7 +92,6 @@ try
     [dimy,dimx] = size(data.data);
     
     % Get cross section and axis, depending on direction
-    % NOTE: Use of "lower" to account for both small and capital letters
     switch lower(parameters.crosssection.direction)
         case 'x'
             % Check whether position parameter is within dataset dimensions
@@ -103,11 +102,11 @@ try
                 return;
             end
             crosssection = data.data(parameters.crosssection.position,:)';
-            if ~isfield(data,'axes') || ~isfield(data.axes,'x') ... 
-                    || ~isfield(data.axes.x,'values')
+            if ~isfield(data,'axes') || ~isfield(data.axes,'data') ... 
+                    || ~isfield(data.axes.data(1),'values')
                 axis = 1:dimx;
             else
-                axis = data.axes.x.values';
+                axis = data.axes.data(1).values';
             end
         case 'y'
             % Check whether position parameter is within dataset dimensions
@@ -118,11 +117,11 @@ try
                 return;
             end
             crosssection = data.data(:,parameters.crosssection.position);
-            if ~isfield(data,'axes') || ~isfield(data.axes,'y') ... 
-                    || ~isfield(data.axes.y,'values')
+            if ~isfield(data,'axes') || ~isfield(data.axes,'data') ... 
+                    || ~isfield(data.axes.data(2),'values')
                 axis = 1:dimy;
             else
-                axis = data.axes.y.values';
+                axis = data.axes.data(2).values';
             end
         otherwise
             % That shall normally not happen...
@@ -174,20 +173,16 @@ try
         % Smoothing
         if isfield(data.display,'smoothing')
             if strcmpi(parameters.crosssection.direction,'x') ...
-                    && isfield(data.display.smoothing,'x') ...
-                    && (data.display.smoothing.x.value > 1) ...
-                    && isfield(data.display.smoothing.x,'filterfun')
-                filterfun = str2func(data.display.smoothing.x.filterfun);
+                    && (data.display.smoothing.data(1).value > 1)
+                filterfun = str2func(data.display.smoothing.data(1).filterfun);
                 crosssection = ...
-                    filterfun(crosssection,data.display.smoothing.x.value);
+                    filterfun(crosssection,data.display.smoothing.data(1).value);
             end
             if strcmpi(parameters.crosssection.direction,'y') ...
-                    && isfield(data.display.smoothing,'y') ...
-                    && (data.display.smoothing.y.value > 1) ...
-                    && isfield(data.display.smoothing.y,'filterfun')
-                filterfun = str2func(data.display.smoothing.y.filterfun);
+                    && (data.display.smoothing.data(2).value > 1)
+                filterfun = str2func(data.display.smoothing.data(2).filterfun);
                 crosssection = ...
-                    filterfun(crosssection,data.display.smoothing.y.value);
+                    filterfun(crosssection,data.display.smoothing.data(2).value);
             end
         end
     end

@@ -16,8 +16,8 @@ function varargout = trEPRasciiLoad(filename, varargin)
 % warning  - cell array of strings
 %            empty if there are no warnings
 
-% Copyright (c) 2009-12, Till Biskup
-% 2012-06-10
+% Copyright (c) 2009-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 parser = inputParser;   % Create an instance of the inputParser class.
@@ -186,47 +186,47 @@ content.data = load(filename);
 
 switch identifierString
     case 'ascii_save_2Dspectrum'
-        content.axes.xaxis.values = ...
+        content.axes.data(1).values = ...
             -content.parameters.transient.length/content.parameters.transient.points * ...
             (content.parameters.transient.triggerPosition - 1) : ...
             content.parameters.transient.length/content.parameters.transient.points : ...
             content.parameters.transient.length - ...
             content.parameters.transient.length/content.parameters.transient.points * ...
             content.parameters.transient.triggerPosition;
-        content.axes.xaxis.measure = 'time';
-        content.axes.xaxis.unit = 'us';
+        content.axes.data(1).measure = 'time';
+        content.axes.data(1).unit = 'us';
         
-        content.axes.yaxis.values = ...
+        content.axes.data(2).values = ...
             content.parameters.field.start : ...
             content.parameters.field.step : ...
             content.parameters.field.stop;
-        content.axes.yaxis.measure = 'magnetic field';
-        content.axes.yaxis.unit = 'G';
+        content.axes.data(2).measure = 'magnetic field';
+        content.axes.data(2).unit = 'G';
     case 'ascii_save_spectrum'
-        content.axes.xaxis.values = ...
+        content.axes.data(1).values = ...
             content.parameters.field.start : ...
             content.parameters.field.step : ...
             content.parameters.field.stop;
-        content.axes.xaxis.measure = 'magnetic field';
-        content.axes.xaxis.unit = 'G';
+        content.axes.data(1).measure = 'magnetic field';
+        content.axes.data(1).unit = 'G';
         
-        content.axes.yaxis.values = [];
-        content.axes.yaxis.measure = '';
-        content.axes.xaxis.unit = '';
+        content.axes.data(2).values = [];
+        content.axes.data(2).measure = '';
+        content.axes.data(1).unit = '';
     case 'ascii_save_timeslice'
-        content.axes.xaxis.values = ...
+        content.axes.data(1).values = ...
             -content.parameters.transient.length/content.parameters.transient.points * ...
             (content.parameters.transient.triggerPosition - 1) : ...
             content.parameters.transient.length/content.parameters.transient.points : ...
             content.parameters.transient.length - ...
             content.parameters.transient.length/content.parameters.transient.points * ...
             content.parameters.transient.triggerPosition;
-        content.axes.xaxis.measure = 'time';
-        content.axes.xaxis.unit = 'us';
+        content.axes.data(1).measure = 'time';
+        content.axes.data(1).unit = 'us';
         
-        content.axes.yaxis.values = [];
-        content.axes.yaxis.measure = '';
-        content.axes.xaxis.unit = '';
+        content.axes.data(2).values = [];
+        content.axes.data(2).measure = '';
+        content.axes.data(1).unit = '';
 end
 end
 

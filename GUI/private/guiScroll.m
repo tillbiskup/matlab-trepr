@@ -6,8 +6,8 @@ function guiScroll(dimension,step)
 %     step      - scalar|string
 %                 if string, one of {'first','last','end'}
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-07-25
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 try
     % Get appdata of main window
@@ -26,36 +26,36 @@ try
     switch lower(dimension)
         case 'x'
             if ischar(step) && strcmpi(step,'first')
-                ad.data{active}.display.position.x = 1;
+                ad.data{active}.display.position.data(1) = 1;
             elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                ad.data{active}.display.position.x = x;
+                ad.data{active}.display.position.data(1) = x;
             elseif isscalar(step)
-                ad.data{active}.display.position.x = ...
-                    ad.data{active}.display.position.x + step;
+                ad.data{active}.display.position.data(1) = ...
+                    ad.data{active}.display.position.data(1) + step;
                 % Check for boundaries
-                if (ad.data{active}.display.position.x < 1)
-                    ad.data{active}.display.position.x = 1;
+                if (ad.data{active}.display.position.data(1) < 1)
+                    ad.data{active}.display.position.data(1) = 1;
                 end
-                if (ad.data{active}.display.position.x > x)
-                    ad.data{active}.display.position.x = x;
+                if (ad.data{active}.display.position.data(1) > x)
+                    ad.data{active}.display.position.data(1) = x;
                 end
             else
                 return;
             end
         case 'y'
             if ischar(step) && strcmpi(step,'first')
-                ad.data{active}.display.position.y = 1;
+                ad.data{active}.display.position.data(2) = 1;
             elseif ischar(step) && any(strcmpi(step,{'last','end'}))
-                ad.data{active}.display.position.y = y;
+                ad.data{active}.display.position.data(2) = y;
             elseif isscalar(step)
-                ad.data{active}.display.position.y = ...
-                    ad.data{active}.display.position.y + step;
+                ad.data{active}.display.position.data(2) = ...
+                    ad.data{active}.display.position.data(2) + step;
                 % Check for boundaries
-                if (ad.data{active}.display.position.y < 1)
-                    ad.data{active}.display.position.y = 1;
+                if (ad.data{active}.display.position.data(2) < 1)
+                    ad.data{active}.display.position.data(2) = 1;
                 end
-                if (ad.data{active}.display.position.y > y)
-                    ad.data{active}.display.position.y = y;
+                if (ad.data{active}.display.position.data(2) > y)
+                    ad.data{active}.display.position.data(2) = y;
                 end
             else
                 return;
@@ -66,9 +66,9 @@ try
     % Set slider values depending on display type settings
     switch ad.control.axis.displayType
         case '1D along x'
-            set(gh.vert1_slider,'Value',ad.data{active}.display.position.y);
+            set(gh.vert1_slider,'Value',ad.data{active}.display.position.data(2));
         case '1D along y'
-            set(gh.vert1_slider,'Value',ad.data{active}.display.position.x);
+            set(gh.vert1_slider,'Value',ad.data{active}.display.position.data(1));
         otherwise
             trEPRoptionUnknown(ad.control.axis.displayType,...
                 'display type');

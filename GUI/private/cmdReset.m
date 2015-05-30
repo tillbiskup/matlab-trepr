@@ -63,13 +63,13 @@ end
 active = ad.control.data.active;
 
 % Reset displacement and scaling for current spectrum
-ad.data{active}.display.displacement.data.x = 0;
-ad.data{active}.display.displacement.data.y = 0;
-ad.data{active}.display.displacement.data.z = 0;
+ad.data{active}.display.displacement.data(1) = 0;
+ad.data{active}.display.displacement.data(2) = 0;
+ad.data{active}.display.displacement.data(3) = 0;
 
-ad.data{active}.display.scaling.data.x = 1;
-ad.data{active}.display.scaling.data.y = 1;
-ad.data{active}.display.scaling.data.z = 1;
+ad.data{active}.display.scaling.data(1) = 1;
+ad.data{active}.display.scaling.data(2) = 1;
+ad.data{active}.display.scaling.data(3) = 1;
 
 % Update appdata of main window
 setappdata(mainWindow,'data',ad.data);

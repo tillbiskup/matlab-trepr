@@ -22,8 +22,8 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-08
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -177,32 +177,12 @@ if iscell(data)
         if ~isfield(data{k},'label') || isempty(data{k}.label)
             data{k}.label = [fn ext];
         end
-        % For compatibility with old versions of trEPRread and for
-        % consistency with the naming of all other structures
-        if (isfield(data{k},'axes') && isfield(data{k}.axes,'xaxis'))
-            data{k}.axes.x = data{k}.axes.xaxis;
-            data{k}.axes = rmfield(data{k}.axes,'xaxis');
-        end
-        if (isfield(data{k},'axes') && isfield(data{k}.axes,'yaxis'))
-            data{k}.axes.y = data{k}.axes.yaxis;
-            data{k}.axes = rmfield(data{k}.axes,'yaxis');
-        end
     end
 else
     fileNames = data.file.name;
     [~,fn,ext] = fileparts(data.file.name);
     if ~isfield(data,'label') || isempty(data.label)
         data.label = [fn ext];
-    end
-    % For compatibility with old versions of trEPRread and for
-    % consistency with the naming of all other structures
-    if (isfield(data,'axes') && isfield(data.axes,'xaxis'))
-        data.axes.x = data.axes.xaxis;
-        data.axes = rmfield(data.axes,'xaxis');
-    end
-    if (isfield(data,'axes') && isfield(data.axes,'yaxis'))
-        data.axes.y = data.axes.yaxis;
-        data.axes = rmfield(data.axes,'yaxis');
     end
 end
 
@@ -287,36 +267,18 @@ end
 % Try to load axis labels from file
 if ad.control.panels.load.fileTypes(fileType).determineAxisLabels
     if (isfield(ad.data{newDataIdx(end)},'axes'))
-        if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.x,'measure'))
-            ad.control.axis.labels.x.measure = ...
-                ad.data{newDataIdx(end)}.axes.x.measure;
-        end
-        if (isfield(ad.data{newDataIdx(end)}.axes,'x') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.x,'unit'))
-            ad.control.axis.labels.x.unit = ...
-                ad.data{newDataIdx(end)}.axes.x.unit;
-        end
-        if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.y,'measure'))
-            ad.control.axis.labels.y.measure = ...
-                ad.data{newDataIdx(end)}.axes.y.measure;
-        end
-        if (isfield(ad.data{newDataIdx(end)}.axes,'y') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.y,'unit'))
-            ad.control.axis.labels.y.unit = ...
-                ad.data{newDataIdx(end)}.axes.y.unit;
-        end
-        if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.z,'measure'))
-            ad.control.axis.labels.z.measure = ...
-                ad.data{newDataIdx(end)}.axes.z.measure;
-        end
-        if (isfield(ad.data{newDataIdx(end)}.axes,'z') && ...
-                isfield(ad.data{newDataIdx(end)}.axes.z,'unit'))
-            ad.control.axis.labels.z.unit = ...
-                ad.data{newDataIdx(end)}.axes.z.unit;
-        end
+        ad.control.axis.labels.x.measure = ...
+            ad.data{newDataIdx(end)}.axes.data(1).measure;
+        ad.control.axis.labels.x.unit = ...
+            ad.data{newDataIdx(end)}.axes.data(1).unit;
+        ad.control.axis.labels.y.measure = ...
+            ad.data{newDataIdx(end)}.axes.data(2).measure;
+        ad.control.axis.labels.y.unit = ...
+            ad.data{newDataIdx(end)}.axes.data(2).unit;
+        ad.control.axis.labels.z.measure = ...
+            ad.data{newDataIdx(end)}.axes.data(3).measure;
+        ad.control.axis.labels.z.unit = ...
+            ad.data{newDataIdx(end)}.axes.data(3).unit;
     end
     setappdata(mainWindow,'control',ad.control);
 end

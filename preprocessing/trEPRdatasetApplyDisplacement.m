@@ -20,8 +20,8 @@ function data = trEPRdatasetApplyDisplacement(data,varargin)
 % See also: trEPRdatasetApplyScaling, trEPRdatasetApplySmoothing,
 % trEPRdatasetApplyNormalisation
 
-% Copyright (c) 2014, Till Biskup
-% 2014-12-16
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -50,20 +50,20 @@ if ~isempty(fieldnames(p.Results.parameters))
     data.display.displacement = p.Results.parameters;
 end
 
-if length(data.axes.x.values)>1
-    data.axes.x.values = data.axes.x.values + ...
-        data.display.displacement.data.x*diff(data.axes.x.values([1,2]));
+if length(data.axes.data(1).values)>1
+    data.axes.data(1).values = data.axes.data(1).values + ...
+        data.display.displacement.data(1)*diff(data.axes.data(1).values([1,2]));
 end
-if length(data.axes.y.values)>1
-    data.axes.y.values = data.axes.y.values + ...
-        data.display.displacement.data.y*diff(data.axes.y.values([1,2]));
+if length(data.axes.data(2).values)>1
+    data.axes.data(2).values = data.axes.data(2).values + ...
+        data.display.displacement.data(2)*diff(data.axes.data(2).values([1,2]));
 end
 
-data.data = data.data + data.display.displacement.data.z;
+data.data = data.data + data.display.displacement.data(3);
 
 if isfield(data,'calculated') && ~isempty(data.calculated)
     data.calculated = ...
-        data.calculated + data.display.displacement.calculated.z;
+        data.calculated + data.display.displacement.calculated(3);
 end
 
 % Write history record

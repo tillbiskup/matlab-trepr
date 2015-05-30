@@ -17,8 +17,8 @@ function [ data, warnings ] = trEPRbrukerASCIIload(filename)
 % If no data could be loaded, data is an empty struct.
 % In such case, warning may hold some further information what happened.
 
-% Copyright (c) 2011, Till Biskup
-% 2011-07-06
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -71,21 +71,21 @@ try
     data.data = reshape(rawData.data(:,4),a(1),[])';
     
     % Creating x axis (time)
-    data.axes.x.values = rawData.data(1:a(1),2);
-    data.axes.x.measure = lower(tokens{2}{1});
-    data.axes.x.unit = tokens{3}{1};
+    data.axes.data(1).values = rawData.data(1:a(1),2);
+    data.axes.data(1).measure = lower(tokens{2}{1});
+    data.axes.data(1).unit = tokens{3}{1};
     
     % Creating y axis (field)
-    data.axes.y.values = rawData.data(1:a(1):end,3);
+    data.axes.data(2).values = rawData.data(1:a(1):end,3);
     if strcmpi(tokens{4}{1},'Field')
-        data.axes.y.measure = 'magnetic field';
+        data.axes.data(2).measure = 'magnetic field';
     else
-        data.axes.x.measure = lower(tokens{4}{1});
+        data.axes.data(1).measure = lower(tokens{4}{1});
     end
-    data.axes.y.unit = tokens{5}{1};
+    data.axes.data(2).unit = tokens{5}{1};
     
     % Creating z axis (field)
-    data.axes.z.measure = lower(tokens{6}{1});
+    data.axes.data(3).measure = lower(tokens{6}{1});
     
     % Write additional fields
     data.file.name = filename;
@@ -97,17 +97,17 @@ try
     % Details of the structure can be found at the toolbox homepage, look
     % for description of the trEPRload return argument format
     data.parameters.runs = 1;
-    data.parameters.field.start.value = data.axes.y.values(1);
-    data.parameters.field.stop.value = data.axes.y.values(end);
+    data.parameters.field.start.value = data.axes.data(2).values(1);
+    data.parameters.field.stop.value = data.axes.data(2).values(end);
     data.parameters.field.step.value = ...
-        data.axes.y.values(2)-data.axes.y.values(1);
-    data.parameters.field.start.unit = data.axes.x.measure;
-    data.parameters.field.stop.unit = data.axes.x.measure;
-    data.parameters.field.step.unit = data.axes.x.measure;
-    data.parameters.transient.points = length(data.axes.x.values);
+        data.axes.data(2).values(2)-data.axes.data(2).values(1);
+    data.parameters.field.start.unit = data.axes.data(1).measure;
+    data.parameters.field.stop.unit = data.axes.data(1).measure;
+    data.parameters.field.step.unit = data.axes.data(1).measure;
+    data.parameters.transient.points = length(data.axes.data(1).values);
     data.parameters.transient.length.value = ...
-        data.axes.x.values(end)-data.axes.x.values(1);
-    data.parameters.transient.length.unit = data.axes.x.unit;
+        data.axes.data(1).values(end)-data.axes.data(1).values(1);
+    data.parameters.transient.length.unit = data.axes.data(1).unit;
 catch exception
     throw(exception);
 end

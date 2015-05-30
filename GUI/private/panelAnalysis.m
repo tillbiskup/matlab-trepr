@@ -6,8 +6,8 @@ function handle = panelAnalysis(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -206,8 +206,8 @@ try
                 return;
             end
             active = ad.control.data.active;
-            if isscalar(ad.data{active}.axes.x.values) || ...
-                    isscalar(ad.data{active}.axes.y.values)
+            if isscalar(ad.data{active}.axes.data(1).values) || ...
+                    isscalar(ad.data{active}.axes.data(2).values)
                 msgbox('Currently active dataset has insufficient dimensions for net polarisation analysis.',...
                     'Net Polarisation Plot','warn');
                 trEPRmsg(['Net polarisation analysis failed: ' ...

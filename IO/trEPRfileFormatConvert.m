@@ -12,8 +12,8 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 %
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
-% Copyright (c) 2012-14, Till Biskup
-% 2014-10-21
+% Copyright (c) 2012-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -69,6 +69,50 @@ end
 
 % Get empty data structure and copy fields if possible
 newdata = structcopy(newdata,data);
+
+% Change axes for version < 1.13
+if str2double(version) < 1.13
+    % Main change: Axes renamed
+    % Remove unnecessary field in old y axis
+    if isfield(data.axes.y,'calibratedValues') && ...
+            isempty(data.axes.y.calibratedValues)
+        data.axes.y = rmfield(data.axes.y,'calibratedValues');
+    end
+    newdata.axes.data(1) = data.axes.x;
+    newdata.axes.data(2) = data.axes.y;
+    newdata.axes.data(3) = ...
+        structcopy(newdata.axes.data(3),data.axes.z);
+    % Remove old fields
+    newdata.axes = rmfield(newdata.axes,{'x','y','z'});
+    % Display fields were reorganised as well
+    newdata.display.position.data = ...
+        [data.display.position.x data.display.position.y];
+    fields = {'displacement','scaling'};
+    for field = 1:length(fields)
+        newdata.display.(fields{field}).data = [ ...
+            data.display.(fields{field}).data.x ...
+            data.display.(fields{field}).data.y ...
+            data.display.(fields{field}).data.z ];
+        newdata.display.(fields{field}).calculated = [ ...
+            data.display.(fields{field}).calculated.x ...
+            data.display.(fields{field}).calculated.y ...
+            data.display.(fields{field}).calculated.z ];
+    end
+    newdata.display.averaging.data = [ ...
+        data.display.averaging.data.x ...
+        data.display.averaging.data.y ];
+    newdata.display.averaging.calculated = [ ...
+        data.display.averaging.calculated.x ...
+        data.display.averaging.calculated.y ];
+    newdata.display.smoothing.data(1) = data.display.smoothing.data.x;
+    newdata.display.smoothing.data(2) = data.display.smoothing.data.y;
+    newdata.display.smoothing.calculated(1) = ...
+        data.display.smoothing.calculated.x;
+    newdata.display.smoothing.calculated(2) = ...
+        data.display.smoothing.calculated.y;
+    % Remove old fields
+    newdata.display.position = rmfield(newdata.display.position,{'x','y'});
+end
 
 switch version
     case '1.10'
@@ -253,15 +297,15 @@ switch version
     case '1.4'
         if isnumeric(data.parameters.field.start)
             newdata.parameters.field.start.value = data.parameters.field.start;
-            newdata.parameters.field.start.unit = data.axes.y.unit;
+            newdata.parameters.field.start.unit = data.axes.data(2).unit;
             newdata.parameters.field.stop.value = data.parameters.field.stop;
-            newdata.parameters.field.stop.unit = data.axes.y.unit;
+            newdata.parameters.field.stop.unit = data.axes.data(2).unit;
             newdata.parameters.field.step.value = data.parameters.field.step;
-            newdata.parameters.field.step.unit = data.axes.y.unit;
+            newdata.parameters.field.step.unit = data.axes.data(2).unit;
         end
         if isnumeric(data.parameters.transient.length)
             newdata.parameters.transient.length.value = data.parameters.transient.length;
-            newdata.parameters.transient.length.unit = data.axes.x.unit;
+            newdata.parameters.transient.length.unit = data.axes.data(1).unit;
         end
         if ~isempty(data.parameters.bridge.calibration) ...
                 && length(data.parameters.bridge.calibration) > 1
@@ -278,13 +322,13 @@ switch version
         newdata.parameters.date.start = data.parameters.date;
         newdata.parameters.date.end = '';
         newdata.parameters.field.start.value = data.parameters.field.start;
-        newdata.parameters.field.start.unit = data.axes.y.unit;
+        newdata.parameters.field.start.unit = data.axes.data(2).unit;
         newdata.parameters.field.stop.value = data.parameters.field.stop;
-        newdata.parameters.field.stop.unit = data.axes.y.unit;
+        newdata.parameters.field.stop.unit = data.axes.data(2).unit;
         newdata.parameters.field.step.value = data.parameters.field.step;        
-        newdata.parameters.field.step.unit = data.axes.y.unit;
+        newdata.parameters.field.step.unit = data.axes.data(2).unit;
         newdata.parameters.transient.length.value = data.parameters.transient.length;
-        newdata.parameters.transient.length.unit = data.axes.x.unit;
+        newdata.parameters.transient.length.unit = data.axes.data(1).unit;
         if ~isempty(data.parameters.bridge.calibration) ...
                 && length(data.parameters.bridge.calibration) > 1
             newdata.parameters.bridge.calibration.start.value = data.parameters.bridge.calibration.values(1);
@@ -298,13 +342,13 @@ switch version
         newdata.parameters.date.start = data.parameters.date;
         newdata.parameters.date.end = '';
         newdata.parameters.field.start.value = data.parameters.field.start;
-        newdata.parameters.field.start.unit = data.axes.y.unit;
+        newdata.parameters.field.start.unit = data.axes.data(2).unit;
         newdata.parameters.field.stop.value = data.parameters.field.stop;
-        newdata.parameters.field.stop.unit = data.axes.y.unit;
+        newdata.parameters.field.stop.unit = data.axes.data(2).unit;
         newdata.parameters.field.step.value = data.parameters.field.step;        
-        newdata.parameters.field.step.unit = data.axes.y.unit;
+        newdata.parameters.field.step.unit = data.axes.data(2).unit;
         newdata.parameters.transient.length.value = data.parameters.transient.length;
-        newdata.parameters.transient.length.unit = data.axes.x.unit;
+        newdata.parameters.transient.length.unit = data.axes.data(1).unit;
         if ~isempty(data.parameters.bridge.calibration) ...
                 && length(data.parameters.bridge.calibration) > 1
             newdata.parameters.bridge.calibration.start.value = data.parameters.bridge.calibration.values(1);
@@ -320,13 +364,13 @@ switch version
         newdata.parameters.date.start = data.parameters.date;
         newdata.parameters.date.end = '';
         newdata.parameters.field.start.value = data.parameters.field.start;
-        newdata.parameters.field.start.unit = data.axes.y.unit;
+        newdata.parameters.field.start.unit = data.axes.data(2).unit;
         newdata.parameters.field.stop.value = data.parameters.field.stop;
-        newdata.parameters.field.stop.unit = data.axes.y.unit;
+        newdata.parameters.field.stop.unit = data.axes.data(2).unit;
         newdata.parameters.field.step.value = data.parameters.field.step;        
-        newdata.parameters.field.step.unit = data.axes.y.unit;
+        newdata.parameters.field.step.unit = data.axes.data(2).unit;
         newdata.parameters.transient.length.value = data.parameters.transient.length;
-        newdata.parameters.transient.length.unit = data.axes.x.unit;
+        newdata.parameters.transient.length.unit = data.axes.data(1).unit;
         newdata.parameters.probehead.model = data.parameters.bridge.probehead;
         newdata.parameters.bridge = rmfield(newdata.parameters.bridge,'probehead');
         if ~isempty(data.parameters.bridge.calibration) ...
@@ -343,15 +387,15 @@ switch version
     case '1.0'
         if ~isstruct(data.parameters.field.start)
         newdata.parameters.field.start.value = data.parameters.field.start;
-        newdata.parameters.field.start.unit = data.axes.y.unit;
+        newdata.parameters.field.start.unit = data.axes.data(2).unit;
         end
         if ~isstruct(data.parameters.field.stop)
         newdata.parameters.field.stop.value = data.parameters.field.stop;
-        newdata.parameters.field.stop.unit = data.axes.y.unit;
+        newdata.parameters.field.stop.unit = data.axes.data(2).unit;
         end
         if ~isstruct(data.parameters.field.step)
         newdata.parameters.field.step.value = data.parameters.field.step;        
-        newdata.parameters.field.step.unit = data.axes.y.unit;
+        newdata.parameters.field.step.unit = data.axes.data(2).unit;
         end
         if ~isstruct(data.parameters.recorder.timeBase)
         newdata.parameters.recorder.timeBase.value = data.parameters.recorder.timeBase;
@@ -359,7 +403,7 @@ switch version
         end
         if ~isstruct(data.parameters.transient.length)
         newdata.parameters.transient.length.value = data.parameters.transient.length;
-        newdata.parameters.transient.length.unit = data.axes.x.unit;
+        newdata.parameters.transient.length.unit = data.axes.data(1).unit;
         end
         if ~isstruct(data.parameters.bridge.MWfrequency)
             newdata.parameters.bridge.MWfrequency.value = data.parameters.bridge.MWfrequency;
@@ -398,8 +442,8 @@ end
 
 % Handle situation with reversed field axis
 if newdata.parameters.field.start.value > newdata.parameters.field.stop.value
-    newdata.parameters.field.start.value = newdata.axes.y.values(1);
-    newdata.parameters.field.stop.value = newdata.axes.y.values(end);
+    newdata.parameters.field.start.value = newdata.axes.data(2).values(1);
+    newdata.parameters.field.stop.value = newdata.axes.data(2).values(end);
     newdata.parameters.field.sequence = 'down';
 end
 

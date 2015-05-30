@@ -7,8 +7,8 @@ function handle = panelDisplay(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-20
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -2497,34 +2497,34 @@ function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
         
         if (isfield(ad.data{ad.control.data.active},'axes'))
             if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.x,'measure'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(1),'measure'))
                 ad.control.axis.labels.x.measure = ...
-                    ad.data{ad.control.data.active}.axes.x.measure;
+                    ad.data{ad.control.data.active}.axes.data(1).measure;
             end
             if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.x,'unit'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(1),'unit'))
                 ad.control.axis.labels.x.unit = ...
-                    ad.data{ad.control.data.active}.axes.x.unit;
+                    ad.data{ad.control.data.active}.axes.data(1).unit;
             end
             if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.y,'measure'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(2),'measure'))
                 ad.control.axis.labels.y.measure = ...
-                    ad.data{ad.control.data.active}.axes.y.measure;
+                    ad.data{ad.control.data.active}.axes.data(2).measure;
             end
             if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.y,'unit'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(2),'unit'))
                 ad.control.axis.labels.y.unit = ...
-                    ad.data{ad.control.data.active}.axes.y.unit;
+                    ad.data{ad.control.data.active}.axes.data(2).unit;
             end
             if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.z,'measure'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(3),'measure'))
                 ad.control.axis.labels.z.measure = ...
-                    ad.data{ad.control.data.active}.axes.z.measure;
+                    ad.data{ad.control.data.active}.axes.data(3).measure;
             end
             if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.z,'unit'))
+                    isfield(ad.data{ad.control.data.active}.axes.data(3),'unit'))
                 ad.control.axis.labels.z.unit = ...
-                    ad.data{ad.control.data.active}.axes.z.unit;
+                    ad.data{ad.control.data.active}.axes.data(3).unit;
             end
         end
         

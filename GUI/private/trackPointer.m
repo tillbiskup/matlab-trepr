@@ -15,8 +15,8 @@ function status = trackPointer(varargin)
 %           -4: no datasets displayed
 %            0: successful
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -103,10 +103,10 @@ if pointerPosition(1) > axisCoordinates(1) && ...
             ydata = get(findobj('Parent',mainAxis,'-and','Type','image'),'ydata');
         case '1D along x'
             xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
-            ydata = ad.data{active}.axes.y.values;
+            ydata = ad.data{active}.axes.data(2).values;
         case '1D along y'
             xdata = get(findobj('Parent',mainAxis,'-and','Type','line'),'xdata');
-            ydata = ad.data{active}.axes.x.values;
+            ydata = ad.data{active}.axes.data(1).values;
     end
     
     % If we are in 1D display mode and there are more than one spectrum
@@ -260,7 +260,7 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 linspace(1,axisPosition(3),length(newXdata)),...
                 newXindex,...
                 pointerPositionInAxis(1),'nearest');
-            indy=ad.data{active}.display.position.y;
+            indy=ad.data{active}.display.position.data(2);
             valz = ad.data{active}.data(indy,indx);
             % Get value (in units) of current point in dataset
             valx = xdata(indx);
@@ -271,7 +271,7 @@ if pointerPosition(1) > axisCoordinates(1) && ...
                 linspace(1,axisPosition(3),length(newXdata)),...
                 newXindex,...
                 pointerPositionInAxis(1),'nearest');
-            indx=ad.data{active}.display.position.x;
+            indx=ad.data{active}.display.position.data(1);
             valz = ad.data{active}.data(indy,indx);
             % Get value (in units) of current point in dataset
             valx = ydata(indx);

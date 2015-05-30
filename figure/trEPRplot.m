@@ -21,8 +21,8 @@ function trEPRplot(varargin)
 % respective fields or as key-value pairs directly in the function call.
 % (Hint: Matlab(r) input parser is used to parse parameters.)
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-26
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % PLEASE NOTE: The additional parameters are defined together with their
 %              default values in the subfunction parseAdditionalParameters
@@ -173,12 +173,12 @@ dataset = inputArguments{1};
 parameters.dimension              = '2D';
 parameters.direction              = 'y';
 parameters.position               = 1;
-parameters.xMeasure               = dataset.axes.x.measure;
-parameters.yMeasure               = dataset.axes.y.measure;
-parameters.zMeasure               = dataset.axes.z.measure;
-parameters.xUnit                  = dataset.axes.x.unit;
-parameters.yUnit                  = dataset.axes.y.unit;
-parameters.zUnit                  = dataset.axes.z.unit;
+parameters.xMeasure               = dataset.axes.data(1).measure;
+parameters.yMeasure               = dataset.axes.data(2).measure;
+parameters.zMeasure               = dataset.axes.data(3).measure;
+parameters.xUnit                  = dataset.axes.data(1).unit;
+parameters.yUnit                  = dataset.axes.data(2).unit;
+parameters.zUnit                  = dataset.axes.data(3).unit;
 parameters.xLimits                = [];
 parameters.yLimits                = [];
 parameters.zLimits                = [];
@@ -290,15 +290,15 @@ x = linspace(1,x,x);
 y = linspace(1,y,y);
 if (isfield(dataset,'axes') ...
         && isfield(dataset.axes,'x') ...
-        && isfield(dataset.axes.x,'values') ...
-        && ~isempty(dataset.axes.x.values))
-    x = dataset.axes.x.values;
+        && isfield(dataset.axes.data(1),'values') ...
+        && ~isempty(dataset.axes.data(1).values))
+    x = dataset.axes.data(1).values;
 end
 if (isfield(dataset,'axes') ...
         && isfield(dataset.axes,'y') ...
-        && isfield(dataset.axes.y,'values') ...
-        && ~isempty(dataset.axes.y.values))
-    y = dataset.axes.y.values;
+        && isfield(dataset.axes.data(2),'values') ...
+        && ~isempty(dataset.axes.data(2).values))
+    y = dataset.axes.data(2).values;
 end
 
 end

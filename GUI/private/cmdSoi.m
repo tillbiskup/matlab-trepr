@@ -21,8 +21,8 @@ function [status,warnings] = cmdSoi(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014, Till Biskup
-% 2014-08-11
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -79,19 +79,19 @@ soi = S.characteristics.soi;
 % Set coordinates according to display mode
 switch lower(ad.control.axis.displayType)
     case '1d along x'
-        soi.parameters.coordinates = ad.data{active}.display.position.y;
+        soi.parameters.coordinates = ad.data{active}.display.position.data(2);
         soi.parameters.direction = 'x';
         % Set default label
         soi.label = sprintf('%s (%e %s)',soi.parameters.direction,...
-            ad.data{active}.axes.y.values(soi.parameters.coordinates),...
-            ad.data{active}.axes.y.unit);
+            ad.data{active}.axes.data(2).values(soi.parameters.coordinates),...
+            ad.data{active}.axes.data(2).unit);
     case '1d along y'
-        soi.parameters.coordinates = ad.data{active}.display.position.x;
+        soi.parameters.coordinates = ad.data{active}.display.position.data(1);
         soi.parameters.direction = 'y';
         % Set default label
         soi.label = sprintf('%s (%e %s)',soi.parameters.direction,...
-            ad.data{active}.axes.x.values(soi.parameters.coordinates),...
-            ad.data{active}.axes.x.unit);
+            ad.data{active}.axes.data(1).values(soi.parameters.coordinates),...
+            ad.data{active}.axes.data(1).unit);
 end
 
 soiIndex = 0;

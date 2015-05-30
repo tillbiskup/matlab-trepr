@@ -20,8 +20,8 @@ function data = trEPRdatasetApplySmoothing(data,varargin)
 % See also: trEPRdatasetApplyDisplacement, trEPRdatasetApplyScaling,
 % trEPRdatasetApplyNormalisation
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -50,44 +50,44 @@ if ~isempty(fieldnames(p.Results.parameters))
     data.display.smoothing = p.Results.parameters;
 end
 
-if ~isempty(data.display.smoothing.data.x.filterfun) ...
-        && data.display.smoothing.data.x.parameters.width > 0
+if ~isempty(data.display.smoothing.data(1).filterfun) ...
+        && data.display.smoothing.data(1).parameters.width > 0
     filterFun = ...
-        str2func(['trEPRfilter_' data.display.smoothing.data.x.filterfun]);
+        str2func(['trEPRfilter_' data.display.smoothing.data(1).filterfun]);
     for rows = 1:size(data.data,1)
         data.data(rows,:) = filterFun(data.data(rows,:),...
-            data.display.smoothing.data.x.parameters);
+            data.display.smoothing.data(1).parameters);
     end
 end
 
-if ~isempty(data.display.smoothing.data.y.filterfun) ...
-        && data.display.smoothing.data.y.parameters.width > 0
+if ~isempty(data.display.smoothing.data(2).filterfun) ...
+        && data.display.smoothing.data(2).parameters.width > 0
     filterFun = ...
-        str2func(['trEPRfilter_' data.display.smoothing.data.y.filterfun]); 
+        str2func(['trEPRfilter_' data.display.smoothing.data(2).filterfun]); 
     for cols = 1:size(data.data,2)
         data.data(:,cols) = filterFun(data.data(:,cols),...
-            data.display.smoothing.data.y.parameters);
+            data.display.smoothing.data(2).parameters);
     end
 end
 
 if isfield(data,'calculated') && ~isempty(data.calculated)
-    if ~isempty(data.display.smoothing.calculated.x.filterfun) ...
-            && data.display.smoothing.calculated.x.parameters.width > 0
+    if ~isempty(data.display.smoothing.calculated(1).filterfun) ...
+            && data.display.smoothing.calculated(1).parameters.width > 0
         filterFun = str2func(['trEPRfilter_' ...
-            data.display.smoothing.calculated.x.filterfun]);
+            data.display.smoothing.calculated(1).filterfun]);
         for rows = 1:size(data.calculated,1)
             data.calculated(rows,:) = filterFun(data.calculated(rows,:),...
-                data.display.smoothing.calculated.x.parameters);
+                data.display.smoothing.calculated(1).parameters);
         end
     end
     
-    if ~isempty(data.display.smoothing.calculated.y.filterfun) ...
-            && data.display.smoothing.calculated.y.parameters.width > 0
+    if ~isempty(data.display.smoothing.calculated(2).filterfun) ...
+            && data.display.smoothing.calculated(2).parameters.width > 0
         filterFun = str2func(['trEPRfilter_' ...
-            data.display.smoothing.calculated.y.filterfun]);
+            data.display.smoothing.calculated(2).filterfun]);
         for cols = 1:size(data.calculated,2)
             data.calculated(:,cols) = filterFun(data.calculated(:,cols),...
-                data.display.smoothing.calculated.y.parameters);
+                data.display.smoothing.calculated(2).parameters);
         end
     end
 end

@@ -13,9 +13,9 @@ function status = trEPRexport4glotaran(dataset,filename,varargin)
 % See also: trEPRexport1D, trEPRexport2D
 
 % Copyright (c) 2011, Bernd Paulus
-% Copyright (c) 2011-14, Till Biskup
+% Copyright (c) 2011-15, Till Biskup
 % Copyright (c) 2014, Deborah Meyer
-% 2014-11-26
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create an instance of the inputParser class.
@@ -50,12 +50,12 @@ try
     
     % Write data to output file
     % Write column headers
-    dlmwrite (filename,dataset.axes.y.values,...
+    dlmwrite (filename,dataset.axes.data(2).values,...
         'delimiter','\t','-append','coffset',1);
     % Add row headers to data
     % The time values are multiplied by 10^9, so the time is in
     % picoseconds, what is useful for glotteran
-    matrix(:,1) = (dataset.axes.x.values)*10^9;
+    matrix(:,1) = (dataset.axes.data(1).values)*10^9;
     matrix(:,2:size(dataset.data,1)+1) = dataset.data';
     % Write data
     dlmwrite(filename,matrix,...

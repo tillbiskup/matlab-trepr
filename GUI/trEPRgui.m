@@ -12,8 +12,8 @@ function varargout = trEPRgui(varargin)
 % concept). Calling the function multiple times will only bring the current
 % trEPRgui figure window in the foreground and make it active.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -904,19 +904,19 @@ function slider_Callback(source,~,action)
                     case '2d plot'
                         return;
                     case '1d along x'
-                        ad.data{active}.display.position.y = ...
+                        ad.data{active}.display.position.data(2) = ...
                             int16(get(source,'Value'));
                     case '1d along y'
-                        ad.data{active}.display.position.x = ...
+                        ad.data{active}.display.position.data(1) = ...
                             int16(get(source,'Value'));
                 end
             case 'displaceh'
                 switch ad.control.axis.displayType
                     case {'2D plot','1D along x'}
-                        ad.data{active}.display.displacement.data.x = ...
+                        ad.data{active}.display.displacement.data(1) = ...
                             get(source,'Value');
                     case '1D along y'
-                        ad.data{active}.display.displacement.data.y = ...
+                        ad.data{active}.display.displacement.data(2) = ...
                             get(source,'Value');
                     otherwise
                         trEPRoptionUnknown(ad.control.axis.displayType,...
@@ -925,10 +925,10 @@ function slider_Callback(source,~,action)
             case 'displacev'
                 switch ad.control.axis.displayType
                     case '2D plot'
-                        ad.data{active}.display.displacement.data.y = ...
+                        ad.data{active}.display.displacement.data(2) = ...
                             get(source,'Value');
                     case {'1D along x','1D along y'}
-                        ad.data{active}.display.displacement.data.z = ...
+                        ad.data{active}.display.displacement.data(3) = ...
                             get(source,'Value');
                     otherwise
                         trEPRoptionUnknown(ad.control.axis.displayType,...
@@ -945,9 +945,9 @@ function slider_Callback(source,~,action)
                 % Depending on display type settings
                 switch ad.control.axis.displayType
                     case {'2D plot','1D along x'}
-                        ad.data{active}.display.scaling.data.x = scalingFactor;
+                        ad.data{active}.display.scaling.data(1) = scalingFactor;
                     case '1D along y'
-                        ad.data{active}.display.scaling.data.y = scalingFactor;
+                        ad.data{active}.display.scaling.data(2) = scalingFactor;
                     otherwise
                         trEPRoptionUnknown(ad.control.axis.displayType,...
                             'display type');
@@ -961,9 +961,9 @@ function slider_Callback(source,~,action)
                 end
                 switch lower(ad.control.axis.displayType)
                     case '2d plot'
-                        ad.data{active}.display.scaling.data.y = scalingFactor;
+                        ad.data{active}.display.scaling.data(2) = scalingFactor;
                     case {'1d along x','1d along y'}
-                        ad.data{active}.display.scaling.data.z = scalingFactor;
+                        ad.data{active}.display.scaling.data(3) = scalingFactor;
                 end
             otherwise
                 trEPRoptionUnknown(action);

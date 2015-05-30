@@ -23,8 +23,8 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 %
 % See also: trEPRxmlZipWrite, trEPRload
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-21
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -142,11 +142,17 @@ catch errmsg
     cd(PWD);
     return;
 end
+% Convert to current toolbox format if necessary
 if exist('data','var')
     % Check whether data have the right dimensions - in case that we read
     % from binary, most probably they have not - in this case, reshape
-    xdim = length(struct.axes.x.values);
-    ydim = length(struct.axes.y.values);
+    if isfield(struct.axes,'data')
+        xdim = length(struct.axes.data(1).values);
+        ydim = length(struct.axes.data(2).values);
+    else
+        xdim = length(struct.axes.x.values);
+        ydim = length(struct.axes.y.values);
+    end
     [y,x] = size(data);
     if ((x ~= xdim) || (y ~= ydim))  && ~isempty(data)
         try
@@ -164,7 +170,6 @@ if exist('data','var')
     clear data
 end
 cd(PWD);
-% Convert to current toolbox format if necessary
 if p.Results.convertFormat
     if isfield(struct,'format') && isfield(struct.format,'version')
         oldversion = struct.format.version;

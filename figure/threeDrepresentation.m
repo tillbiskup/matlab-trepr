@@ -16,8 +16,8 @@
 %              0 if some problems occurred
 %
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 function figHandle = threeDrepresentation(data,parameters)
 
@@ -90,12 +90,12 @@ try
             offsetx = 0;
             offsety = 0;
         end
-        x = data.axes.x.values(offsetx+1:stepx:end);
-        y = data.axes.y.values(offsety+1:stepy:end);
+        x = data.axes.data(1).values(offsetx+1:stepx:end);
+        y = data.axes.data(2).values(offsety+1:stepy:end);
         z = data.data(offsety+1:stepy:end,offsetx+1:stepx:end);
     else
-        x = data.axes.x.values;
-        y = data.axes.y.values;
+        x = data.axes.data(1).values;
+        y = data.axes.data(2).values;
         z = data.data;
     end
     
@@ -182,14 +182,14 @@ try
     set(hAxes,'ZTick',[]);
     
     % Set axes labels
-    if isfield(data.axes.x,'measure') && isfield(data.axes.x,'unit')
+    if isfield(data.axes.data(1),'measure') && isfield(data.axes.data(1),'unit')
         xAxisLabel = sprintf('{\\it%s} / %s',...
-            data.axes.x.measure,data.axes.x.unit);
+            data.axes.data(1).measure,data.axes.data(1).unit);
         xlabel(xAxisLabel);
     end
-    if isfield(data.axes.y,'measure') && isfield(data.axes.y,'unit')
+    if isfield(data.axes.data(2),'measure') && isfield(data.axes.data(2),'unit')
         yAxisLabel = sprintf('{\\it%s} / %s',...
-            data.axes.y.measure,data.axes.y.unit);
+            data.axes.data(2).measure,data.axes.data(2).unit);
         ylabel(yAxisLabel);
     end
     

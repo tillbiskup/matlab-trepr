@@ -23,8 +23,8 @@ function data = trEPRspikeRemoval(data,fieldPositions)
 %              way. Use entirely on your own risk knowing what you're
 %              doing.
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % If called without parameter, display help
 if ~nargin && ~nargout
@@ -43,8 +43,8 @@ p.addOptional('fieldPositions','',@(x)isvector(x));
 p.parse(data,fieldPositions);
 
 % Prepare x,y vectors, Z matrix
-x = data.axes.x.values;
-y = data.axes.y.values;
+x = data.axes.data(1).values;
+y = data.axes.data(2).values;
 Z = data.data;
 
 % Get field positions

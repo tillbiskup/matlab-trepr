@@ -32,8 +32,8 @@ function status = trEPRexport2D(dataset,filename,varargin)
 %
 % See also: trEPRexport1D
 
-% Copyright (c) 2014, Till Biskup
-% 2014-08-13
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % If called without parameter, display help
 if ~nargin && ~nargout
@@ -78,11 +78,11 @@ try
     % Add axes if requested
     if p.Results.includeAxes
         % Write column headers
-        dlmwrite (filename,[NaN dataset.axes.y.values],...
+        dlmwrite (filename,[NaN dataset.axes.data(2).values],...
             'delimiter',p.Results.delimiter,...
             'precision',p.Results.precision,'-append');
         % Add row headers to data
-        matrix(:,1) = dataset.axes.x.values;
+        matrix(:,1) = dataset.axes.data(1).values;
         matrix(:,2:size(dataset.data,1)+1) = dataset.data';
         % Write data
     else

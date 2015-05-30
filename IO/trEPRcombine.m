@@ -25,8 +25,8 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % otherwise the label of the first dataset that is combined gets used.
 %
 
-% Copyright (c) 2011, Till Biskup
-% 2011-11-21
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -75,7 +75,7 @@ try
             combinedDataset.data = ...
                 [ combinedDataset.data; datasets{k}.data ];
         end
-        combinedDataset.axes.y.values = linspace(...
+        combinedDataset.axes.data(2).values = linspace(...
             datasets{1}.parameters.field.start.value,...
             datasets{end}.parameters.field.stop.value,...
             length(datasets));
@@ -84,13 +84,13 @@ try
         combinedDataset.parameters.field.stop.value = ...
             datasets{end}.parameters.field.stop.value;
         combinedDataset.parameters.field.step.value = ...
-            combinedDataset.axes.y.values(2)-combinedDataset.axes.y.values(1);
+            combinedDataset.axes.data(2).values(2)-combinedDataset.axes.data(2).values(1);
         combinedDataset.parameters.field.start.unit = ...
-            combinedDataset.axes.y.unit;
+            combinedDataset.axes.data(2).unit;
         combinedDataset.parameters.field.stop.unit = ...
-            combinedDataset.axes.y.unit;
+            combinedDataset.axes.data(2).unit;
         combinedDataset.parameters.field.step.unit = ...
-            combinedDataset.axes.y.unit;
+            combinedDataset.axes.data(2).unit;
     end
     
     % In case that we have identical dimensions along x (cols, therefore

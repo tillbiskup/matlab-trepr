@@ -21,8 +21,8 @@ function [status,warnings] = cmdStack(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014, Till Biskup
-% 2014-12-16
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -88,14 +88,14 @@ end
 switch dimension
     case 'x'
         zMin = min(...
-            corrDatasets{1}.data(corrDatasets{1}.display.position.y,:));
+            corrDatasets{1}.data(corrDatasets{1}.display.position.data(2),:));
         zMax = max(...
-            corrDatasets{end}.data(corrDatasets{end}.display.position.y,:));
+            corrDatasets{end}.data(corrDatasets{end}.display.position.data(2),:));
     case 'y'
         zMin = min(...
-            corrDatasets{1}.data(:,corrDatasets{1}.display.position.x));
+            corrDatasets{1}.data(:,corrDatasets{1}.display.position.data(1)));
         zMax = max(...
-            corrDatasets{end}.data(:,corrDatasets{end}.display.position.x));
+            corrDatasets{end}.data(:,corrDatasets{end}.display.position.data(1)));
 end
 
 deltas = zeros(1,length(ad.control.data.visible)-1);
@@ -106,12 +106,12 @@ for dataset = 1:length(ad.control.data.visible)-1
     switch dimension
         case 'x'
             deltas(dataset) = abs(min(...
-                tmpDatasets{2}.data(tmpDatasets{2}.display.position.y,:)- ...
-                tmpDatasets{1}.data(tmpDatasets{1}.display.position.y,:)));
+                tmpDatasets{2}.data(tmpDatasets{2}.display.position.data(2),:)- ...
+                tmpDatasets{1}.data(tmpDatasets{1}.display.position.data(2),:)));
         case 'y'
             deltas(dataset) = abs(min(...
-                tmpDatasets{2}.data(:,tmpDatasets{2}.display.position.x)- ...
-                tmpDatasets{1}.data(:,tmpDatasets{1}.display.position.x)));
+                tmpDatasets{2}.data(:,tmpDatasets{2}.display.position.data(1))- ...
+                tmpDatasets{1}.data(:,tmpDatasets{1}.display.position.data(1))));
     end
 end
 
@@ -121,7 +121,7 @@ additionalDelta = (zMin + zMax + sum(deltas)) * percentage/100;
 
 % Add deltas and additionalDelta to traces
 for delta = 1:length(deltas)
-    ad.data{ad.control.data.visible(delta+1)}.display.displacement.data.z = ...
+    ad.data{ad.control.data.visible(delta+1)}.display.displacement.data(3) = ...
         sum(deltas(1:delta)) + delta*additionalDelta;
 end
 

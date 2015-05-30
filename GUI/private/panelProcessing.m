@@ -6,8 +6,8 @@ function handle = panelProcessing(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -755,13 +755,13 @@ function edit_Callback(source,~,action)
                     sprintf('trEPRfilter_%s',filterType);
             case 'smoothingUnits'
                 if strcmpi(filterDirection,'x') && x>1
-                    deltaUnit = diff(ad.data{active}.axes.x.values(1:2));
+                    deltaUnit = diff(ad.data{active}.axes.data(1).values(1:2));
                     value = trEPRguiSanitiseNumericInput(...
                         get(source,'String'),...
                         0:deltaUnit:(x-1)*deltaUnit,...
                         'map',true);
                 elseif strcmpi(filterDirection,'y') && y>1
-                    deltaUnit = diff(ad.data{active}.axes.y.values(1:2));
+                    deltaUnit = diff(ad.data{active}.axes.data(2).values(1:2));
                     value = trEPRguiSanitiseNumericInput(...
                         get(source,'String'),...
                         0:deltaUnit:(y-1)*deltaUnit,...

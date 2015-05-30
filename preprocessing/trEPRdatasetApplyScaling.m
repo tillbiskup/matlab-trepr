@@ -20,8 +20,8 @@ function data = trEPRdatasetApplyScaling(data,varargin)
 % See also: trEPRdatasetApplyDisplacement, trEPRdatasetApplySmoothing,
 % trEPRdatasetApplyNormalisation
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-27
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-30
 
 % Parse input arguments using the inputParser functionality
 try
@@ -52,17 +52,17 @@ end
 
 % Scaling in x and y dimension should be symmetric around the centre
 % Example: x = (x-(max(x)-min(x))/2).*scaling + (max(x)-min(x))/2;
-data.axes.x.values = (data.axes.x.values-(max(data.axes.x.values)-...
-    min(data.axes.x.values))/2).*data.display.scaling.data.x + ...
-    (max(data.axes.x.values)-min(data.axes.x.values))/2;
-data.axes.y.values = (data.axes.y.values-(max(data.axes.y.values)-...
-    min(data.axes.y.values))/2).*data.display.scaling.data.y + ...
-    (max(data.axes.y.values)-min(data.axes.y.values))/2;
+data.axes.data(1).values = (data.axes.data(1).values-(max(data.axes.data(1).values)-...
+    min(data.axes.data(1).values))/2).*data.display.scaling.data(1) + ...
+    (max(data.axes.data(1).values)-min(data.axes.data(1).values))/2;
+data.axes.data(2).values = (data.axes.data(2).values-(max(data.axes.data(2).values)-...
+    min(data.axes.data(2).values))/2).*data.display.scaling.data(2) + ...
+    (max(data.axes.data(2).values)-min(data.axes.data(2).values))/2;
 
-data.data = data.data .* data.display.scaling.data.z;
+data.data = data.data .* data.display.scaling.data(3);
 
 if isfield(data,'calculated') && ~isempty(data.calculated)
-    data.calculated = data.calculated .* data.display.scaling.calculated.z;
+    data.calculated = data.calculated .* data.display.scaling.calculated(3);
 end
 
 % Write history record

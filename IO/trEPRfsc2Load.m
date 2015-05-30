@@ -36,8 +36,8 @@ function varargout = trEPRfsc2Load(filename, varargin)
 %
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
-% Copyright (c) 2009-2013, Till Biskup
-% 2013-10-03
+% Copyright (c) 2009-2015, Till Biskup
+% 2015-05-30
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -362,22 +362,22 @@ function [content,warnings] = loadFile(filename,parameters)
         return;
     end
     
-    content.axes.x.values = ...
+    content.axes.data(1).values = ...
         -content.parameters.transient.length.value/content.parameters.transient.points * ...
         (content.parameters.transient.triggerPosition - 1) : ...
         content.parameters.transient.length.value/content.parameters.transient.points : ...
         content.parameters.transient.length.value - ...
         content.parameters.transient.length.value/content.parameters.transient.points * ...
         content.parameters.transient.triggerPosition;
-    content.axes.x.measure = 'time';
-    content.axes.x.unit = content.parameters.transient.length.unit;
+    content.axes.data(1).measure = 'time';
+    content.axes.data(1).unit = content.parameters.transient.length.unit;
     
-    content.axes.y.values = ...
+    content.axes.data(2).values = ...
         content.parameters.field.start.value : ...
         content.parameters.field.step.value : ...
         content.parameters.field.stop.value;
-    content.axes.y.measure = 'magnetic field';
-    content.axes.y.unit = content.parameters.field.start.unit;
+    content.axes.data(2).measure = 'magnetic field';
+    content.axes.data(2).unit = content.parameters.field.start.unit;
     
     % Fix date string
     if ~isempty(content.parameters.date.start)

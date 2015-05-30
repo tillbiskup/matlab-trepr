@@ -8,8 +8,8 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-11-10
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-30
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -99,29 +99,15 @@ active = ad.control.data.active;
 
 % Set units if only one visible dataset or only active visible
 if length(ad.control.data.visible) == 1 || ad.control.axis.onlyActive
-    ad.control.axis.labels.x.unit = ad.data{active}.axes.x.unit;
-    ad.control.axis.labels.y.unit = ad.data{active}.axes.y.unit;
-    ad.control.axis.labels.z.unit = ad.data{active}.axes.z.unit;
+    ad.control.axis.labels.x.unit = ad.data{active}.axes.data(1).unit;
+    ad.control.axis.labels.y.unit = ad.data{active}.axes.data(2).unit;
+    ad.control.axis.labels.z.unit = ad.data{active}.axes.data(3).unit;
     setappdata(mainWindow,'control',ad.control);
 end
 
 % Plot depending on display type settings
-% Be as robust as possible: if there is no axes, default is indices
-[y,x] = size(ad.data{ad.control.data.active}.data);
-x = linspace(1,x,x);
-y = linspace(1,y,y);
-if (isfield(ad.data{active},'axes') ...
-        && isfield(ad.data{active}.axes,'x') ...
-        && isfield(ad.data{active}.axes.x,'values') ...
-        && not (isempty(ad.data{active}.axes.x.values)))
-    x = ad.data{active}.axes.x.values;
-end
-if (isfield(ad.data{active},'axes') ...
-        && isfield(ad.data{active}.axes,'y') ...
-        && isfield(ad.data{active}.axes.y,'values') ...
-        && not (isempty(ad.data{active}.axes.y.values)))
-    y = ad.data{active}.axes.y.values;
-end
+x = ad.data{active}.axes.data(1).values;
+y = ad.data{active}.axes.data(2).values;
 
 % In case we have no axes values, should not happen, but might do...
 % (simulation for example)
@@ -173,18 +159,18 @@ switch ad.control.axis.displayType
             end
         end
         % Apply filter if necessary
-        if (ad.data{active}.display.smoothing.data.x.parameters.width > 0)
-            filterfun = str2func(ad.data{active}.display.smoothing.data.x.filterfun);
+        if (ad.data{active}.display.smoothing.data(1).parameters.width > 0)
+            filterfun = str2func(ad.data{active}.display.smoothing.data(1).filterfun);
             for yidx = 1:size(data,1)
                 data(yidx,:) = filterfun(data(yidx,:),...
-                    ad.data{active}.display.smoothing.data.x.parameters);
+                    ad.data{active}.display.smoothing.data(1).parameters);
             end
         end
-        if (ad.data{active}.display.smoothing.data.y.parameters.width > 0)
-            filterfun = str2func(ad.data{active}.display.smoothing.data.y.filterfun);
+        if (ad.data{active}.display.smoothing.data(2).parameters.width > 0)
+            filterfun = str2func(ad.data{active}.display.smoothing.data(2).filterfun);
             for xidx = 1:size(data,2)
                 data(:,xidx) = filterfun(data(:,xidx),...
-                    ad.data{active}.display.smoothing.data.y.parameters);
+                    ad.data{active}.display.smoothing.data(2).parameters);
             end
         end
         % For very special cases where limits are identical
@@ -282,7 +268,7 @@ switch ad.control.axis.displayType
                 'Enable','on',...
                 'Min',1,'Max',length(y),...
                 'SliderStep',[1/(length(y)) 10/(length(y))],...
-                'Value',ad.data{active}.display.position.y...
+                'Value',ad.data{active}.display.position.data(2)...
                 );
         else
             set(gh.vert1_slider,...
@@ -295,14 +281,8 @@ switch ad.control.axis.displayType
         if ad.control.axis.onlyActive
             k = ad.control.data.active;
             data = getData(ad.data{k});
-            x = linspace(1,size(data,2),size(data,2));
-            if (isfield(ad.data{k},'axes') ...
-                    && isfield(ad.data{k}.axes,'x') ...
-                    && isfield(ad.data{k}.axes.x,'values') ...
-                    && not (isempty(ad.data{k}.axes.x.values)))
-                x = ad.data{k}.axes.x.values;
-            end
-            y = data(ad.data{k}.display.position.y,:);
+            x = ad.data{k}.axes.data(1).values;
+            y = data(ad.data{k}.display.position.data(2),:);
             % In case that we loaded 1D data...
             if isscalar(x)
                 x = [x x+1];
@@ -339,26 +319,26 @@ switch ad.control.axis.displayType
             end
             % Apply displacement if necessary
             % IMPORTANT: Apply AFTER normalisation
-            if (ad.data{k}.display.displacement.data.x ~= 0)
-                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
+            if (ad.data{k}.display.displacement.data(1) ~= 0)
+                x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data(1);
             end
-            if (ad.data{k}.display.displacement.data.z ~= 0)
-                y = y + ad.data{k}.display.displacement.data.z;
+            if (ad.data{k}.display.displacement.data(3) ~= 0)
+                y = y + ad.data{k}.display.displacement.data(3);
             end
             % Apply filter if necessary
-            if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
-                filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters);
+            if (ad.data{k}.display.smoothing.data(1).parameters.width > 0)
+                filterfun = str2func(ad.data{k}.display.smoothing.data(1).filterfun);
+                y = filterfun(y,ad.data{k}.display.smoothing.data(1).parameters);
             end
             % Apply scaling if necessary
-            if (ad.data{k}.display.scaling.data.x ~= 0)
+            if (ad.data{k}.display.scaling.data(1) ~= 0)
                 x = linspace(...
-                    (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.data.x/2),...
-                    (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.data.x/2),...
+                    (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
+                    (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
                     length(x));
             end
-            if (ad.data{k}.display.scaling.data.z ~= 0)
-                y = y * ad.data{k}.display.scaling.data.z;
+            if (ad.data{k}.display.scaling.data(3) ~= 0)
+                y = y * ad.data{k}.display.scaling.data(3);
             end
             if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
                     && strcmpi(ad.data{k}.avg.dimension,'y')
@@ -393,14 +373,8 @@ switch ad.control.axis.displayType
             for l = 1 : length(ad.control.data.visible)
                 k = ad.control.data.visible(l);
                 data = getData(ad.data{k});
-                x = linspace(1,size(data,2),size(data,2));
-                if (isfield(ad.data{k},'axes') ...
-                        && isfield(ad.data{k}.axes,'x') ...
-                        && isfield(ad.data{k}.axes.x,'values') ...
-                        && not (isempty(ad.data{k}.axes.x.values)))
-                    x = ad.data{k}.axes.x.values;
-                end
-                y = data(ad.data{k}.display.position.y,:);
+                x = ad.data{k}.axes.data(1).values;
+                y = data(ad.data{k}.display.position.data(2),:);
                 % In case that we loaded 1D data...
                 if isscalar(x)
                     x = [x x+1]; %#ok<AGROW>
@@ -437,26 +411,26 @@ switch ad.control.axis.displayType
                 end
                 % Apply displacement if necessary
                 % IMPORTANT: Apply AFTER normalisation
-                if (ad.data{k}.display.displacement.data.x ~= 0)
-                    x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data.x;
+                if (ad.data{k}.display.displacement.data(1) ~= 0)
+                    x = x + (x(2)-x(1)) * ad.data{k}.display.displacement.data(1);
                 end
-                if (ad.data{k}.display.displacement.data.z ~= 0)
-                    y = y + ad.data{k}.display.displacement.data.z;
+                if (ad.data{k}.display.displacement.data(3) ~= 0)
+                    y = y + ad.data{k}.display.displacement.data(3);
                 end
                 % Apply filter if necessary
-                if (ad.data{k}.display.smoothing.data.x.parameters.width > 0)
-                    filterfun = str2func(ad.data{k}.display.smoothing.data.x.filterfun);
-                    y = filterfun(y,ad.data{k}.display.smoothing.data.x.parameters);
+                if (ad.data{k}.display.smoothing.data(1).parameters.width > 0)
+                    filterfun = str2func(ad.data{k}.display.smoothing.data(1).filterfun);
+                    y = filterfun(y,ad.data{k}.display.smoothing.data(1).parameters);
                 end
                 % Apply scaling if necessary
-                if (ad.data{k}.display.scaling.data.x ~= 0)
+                if (ad.data{k}.display.scaling.data(1) ~= 0)
                     x = linspace(...
-                        (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.data.x/2),...
-                        (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.data.x/2),...
+                        (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
+                        (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
                         length(x));
                 end
-                if (ad.data{k}.display.scaling.data.z ~= 0)
-                    y = y * ad.data{k}.display.scaling.data.z;
+                if (ad.data{k}.display.scaling.data(3) ~= 0)
+                    y = y * ad.data{k}.display.scaling.data(3);
                 end
                 if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
                         && strcmpi(ad.data{k}.avg.dimension,'y')
@@ -511,8 +485,8 @@ switch ad.control.axis.displayType
                 ad.control.data.temporary.parameters);
             plot(...
                 mainAxes,...
-                tmpData.axes.x.values,...
-                tmpData.data(tmpData.display.position.y,:),...
+                tmpData.axes.data(1).values,...
+                tmpData.data(tmpData.display.position.data(2),:),...
                 'Color',ad.control.axis.lines.temporary.color,...
                 'LineStyle',ad.control.axis.lines.temporary.style,...
                 'Marker',ad.control.axis.lines.temporary.marker.type,...
@@ -623,7 +597,7 @@ switch ad.control.axis.displayType
                 'Enable','on',...
                 'Min',1,'Max',length(x),...
                 'SliderStep',[1/(length(x)) 10/(length(x))],...
-                'Value',ad.data{active}.display.position.x...
+                'Value',ad.data{active}.display.position.data(1)...
                 );
         else
             set(gh.vert1_slider,...
@@ -636,14 +610,8 @@ switch ad.control.axis.displayType
         if ad.control.axis.onlyActive
             k = ad.control.data.active;
             data = getData(ad.data{k});
-            y = linspace(1,size(data,1),size(data,1));
-            if (isfield(ad.data{k},'axes') ...
-                    && isfield(ad.data{k}.axes,'y') ...
-                    && isfield(ad.data{k}.axes.y,'values') ...
-                    && not (isempty(ad.data{k}.axes.y.values)))
-                y = ad.data{k}.axes.y.values;
-            end
-            x = data(:,ad.data{k}.display.position.x);
+            y = ad.data{k}.axes.data(2).values;
+            x = data(:,ad.data{k}.display.position.data(1));
             % In case that we loaded 1D data...
             if isscalar(x)
                 x = [x x+1];
@@ -679,26 +647,26 @@ switch ad.control.axis.displayType
             end
             % Apply displacement if necessary
             % IMPORTANT: Apply AFTER normalisation
-            if (ad.data{k}.display.displacement.data.y ~= 0)
-                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
+            if (ad.data{k}.display.displacement.data(2) ~= 0)
+                y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data(2);
             end
-            if (ad.data{k}.display.displacement.data.z ~= 0)
-                x = x + ad.data{k}.display.displacement.data.z;
+            if (ad.data{k}.display.displacement.data(3) ~= 0)
+                x = x + ad.data{k}.display.displacement.data(3);
             end
             % Apply filter if necessary
-            if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)
-                filterfun = str2func(ad.data{k}.display.smoothing.data.y.filterfun);
-                x = filterfun(x,ad.data{k}.display.smoothing.data.y.parameters.width);
+            if (ad.data{k}.display.smoothing.data(2).parameters.width > 0)
+                filterfun = str2func(ad.data{k}.display.smoothing.data(2).filterfun);
+                x = filterfun(x,ad.data{k}.display.smoothing.data(2).parameters.width);
             end
             % Apply scaling if necessary
-            if (ad.data{k}.display.scaling.data.y ~= 0)
+            if (ad.data{k}.display.scaling.data(2) ~= 0)
                 y = linspace(...
-                    (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data.y/2),...
-                    (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data.y/2),...
+                    (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
+                    (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                     length(y));
             end
-            if (ad.data{k}.display.scaling.data.z ~= 0)
-                x = x * ad.data{k}.display.scaling.data.z;
+            if (ad.data{k}.display.scaling.data(3) ~= 0)
+                x = x * ad.data{k}.display.scaling.data(3);
             end
             if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
                     && strcmpi(ad.data{k}.avg.dimension,'x')
@@ -751,14 +719,8 @@ switch ad.control.axis.displayType
             for l = 1 : length(ad.control.data.visible)
                 k = ad.control.data.visible(l);
                 data = getData(ad.data{k});
-                y = linspace(1,size(data,1),size(data,1));
-                if (isfield(ad.data{k},'axes') ...
-                        && isfield(ad.data{k}.axes,'y') ...
-                        && isfield(ad.data{k}.axes.y,'values') ...
-                        && not (isempty(ad.data{k}.axes.y.values)))
-                    y = ad.data{k}.axes.y.values;
-                end
-                x = data(:,ad.data{k}.display.position.x);
+                y = ad.data{k}.axes.data(2).values;
+                x = data(:,ad.data{k}.display.position.data(1));
                 % In case that we loaded 1D data...
                 if isscalar(x)
                     x = [x x+1]; %#ok<AGROW>
@@ -795,26 +757,26 @@ switch ad.control.axis.displayType
                 end
                 % Apply displacement if necessary
                 % IMPORTANT: Apply AFTER normalisation
-                if (ad.data{k}.display.displacement.data.y ~= 0)
-                    y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data.y;
+                if (ad.data{k}.display.displacement.data(2) ~= 0)
+                    y = y + (y(2)-y(1)) * ad.data{k}.display.displacement.data(2);
                 end
-                if (ad.data{k}.display.displacement.data.z ~= 0)
-                    x = x + ad.data{k}.display.displacement.data.z;
+                if (ad.data{k}.display.displacement.data(3) ~= 0)
+                    x = x + ad.data{k}.display.displacement.data(3);
                 end
                 % Apply filter if necessary
-                if (ad.data{k}.display.smoothing.data.y.parameters.width > 0)
-                    filterfun = str2func(ad.data{k}.display.smoothing.data.y.filterfun);
-                    x = filterfun(x,ad.data{k}.display.smoothing.data.y.parameters.width);
+                if (ad.data{k}.display.smoothing.data(2).parameters.width > 0)
+                    filterfun = str2func(ad.data{k}.display.smoothing.data(2).filterfun);
+                    x = filterfun(x,ad.data{k}.display.smoothing.data(2).parameters.width);
                 end
                 % Apply scaling if necessary
-                if (ad.data{k}.display.scaling.data.y ~= 0)
+                if (ad.data{k}.display.scaling.data(2) ~= 0)
                     y = linspace(...
-                        (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data.y/2),...
-                        (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data.y/2),...
+                        (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
+                        (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                         length(y));
                 end
-                if (ad.data{k}.display.scaling.data.z ~= 0)
-                    x = x * ad.data{k}.display.scaling.data.z;
+                if (ad.data{k}.display.scaling.data(3) ~= 0)
+                    x = x * ad.data{k}.display.scaling.data(3);
                 end
                 if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
                         && strcmpi(ad.data{k}.avg.dimension,'x')
@@ -886,8 +848,8 @@ switch ad.control.axis.displayType
                 ad.control.data.temporary.parameters);
             plot(...
                 mainAxes,...
-                tmpData.axes.y.values,...
-                tmpData.data(:,tmpData.display.position.x),...
+                tmpData.axes.data(2).values,...
+                tmpData.data(:,tmpData.display.position.data(1)),...
                 'Color',ad.control.axis.lines.temporary.color,...
                 'LineStyle',ad.control.axis.lines.temporary.style,...
                 'Marker',ad.control.axis.lines.temporary.marker.type,...
@@ -1089,22 +1051,8 @@ if (ad.control.axis.limits.auto)
     zmax = zeros(length(ad.control.data.visible),1);
     for k=1:length(ad.control.data.visible)
         data = getData(ad.data{ad.control.data.visible(k)});
-        % be as robust as possible: if there is no axes, default is indices
-        [y,x] = size(data);
-        x = linspace(1,x,x);
-        y = linspace(1,y,y);
-        if (isfield(ad.data{ad.control.data.visible(k)},'axes') ...
-                && isfield(ad.data{ad.control.data.visible(k)}.axes,'x') ...
-                && isfield(ad.data{ad.control.data.visible(k)}.axes.x,'values') ...
-                && not (isempty(ad.data{ad.control.data.visible(k)}.axes.x.values)))
-            x = ad.data{ad.control.data.visible(k)}.axes.x.values;
-        end
-        if (isfield(ad.data{ad.control.data.visible(k)},'axes') ...
-                && isfield(ad.data{ad.control.data.visible(k)}.axes,'y') ...
-                && isfield(ad.data{ad.control.data.visible(k)}.axes.y,'values') ...
-                && not (isempty(ad.data{ad.control.data.visible(k)}.axes.y.values)))
-            y = ad.data{ad.control.data.visible(k)}.axes.y.values;
-        end
+        x = ad.data{ad.control.data.visible(k)}.axes.data(1).values;
+        y = ad.data{ad.control.data.visible(k)}.axes.data(2).values;
         xmin(k) = x(1);
         xmax(k) = x(end);
         ymin(k) = y(1);
@@ -1114,10 +1062,10 @@ if (ad.control.axis.limits.auto)
                 switch lower(ad.control.axis.displayType)
                     case '1d along x'
                         data = data(ad.data{...
-                            ad.control.data.visible(k)}.display.position.y,:);
+                            ad.control.data.visible(k)}.display.position.data(2),:);
                     case '1d along y'
                         data = data(:,ad.data{...
-                            ad.control.data.visible(k)}.display.position.x);
+                            ad.control.data.visible(k)}.display.position.data(1));
                 end
                 switch ad.control.axis.normalisation.type
                     case {'pk-pk','pk2pk'}
@@ -1200,13 +1148,13 @@ if (ad.control.axis.limits.auto)
     clear data;
 else
 %     ad.control.axis.limits.x.min = ...
-%         ad.data{ad.control.data.active}.axes.x.values(1);
+%         ad.data{ad.control.data.active}.axes.data(1).values(1);
 %     ad.control.axis.limits.x.max = ...
-%         ad.data{ad.control.data.active}.axes.x.values(end);
+%         ad.data{ad.control.data.active}.axes.data(1).values(end);
 %     ad.control.axis.limits.y.min = ...
-%         ad.data{ad.control.data.active}.axes.y.values(1);
+%         ad.data{ad.control.data.active}.axes.data(2).values(1);
 %     ad.control.axis.limits.y.max = ...
-%         ad.data{ad.control.data.active}.axes.y.values(end);
+%         ad.data{ad.control.data.active}.axes.data(2).values(end);
 %     switch ad.control.axis.normalisation
 %         case 'pk-pk'
 %             ad.control.axis.limits.z.min = ...
@@ -1272,19 +1220,19 @@ cla(gh.verticalAxis,'reset');
 switch lower(ad.control.axis.projectionAxes.mode)
     case 'slice'
         plot(gh.horizontalAxis,...
-            ad.data{active}.axes.x.values,...
-            ad.data{active}.data(ad.data{active}.display.position.y,:),...
+            ad.data{active}.axes.data(1).values,...
+            ad.data{active}.data(ad.data{active}.display.position.data(2),:),...
             'k-');
         plot(gh.verticalAxis,...
-            -ad.data{active}.data(:,ad.data{active}.display.position.x),...
-            ad.data{active}.axes.y.values,...
+            -ad.data{active}.data(:,ad.data{active}.display.position.data(1)),...
+            ad.data{active}.axes.data(2).values,...
             'k-');
     case 'sum'
         plot(gh.horizontalAxis,...
-            ad.data{active}.axes.x.values,sum(ad.data{active}.data,1),...
+            ad.data{active}.axes.data(1).values,sum(ad.data{active}.data,1),...
             'k-');
         plot(gh.verticalAxis,...
-            -sum(ad.data{active}.data,2),ad.data{active}.axes.y.values,...
+            -sum(ad.data{active}.data,2),ad.data{active}.axes.data(2).values,...
             'k-');
     otherwise
         trEPRoptionUnknown(option,'projection axis mode');
@@ -1357,7 +1305,7 @@ cla(gh.residualsAxis,'reset');
 if ~isempty(ad.data{active}.calculated) && ad.control.axis.sim
     residuals = ad.data{active}.data(:,ad.data{active}.calculation.position)-...
         ad.data{active}.calculated;
-    plot(gh.residualsAxis,ad.data{active}.axes.y.values,residuals,'k-');
+    plot(gh.residualsAxis,ad.data{active}.axes.data(2).values,residuals,'k-');
 end
 
 set(gh.residualsAxis,'XLim',get(gh.mainAxis,'XLim'));

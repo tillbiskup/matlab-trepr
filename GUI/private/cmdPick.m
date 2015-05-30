@@ -21,8 +21,8 @@ function [status,warnings] = cmdPick(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-07-17
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 status = 0;
 warnings = cell(0);
@@ -75,13 +75,13 @@ switch lower(opt{1}(1:3))
     case 'min'
         [~,ximin] = min(min(data));
         [~,yimin] = min(data(:,ximin));
-        ad.data{active}.display.position.x = ximin;
-        ad.data{active}.display.position.y = yimin;
+        ad.data{active}.display.position.data(1) = ximin;
+        ad.data{active}.display.position.data(2) = yimin;
         
         % Display info about values in status window
         message = sprintf('Values of minimum: x = %e, y = %8.2f, z = %f',...
-            ad.data{active}.axes.x.values(ximin),...
-            ad.data{active}.axes.y.values(yimin),...
+            ad.data{active}.axes.data(1).values(ximin),...
+            ad.data{active}.axes.data(2).values(yimin),...
             ad.data{active}.data(yimin,ximin) ...
             );
         trEPRmsg(message,'info');
@@ -98,13 +98,13 @@ switch lower(opt{1}(1:3))
     case 'max'
         [~,ximax] = max(max(data));
         [~,yimax] = max(data(:,ximax));
-        ad.data{active}.display.position.x = ximax;
-        ad.data{active}.display.position.y = yimax;
+        ad.data{active}.display.position.data(1) = ximax;
+        ad.data{active}.display.position.data(2) = yimax;
         
         % Display info about values in status window
         message = sprintf('Values of maximum: x = %e, y = %8.2f, z = %f',...
-            ad.data{active}.axes.x.values(ximax),...
-            ad.data{active}.axes.y.values(yimax),...
+            ad.data{active}.axes.data(1).values(ximax),...
+            ad.data{active}.axes.data(2).values(yimax),...
             ad.data{active}.data(yimax,ximax) ...
             );
         trEPRmsg(message,'info');

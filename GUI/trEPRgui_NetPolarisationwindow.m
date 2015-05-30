@@ -6,8 +6,8 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-30
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1171,9 +1171,9 @@ function edit_Callback(source,~,action)
                 time = linspace(1,x,x);
                 if (isfield(ad.data{active},'axes') ...
                         && isfield(ad.data{active}.axes,'x') ...
-                        && isfield(ad.data{active}.axes.x,'values') ...
-                        && not (isempty(ad.data{active}.axes.x.values)))
-                    time = ad.data{active}.axes.x.values;
+                        && isfield(ad.data{active}.axes.data(1),'values') ...
+                        && not (isempty(ad.data{active}.axes.data(1).values)))
+                    time = ad.data{active}.axes.data(1).values;
                 end
                 atomic = time(2)-time(1);
                 set(gh.processing_panel_smoothing_unit_edit,...
@@ -1193,9 +1193,9 @@ function edit_Callback(source,~,action)
                 x = linspace(1,x,x);
                 if (isfield(ad.data{active},'axes') ...
                         && isfield(ad.data{active}.axes,'x') ...
-                        && isfield(ad.data{active}.axes.x,'values') ...
-                        && not (isempty(ad.data{active}.axes.x.values)))
-                    x = ad.data{active}.axes.x.values;
+                        && isfield(ad.data{active}.axes.data(1),'values') ...
+                        && not (isempty(ad.data{active}.axes.data(1).values)))
+                    x = ad.data{active}.axes.data(1).values;
                 end
                 
                 % Get "atomic" value
@@ -2083,9 +2083,9 @@ function updateAnalysisPanel()
         
         % Set pretrigger statistics subpanel fields
         NP = sum(getData(ad.data{active}));
-        PTNP = NP(1:find(ad.data{active}.axes.x.values>0,1)-1);
+        PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
         
-        NP = NP(find(ad.data{active}.axes.x.values>0,1):end);
+        NP = NP(find(ad.data{active}.axes.data(1).values>0,1):end);
 
         set(gh.pretrigpol_min_edit,'String',num2str(min(PTNP),'%10.6f'));
         set(gh.pretrigpol_max_edit,'String',num2str(max(PTNP),'%10.6f'));
@@ -2098,19 +2098,19 @@ function updateAnalysisPanel()
         [minNPval,minNPind] = min(NP);
         set(gh.netpol_min_edit,'String',num2str(minNPval));
         set(gh.netpol_minpos_edit,'String',...
-            num2str(ad.data{active}.axes.x.values(minNPind+...
-            find(ad.data{active}.axes.x.values>0,1))));
+            num2str(ad.data{active}.axes.data(1).values(minNPind+...
+            find(ad.data{active}.axes.data(1).values>0,1))));
         [maxNPval,maxNPind] = max(NP);
         set(gh.netpol_max_edit,'String',num2str(maxNPval));
         set(gh.netpol_maxpos_edit,'String',...
-            num2str(ad.data{active}.axes.x.values(maxNPind+...
-            find(ad.data{active}.axes.x.values>0,1))));
+            num2str(ad.data{active}.axes.data(1).values(maxNPind+...
+            find(ad.data{active}.axes.data(1).values>0,1))));
         
         % Set unit fields
 %         set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
 %             'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
 %         set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
-%             'String',ad.data{active}.axes.y.unit);
+%             'String',ad.data{active}.axes.data(2).unit);
         
         % Set background of deviation fields accordingly
         if minNPval < (min(PTNP))
@@ -2427,13 +2427,13 @@ function updateAxes(varargin)
         t = linspace(1,size(data,2),size(data,2));
         if (isfield(ad.data{active},'axes') ...
                 && isfield(ad.data{active}.axes,'x') ...
-                && isfield(ad.data{active}.axes.x,'values') ...
-                && not (isempty(ad.data{active}.axes.x.values)))
-            t = ad.data{active}.axes.x.values;
+                && isfield(ad.data{active}.axes.data(1),'values') ...
+                && not (isempty(ad.data{active}.axes.data(1).values)))
+            t = ad.data{active}.axes.data(1).values;
         end
         % Get net polarisation
         NP = sum(data);
-        PTNP = NP(1:find(ad.data{active}.axes.x.values>0,1)-1);
+        PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
 
         % Do the actual plotting
         cla reset;
@@ -2535,8 +2535,8 @@ function updateAxes(varargin)
         % Plot axis labels
         xlabel(mainAxes,...
             sprintf('{\\it %s} / %s',...
-            ad.data{active}.axes.x.measure,...
-            ad.data{active}.axes.x.unit));
+            ad.data{active}.axes.data(1).measure,...
+            ad.data{active}.axes.data(1).unit));
         ylabel(mainAxes,...
             sprintf('{\\it %s} / %s',...
             'Net polarisation','a.u.'));
