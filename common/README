@@ -1,0 +1,5 @@
+Please note: This directory contains files that should eventually all be included in the common toolbox that is currently under active development. Once the trEPR toolbox is based on the common toolbox (what will be a major release), most of these files will be gone.
+
+For the time being, due to being based increasingly on concepts developed within the common toolbox, the number of routines in this directory may grow temporarily.
+
+-- tb, 2015-05-31

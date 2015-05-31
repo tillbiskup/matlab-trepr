@@ -1,0 +1,49 @@
+This directory contains a dataset according to the specifications layed out on its respective website (for details, see below).
+
+Copyright (c) 2015, Till Biskup
+2015-03-25
+
+Files and their meaning:
+
+binaryData/data - binary
+  primary data of the dataset, stored as binary.
+
+binaryData/origdata - binary
+  original data of the dataset, stored as binary.
+
+binaryData/calculated - binary (OPTIONAL)
+  calculated data of the dataset, stored as binary.
+
+binaryData/data.dim - text
+  dimension of primary data of the dataset.
+
+binaryData/origdata.dim - text
+  dimension of original data of the dataset.
+
+binaryData/calculated.dim - text (OPTIONAL)
+  dimension of calculated data of the dataset.
+
+structure.xml - XML
+  structure containing information accompagnying the data
+
+VERSION - text
+  version information of the dataset storage format
+
+PRECISION - text
+  precision used for storing the binary data
+  string compatible to Matlab(r) fwrite routine
+
+SCHEMA - text
+  XML schema used for structure.xml
+
+README - text
+  this file
+
+
+Further information
+
+More information can be found on the web - unfortunately currently (2015-03) only in German:
+
+http://www.till-biskup.de/de/software/datensatz/index
+http://www.till-biskup.de/de/software/datensatz/austauschformat
+

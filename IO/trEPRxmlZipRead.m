@@ -24,7 +24,7 @@ function varargout = trEPRxmlZipRead(filename,varargin)
 % See also: trEPRxmlZipWrite, trEPRload
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % Parse input arguments using the inputParser functionality
 try
@@ -67,109 +67,10 @@ if ~status
     if nargout, varargout{1} = logical(false); end;
     return;
 end
-PWD = pwd;
-cd(tempdir);
-% Unzip and delete ZIP archive afterwards
-try
-    filenames = unzip(filename);
-    [~, name, ext] = fileparts(filename);
-    delete(fullfile(tempdir,[name ext]));
-catch exception
-    warning = sprintf('%s\n%s\n"%s"\n%s\n',...
-        exception.identifier,...
-        'Problems with unzipping:',...
-        filename,...
-        'seems not to be a valid zip file. Aborted.');
-    if nargout
-        varargout{1} = logical(false);
-        varargout{2} = warning;
-    end
-    return;
-end
-% Read different files of the archive
-try
-    for k=1:length(filenames)
-        [pathstr, name, ext] = fileparts(filenames{k});
-        switch ext
-            case '.xml'
-                xmlFileSerialize(fullfile(pathstr,[name ext]));
-                DOMnode = xmlread(fullfile(pathstr,[name ext]));
-                struct = xml2struct(DOMnode);
-                delete(fullfile(pathstr,[name ext]));
-            case '.dat'
-                try
-                    data = load(fullfile(pathstr,[name ext]));
-                    % Try to check whether we have read correct data - as
-                    % we cannot rely to already have read the xml file, we
-                    % need to check whether "length(data) == 1" and in this
-                    % case try to read via binary and see what happens.
-                    %
-                    % This is to cope with the fact that some binary files
-                    % might start with something load interprets as proper
-                    % number - and therefore doesn't crash. There is no
-                    % easy way to distinguish whether a file has binary
-                    % content in Matlab. At least not that I know of...
-                    if length(data) == 1
-                        tmpData = readBinary(fullfile(pathstr,[name ext]));
-                        if length(tmpData) > length(data)
-                            data = tmpData;
-                        end
-                        clear tmpData;
-                    end
-                catch exception
-                    try
-                        data = readBinary(fullfile(pathstr,[name ext]));
-                    catch exception2
-                        exception = addCause(exception2, exception);
-                        throw(exception);
-                    end
-                end
-                delete(fullfile(pathstr,[name ext]));
-            otherwise
-                delete(fullfile(pathstr,[name ext]));
-        end
-    end
-catch errmsg
-    warning{end+1}.identifier = 'trEPRxmlZipRead:xmlParser';
-    warning{end}.message = sprintf('%s\n%s\n"%s"\n',...
-        errmsg.identifier,...
-        'Problems with parsing XML in file:',...
-        filename);
-    if nargout
-        varargout{1} = logical(false);
-        varargout{2} = warning;
-    end
-    cd(PWD);
-    return;
-end
+
+struct = commonLoad(filename,'extension','.tez');
+
 % Convert to current toolbox format if necessary
-if exist('data','var')
-    % Check whether data have the right dimensions - in case that we read
-    % from binary, most probably they have not - in this case, reshape
-    if isfield(struct.axes,'data')
-        xdim = length(struct.axes.data(1).values);
-        ydim = length(struct.axes.data(2).values);
-    else
-        xdim = length(struct.axes.x.values);
-        ydim = length(struct.axes.y.values);
-    end
-    [y,x] = size(data);
-    if ((x ~= xdim) || (y ~= ydim))  && ~isempty(data)
-        try
-            data = reshape(data,ydim,xdim);
-        catch exception
-            errmsg = sprintf('%s\n%s\n\nError was: %s',...
-                'Something caused trouble trying to reshape...',...
-                'Therefore, data might be corrupted. BE CAREFUL!',...
-                getReport(exception, 'extended', 'hyperlinks', 'off'));
-            warning{end+1}.identifier = 'trEPRxmlZipRead:reshape';
-            warning{end}.message = errmsg;
-        end
-    end
-    struct.data = data;
-    clear data
-end
-cd(PWD);
 if p.Results.convertFormat
     if isfield(struct,'format') && isfield(struct.format,'version')
         oldversion = struct.format.version;
@@ -197,12 +98,5 @@ else
     varname=char(DOMnode.getDocumentElement.getNodeName);
     assignin('caller',varname,struct);
 end
-end
-
-function data = readBinary(filename)
-
-fh = fopen(filename);
-data = fread(fh,inf,'real*4');
-fclose(fh);
 
 end
