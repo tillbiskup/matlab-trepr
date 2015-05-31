@@ -17,7 +17,7 @@ function [data,warnings] = trEPRbrukerBES3Tload(filename)
 % In such case, warning may hold some further information what happened.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -294,6 +294,10 @@ try
         datenum([parameters.DATE ' ' parameters.TIME],...
         'dd/mm/yy HH:MM:SS'),...
         31);
+    
+    % Handle origdata
+    content.origdata = content.data;
+    content.axes.origdata = content.axes.data;
 catch exception
     throw(exception);
 end

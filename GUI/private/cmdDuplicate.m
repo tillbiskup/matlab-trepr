@@ -21,8 +21,8 @@ function [status,warnings] = cmdDuplicate(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-06
+% Copyright (c) 2013-15, Till Biskup
+% 2015-05-31
 
 status = 0;
 warnings = cell(0);
@@ -66,7 +66,8 @@ end
 
 if isempty(opt)
     % Get selected item of listbox
-    selected = get(gh.data_panel_visible_listbox,'Value');
+    selected = ad.control.data.visible(...
+        get(gh.data_panel_visible_listbox,'Value'));
     
     % Create label for duplicate
     % That is, add number in brackets at the end: (n)

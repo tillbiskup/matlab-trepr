@@ -30,7 +30,7 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-03-25
+% 2015-05-31
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -86,7 +86,7 @@ try
             case 'map'
                 if commonVersionLessThan(format.version,'0.1.5')
                     parameters = mapToDataStructure(parameters);
-                    parameters.parameters.transient.triggerPosition
+                    parameters.parameters.transient.triggerPosition;
                 else
                     dataset = trEPRdataStructure('structure');
                     parameters = trEPRdatasetMapInfo(...

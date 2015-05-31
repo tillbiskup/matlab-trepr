@@ -30,7 +30,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -402,6 +402,10 @@ function [content,warnings] = loadFile(filename,varargin)
                     );
         end     
     end
+    
+    % Handle origdata
+    content.origdata = content.data;
+    content.axes.origdata = content.axes.data;
 end
 
 % --- Check whether the file is in speksim format

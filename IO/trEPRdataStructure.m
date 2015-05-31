@@ -42,7 +42,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRLOAD.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % Version string of data structure
 versionString = '1.13';
@@ -55,6 +55,7 @@ end
 % Create empty trEPR toolbox data structure
 dataStructure = struct();
 dataStructure.data = [];
+dataStructure.origdata = [];
 % TODO: Needs to be changed into cell array of matrices
 %       for handling multiple simulations in one dataset
 dataStructure.calculated = [];

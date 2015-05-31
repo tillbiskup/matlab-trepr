@@ -37,7 +37,7 @@ function varargout = trEPRfsc2Load(filename, varargin)
 % See also TREPRLOAD, TREPRFSC2METALOAD.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % If called without parameter, do something useful: display help
 if ~nargin
@@ -385,6 +385,10 @@ function [content,warnings] = loadFile(filename,parameters)
             datestr(datenum(...
             content.parameters.date.start,'ddd mmm dd, yyyy; HH:MM:SS'),31);
     end
+    
+    % Handle origdata
+    content.origdata = content.data;
+    content.axes.origdata = content.axes.data;
 end
 
 

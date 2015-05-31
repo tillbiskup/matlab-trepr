@@ -253,7 +253,7 @@ if ad.control.panels.load.fileTypes(fileType).BGC
     ad = getappdata(handle);
 end
 
-% TODO: Include unitConversion here
+% convert units
 if ad.control.panels.load.fileTypes(fileType).convertUnits
     conversions = regexp(ad.configuration.load.convert,',','split');
     for k=1:length(newDataIdx)
