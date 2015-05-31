@@ -285,21 +285,8 @@ end
 
 function [x,y] = getXY(dataset)
 
-[y,x] = size(dataset.data);
-x = linspace(1,x,x);
-y = linspace(1,y,y);
-if (isfield(dataset,'axes') ...
-        && isfield(dataset.axes,'x') ...
-        && isfield(dataset.axes.data(1),'values') ...
-        && ~isempty(dataset.axes.data(1).values))
-    x = dataset.axes.data(1).values;
-end
-if (isfield(dataset,'axes') ...
-        && isfield(dataset.axes,'y') ...
-        && isfield(dataset.axes.data(2),'values') ...
-        && ~isempty(dataset.axes.data(2).values))
-    y = dataset.axes.data(2).values;
-end
+x = dataset.axes.data(1).values;
+y = dataset.axes.data(2).values;
 
 end
 
