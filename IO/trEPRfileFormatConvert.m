@@ -248,20 +248,20 @@ switch version
             newdata.display.lines.data = data.line;
         end
         if isfield(data,'display')
-            newdata.display.displacement.data.x = data.display.displacement.x;
-            newdata.display.displacement.data.y = data.display.displacement.y;
-            newdata.display.displacement.data.z = data.display.displacement.z;
-            newdata.display.scaling.data.x = data.display.scaling.x;
-            newdata.display.scaling.data.y = data.display.scaling.y;
-            newdata.display.scaling.data.z = data.display.scaling.z;
-            newdata.display.smoothing.data.x.filterfun = '';
-            newdata.display.smoothing.data.x.parameters.width = ...
+            newdata.display.displacement.data(1) = data.display.displacement.x;
+            newdata.display.displacement.data(2) = data.display.displacement.y;
+            newdata.display.displacement.data(3) = data.display.displacement.z;
+            newdata.display.scaling.data(1) = data.display.scaling.x;
+            newdata.display.scaling.data(2) = data.display.scaling.y;
+            newdata.display.scaling.data(3) = data.display.scaling.z;
+            newdata.display.smoothing.data(1).filterfun = '';
+            newdata.display.smoothing.data(1).parameters.width = ...
                 data.display.smoothing.x.value;
-            newdata.display.smoothing.data.y.filterfun = '';
-            newdata.display.smoothing.data.y.parameters.width = ...
+            newdata.display.smoothing.data(2).filterfun = '';
+            newdata.display.smoothing.data(2).parameters.width = ...
                 data.display.smoothing.y.value;
-            newdata.display.smoothing.calculated.x.parameters.width = 0;
-            newdata.display.smoothing.calculated.y.parameters.width = 0;
+            newdata.display.smoothing.calculated(1).parameters.width = 0;
+            newdata.display.smoothing.calculated(1).parameters.width = 0;
             % Remove old fields
             newdata.display.displacement = ...
                 rmfield(newdata.display.displacement,{'x','y','z'});
@@ -271,10 +271,10 @@ switch version
                 rmfield(newdata.display.smoothing,{'x','y'});
             newdata = rmfield(newdata,'line');
             % Change value of filter width
-            newdata.display.smoothing.data.x.parameters.width = floor(...
-                (newdata.display.smoothing.data.x.parameters.width-1)/2);
-            newdata.display.smoothing.data.y.parameters.width = floor(...
-                (newdata.display.smoothing.data.y.parameters.width-1)/2);
+            newdata.display.smoothing.data(1).parameters.width = floor(...
+                (newdata.display.smoothing.data(1).parameters.width-1)/2);
+            newdata.display.smoothing.data(2).parameters.width = floor(...
+                (newdata.display.smoothing.data(2).parameters.width-1)/2);
         end
         % Check for wrong field types (was problem with old format)
         if ischar(newdata.parameters.purpose)
