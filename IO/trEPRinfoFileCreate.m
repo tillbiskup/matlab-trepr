@@ -20,8 +20,8 @@ function [fileContents,warnings] = trEPRinfoFileCreate(parameters,varargin)
 %
 % See also: TREPRINFOFILEPARSE, TREPRINFOFILEWRITE
 
-% Copyright (c) 2012-13, Till Biskup
-% 2013-05-19
+% Copyright (c) 2012-15, Till Biskup
+% 2015-05-31
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -250,21 +250,21 @@ try
     for k=1:length(matching)
         switch matching{k,3}
             case 'numeric'
-                dataStructure = setCascadedField(dataStructure,...
+                dataStructure = commonSetCascadedField(dataStructure,...
                     matching{k,1},...
-                    num2str(getCascadedField(parameters,matching{k,2}),...
+                    num2str(commonGetCascadedField(parameters,matching{k,2}),...
                     precision));
             case 'valueunit'
-                dataStructure = setCascadedField(dataStructure,...
+                dataStructure = commonSetCascadedField(dataStructure,...
                     matching{k,1},...
                     sprintf('%s %s',...
-                    num2str(getCascadedField(parameters,[matching{k,2} '.value']),precision),...
-                    getCascadedField(parameters,[matching{k,2} '.unit'])...
+                    num2str(commonGetCascadedField(parameters,[matching{k,2} '.value']),precision),...
+                    commonGetCascadedField(parameters,[matching{k,2} '.unit'])...
                     ));
             case 'copy'
-                dataStructure = setCascadedField(dataStructure,...
+                dataStructure = commonSetCascadedField(dataStructure,...
                     matching{k,1},...
-                    getCascadedField(parameters,matching{k,2}));
+                    commonGetCascadedField(parameters,matching{k,2}));
         end
     end
     
@@ -277,47 +277,4 @@ catch exception
     throw(exception);
 end
 
-end
-
-% --- Get field of cascaded struct
-function value = getCascadedField (struct, fieldName)
-    try
-        % Get number of "." in fieldName
-        nDots = strfind(fieldName,'.');
-        if isempty(nDots)
-            if isfield(struct,fieldName)
-                value = struct.(fieldName);
-            else
-                value = '';
-            end
-        else
-            struct = struct.(fieldName(1:nDots(1)-1));
-            value = getCascadedField(...
-                struct,...
-                fieldName(nDots(1)+1:end));
-        end
-    catch exception
-        disp(fieldName);
-        disp(struct);
-        throw(exception);
-    end 
-end
-
-% --- Set field of cascaded struct
-function struct = setCascadedField (struct, fieldName, value)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    if isempty(nDots)
-        struct.(fieldName) = value;
-    else
-        if ~isfield(struct,fieldName(1:nDots(1)-1))
-            struct.(fieldName(1:nDots(1)-1)) = [];
-        end
-        innerstruct = struct.(fieldName(1:nDots(1)-1));
-        innerstruct = setCascadedField(...
-            innerstruct,...
-            fieldName(nDots(1)+1:end),...
-            value);
-        struct.(fieldName(1:nDots(1)-1)) = innerstruct;
-    end
 end

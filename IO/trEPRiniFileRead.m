@@ -129,7 +129,7 @@ for k=1:length(iniFileContents)
             if ~isfield(data,blockname)
                 data.(blockname) = '';
             end
-            
+                        
             data.(blockname) = setCascadedField(data.(blockname),...
                 strtrim(names.key),strtrim(names.val),typeConversion);
         end

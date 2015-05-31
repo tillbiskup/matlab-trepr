@@ -1,5 +1,5 @@
-function structure = structcopy(master,tocopy,varargin)
-%STRUCTCOPY Copy struct array contents into another array.
+function structure = commonStructCopy(master,tocopy,varargin)
+% COMMONSTRUCTCOPY Copy struct array contents into another array.
 %
 % All fields (and contents) from "tocopy" get copied into "master".
 % Therefore, this function is particularly useful if you have a "master"
@@ -7,23 +7,32 @@ function structure = structcopy(master,tocopy,varargin)
 % the information in "tocopy".
 %
 % Usage
-%    struct = structcopy(master,tocopy)
-%    struct = structcopy(master,tocopy,<parameter>,<value>)
+%   struct = commonStructCopy(master,tocopy)
+%   struct = commonStructCopy(master,tocopy,<parameter>,<value>)
 %
-%    master - struct
-%             Master means here master in terms of the available fields,
-%             but NOT in terms of their contents.
+%   master     - struct
+%                Master means here master in terms of the available fields,
+%                but NOT in terms of their contents.
 %
-%    tocopy - struct
-%             The contents of this struct get copied in the struct
-%             "master", and if fields of tocopy don't exist in master, they
-%             will be created.
+%   tocopy     - struct
+%                The contents of this struct get copied in the struct
+%                "master", and if fields of tocopy don't exist in master,
+%                they will be created.
+%
+%   parameters - key-value pairs (OPTIONAL)
+%
+%                Optional parameters may include:
+%
+%                overwrite - boolean
+%                            This parameter is currently not recognised...
+%                            Default: false
+%   
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 if ~nargin
-    help structcopy
+    help commonStructCopy
     return;
 end
 

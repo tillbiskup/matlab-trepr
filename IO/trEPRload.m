@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -332,7 +332,7 @@ if exist('content','var') && p.Results.loadInfoFile ...
         % Fix problem with overriding MWfrequency vector
         MWfrequency = content.parameters.bridge.MWfrequency.values;
         if isempty(ifpwarnings)
-            content = structcopy(content,parameters);
+            content = commonStructCopy(content,parameters);
             content.parameters.bridge.MWfrequency.values = MWfrequency;
             trEPRmsg({'Loaded info file and applied contents to dataset',...
                 infoFileName},'info');
@@ -345,7 +345,7 @@ if exist('content','var') && p.Results.loadInfoFile ...
         if exist(infoFileName,'file')
             [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
             if isempty(ifpwarnings)
-                content = structcopy(content,parameters);
+                content = commonStructCopy(content,parameters);
                 trEPRmsg({'Loaded info file and applied contents to dataset',...
                     infoFileName},'info');
             else

@@ -6,8 +6,8 @@ function handle = panelLoad(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-31
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -206,7 +206,7 @@ if ~isempty(fileTypes)
     for type = 1:length(types)
         try
             ad.control.panels.load.fileTypes(end+1) = ...
-                structcopy(fileTypesStruct,fileTypes.(types{type}));
+                commonStructCopy(fileTypesStruct,fileTypes.(types{type}));
             fields = fieldnames(ad.control.panels.load.fileTypes);
             for field = 1:length(fields)
                 if isscalar(ad.control.panels.load.fileTypes(end).(fields{field}))

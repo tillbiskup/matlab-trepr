@@ -9,8 +9,8 @@ function varargout = trEPRinstall()
 %               Empty if everything went fine, otherwise contains message.
 %
 
-% Copyright (c) 2012-14, Till Biskup
-% 2014-10-14
+% Copyright (c) 2012-15, Till Biskup
+% 2015-05-31
 
 status = 0;
 
@@ -108,7 +108,7 @@ if installed
             tocopy = trEPRiniFileRead(confFiles{k},'typeConversion',true);
             master = trEPRiniFileRead([confFiles{k} '.dist'],...
                 'typeConversion',true);
-            newConf = structcopy(master,tocopy);
+            newConf = commonStructCopy(master,tocopy);
             header = 'Configuration file for trEPR toolbox';
             trEPRiniFileWrite(confFiles{k},...
                 newConf,'header',header,'overwrite',true);

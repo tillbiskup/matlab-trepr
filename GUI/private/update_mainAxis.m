@@ -159,14 +159,16 @@ switch ad.control.axis.displayType
             end
         end
         % Apply filter if necessary
-        if (ad.data{active}.display.smoothing.data(1).parameters.width > 0)
+        if (ad.data{active}.display.smoothing.data(1).parameters.width > 0) ...
+                && ~isempty(ad.data{active}.display.smoothing.data(1).filterfun)
             filterfun = str2func(ad.data{active}.display.smoothing.data(1).filterfun);
             for yidx = 1:size(data,1)
                 data(yidx,:) = filterfun(data(yidx,:),...
                     ad.data{active}.display.smoothing.data(1).parameters);
             end
         end
-        if (ad.data{active}.display.smoothing.data(2).parameters.width > 0)
+        if (ad.data{active}.display.smoothing.data(2).parameters.width > 0) ...
+                && ~isempty(ad.data{active}.display.smoothing.data(1).filterfun)
             filterfun = str2func(ad.data{active}.display.smoothing.data(2).filterfun);
             for xidx = 1:size(data,2)
                 data(:,xidx) = filterfun(data(:,xidx),...

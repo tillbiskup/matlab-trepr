@@ -276,12 +276,12 @@ try
         'AveragesPerScan','parameters.recorder.averages'; ...
         };
     % Assign values according to cell array above. Therefore, make use of
-    % the two internal functions setCascadedField and getCascadedField.
+    % the two internal functions commonSetCascadedField and commonGetCascadedField.
     for k=1:length(parameterMatching)
-        data = setCascadedField(...
+        data = commonSetCascadedField(...
             data,...
             parameterMatching{k,2},...
-            getCascadedField(parameters,parameterMatching{k,1}));
+            commonGetCascadedField(parameters,parameterMatching{k,1}));
     end
     % Assign manually a few parameters that cannot easily assigned above
     data.parameters.runs = 1;
@@ -306,7 +306,7 @@ end
 
 
 % --- Get field of cascaded struct
-function value = getCascadedField (struct, fieldName)
+function value = commonGetCascadedField (struct, fieldName)
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
     switch length(nDots)
@@ -321,7 +321,7 @@ function value = getCascadedField (struct, fieldName)
 end
 
 % --- Set field of cascaded struct
-function struct = setCascadedField (struct, fieldName, value)
+function struct = commonSetCascadedField (struct, fieldName, value)
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
     if isempty(nDots)
@@ -331,7 +331,7 @@ function struct = setCascadedField (struct, fieldName, value)
             struct.(fieldName(1:nDots(1)-1)) = [];
         end
         innerstruct = struct.(fieldName(1:nDots(1)-1));
-        innerstruct = setCascadedField(...
+        innerstruct = commonSetCascadedField(...
             innerstruct,...
             fieldName(nDots(1)+1:end),...
             value);

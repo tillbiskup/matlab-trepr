@@ -23,24 +23,28 @@ function struct = commonSetCascadedField(struct, fieldName, value, varargin)
 %   struct    - structure array
 %               structure array to be written into
 %
-% SEE ALSO: commonGetCascadedField
+% SEE ALSO: commonGetCascadedField, commonIsCascadedField
 
 % Copyright (c) 2011-15, Till Biskup
 % Copyright (c) 2011-13, Bernd Paulus
-% 2015-03-23
+% 2015-05-27
 
 try
     % Get number of "." in fieldName
     nDots = strfind(fieldName,'.');
     curlies = strfind(fieldName,'{');
+    brackets = strfind(fieldName,'(');
     currentIsCell = false;
     % if target field is cell array
     if ~isempty(curlies)
-        % ... get index of first cell array call (if there's more than one)
-        cellind = str2double(...
-            fieldName(...
-                regexp(fieldName,'{','once')+1 : ...
-                regexp(fieldName,'}','once')-1 ) );
+        % ... get index of first cell array call
+        cellind = str2double(fieldName(...
+            min(strfind(fieldName,'{'))+1:min(strfind(fieldName,'}'))-1));
+    end
+    if ~isempty(brackets)
+        % ... get index of first array call
+        arrayind = str2double(fieldName(...
+            min(strfind(fieldName,'('))+1:min(strfind(fieldName,')'))-1));
     end
     % If there are no ".", we have the target field and can write
     if isempty(nDots)
@@ -52,6 +56,18 @@ try
                 struct.(fieldName){cellind}(varargin{1}) = value;
             else
                 struct.(fieldName){cellind} = value;
+            end
+        elseif ~isempty(brackets)
+            % In case of array adjust fieldName
+            fieldName = fieldName(1:min(brackets)-1);
+            if ~isfield(struct,fieldName)
+                return;
+            end
+            % Consider possible optional index for target vector
+            if nargin == 4
+                struct.(fieldName)(varargin{1}) = value;
+            else
+                struct.(fieldName)(arrayind) = value;
             end
         else
             % Consider possible optional index for target vector

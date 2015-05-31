@@ -21,8 +21,8 @@ function [status,warnings] = cmdGet(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014, Till Biskup
-% 2014-09-25
+% Copyright (c) 2014-15, Till Biskup
+% 2015-05-31
 
 status = 0;
 warnings = cell(0);
@@ -63,7 +63,7 @@ if isempty(opt)
     return;
 end
 
-field = getCascadedField(ad,opt{1});
+field = commonGetCascadedField(ad,opt{1});
 
 if isempty(field)
     trEPRmsg(['Field "' opt{1} '" seems not to exist or is empty.'],'info');

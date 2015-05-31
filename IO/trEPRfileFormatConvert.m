@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-30
+% 2015-05-31
 
 % Parse input arguments using the inputParser functionality
 try
@@ -68,51 +68,7 @@ if strcmpi(version,newdata.format.version)
 end
 
 % Get empty data structure and copy fields if possible
-newdata = structcopy(newdata,data);
-
-% Change axes for version < 1.13
-if str2double(version) < 1.13
-    % Main change: Axes renamed
-    % Remove unnecessary field in old y axis
-    if isfield(data.axes.y,'calibratedValues') && ...
-            isempty(data.axes.y.calibratedValues)
-        data.axes.y = rmfield(data.axes.y,'calibratedValues');
-    end
-    newdata.axes.data(1) = data.axes.x;
-    newdata.axes.data(2) = data.axes.y;
-    newdata.axes.data(3) = ...
-        structcopy(newdata.axes.data(3),data.axes.z);
-    % Remove old fields
-    newdata.axes = rmfield(newdata.axes,{'x','y','z'});
-    % Display fields were reorganised as well
-    newdata.display.position.data = ...
-        [data.display.position.x data.display.position.y];
-    fields = {'displacement','scaling'};
-    for field = 1:length(fields)
-        newdata.display.(fields{field}).data = [ ...
-            data.display.(fields{field}).data.x ...
-            data.display.(fields{field}).data.y ...
-            data.display.(fields{field}).data.z ];
-        newdata.display.(fields{field}).calculated = [ ...
-            data.display.(fields{field}).calculated.x ...
-            data.display.(fields{field}).calculated.y ...
-            data.display.(fields{field}).calculated.z ];
-    end
-    newdata.display.averaging.data = [ ...
-        data.display.averaging.data.x ...
-        data.display.averaging.data.y ];
-    newdata.display.averaging.calculated = [ ...
-        data.display.averaging.calculated.x ...
-        data.display.averaging.calculated.y ];
-    newdata.display.smoothing.data(1) = data.display.smoothing.data.x;
-    newdata.display.smoothing.data(2) = data.display.smoothing.data.y;
-    newdata.display.smoothing.calculated(1) = ...
-        data.display.smoothing.calculated.x;
-    newdata.display.smoothing.calculated(2) = ...
-        data.display.smoothing.calculated.y;
-    % Remove old fields
-    newdata.display.position = rmfield(newdata.display.position,{'x','y'});
-end
+newdata = commonStructCopy(newdata,data);
 
 switch version
     case '1.10'
@@ -248,12 +204,19 @@ switch version
             newdata.display.lines.data = data.line;
         end
         if isfield(data,'display')
+            data.display.displacement.data = data.display.displacement;
             newdata.display.displacement.data(1) = data.display.displacement.x;
             newdata.display.displacement.data(2) = data.display.displacement.y;
             newdata.display.displacement.data(3) = data.display.displacement.z;
+            data.display.scaling.data = data.display.scaling;
             newdata.display.scaling.data(1) = data.display.scaling.x;
             newdata.display.scaling.data(2) = data.display.scaling.y;
             newdata.display.scaling.data(3) = data.display.scaling.z;
+            data.display.smoothing.data = data.display.smoothing;
+            data.display.smoothing.data.x.parameters.width = ...
+                data.display.smoothing.x.value;
+            data.display.smoothing.data.y.parameters.width = ...
+                data.display.smoothing.y.value;
             newdata.display.smoothing.data(1).filterfun = '';
             newdata.display.smoothing.data(1).parameters.width = ...
                 data.display.smoothing.x.value;
@@ -261,7 +224,11 @@ switch version
             newdata.display.smoothing.data(2).parameters.width = ...
                 data.display.smoothing.y.value;
             newdata.display.smoothing.calculated(1).parameters.width = 0;
-            newdata.display.smoothing.calculated(1).parameters.width = 0;
+            newdata.display.smoothing.calculated(2).parameters.width = 0;
+            data.display.smoothing.calculated.x = ...
+                newdata.display.smoothing.calculated(1);
+            data.display.smoothing.calculated.y = ...
+                newdata.display.smoothing.calculated(2);
             % Remove old fields
             newdata.display.displacement = ...
                 rmfield(newdata.display.displacement,{'x','y','z'});
@@ -270,6 +237,11 @@ switch version
             newdata.display.smoothing = ...
                 rmfield(newdata.display.smoothing,{'x','y'});
             newdata = rmfield(newdata,'line');
+            data.display.smoothing.data.x = ...
+                rmfield(data.display.smoothing.data.x,'value');
+            data.display.smoothing.data.y = ...
+                rmfield(data.display.smoothing.data.y,'value');
+            data.display.averaging.data = data.display.averaging;
             % Change value of filter width
             newdata.display.smoothing.data(1).parameters.width = floor(...
                 (newdata.display.smoothing.data(1).parameters.width-1)/2);
@@ -437,7 +409,57 @@ switch version
             newdata.parameters.laser.repetitionRate.unit = 'Hz';
         end
         % Finally, recopy to ensure to have all fields
-        newdata = structcopy(trEPRdataStructure('structure'),newdata);
+        newdata = commonStructCopy(trEPRdataStructure('structure'),newdata);
+end
+
+% Change axes for version < 1.13
+if commonVersionLessThan(version,'1.13')
+    % Main change: Axes renamed
+    % Remove unnecessary field in old y axis
+    if isfield(data.axes.y,'calibratedValues') && ...
+            isempty(data.axes.y.calibratedValues)
+        data.axes.y = rmfield(data.axes.y,'calibratedValues');
+    end
+    newdata.axes.data(1) = data.axes.x;
+    newdata.axes.data(2) = data.axes.y;
+    newdata.axes.data(3) = ...
+        commonStructCopy(newdata.axes.data(3),data.axes.z);
+    % Remove old fields
+    newdata.axes = rmfield(newdata.axes,{'x','y','z'});
+    % Display fields were reorganised as well
+    newdata.display.position.data = ...
+        [data.display.position.x data.display.position.y];
+    fields = {'displacement','scaling'};
+    for field = 1:length(fields)
+        if isfield(data.display,fields{field})
+            newdata.display.(fields{field}).data = [ ...
+                data.display.(fields{field}).data.x ...
+                data.display.(fields{field}).data.y ...
+                data.display.(fields{field}).data.z ];
+            newdata.display.(fields{field}).calculated = [ ...
+                data.display.(fields{field}).calculated.x ...
+                data.display.(fields{field}).calculated.y ...
+                data.display.(fields{field}).calculated.z ];
+        end
+    end
+    if isfield(data.display,'averaging')
+        newdata.display.averaging.data = [ ...
+            data.display.averaging.data.x ...
+            data.display.averaging.data.y ];
+        newdata.display.averaging.calculated = [ ...
+            data.display.averaging.calculated.x ...
+            data.display.averaging.calculated.y ];
+    end
+    if isfield(data.display,'smoothing')
+        newdata.display.smoothing.data(1) = data.display.smoothing.data.x;
+        newdata.display.smoothing.data(2) = data.display.smoothing.data.y;
+        newdata.display.smoothing.calculated(1) = ...
+            data.display.smoothing.calculated.x;
+        newdata.display.smoothing.calculated(2) = ...
+            data.display.smoothing.calculated.y;
+    end
+    % Remove old fields
+    newdata.display.position = rmfield(newdata.display.position,{'x','y'});
 end
 
 % Handle situation with reversed field axis

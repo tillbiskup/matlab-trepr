@@ -14,8 +14,8 @@ function status = guiConfigApply(guiname)
 %
 % See also GUICONFIGLOAD, INIFILEREAD
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-08
+% Copyright (c) 2011-15, Till Biskup
+% 2015-05-31
 
 status = 0;
 
@@ -94,7 +94,7 @@ try
                     'Value',ad.configuration.display.figsave.caption);
             end
             % Set colormap settings
-            ad.control.axis.colormap = structcopy(...
+            ad.control.axis.colormap = commonStructCopy(...
                 ad.control.axis.colormap,ad.configuration.colormap);
             % Generically set a number of configuration settings where we
             % have a direct match
@@ -106,7 +106,7 @@ try
             for k=1:length(matchConfig(:,1))
                 if isfield(ad.configuration,matchConfig{k,1})
                     ad.control.(matchConfig{k,2}) = ...
-                        structcopy(ad.control.(matchConfig{k,2}), ...
+                        commonStructCopy(ad.control.(matchConfig{k,2}), ...
                         ad.configuration.(matchConfig{k,1}));
                 end
             end
