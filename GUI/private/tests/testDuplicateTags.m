@@ -12,7 +12,7 @@ function tags = testDuplicateTags(handle,varargin)
 %            Names of the duplicate tags, if any. Empty if no duplicates
 %            are found.
 
-% (c) 2013, Till Biskup
+% Copyright (c) 2013, Till Biskup
 % 2013-11-29
 
 % Predefine output

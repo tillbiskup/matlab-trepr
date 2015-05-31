@@ -1,7 +1,7 @@
 % Sample configuration file for the trEPRgui_MWfrequencyDriftwindow 
 % function of the trEPR toolbox
 %
-% (c) 2012, Till Biskup <till@till-biskup.de>
+% Copyright (c) 2012, Till Biskup <till@till-biskup.de>
 %
 % This file serves as an example and documentation for the real
 % configuration in the file "trEPRgui_MWfrequencyDriftwindow.ini" in the 
