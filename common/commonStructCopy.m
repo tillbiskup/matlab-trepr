@@ -77,6 +77,11 @@ try
                 isstruct(master.(tocopyFieldNames{k})(1)) && ...
                 length(tocopy.(tocopyFieldNames{k})) < length(master.(tocopyFieldNames{k}))
             disp('(WW) Cannot copy: array of struct in master and struct in tocopy');
+            disp(['<DEBUG> ' mfilename])
+            disp(tocopyFieldNames{k})
+            display(master)
+            display(tocopy)
+            disp('</DEBUG>')
         elseif length(tocopy.(tocopyFieldNames{k}))>1 && ...
                 isstruct(tocopy.(tocopyFieldNames{k})(1))
             % Need to add additional field names before handling arrays of
