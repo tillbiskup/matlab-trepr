@@ -171,56 +171,67 @@ if commonVersionLessThan(version,'1.6')
 end
 
 if commonVersionLessThan(version,'1.9')
-    if isfield(data.display,'averaging')
+    if isfield(data,'display') && isfield(data.display,'averaging')
         data.display.averaging.data = data.display.averaging;
         data.display.averaging = rmfield(data.display.averaging,{'x','y'});
     end
     data.display.smoothing.x.filterfun = '';
     data.display.smoothing.y.filterfun = '';
+    data.display.smoothing.x.value = 1;
+    data.display.smoothing.y.value = 1;
 end
 
 if commonVersionLessThan(version,'1.10')
     if isfield(data,'line')
         data.display.lines.data = data.line;
     end
-    data.display.displacement.data.x = data.display.displacement.x;
-    data.display.displacement.data.y = data.display.displacement.y;
-    data.display.displacement.data.z = data.display.displacement.z;
-    data.display.scaling.data.x = data.display.scaling.x;
-    data.display.scaling.data.y = data.display.scaling.y;
-    data.display.scaling.data.z = data.display.scaling.z;
-    data.display.smoothing.data.x.filterfun = ...
-        data.display.smoothing.x.filterfun;
-    data.display.smoothing.data.x.parameters.width = ...
-        data.display.smoothing.x.value;
-    data.display.smoothing.data.y.filterfun = ...
-        data.display.smoothing.y.filterfun;
-    data.display.smoothing.data.y.parameters.width = ...
-        data.display.smoothing.y.value;
-    if isfield(data.display.smoothing,'calculated')
-        data.display.smoothing.calculated.x.parameters.width = ...
-            data.display.smoothing.calculated.x.value;
-        data.display.smoothing.calculated.y.parameters.width = ...
-            data.display.smoothing.calculated.y.value;
+    if isfield(data.display,'displacement')
+        data.display.displacement.data.x = data.display.displacement.x;
+        data.display.displacement.data.y = data.display.displacement.y;
+        data.display.displacement.data.z = data.display.displacement.z;
         % Remove old fields
-        data.display.smoothing.calculated.x = ...
-            rmfield(data.display.smoothing.calculated.x,'value');
-        data.display.smoothing.calculated.y = ...
-            rmfield(data.display.smoothing.calculated.y,'value');
+        data.display.displacement = ...
+            rmfield(data.display.displacement,{'x','y','z'});
     end
-    % Remove old fields
-    data.display.displacement = ...
-        rmfield(data.display.displacement,{'x','y','z'});
-    data.display.scaling = ...
-        rmfield(data.display.scaling,{'x','y','z'});
-    data.display.smoothing = ...
-        rmfield(data.display.smoothing,{'x','y'});
-    data = rmfield(data,'line');
-    % Change value of filter width
-    data.display.smoothing.data.x.parameters.width = floor(...
-        (data.display.smoothing.data.x.parameters.width-1)/2);
-    data.display.smoothing.data.y.parameters.width = floor(...
-        (data.display.smoothing.data.y.parameters.width-1)/2);
+    if isfield(data.display,'scaling')
+        data.display.scaling.data.x = data.display.scaling.x;
+        data.display.scaling.data.y = data.display.scaling.y;
+        data.display.scaling.data.z = data.display.scaling.z;
+        % Remove old fields
+        data.display.scaling = ...
+            rmfield(data.display.scaling,{'x','y','z'});
+    end
+    if isfield(data.display,'smoothing')
+        data.display.smoothing.data.x.filterfun = ...
+            data.display.smoothing.x.filterfun;
+        data.display.smoothing.data.x.parameters.width = ...
+            data.display.smoothing.x.value;
+        data.display.smoothing.data.y.filterfun = ...
+            data.display.smoothing.y.filterfun;
+        data.display.smoothing.data.y.parameters.width = ...
+            data.display.smoothing.y.value;
+        if isfield(data.display.smoothing,'calculated')
+            data.display.smoothing.calculated.x.parameters.width = ...
+                data.display.smoothing.calculated.x.value;
+            data.display.smoothing.calculated.y.parameters.width = ...
+                data.display.smoothing.calculated.y.value;
+            % Remove old fields
+            data.display.smoothing.calculated.x = ...
+                rmfield(data.display.smoothing.calculated.x,'value');
+            data.display.smoothing.calculated.y = ...
+                rmfield(data.display.smoothing.calculated.y,'value');
+        end
+        data.display.smoothing = ...
+            rmfield(data.display.smoothing,{'x','y'});
+        % Change value of filter width
+        data.display.smoothing.data.x.parameters.width = floor(...
+            (data.display.smoothing.data.x.parameters.width-1)/2);
+        data.display.smoothing.data.y.parameters.width = floor(...
+            (data.display.smoothing.data.y.parameters.width-1)/2);
+    end
+    if isfield(data,'line')
+        data = rmfield(data,'line');
+    end
     % Check for wrong field types (was problem with old format)
     if isfield(data.parameters,'purpose') && ischar(data.parameters.purpose)
         purpose = data.parameters.purpose;
@@ -323,22 +334,26 @@ if commonVersionLessThan(version,'1.13')
     % Remove old fields
     data.axes = rmfield(data.axes,{'x','y','z'});
     % Display fields were reorganised as well
-    data.display.position.data = ...
-        [data.display.position.x data.display.position.y];
-    data.display.position = ...
-        rmfield(data.display.position,{'x','y'});
+    if isfield(data.display,'position')
+        data.display.position.data = ...
+            [data.display.position.x data.display.position.y];
+        data.display.position = ...
+            rmfield(data.display.position,{'x','y'});
+    end
     fields = {'displacement','scaling'};
-    for field = 1:length(fields)
-        if isfield(data.display,fields{field})
-            data.display.(fields{field}).data = [ ...
-                data.display.(fields{field}).data.x ...
-                data.display.(fields{field}).data.y ...
-                data.display.(fields{field}).data.z ];
-            if isfield(data.display.(fields{field}),'calculated')
-                data.display.(fields{field}).calculated = [ ...
-                    data.display.(fields{field}).calculated.x ...
-                    data.display.(fields{field}).calculated.y ...
-                    data.display.(fields{field}).calculated.z ];
+    if all(isfield(data.display,fields))
+        for field = 1:length(fields)
+            if isfield(data.display,fields{field})
+                data.display.(fields{field}).data = [ ...
+                    data.display.(fields{field}).data.x ...
+                    data.display.(fields{field}).data.y ...
+                    data.display.(fields{field}).data.z ];
+                if isfield(data.display.(fields{field}),'calculated')
+                    data.display.(fields{field}).calculated = [ ...
+                        data.display.(fields{field}).calculated.x ...
+                        data.display.(fields{field}).calculated.y ...
+                        data.display.(fields{field}).calculated.z ];
+                end
             end
         end
     end
@@ -382,19 +397,5 @@ end
 newdata.format.version = newVersion;
 
 data = newdata;
-
-end
-
-function struct = secureRmField(struct,fields)
-
-if ~iscell(fields)
-    fields = {fields};
-end
-
-for field = 1:length(fields)
-    if isfield(struct,fields{field})
-        struct = rmfield(struct,fields{field});
-    end
-end
 
 end
