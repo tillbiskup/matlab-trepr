@@ -52,6 +52,13 @@ muB = 9.27400968e-24;
 ge = 2.00231930436153;
 
 oldFrequency = dataset.parameters.bridge.MWfrequency.value;
+
+% In case old and new frequency value are numerically identical, return
+if (oldFrequency-frequency) < eps(oldFrequency)
+    return;
+end
+
+
 DeltaNu = oldFrequency-frequency;
 DeltaB0 = h*DeltaNu*1e9 / (ge*muB); % in T
 
