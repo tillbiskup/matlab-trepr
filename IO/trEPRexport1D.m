@@ -22,7 +22,7 @@
 %
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-06-11
 
 function status = trEPRexport1D(data,fileName,parameters)
 
@@ -170,19 +170,17 @@ try
             end            
         end
         
+        disp('!')
+        
         % Smoothing
         if isfield(data.display,'smoothing')
             if strcmpi(parameters.crosssection.direction,'x') ...
-                    && (data.display.smoothing.data(1).value > 1)
-                filterfun = str2func(data.display.smoothing.data(1).filterfun);
-                crosssection = ...
-                    filterfun(crosssection,data.display.smoothing.data(1).value);
+                    && (data.display.smoothing.data(1).parameters.width > 1)
+                data = trEPRdatasetApplySmoothing(data);
             end
             if strcmpi(parameters.crosssection.direction,'y') ...
-                    && (data.display.smoothing.data(2).value > 1)
-                filterfun = str2func(data.display.smoothing.data(2).filterfun);
-                crosssection = ...
-                    filterfun(crosssection,data.display.smoothing.data(2).value);
+                    && (data.display.smoothing.data(2).parameters.width > 1)
+                data = trEPRdatasetApplySmoothing(data);
             end
         end
     end

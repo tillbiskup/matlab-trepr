@@ -392,6 +392,25 @@ switch fileType
         fileExtension = '';
 end
 
+if ~exist('fileName','var')
+    % Ask user for file name
+    [~,f,~] = ...
+        fileparts(ad.data{ad.control.data.active}.file.name);
+    fileNameSuggested = fullfile(startDir,[f '-1D']);
+    clear f;
+    [fileName,pathName] = uiputfile(...
+        sprintf('*.%s',fileExtension),...
+        sprintf('Filename for dataset "%s"',...
+        ad.data{ad.control.data.active}.label),...
+        fileNameSuggested);
+    % If user aborts process, return
+    if fileName == 0
+        return;
+    end
+    % Create filename with full path
+    fileName = fullfile(pathName,fileName);
+end
+
 if ~isempty(fileExtension)
     fileName = [fileName '.' fileExtension];
 end
