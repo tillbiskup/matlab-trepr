@@ -30,7 +30,7 @@ function [parameters,warnings] = trEPRinfoFileParse(filename,varargin)
 % See also: TREPRINFOFILECREATE, TREPRINFOFILEWRITE
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-31
+% 2015-06-11
 
 % If called without parameter, do something useful: display help
 if ~nargin && ~nargout
@@ -95,8 +95,9 @@ try
                     % toolbox, as commonDatasetMapInfo returns a full
                     % dataset and trEPRinfoFileParse is expected not to do.
                     fields2remove = {...
-                        'data','axes','calculated','history','format',...
-                        'characteristics','file','display','calculation'};
+                        'data','origdata','axes','calculated','history',...
+                        'format','characteristics','file','display',...
+                        'calculation'};
                     parameters = rmfield(parameters,fields2remove);
                 end
             otherwise
