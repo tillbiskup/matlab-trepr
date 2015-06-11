@@ -28,7 +28,7 @@ function dataset = trEPRFC(dataset,varargin)
 % any intrinsic nonlinearity of the problem.
 
 % Copyright (c) 2015, Till Biskup
-% 2015-06-08
+% 2015-06-11
 
 try
     % Parse input arguments using the inputParser functionality
@@ -54,7 +54,8 @@ ge = 2.00231930436153;
 oldFrequency = dataset.parameters.bridge.MWfrequency.value;
 
 % In case old and new frequency value are numerically identical, return
-if (oldFrequency-frequency) < eps(oldFrequency)
+if abs(oldFrequency-frequency) < eps(oldFrequency)
+    trEPRmsg('Frequency difference less than numerical accuracy','info');
     return;
 end
 
