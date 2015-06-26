@@ -21,8 +21,8 @@ function [status,warnings] = cmdInput(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014, Till Biskup
-% 2014-09-22
+% Copyright (c) 2014-15, Till Biskup
+% 2015-06-17
 
 status = 0;
 warnings = cell(0);
@@ -60,7 +60,7 @@ end
 % Check for variable type and preset
 varPreset = '';
 if length(opt) > 1
-    for optidx = 2:length(opt)
+    for optidx = length(opt):-1:2
         if length(opt{optidx})>4 && strncmpi(opt{optidx},'type=',5)
             varType = opt{optidx}(6:end);
             opt(optidx) = [];

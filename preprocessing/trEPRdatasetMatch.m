@@ -38,7 +38,7 @@ function [data] = trEPRdatasetMatch(data,varargin)
 % See also: interp1, interp2
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-05-30
+% 2015-06-17
 
 % Parse input arguments using the inputParser functionality
 try
@@ -190,7 +190,7 @@ limit(dimension).index(2) = ...
     limit(dimension).value(2),'nearest');
 
 % Check for non-overlapping datasets
-if any(isnan(limit.(dimension).index))
+if any(isnan(limit(dimension).index))
     trEPRmsg([mfilename ': Datasets seem not to overlap'],'warning');
     data = {};
     return;

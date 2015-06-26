@@ -22,7 +22,7 @@ function [status,warnings] = cmdUnstack(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-05-30
+% 2015-06-17
 
 status = 0;
 warnings = cell(0);
@@ -68,11 +68,11 @@ end
 % Get maxima of z values
 % Preallocation
 maxima = zeros(length(ad.control.data.visible),1);
-dimension = lower(ad.control.axis.displayType(end));
+dimension = strcmpi(ad.control.axis.displayType(end),{'x','y'});
 for idx=1:length(ad.control.data.visible)
     maxima(idx) = max(...
         ad.data{ad.control.data.visible(idx)}.data(...
-        ad.data{ad.control.data.visible(idx)}.display.position.(dimension),:));
+        ad.data{ad.control.data.visible(idx)}.display.position.data(dimension),:));
 end
 
 % Reset displacement to zero for all traces
