@@ -30,7 +30,7 @@ function varargout = trEPRspeksimLoad(filename, varargin)
 % See also TREPRLOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-06-26
+% 2015-07-01
 
     % Parse input arguments using the inputParser functionality
     parser = inputParser;   % Create an instance of the inputParser class.
@@ -251,11 +251,18 @@ function [content,warnings] = loadFile(filename,varargin)
                             tokens = regexp(data.textdata{2},...
                                 'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
                                 'tokens');
-                            content.parameters.bridge.MWfrequency.value(end+1) = ...
-                                str2double(tokens{1}{3});
-                            content.parameters.bridge.MWfrequency.values(end+1) = ...
-                                str2double(tokens{1}{3});
-                            content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+                            % In case we don't have MW frequency
+                            if isempty(tokens)
+                                tokens = regexp(data.textdata{2},...
+                                    'B0 = ([0-9.]*)\s*(\w*)',...
+                                    'tokens');
+                            else
+                                content.parameters.bridge.MWfrequency.value(end+1) = ...
+                                    str2double(tokens{1}{3});
+                                content.parameters.bridge.MWfrequency.values(end+1) = ...
+                                    str2double(tokens{1}{3});
+                                content.parameters.bridge.MWfrequency.unit = tokens{1}{4};
+                            end
                         end
                         switch tokens{1}{2}
                             case 'Gauss'
