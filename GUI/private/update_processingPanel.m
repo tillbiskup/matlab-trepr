@@ -6,8 +6,8 @@ function status = update_processingPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-09
+% Copyright (c) 2011-15, Till Biskup
+% 2015-07-07
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -32,6 +32,11 @@ active = ad.control.data.active;
 set(findobj(allchild(gh.processing_panel),'-not','type','uipanel',...
         '-not','type','uibuttongroup'),...
     'Enable','On');
+
+% Set default value for MW frequency correction
+set(gh.processing_panel_fc_edit,'String',...
+    num2str(ad.data{active}.parameters.bridge.MWfrequency.value));
+
 % Disable Savitzky-Golay-specific fields if not needed
 smoothingTypes = cellstr(...
     get(gh.processing_panel_smoothing_type_popupmenu,'String'));
