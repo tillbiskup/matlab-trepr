@@ -8,7 +8,7 @@ function handle = panelSlider(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-07-07
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -385,13 +385,13 @@ function edit_Callback(source,~,action)
         x = linspace(1,x,x);
         y = linspace(1,y,y);
         if (isfield(ad.data{active},'axes') ...
-                && isfield(ad.data{active}.axes,'x') ...
+                && isfield(ad.data{active}.axes,'data') ...
                 && isfield(ad.data{active}.axes.data(1),'values') ...
                 && not (isempty(ad.data{active}.axes.data(1).values)))
             x = ad.data{active}.axes.data(1).values;
         end
         if (isfield(ad.data{active},'axes') ...
-                && isfield(ad.data{active}.axes,'y') ...
+                && isfield(ad.data{active}.axes,'data') ...
                 && isfield(ad.data{active}.axes.data(2),'values') ...
                 && not (isempty(ad.data{active}.axes.data(2).values)))
             y = ad.data{active}.axes.data(2).values;
@@ -401,43 +401,61 @@ function edit_Callback(source,~,action)
             case 'position_xindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),1:length(x),'round',true);
-                ad.data{active}.display.position.data(1) = value;
+                if ~isnan(value)
+                    ad.data{active}.display.position.data(1) = value;
+                end
             case 'position_xunit'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),x,'map',true);
-                ad.data{active}.display.position.data(1) = find(x==value);
+                if ~isnan(value)
+                    ad.data{active}.display.position.data(1) = find(x==value);
+                end
             case 'position_yindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),1:length(y),'round',true);
-                ad.data{active}.display.position.data(2) = value;
+                if ~isnan(value)
+                    ad.data{active}.display.position.data(2) = value;
+                end
             case 'position_yunit'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),y,'map',true);
-                ad.data{active}.display.position.data(2) = find(y==value);
+                if ~isnan(value)
+                    ad.data{active}.display.position.data(2) = find(y==value);
+                end
             case 'displacement_xindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),-length(x):length(x));
-                ad.data{active}.display.displacement.data(1) = value;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.data(1) = value;
+                end
             case 'displacement_xunit'
                 vector = -(x(2)-x(1))*length(x):x(2)-x(1):(x(2)-x(1))*length(x);
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),vector,'map',true);
-                ad.data{active}.display.displacement.data(1) = ...
-                    find(vector==value)-(length(vector)+1)/2;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.data(1) = ...
+                        find(vector==value)-(length(vector)+1)/2;
+                end
             case 'displacement_yindex'
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),-length(y):length(y));
-                ad.data{active}.display.displacement.data(2) = value;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.data(2) = value;
+                end
             case 'displacement_yunit'
                 vector = -(y(2)-y(1))*length(y):y(2)-y(1):(y(2)-y(1))*length(y);
                 value = trEPRguiSanitiseNumericInput(...
                     get(source,'String'),vector,'map',true);
-                ad.data{active}.display.displacement.data(2) = ...
-                    find(vector==value)-(length(vector)+1)/2;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.data(2) = ...
+                        find(vector==value)-(length(vector)+1)/2;
+                end
             case 'displacement_zindex'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [get(gh.vert3_slider,'Min'),get(gh.vert3_slider,'Max')]);
-                ad.data{active}.display.displacement.data(3) = value;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.data(3) = value;
+                end
             case 'displacement_zunit'
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -491,37 +509,49 @@ function edit_Callback(source,~,action)
                 % "round" is due to rounding mistakes that otherwise make
                 % problems with the slider values...
                 % If you don't understand what's going on here, DON'T TOUCH!
-                ad.data{active}.display.displacement.z = ...
-                    round(...
-                    value*(...
-                    (max(max(ad.data{active}.data)) - ...
-                    min(min(ad.data{active}.data)))/(z(2)-z(1))...
-                    )*1e7)/1e7;
+                if ~isnan(value)
+                    ad.data{active}.display.displacement.z = ...
+                        round(...
+                        value*(...
+                        (max(max(ad.data{active}.data)) - ...
+                        min(min(ad.data{active}.data)))/(z(2)-z(1))...
+                        )*1e7)/1e7;
+                end
             case 'scaling_xindex'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [1/((get(gh.horz1_slider,'Max')*2)),...
                     (get(gh.horz1_slider,'Max')*2)]);
-                ad.data{active}.display.scaling.x = value;
+                if ~isnan(value)
+                    ad.data{active}.display.scaling.x = value;
+                end
             case 'scaling_xunit'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [-(x(end)-x(1))/(get(gh.horz1_slider,'Max')*2),...
                     (x(end)-x(1)*(get(gh.horz1_slider,'Max')))]);
-                ad.data{active}.display.scaling.x = 1+value/(x(end)-x(1));
+                if ~isnan(value)
+                    ad.data{active}.display.scaling.x = 1+value/(x(end)-x(1));
+                end
             case 'scaling_yindex'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [1/((get(gh.horz1_slider,'Max')*2)),...
                     (get(gh.horz1_slider,'Max')*2)]);
-                ad.data{active}.display.scaling.y = value;
+                if ~isnan(value)
+                    ad.data{active}.display.scaling.y = value;
+                end
             case 'scaling_yunit'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [-(y(end)-y(1))/(get(gh.horz1_slider,'Max')*2),...
                     (y(end)-y(1)*(get(gh.horz1_slider,'Max')))]);
-                ad.data{active}.display.scaling.y = 1+value/(y(end)-y(1));
+                if ~isnan(value)
+                    ad.data{active}.display.scaling.y = 1+value/(y(end)-y(1));
+                end
             case 'scaling_zindex'
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [1/((get(gh.vert2_slider,'Max')*2)),...
                     (get(gh.vert2_slider,'Max')*2)]);
-                ad.data{active}.display.scaling.z = value;
+                if ~isnan(value)
+                    ad.data{active}.display.scaling.z = value;
+                end
             case 'scaling_zunit'
                 if ad.control.axis.normalisation.enable
                     if strcmpi(ad.control.axis.normalisation.dimension,'1D')
@@ -573,8 +603,10 @@ function edit_Callback(source,~,action)
                 value = trEPRguiSanitiseNumericInput(get(source,'String'),...
                     [-(z(2)-z(1))/(get(gh.vert2_slider,'Max')*2),...
                     (z(2)-z(1)*(get(gh.vert2_slider,'Max')))]);
-                ad.data{ad.control.data.active}.display.scaling.z = ...
-                    1+value/(z(2)-z(1));
+                if ~isnan(value)
+                    ad.data{ad.control.data.active}.display.scaling.z = ...
+                        1+value/(z(2)-z(1));
+                end
             otherwise
                 trEPRoptionUnknown(action);
                 return;
