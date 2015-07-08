@@ -10,11 +10,11 @@
     <body>
 		<h1>Dataset display</h1>
 		<p class="intro">
-			The "Datasets" panel consists of controls necessary to handle loaded datasets, their visibility, save, remove, duplicate and combine them.
+			The "Datasets" panel consists of controls necessary to handle loaded datasets, their visibility, save, remove, duplicate and combine them. On its second page, you can export 1D and 2D datasets in different formats.
 		</p>
-		<h2>The controls</h2>
+		<h2>Page 1</h2>
 		<p>
-			A short description of all the controls of the panel.
+			A short description of all the controls of the first page of the panel.
 		</p>
 		<h3>Invisible datasets</h3>
 		<p>
@@ -50,23 +50,41 @@
 			<key>Remove</key> removes the current dataset from the GUI (but NOT from the file system). If the dataset was modified (star left of its label), the user gets asked what to do (save and remove, remove, cancel).
 		</p>
 		<p>
-			<key>Undo</key> will provide means to undo the last changes made to the currently active dataset.
+			<key>Undo</key> reverts the last change made to the currently active dataset.
 		</p>
 		<p>
-			<key>Get info</key> will present an additional GUI window to the user providing access to all sorts of information about the currently active dataset, including the full history of operations performed with the toolbox.
+			<key>Get info</key> opens an additional GUI window providing access to all sorts of information about the currently active dataset, including the full history of operations performed with the toolbox.
 		</p>
 		<p>
 			<key>Duplicate</key> copies the currently active dataset. This is particularly useful for 2D datasets if one wants to compare different parts of the dataset (spectra at different times, time traces at different field positions). 
 		</p>
 		<p>
-			Note: <key>Undo</key> doesn't work yet.
+			Note: <key>Undo</key> functionality is not fully tested yet and might produce unwanted results.
+		</p>
+		<h2>Page 2</h2>
+		<p>
+			A short description of all the controls of the second page of the panel.
+		</p>
+		<h3>Export 1D data</h3>
+		<p>
+			This function allows the user to save the currently active 1D dataset as ASCII data, mainly for further analysis and processing in other software.
+		</p>
+		<p>
+			Currently, the only export format is ASCII. You can control the comment character of the header (default: &quot;%&quot;), what to include (such as the axis in the first column, the standard deviation if available, the simulation trace, ...). Furthermore, you can determine whether multiple traces should be exported as one file or several files.
+		</p>
+		<h3>Export 2D data</h3>
+		<p>
+			This function allows the user to save the currently active 2D dataset as ASCII data, mainly for further analysis and processing in other software.
+		</p>
+		<p>
+			The two formats currently available are &quot;glotaran&quot; (for use with the tool for global analysis of the same name) and bare ASCII. Here, you can again set the comment character for the header and whether to include the axes and the info file (as comment in the header).
 		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2011-14, Till Biskup
+			&copy; 2011-15, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-10
+			2015-07-08
 		</p>
 		</div>
 	</body>

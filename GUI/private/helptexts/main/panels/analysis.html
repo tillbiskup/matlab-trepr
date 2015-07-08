@@ -10,21 +10,36 @@
     <body>
 		<h1>Data analysis</h1>
 		<p class="intro">
-			This panel will give access to different means of data analysis.
+			This panel gives access to different means of data analysis.
 		</p>
 		<h2>The controls</h2>
 		<p>
 			A short description of all the controls of the panel.
 		</p>
+		<h3>MW frequency drift</h3>
 		<p>
-			NOTE: Currently, no such analysis tools are implemented.
+			This can be only used with datasets where for each time trace a microwave frequency value is recorded (as in case of the Freiburg data).
+		</p>
+		<p>
+			Pressing the <key>Show</key> button will open an additional GUI window displaying the MW frequency versus field. Such, drifts of the MW frequency that have some impact on the signal can easily be revealed.
+		</p>
+		<h3>Net polarisation</h3>
+		<p>
+			Sometimes it is useful to get an idea of the net polarisation of a dataset. Therefore, a sum projection over each time trace is displayed in an additional GUI window upon pressing the <key>Show</key> button.
+		</p>
+		<h3>BG positions</h3>
+		<p>
+			For recording schemes as those used in Freiburg where the background signal is recorded repeatedly over the time course of the measurement at off-resonant position, sometimes it is useful to see where such background traces have been recorded to get an idea whether some &quot;wiggles&quot; are real features of your spectra or artifacts introduced by drifts followed by background subtraction.
+		</p>
+		<p>
+			Displaying background positions works only in 2D mode and in 1D mode showing spectra (with magnetic field axis).
 		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2011-14, Till Biskup
+			&copy; 2011-15, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-10
+			2015-07-08
 		</p>
 		</div>
 	</body>

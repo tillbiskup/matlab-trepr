@@ -19,6 +19,10 @@
 		<p>
 			A short description of all the controls of the panel.
 		</p>
+		<h3>File type</h3>
+		<p>
+			This popupmenu allows to preselect settings of the checkboxes below. "Automatic" should work in many cases, as the toolbox is capable of detecting the file types automatically and loads the datasets accordingly. For loading raw data recorded in Freiburg (&quot;speksim&uqot; format), please choose the appropriate entry.
+		</p>
 		<h3>Files to load</h3>
 		<p>
 			You can select to
@@ -28,18 +32,17 @@
 				combine multiple files, or to
 			</li>
 			<li>
-				load all (readable) files of a directory
+				load all (readable) files of a directory.
 			</li>
 		</ul>
 		<p>
-			Please, be especially careful with "combining multiple files", as it is intended to be used in case that you have datasets consisting of multiple files, normally one file per time trace (as it is the case for the TREPR data in Freiburg).
-		</p>
-		<h3>Info file</h3>
-		<p>
-			If ticked, the GUI will try to find a fitting info file for your dataset(s), read and apply it to your dataset(s).
+		    Additionally, you can select to automatically load the corresponding info file of a dataset. If ticked, the GUI will try to find a fitting info file for your dataset(s), read and apply it to your dataset(s).
 		</p>
 		<p>
 			<strong>Please note:</strong> This option has no effect on data in the trEPR toolbox format. If you want to apply info files to those datasets, use the Info GUI.
+		</p>
+		<p>
+			Please, be especially careful with "combining multiple files", as it is intended to be used in case that you have datasets consisting of multiple files, normally one file per time trace (as it is the case for the TREPR data in Freiburg).
 		</p>
 		<h3>Preprocessing on load</h3>
 		<p>
@@ -65,19 +68,17 @@
 		<p>
 			If in doubt, don't check the boxes and perform the corrections afterwards manually (via the "Processing" panel) while inspecting the data.
 		</p>
-		<h3>Axis labels</h3>
+		<h3>Display options</h3>
 		<p>
-			Check this box if you want the GUI to try to determine the axis labels already during load of the datasets.
+			For convenience, there is a number of options that you can set for the display, namely:
 		</p>
+		<ul>
+			<li>Determine the axis labels automatically from the data loaded.</li>
+			<li>Make dataset visible upon load, i.e., not adding it to the set of invisible datasets at start, but to the visible ones.</li>
+			<li>Convert units, currently the field axis from G to mT.</li>
+		</ul>
 		<p>
-			If labels could not be determined from the dataset, defaults apply. If more than one dataset is loaded at the same time, the last dataset "wins" in terms of axes labels.
-		</p>
-		<h3>File type</h3>
-		<p>
-			Currently, this popupmenu has only one entry, "Automatic", as the toolbox is capable of detecting the file types automatically and loads the datasets accordingly.
-		</p>
-		<p>
-			Especially for some new developments in Berlin (still to come) this might be of interest later on, allowing to select a "meta file" to load that in itself triggers the toolbox to read several datasets and at the same time to modify a few of the parameters of the datasets loaded.
+			Please note: If labels could not be determined from the dataset, defaults apply. If more than one dataset is loaded at the same time, the last dataset "wins" in terms of axes labels.
 		</p>
 		<h3>The "Load" button</h3>
 		<p>
@@ -85,10 +86,10 @@
 		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2011-14, Till Biskup
+			&copy; 2011-15, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-10
+			2015-07-08
 		</p>
 		</div>
 	</body>

@@ -10,11 +10,11 @@
     <body>
 		<h1>Data processing</h1>
 		<p class="intro">
-			A set of standard data (pre)processing functions are available from this panel.
+			A set of standard data (pre)processing functions are available from this panel. It is divided into three pages.
 		</p>
-		<h2>The controls</h2>
+		<h2>Page 1: Standard and advanced corrections, scaling, frequency correction</h2>
 		<p>
-			A short description of all the controls of the panel.
+			A short description of all the controls of the panel's first page.
 		</p>
 		<h3>Select dataset</h3>
 		<p>
@@ -56,22 +56,47 @@
 		<p>
 			Both GUI windows come with their separate online help.
 		</p>
+		<h3>Scaling</h3>
+		<p>
+			Sometimes you want to scale the dataset without using the slider, e.g., if the slider range is not sufficient.
+		</p>
+		<p>
+			<strong>Please note:</strong> This feature does scale directly the intensity of your dataset, and this behaviour may change in the future.
+		</p>
+		<h3>Frequency correction</h3>
+		<p>
+			Often, different datasets are recorded at slightly different microwave frequencies. To directly compare those datasets, one needs to correct them for the same frequency.
+		</p>
+		<p>
+			Here you can set a microwave frequency (in GHz, as shown) an apply this to either all or only the current dataset. Alternatively, you can use the &quot;<tt>fc</tt>&quot; command from the GUI CMD.
+		</p>
+		<h2>Page 2: Smoothing</h2>
+		<p>
+			A short description of all the controls of the panel's second page.
+		</p>
 		<h3>Smoothing (running average filter)</h3>
 		<p>
 			To reduce the noise level, it is often convenient to smooth data with a running average filter with a given filter window.
 		</p>
 		<p>
-			Currently, only "simple_filter" is available, being a non-weighted running average filter that averages over the given filter window width.
+			Currently, three filters are available: boxcar, binomial, and Savitzky-Golay. Whereas boxcar shall normally not be used due to it strongly distorting your signals, the other two have less impact on your overall signal.
 		</p>
 		<p>
 			Be aware of that filtering with a window too large compared to the spectral features can easily lead to distortions of the spectra (comparable to "overmodulating" in cw-EPR). Therefore, use with care.
 		</p>
+		<h2>Page 3: Arithmetics</h2>
+		<p>
+			A short description of all the controls of the panel's third page.
+		</p>
+		<p>
+			Please note that the underlying functions for arithmetics (add, subtract, ...) are still quite buggy. Therefore, use with care if at all...
+		</p>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2011-14, Till Biskup
+			&copy; 2011-15, Till Biskup
 		</p>
 		<p class="lastchange">
-			2014-08-10
+			2015-07-08
 		</p>
 		</div>
 	</body>
