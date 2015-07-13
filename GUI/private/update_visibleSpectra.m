@@ -10,8 +10,8 @@ function status = update_visibleSpectra()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated panels listing the spectra
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-11-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-07-11
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -130,6 +130,12 @@ if get(procPLbox,'Value')>length(vis)
 end
 if get(procPLbox2,'Value')>length(vis)
     set(procPLbox2,'Value',length(vis));
+end
+if get(procPLboxPrim,'Value')>length(vis)
+    set(procPLboxPrim,'Value',length(vis));
+end
+if get(procPLboxSec,'Value')>length(vis)
+    set(procPLboxSec,'Value',length(vis));
 end
 
 % Update list of spectra of the display panel
