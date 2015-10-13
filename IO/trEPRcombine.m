@@ -25,7 +25,7 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % otherwise the label of the first dataset that is combined gets used.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-12
+% 2015-10-13
 
 % Assign default output
 combinedDataset = struct();
@@ -86,6 +86,8 @@ try
             % numeric data
             combinedDataset.data = ...
                 [ combinedDataset.data; datasets{k}.data ];
+            combinedDataset.origdata = ...
+                [ combinedDataset.origdata; datasets{k}.origdata ];
             % axis values
             combinedDataset.axes.data(2).values(k) = ...
                 datasets{k}.axes.data(2).values;

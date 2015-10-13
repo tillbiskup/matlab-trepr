@@ -4,7 +4,8 @@ function [data,varargout] = trEPRFRload(filename,varargin)
 %
 % Usage: 
 %   [data] = trEPRFRload(filename,[<parameter>,<value>])
-%   [data,parameters] = trEPRFRload(filename,[<parameter>,<value>])
+%   [data,warnings] = trEPRFRload(filename,[<parameter>,<value>])
+%   [data,~,parameters] = trEPRFRload(filename,[<parameter>,<value>])
 %
 %   filename    - string
 %                 Name of file containing the original data
@@ -12,6 +13,9 @@ function [data,varargout] = trEPRFRload(filename,varargin)
 %   data        - struct/vector
 %                 Either a dataset (trEPR dataset structure, default)
 %                 or a vector containing only the data
+%
+%   warnings    - cell (OPTIONAL)
+%                 Warning messages
 %
 %   parameters  - struct (OPTIONAL)
 %                 Hierarchical structure containing all parameters read
@@ -37,7 +41,7 @@ try
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addRequired('filename',@ischar)
+    p.addRequired('filename',@(x)ischar(x) && exist(x,'file'))
     p.addParamValue('map2dataset',true,@islogical);
     p.parse(filename,varargin{:});
 catch exception
@@ -70,7 +74,10 @@ if p.Results.map2dataset
     data = map2dataset(data,parameters);
 end
 
-varargout{1} = parameters;
+% Assign "warnings" (empty cell) as first optional output
+% Necessary to be compatible with current implementation of trEPRload
+varargout{1} = {};
+varargout{2} = parameters;
 
 end
 
@@ -94,7 +101,7 @@ function [data,parameters] = readFormat1(fileContents)
 parameters = parseHeader(fileContents(2:5));
 
 % Line 6 to end contain the actual data
-data = str2num([fileContents{6:end}])'; %#ok<ST2NM>
+data = str2num([fileContents{6:end}]); %#ok<ST2NM>
 
 end
 
@@ -200,9 +207,10 @@ function dataset = map2dataset(data,par)
 
 dataset = trEPRdataStructure('structure');
 dataset.data = data;
+dataset.origdata = data;
 dataset.parameters.bridge.MWfrequency.value = par.MWfrequency.value;
 dataset.parameters.bridge.MWfrequency.unit = par.MWfrequency.unit;
-dataset.comment = par.comment;
+dataset.comment = {par.comment};
 dataset.axes.data(1).values = ...
     linspace(par.time.start,par.time.stop,par.time.length);
 dataset.axes.data(1).unit = par.time.unit;

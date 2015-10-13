@@ -33,346 +33,134 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-05-31
+% 2015-10-13
 
-% Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
+% Assign default output
+data = struct();
+warnings = {};
 
-p.addRequired('filename', @(x)ischar(x) || iscell(x) || isstruct(x));
-p.addParamValue('combine',logical(false),@islogical);
-p.addParamValue('loadInfoFile',logical(false),@islogical);
-p.parse(filename,varargin{:});
-
-if iscell(filename)
-    sort(filename);
-    if p.Results.combine
-        [content,warnings] = combineFile(filename);
-    else
-        content = cell(length(filename),1);
-        warnings = cell(length(filename),1);
-        for k=1:length(filename)
-            switch exist(filename{k}) %#ok<*EXIST>
-                case 0
-                    % If name does not exist.
-                    fprintf('%s does not exist...\n',filename{k});
-                case 2
-                    % If name is an M-file on your MATLAB search path.
-                    % It also returns 2 when name is the full pathname
-                    % to a file or the name of an ordinary file on your
-                    % MATLAB search path.
-                    [content{k},warnings{k}] = loadFile(filename{k});
-                otherwise
-                    % If none of the above possibilities match
-                    fprintf('%s could not be loaded...\n',filename{k});
-            end
-        end
-        % Concatenate all the warnings messages
-        warningsArray = cell(0);
-        for k=1:length(warnings)
-            if ~isempty(warnings{k})
-                warningsArray{end+1} = warnings{k}; %#ok<AGROW>
-            end
-        end
-        warnings = warningsArray;
-    end
-    if ~nargout && exist('content','var')
-        % If no output argument is given, assign content to a
-        % variable in the workspace with the same name as the
-        % file
-        if p.Results.combine
-            [~, name, ext] = fileparts(filename{1});
-            name = cleanFileName([name ext]);
-            assignVariableInWorkspace(name,content);
-            %assignin('base',name,content);
-            assignin('base','warnings',warnings);
-        else
-            for k=1:length(content)
-                [~, name, ext] = fileparts(...
-                    content{k}.file.name);
-                name = cleanFileName([name ext]);
-                assignVariableInWorkspace(name,content{k});
-                %assignin('base',name,content{k});
-                assignin('base','warnings',warnings);
-            end
-        end
-    elseif exist('content','var')
-        varargout{1} = content;
-        varargout{2} = warnings;
-    else
-        varargout{1} = [];
-        varargout{2} = 'Failed loading data';
-    end
-elseif isstruct(filename) && isfield(filename,'name')
-    % That might be the case if the user uses "dir" as input for the
-    % filenames, as this returns a structure with fields as "name"
-    % Convert struct to cell
-    filenames = cell(length(filename));
-    l = 1;
-    for k = 1:length(filename)
-        if ~strcmp(filename(k).name,'.') && ...
-                ~strcmp(filename(k).name,'..') && ...
-                ~strcmp(filename(k).name(1),'.') && ...
-                ~strcmp(filename(k).name(end),'~')
-            filenames{l} = filename(k).name;
-            l=l+1;
-        end
-    end
-    % Remove empty entries from cell array
-    filenames(cellfun('isempty',filenames)) = [];
-    if p.Results.combine
-        [content,warnings] = combineFile(filenames);
-    else
-        content = cell(length(filename),1);
-        warnings = cell(length(filename),1);
-        for k=1:length(filenames)
-            switch exist(filenames{k})
-                case 0
-                    % If name does not exist.
-                    fprintf('%s does not exist...\n',filenames{k});
-                case 2
-                    % If name is an M-file on your MATLAB search path.
-                    % It also returns 2 when name is the full pathname
-                    % to a file or the name of an ordinary file on your
-                    % MATLAB search path.
-                    [content{k},warnings{k}] = loadFile(filenames{k});
-                otherwise
-                    % If none of the above possibilities match
-                    fprintf('%s could not be loaded...\n',filenames{k});
-            end
-        end
-        % Concatenate all the warnings messages
-        warningsArray = cell(0);
-        for k=1:length(warnings)
-            if ~isempty(warnings{k})
-                warningsArray{end+1} = warnings{k}; %#ok<AGROW>
-            end
-        end
-        warnings = warningsArray;
-    end
-    if ~nargout && exist('content','var')
-        % If no output argument is given, assign content to a
-        % variable in the workspace with the same name as the
-        % file
-        if p.Results.combine
-            [~, name, ext] = fileparts(filenames{1});
-            name = cleanFileName([name ext]);
-            assignVariableInWorkspace(name,content);
-            %assignin('base',name,content);
-            assignin('base','warnings',warnings);
-        else
-            for k=1:length(content)
-                [~, name, ext] = fileparts(...
-                    content{k}.file.name);
-                name = cleanFileName([name ext]);
-                assignVariableInWorkspace(name,content{k});
-                %assignin('base',name,content{k});
-                assignin('base','warnings',warnings);
-            end
-        end
-    elseif exist('content','var')
-        varargout{1} = content;
-        varargout{2} = warnings;
-    else
-        varargout{1} = [];
-        varargout{2} = 'Failed loading data';
-    end
-else    % -> if iscell(filename)
-    warnings = cell(0);
-    switch exist(filename)
-        case 0
-            % Check whether it is only a file basename
-            if isempty(dir(sprintf('%s.*',filename)))
-                errMsg = sprintf('"%s" does not exist...',filename);
-                trEPRmsg(errMsg,'error');
-                warnings{end+1} = errMsg;
-            elseif p.Results.combine
-                % Read all files and combine them
-                files = dir(sprintf('%s.*',filename));
-                filenames = cell(1);
-                for k = 1 : length(files)
-                    filenames{k} = files(k).name;
-                end
-                [content,warnings] = combineFile(filenames);
-                % assign output argument
-                if ~nargout
-                    % of no output argument is given, assign content to
-                    % a variable in the workspace with the same name as
-                    % the file
-                    [~, name, ext] = fileparts(filename);
-                    name = cleanFileName([name ext]);
-                    assignVariableInWorkspace(name,content);
-                    %assignin('base',name,content);
-                    assignin('base','warnings',warnings);
-                else
-                    varargout{1} = content;
-                    varargout{2} = warnings;
-                end
-            else
-                % Read all files and choose the first one to read
-                files = dir(sprintf('%s.*',filename));
-                if ~isempty(files)
-                    [content,warnings] = loadFile(files(1).name);
-                    % assign output argument
-                    if ~nargout
-                        % of no output argument is given, assign content to
-                        % a variable in the workspace with the same name as
-                        % the file
-                        [~, name, ext] = fileparts(filename);
-                        name = cleanFileName([name ext]);
-                        assignVariableInWorkspace(name,content);
-                        %assignin('base',name,content);
-                        assignin('base','warnings',warnings);
-                    else
-                        varargout{1} = content;
-                        varargout{2} = warnings;
-                    end
-                end
-            end
-        case 2
-            % If name is an M-file on your MATLAB search path. It also
-            % returns 2 when name is the full pathname to a file or the
-            % name of an ordinary file on your MATLAB search path.
-            [content,warnings] = loadFile(filename);
-            % assign output argument
-            if ~nargout
-                % of no output argument is given, assign content to a
-                % variable in the workspace with the same name as the
-                % file
-                [~, name, ext] = fileparts(filename);
-                name = cleanFileName([name ext]);
-                assignVariableInWorkspace(name,content);
-                %assignin('base',name,content);
-                assignin('base','warnings',warnings);
-            else
-                varargout{1} = content;
-                varargout{2} = warnings;
-            end
-        case 7
-            % If name is a directory.
-            [content,warnings] = loadDir(filename,'combine',p.Results.combine);
-            if ~nargout
-                % of no output argument is given, assign content to a
-                % variable in the workspace with the same name as the
-                % file
-                if iscell(content)
-                    for k=1:length(content)
-                        [~, name, ext] = fileparts(...
-                            content{k}.file.name);
-                        name = cleanFileName([name ext]);
-                        assignVariableInWorkspace(name,content{k});
-                        %assignin('base',name,content{k});
-                    end
-                else
-                    [~, name, ext] = fileparts(filename);
-                    name = cleanFileName([name ext]);
-                    %assignin('base',name,content);
-                    assignVariableInWorkspace(name,content);
-                    assignin('base','warnings',warnings);
-                end
-            else
-                varargout{1} = content;
-                varargout{2} = warnings;
-            end
-        otherwise
-            % If none of the above possibilities match
-            fprintf('%s could not be loaded...\n',filename);
-    end
-end
-
-if ~exist('content','var') || isempty(content) % && nargout
-    errStr = 'Couldn''t load any data';
-    warnings{end+1} = errStr;
-    trEPRmsg(errStr,'error');
-    varargout{1} = [];
-    varargout{2} = warnings;
+try
+    % Parse input arguments using the inputParser functionality
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Include function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('filename', @(x)(ischar(x) || iscell(x) || ...
+        (isstruct(x) && isfield(x,'name'))));
+    p.addParamValue('combine',logical(false),@islogical);
+    p.addParamValue('loadInfoFile',logical(false),@islogical);
+    p.parse(filename,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
     return;
 end
 
-if isa(content,'cell') && isfield(content{1},'file') && ...
-        isstruct(content{1}.file) && isfield(content{1}.file,'format')
-    trEPRmsg(['File format: ' content{1}.file.format],'debug');
-elseif isfield(content,'file') && isstruct(content.file) && ...
-        isfield(content.file,'format')
-    trEPRmsg(['File format: ' content.file.format],'debug');
+% NOTE: class() returns the type of the variable (here: char, cell, struct)
+switch class(filename)
+    case 'cell'
+        filename = sanitiseFileNameList(filename);
+        data = cell(length(filename),1);
+        warnings = cell(length(filename),1);
+        for iFilename = 1:length(filename)
+            [data{iFilename},warnings{iFilename}] = ...
+                trEPRload(filename{iFilename});
+        end
+    case 'struct'
+        [data,warnings] = trEPRload({filename.name});
+    otherwise
+        % "char" due to input parsing (see above)
+        switch exist(filename) %#ok<EXIST>
+            case 0 % doesn't exist
+                % Check for basename
+                filename = addDir2Filename(...
+                    filename,dir(sprintf('%s.*',filename)));
+                [data,warnings] = trEPRload(filename);
+            case 2 % regular file
+                [data,warnings] = loadFile(filename);
+            case 7 % directory
+                filename = addDir2Filename(filename,dir(filename));
+                [data,warnings] = trEPRload(filename);
+        end
+end
+
+% Remove empty elements in cell arrays
+if iscell(data)
+    data(cellfun(@(x)isempty(x),data)) = [];
+end
+if iscell(warnings)
+    warnings(cellfun(@(x)isempty(x),warnings)) = [];
+end
+
+% Combine if necessary
+if iscell(data) && p.Results.combine
+    [data,status] = trEPRcombine(data);
+    if ~isempty(status)
+        warnings{end+1} = status;
+    end
+end
+
+% Replace "filename" with single string
+if iscell(filename)
+    filename = filename{1};
+end
+
+% Load and apply info file if necessary
+if ~isempty('data') && p.Results.loadInfoFile ...
+        && ~strcmpi(data.file.format,'xmlzip')
+    data = loadAndApplyInfoFile(data,filename);
+end
+
+if ~nargout
+    % assign content to a variable in the workspace with the same name as
+    % the original file
+    [~, name, ext] = fileparts(filename);
+    name = cleanFileName([name ext]);
+    assignVariableInWorkspace(name,data);
+    assignin('base','warnings',warnings);
 else
-    warnStr = 'File format unknown/undetectable';
-    trEPRmsg(warnStr,'warning');
-    warnings{end+1} = warnStr;
-end
-
-% Check for datasets with original toolbox format version prior to 1.14
-% that have data in calculated and whose data are 2D. For backwards
-% compatibility to old simulation traces, set calculation.position to
-% maximum of dataset.
-if exist('content','var') && isfield(content,'calculated') && ...
-        ~isempty(content.calculated) && ...
-        min(size(content.calculated))>1 && isfield(content,'TSim') && ...
-        isfield(content.format,'oldversion') && ...
-        str2double(content.format.oldversion) < 1.14
-    % Get maximum in y
-    [~,content.calculation.position] = max(max(content.data));
-end
-
-if exist('content','var') && p.Results.loadInfoFile ...
-        && ~strcmpi(content.file.format,'xmlzip')
-    % Try to load info file
-    if isdir(filename)
-        directoryListing = dir(fullfile(filename,'*.info'));
-        if ~isempty(directoryListing)
-            infoFileName = fullfile(filename,directoryListing(1).name);
-        end
-    else
-        [fpath,fname,~] = fileparts(filename);
-        infoFileName = fullfile(fpath,[fname '.info']);
-    end
-    if exist(infoFileName,'file')
-        [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
-        % Fix problem with overriding MWfrequency vector
-        MWfrequency = content.parameters.bridge.MWfrequency.values;
-        if isempty(ifpwarnings)
-            content = commonStructCopy(content,parameters);
-            content.parameters.bridge.MWfrequency.values = MWfrequency;
-            trEPRmsg({'Loaded info file and applied contents to dataset',...
-                infoFileName},'info');
-        else
-            warnings{end+1} = ifpwarnings;
-        end
-    elseif isfield(content,'file') && isfield(content.file,'name')
-        [fpath,fname,~] = fileparts(content.file.name);
-        infoFileName = fullfile(fpath,[fname '.info']);
-        if exist(infoFileName,'file')
-            [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
-            if isempty(ifpwarnings)
-                content = commonStructCopy(content,parameters);
-                trEPRmsg({'Loaded info file and applied contents to dataset',...
-                    infoFileName},'info');
-            else
-                warnings{end+1} = ifpwarnings;
-            end
-        else
-            warnings{end+1} = struct('identifier','trEPRload:missingInfoFile',...
-                'message','Could not find accompanying info file.');
-        end
-    else
-        warnings{end+1} = struct('identifier','trEPRload:missingInfoFile',...
-            'message','Could not find accompanying info file.');
-    end
-    varargout{1} = content;
+    varargout{1} = data;
     varargout{2} = warnings;
-    if nargout < 2
-        trEPRmsg(warnings,'warning');
-    end
 end
     
 end
 
+function filenames = sanitiseFileNameList(filenames)
+% Remove all unwanted files, such as ".", "..", "*~", and "*.info"
+
+% Remove names starting with "."
+filenames(strncmpi(filenames,'.',1)) = [];
+
+% Remove other patterns (need to do that in reverse loop)
+for filename = length(filenames):-1:1
+    % Remove files with trailing "~"
+    if strcmpi(filenames{filename}(end),'~')
+        filenames(filename) = [];
+    end
+    % Remove files with extension ".info"
+    if length(filename) > 4 && ...
+            strcmpi(filenames{filename}(end-4:end),'.info')
+        filenames(filename) = [];
+    end
+end
+
+% Sort list
+filenames = sort(filenames);
+
+end
+
+function filenames = addDir2Filename(dirname,filenames)
+
+filenames = sanitiseFileNameList({filenames.name});
+for filename=1:length(filenames)
+    filenames{filename} = fullfile(dirname,filenames{filename});
+end
+
+end
+
 % --- load file and return struct with the content of the file together
 % with the filename and possibly more info
-function [content,warnings] = loadFile(filename)
-    content = [];
+function [data,warnings] = loadFile(filename)
+    data = [];
     warnings = cell(0);
 
     if isempty(dir(filename))
@@ -426,7 +214,7 @@ function [content,warnings] = loadFile(filename)
     % If firstline is "-1", thus we are at the end of the file, meaning we
     % opened an empty file, return immediately
     if isnumeric(firstLine) && firstLine == -1
-        content = [];
+        data = [];
         return;
     end
     
@@ -449,13 +237,13 @@ function [content,warnings] = loadFile(filename)
                     str2func(fileFormats.(binaryFileFormats{k}).function);
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
-                    content.data = data;
+                    data.data = data;
                 else
-                    content = data;
+                    data = data;
                 end
-                if ~iscell(content)
-                    content.file.name = filename;
-                    content.file.format = binaryFileFormats{k};
+                if ~iscell(data)
+                    data.file.name = filename;
+                    data.file.format = binaryFileFormats{k};
                 end
                 break;
            end
@@ -469,183 +257,83 @@ function [content,warnings] = loadFile(filename)
                     str2func(fileFormats.(asciiFileFormats{k}).function);
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
-                    content.data = data;
+                    data.data = data;
                 else
-                    content = data;
+                    data = data;
                 end
-                if ~iscell(content)
-                    content.file.name = filename;
-                    content.file.format = asciiFileFormats{k};
+                if ~iscell(data)
+                    data.file.name = filename;
+                    data.file.format = asciiFileFormats{k};
                 end
                 break;
             end
         end
         % else try to handle it with importdata
-        if ~exist('content')
+        if ~exist('data')
             data = importdata(filename);
             if isfield(data,'textdata')
-                content.header = data.textdata;
+                data.header = data.textdata;
                 if isfield(data,'colheaders')
-                    content.colheaders = data.colheaders;
+                    data.colheaders = data.colheaders;
                 end
-                content.data = data.data;
+                data.data = data.data;
             else
-                content.data = data;
+                data.data = data;
             end
             % In case we have not loaded anything
-            if isempty(content.data)
-                content = [];
+            if isempty(data.data)
+                data = [];
                 return;
             end
-            content.file.name = filename;
-            content.file.format = 'unspecified ASCII';
+            data.file.name = filename;
+            data.file.format = 'unspecified ASCII';
             % Create axis informations from dimensions
-            [y,x] = size(content.data);
-            content.axes.data(1).values = linspace(1,x,x);
-            content.axes.data(1).measure = '';
-            content.axes.data(1).unit = '';
-            content.axes.data(2).values = linspace(1,y,y);
-            content.axes.data(2).measure = '';
-            content.axes.data(2).unit = '';
+            [y,x] = size(data.data);
+            data.axes.data(1).values = linspace(1,x,x);
+            data.axes.data(1).measure = '';
+            data.axes.data(1).unit = '';
+            data.axes.data(2).values = linspace(1,y,y);
+            data.axes.data(2).measure = '';
+            data.axes.data(2).unit = '';
             
             % Assign warnings
             warnings = [];
         end
     end
-    if ~exist('content') 
-        content = []; 
-        warnings = [];
-    end
 end
 
-% --- Sequentially read all files in a directory provided their name does
-% not start with a dot and it is a 'real' file and no directory
-function [content,warnings] = loadDir(dirname,varargin)
-    content = [];
-    warnings = cell(0);
-    
-    % Get names of files in the directory and remove all files whose name
-    % starts with a "." and all directories. The names are stored as a cell
-    % array in 'filesInDir'.
-    allFilesInDir = dir(dirname);
-    filesInDir = cell(length(allFilesInDir));
-    l = 1;
-    for k=1:length(allFilesInDir)
-        if ~allFilesInDir(k).isdir && ...
-                ~strcmp(allFilesInDir(k).name(1),'.') && ...
-                ~strcmp(allFilesInDir(k).name(end),'~')
-            filesInDir{l} = fullfile(dirname,allFilesInDir(k).name);
-            l=l+1;
-        end
-    end
-    % Remove empty entries from cell array
-    filesInDir(cellfun('isempty',filesInDir)) = [];
-    
-    % If there are still files in the directory after removing all dot
-    % files and directories, try to read every single file
-    if ~isempty(filesInDir)
-        if (nargin >= 3) && (strcmp(varargin{1},'combine') && varargin{2})
-            [content,warnings] = combineFile(filesInDir);
-        else
-            l = 1;
-            content = cell(length(filesInDir),1);
-            for k=1:length(filesInDir)
-                [fileContent,warnings] = loadFile(char(filesInDir(k)));
-                if ~isempty(fileContent)
-                    content{l} = fileContent;
-                    l = l+1;
-                end
-            end
-        end
-    end
+function data = loadAndApplyInfoFile(data,filename)
 
-    if ~exist('content') 
-        content = []; 
-    end
+% Try to load info file
+[fpath,fname,~] = fileparts(filename);
+infoFileName = fullfile(fpath,[fname '.info']);
+
+% If infoFile doesn't exist, try with filename from dataset
+if ~exist(infoFileName,'file')
+    [fpath,fname,~] = fileparts(data.file.name);
+    infoFileName = fullfile(fpath,[fname '.info']);
 end
 
-% --- load files, combine them and return struct with the content of the
-% file together with the filename and possibly more info
-function [content,warnings] = combineFile(filename)
-    content = [];
-    warnings = cell(0);
+% If infoFile still doesn't exist, return
+if ~exist(infoFileName,'file')
+    trEPRmsg({'Could not find accompanying info file.',...
+        infoFileName},'warning');
+    return;
+end
 
-    % Set struct containing all ASCII filetypes that are recognized by this
-    % function and can be read. This is done by reading in the
-    % corresponding ini file trEPRload.ini.
-    fileFormats = trEPRiniFileRead([mfilename('fullpath') '.ini']);
-      
-    % read file formats into cell array
-    asciiFileFormats = fieldnames(fileFormats);
-    
-    % open file
-    fid = fopen(filename{1});
-    if fid < 0
-        warnings{end+1} = 'Could not open file.';
-        return;
-    end
-    
-    % Initialize switch resembling binary or ascii data
-    isBinary = logical(false);
-    
-    % Read first characters of the file and try to determine whether it is
-    % binary
-    firstChars = fread(fid,5);
-    for k=1:length(firstChars)
-        if firstChars(k) < 32 && firstChars(k) ~= 10 && firstChars(k) ~= 13
-            isBinary = logical(true);
-        end
-    end
-    
-    % Reset file pointer, then read first line and try to determine from
-    % that the filetype
-    % PROBLEM: fsc2 files tend to have a single empty comment line as the
-    % first line. Therefore, check whether the first line is too short for
-    % an identifier string, and in this case, read a second line.
-    fseek(fid,0,'bof');
-    firstLine = fgetl(fid);
-    
-    % close file
-    fclose(fid);
-    
-    if isBinary
-       fprintf('%s is a binary file!',filename{1}); 
-    else
-        % else try to find a matching function from the ini file
-        for k = 1 : length(asciiFileFormats) 
-            if any(strfind(firstLine,...
-                    fileFormats.(asciiFileFormats{k}).identifierString)) ... 
-                    && strcmp(...
-                    fileFormats.(asciiFileFormats{k}).combineMultiple,...
-                    'true')
-                functionHandle = ...
-                    str2func(fileFormats.(asciiFileFormats{k}).function);
-                [data,warnings] = functionHandle(filename);
-                if ~isstruct(data)
-                    content.data = data;
-                else
-                    content = data;
-                end
-                if ~isfield(content,'filename')
-                    [path,firstFileName,firstExt] = fileparts(filename{1});
-                    [~,lastFileName,lastExt] = fileparts(filename{end});
-                    if strcmp(firstFileName,lastFileName)
-                        % If file basenames are identical
-                        fn = sprintf('%s.%s-%s',firstFileName,firstExt(2:end),lastExt(2:end));
-                    else
-                        fn = sprintf('%s-%s.%s',firstFileName,lastFileName,lastExt(2:end));
-                    end
-                    content.file.name = path; %fullfile(path,fn);
-                    content.file.format = asciiFileFormats{k};
-                end
-                break;
-            end
-        end
-    end
-    if ~exist('content') 
-        content = []; 
-        warnings = [];
-    end
+[parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
+
+% Fix problem with overriding MWfrequency vector
+MWfrequency = data.parameters.bridge.MWfrequency.values;
+if isempty(ifpwarnings)
+    data = commonStructCopy(data,parameters);
+    data.parameters.bridge.MWfrequency.values = MWfrequency;
+    trEPRmsg({'Loaded info file and applied contents to dataset',...
+        infoFileName},'info');
+else
+    trEPRmsg(ifpwarnings,'warning');
+end
+
 end
 
 % --- Cleaning up filename so that it can be used as variable name in the
