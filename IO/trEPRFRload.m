@@ -1,25 +1,35 @@
-function [data,parameters] = trEPRFRload(filename,varargin)
+function [data,varargout] = trEPRFRload(filename,varargin)
 % TREPRFRLOAD General importer routine for the different Freiburg file
 % formats ("speksim").
 %
 % Usage: 
-%   [data,parameters] = trEPRFRload(filename)
+%   [data] = trEPRFRload(filename,[<parameter>,<value>])
+%   [data,parameters] = trEPRFRload(filename,[<parameter>,<value>])
 %
-%   filename   - string
-%                Name of file containing the original data
+%   filename    - string
+%                 Name of file containing the original data
 %
-%   data       - vector
+%   data        - struct/vector
+%                 Either a dataset (trEPR dataset structure, default)
+%                 or a vector containing only the data
 %
-%   parameters - struct
+%   parameters  - struct (OPTIONAL)
+%                 Hierarchical structure containing all parameters read
+%                 from the file
+%
+% Optional parameter-value pairs can be specified as follows:
+%
+%   map2dataset - boolean (default: true)
+%                 Whether to map data and parameters to trEPR dataset
+%                 structure
 %
 % SEE ALSO: trEPRload
 
 % Copyright (c) 2015, Till Biskup
-% 2015-10-12
+% 2015-10-13
 
 % Assign default output
 data = [];
-parameters = struct();
 
 try
     % Parse input arguments using the inputParser functionality
@@ -28,7 +38,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename',@ischar)
-%     p.addParamValue('paperUnits','centimeters',@ischar);
+    p.addParamValue('map2dataset',true,@islogical);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
@@ -42,7 +52,9 @@ if ~correctFileFormat(fileContents)
     return;
 end
 
-switch getFileFormatNumber(fileContents)
+fileFormatNo = getFileFormatNumber(fileContents);
+
+switch fileFormatNo
     case 1
         [data,parameters] = readFormat1(fileContents);
     case 11
@@ -52,8 +64,17 @@ switch getFileFormatNumber(fileContents)
         return;
 end
 
+parameters = addFileFormatInfo(parameters,filename,fileFormatNo);
+
+if p.Results.map2dataset
+    data = map2dataset(data,parameters);
 end
 
+varargout{1} = parameters;
+
+end
+
+% --- Subfunctions (internal)
 
 function TF = correctFileFormat(fileContents)
 
@@ -73,7 +94,7 @@ function [data,parameters] = readFormat1(fileContents)
 parameters = parseHeader(fileContents(2:5));
 
 % Line 6 to end contain the actual data
-data = str2num([fileContents{6:end}]); %#ok<ST2NM>
+data = str2num([fileContents{6:end}])'; %#ok<ST2NM>
 
 end
 
@@ -89,8 +110,8 @@ modifiers = sscanf(fileContents{5},'%f');
 % Line 7 to end contain the actual ("compressed") data
 % To "uncompress", add 999 to each value, multiply with the factor (3rd
 % value in modifiers) and add offset (4th value in modifiers)
-data = (str2num(reshape([fileContents{7:end}],4,[])')+999)...
-    .*modifiers(3)+modifiers(4); %#ok<ST2NM>
+data = ((str2num(reshape([fileContents{7:end}],4,[])')+999)...
+    .*modifiers(3)+modifiers(4))'; %#ok<ST2NM>
 
 end
 
@@ -112,6 +133,7 @@ end
 
 function parameters = parseB0andMWfreq(fileContents,parameters)
 
+% There is not always a "Gaussmeter" entry as second in this line...
 if any(strfind(fileContents,'Gaussmeter'))
     tokens = regexp(fileContents{2},...
         ['B0 = ([0-9.]*)\s*(\w*),\s* B0\(Gaussmeter\) = '...
@@ -137,6 +159,8 @@ else
         str2double(tokens{1}{3});
     parameters.MWfrequency.unit = tokens{1}{4};
 end
+
+% Field parameters (from Hall probe) come always first.
 parameters.field.value = str2double(tokens{1}{1});
 switch tokens{1}{2}
     case 'Gauss'
@@ -161,6 +185,33 @@ end
 function parameters = getUnits(fileContents,parameters)
 
 [parameters.time.unit,yunit] = strtok(fileContents,' ');
-paramaeters.intensity.unit = strtrim(yunit);
+parameters.intensity.unit = strtrim(yunit);
+
+end
+
+function parameters = addFileFormatInfo(parameters,filename,fileFormatNo)
+
+parameters.file.name = filename;
+parameters.file.format = sprintf('Speksim #%i',fileFormatNo);
+
+end
+
+function dataset = map2dataset(data,par)
+
+dataset = trEPRdataStructure('structure');
+dataset.data = data;
+dataset.parameters.bridge.MWfrequency.value = par.MWfrequency.value;
+dataset.parameters.bridge.MWfrequency.unit = par.MWfrequency.unit;
+dataset.comment = par.comment;
+dataset.axes.data(1).values = ...
+    linspace(par.time.start,par.time.stop,par.time.length);
+dataset.axes.data(1).unit = par.time.unit;
+dataset.axes.data(1).measure = 'time';
+dataset.axes.data(2).values = par.field.value;
+dataset.axes.data(2).unit = par.field.unit;
+dataset.axes.data(2).measure = 'magnetic field';
+dataset.axes.data(3).unit = par.intensity.unit;
+dataset.axes.data(3).measure = 'intensity';
+dataset.file = par.file;
 
 end

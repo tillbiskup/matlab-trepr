@@ -23,20 +23,27 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % As you can see in the example above, you can specify a label as
 % parameter/value pair. This label is used for the combined dataset,
 % otherwise the label of the first dataset that is combined gets used.
-%
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-12
 
-% Parse input arguments using the inputParser functionality
-p = inputParser;   % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Function name to be included in error messages
-p.KeepUnmatched = true; % Enable errors on unmatched arguments
-p.StructExpand = true; % Enable passing arguments in a structure
+% Assign default output
+combinedDataset = struct();
+status = '';
 
-p.addRequired('datasets', @(x)iscell(x));
-p.addParamValue('label','', @(x)ischar(x));
-p.parse(datasets,varargin{:});
+try
+    % Parse input arguments using the inputParser functionality
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Include function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('datasets', @(x)iscell(x));
+    p.addParamValue('label','', @(x)ischar(x));
+    p.parse(datasets,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
 try
     status = '';
@@ -63,28 +70,39 @@ try
     % First step: Assign most of the parameters of the combined dataset by
     % using the parameters from the first dataset
     combinedDataset = datasets{1};
+    % Fix MWfrequency values
+    combinedDataset.parameters.bridge.MWfrequency.values = ...
+        combinedDataset.parameters.bridge.MWfrequency.value;
     % Assign label
     if ~isempty(p.Results.label)
         combinedDataset.label = p.Results.label;
     end
     
+    % Second step: Combine data
     if (length(unique(dimensions(:,1)))==1) ...
             && (length(unique(dimensions(:,2)))==1) ...
             && (unique(dimensions(:,1))==1)
         for k=2:length(datasets)
+            % numeric data
             combinedDataset.data = ...
                 [ combinedDataset.data; datasets{k}.data ];
+            % axis values
+            combinedDataset.axes.data(2).values(k) = ...
+                datasets{k}.axes.data(2).values;
+            % MW frequency
+            combinedDataset.parameters.bridge.MWfrequency.values(k) = ...
+                datasets{k}.parameters.bridge.MWfrequency.value;
         end
-        combinedDataset.axes.data(2).values = linspace(...
-            datasets{1}.parameters.field.start.value,...
-            datasets{end}.parameters.field.stop.value,...
-            length(datasets));
+        
+        % Fix field parameters
         combinedDataset.parameters.field.start.value = ...
-            datasets{1}.parameters.field.start.value;
+            combinedDataset.axes.data(2).values(1);
         combinedDataset.parameters.field.stop.value = ...
-            datasets{end}.parameters.field.stop.value;
+            combinedDataset.axes.data(2).values(end);
+        % Field step is only an assumption - continuous and equidistant
         combinedDataset.parameters.field.step.value = ...
-            combinedDataset.axes.data(2).values(2)-combinedDataset.axes.data(2).values(1);
+            combinedDataset.axes.data(2).values(2)-...
+            combinedDataset.axes.data(2).values(1);
         combinedDataset.parameters.field.start.unit = ...
             combinedDataset.axes.data(2).unit;
         combinedDataset.parameters.field.stop.unit = ...
@@ -92,16 +110,6 @@ try
         combinedDataset.parameters.field.step.unit = ...
             combinedDataset.axes.data(2).unit;
     end
-    
-    % In case that we have identical dimensions along x (cols, therefore
-    % dimension 2), and dimension along x is larger than max along y, add
-    % datasets together (assuming that always the longer dimension is the
-    % one that stays fixed)
-    if (length(unique(dimensions(:,2)))==1) ...
-            && unique(dimensions(:,2)) > max(unique(dimensions(:,1))) ...
-            && max(unique(dimensions(:,1))) > 1
-    end
-    
 catch exception
     throw(exception);
 end
