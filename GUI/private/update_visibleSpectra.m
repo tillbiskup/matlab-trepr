@@ -11,7 +11,7 @@ function status = update_visibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-07-11
+% 2015-07-23
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -118,12 +118,6 @@ procPLboxSec = gh.processing_panel_secondary_listbox;
 set(procPLboxPrim,'String',labels);
 set(procPLboxSec,'String',labels);
 
-% Highlight currently active
-if ad.control.data.active
-    set(procPLbox,'Value',find(vis==ad.control.data.active));
-    set(procPLbox2,'Value',find(vis==ad.control.data.active));
-end
-
 % Fix problem if value of listbox is larger than number of entries
 if get(procPLbox,'Value')>length(vis)
     set(procPLbox,'Value',length(vis));
@@ -138,6 +132,14 @@ if get(procPLboxSec,'Value')>length(vis)
     set(procPLboxSec,'Value',length(vis));
 end
 
+% Highlight currently active
+if ad.control.data.active
+    set(procPLbox,'Value',find(vis==ad.control.data.active));
+    set(procPLbox2,'Value',find(vis==ad.control.data.active));
+    set(procPLboxPrim,'Value',find(vis==ad.control.data.active));
+    set(procPLboxSec,'Value',find(vis==ad.control.data.active));
+end
+
 % Update list of spectra of the display panel
 dispPLbox = gh.display_panel_datasets_listbox;
 set(dispPLbox,'String',labels);
@@ -146,7 +148,6 @@ set(dispPLbox,'String',labels);
 if ad.control.data.active
     set(dispPLbox,'Value',find(vis==ad.control.data.active));
 end
-
 
 status = 0;
 

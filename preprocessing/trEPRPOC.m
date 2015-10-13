@@ -37,7 +37,7 @@ function varargout = trEPRPOC (data, varargin)
 % See also: trEPRBGC
 
 % Copyright (c) 2010-15, Till Biskup
-% 2015-05-30
+% 2015-07-29
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -127,12 +127,12 @@ end
 
 % Compensate the pretrigger offset: Subtract mean value from time profile
 if vector
-    data = data - mean(data(1:triggerPosition-p.Results.cutRight));
+    data = data - mean(data(5:triggerPosition-p.Results.cutRight));
 else
     for k = 1 : size(data,1)
         data(k,:) = ...
             data(k,:) - ...
-            mean(data(k,1:triggerPosition-p.Results.cutRight));
+            mean(data(k,5:triggerPosition-p.Results.cutRight));
     end
 end
 
