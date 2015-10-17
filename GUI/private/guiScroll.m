@@ -7,14 +7,15 @@ function guiScroll(dimension,step)
 %                 if string, one of {'first','last','end'}
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-05-30
+% 2015-10-17
 
 try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.UsedByGUIData_m;
+    %gh = guihandles(mainWindow);
     
     % For convenience and shorter lines
     active = ad.control.data.active;

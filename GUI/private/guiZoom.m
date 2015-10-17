@@ -5,15 +5,16 @@ function guiZoom(action)
 %     action    - string
 %                 Action to be performed: on|off|reset
 
-% Copyright (c) 2013, Till Biskup
-% 2013-08-24
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-17
 
 try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.UsedByGUIData_m;
+    %gh = guihandles(mainWindow);
     
     % Somehow, MATLAB(TM) seems inapt to save the main Axis handle to gh
     mainAxis = ad.UsedByGUIData_m.mainAxis;

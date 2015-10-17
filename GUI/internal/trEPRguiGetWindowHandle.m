@@ -20,8 +20,8 @@ function handle = trEPRguiGetWindowHandle(varargin)
 %
 % If no handle could be found, an empty cell array will be returned.
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-06-05
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-17
 
 try
     % Check whether we are called with input argument
@@ -38,11 +38,10 @@ try
     % conventions of naming GUI windows
     
     % Get GUI window filenames
-    guiFileNames = struct2cell(...
-        dir(fullfile(trEPRinfo('dir'),'GUI','trEPR*window.m')));
-    guiFileNames = guiFileNames(1,:);
-    guiSubWindowNames = struct2cell(...
-        dir(fullfile(trEPRinfo('dir'),'GUI','private','trEPR*window.m')));
+    guiFileNames = getFilenames(...
+        fullfile(trEPRinfo('dir'),'GUI','trEPR*window.m'));
+    guiSubWindowNames = getFilenames(...
+        fullfile(trEPRinfo('dir'),'GUI','private','trEPR*window.m'));
     % Get module subdirectories - do it generically for all modules
     moduleDirs = struct2cell(dir(fullfile(trEPRinfo('dir'),'modules')));
     moduleDirs = moduleDirs(1,[moduleDirs{4,:}]);
@@ -84,5 +83,13 @@ catch exception
         throw(exception);
     end
 end
+
+end
+
+function filenames = getFilenames(dirString)
+
+files = dir(dirString);
+filenames = {files.name};
+
 
 end
