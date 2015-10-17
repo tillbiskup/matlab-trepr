@@ -5,8 +5,8 @@ function p = platform
 %
 %   See also: COMPUTER
 
-% Copyright (c) 2007-12, Till Biskup
-% 2012-06-26
+% Copyright (c) 2007-15, Till Biskup
+% 2015-10-17
 
 % find platform OS
 
@@ -17,11 +17,9 @@ if exist('matlabroot','builtin')
         [fail, input] = unix('sw_vers');
         
         if ~fail
-            p = strrep(input, 'ProductName:', '');
-            p = strrep(p, sprintf('\t'), '');
-            p = strrep(p, sprintf('\n'), ' ');
-            p = strrep(p, 'ProductVersion:', ' Version: ');
-            p = strrep(p, 'BuildVersion:', 'Build: ');
+            p = regexprep(input,{'ProductName:','\t','\n',...
+                'ProductVersion:','BuildVersion:'},...
+                {'','',' ',' Version: ','Build: '});
         else
             p = system_dependent('getos');
         end

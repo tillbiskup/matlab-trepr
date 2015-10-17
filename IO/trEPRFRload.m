@@ -30,7 +30,7 @@ function [data,varargout] = trEPRFRload(filename,varargin)
 % SEE ALSO: trEPRload
 
 % Copyright (c) 2015, Till Biskup
-% 2015-10-13
+% 2015-10-17
 
 % Assign default output
 data = [];
@@ -101,7 +101,7 @@ function [data,parameters] = readFormat1(fileContents)
 parameters = parseHeader(fileContents(2:5));
 
 % Line 6 to end contain the actual data
-data = str2num([fileContents{6:end}]); %#ok<ST2NM>
+data = sscanf([fileContents{6:end}],'%f')';
 
 end
 

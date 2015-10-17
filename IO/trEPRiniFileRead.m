@@ -39,7 +39,7 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 % See also: trEPRiniFileWrite
 
 % Copyright (c) 2008-15, Till Biskup, Bernd Paulus
-% 2015-10-14
+% 2015-10-17
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -81,22 +81,8 @@ end
 warnings = cell(0);
 data = struct();
 
-try
-    fh = fopen(fileName);
-    iniFileContents = cell(0);
-    k=1;
-    while 1
-        tline = fgetl(fh);
-        if ~ischar(tline)
-            break
-        end
-        iniFileContents{k} = tline;
-        k=k+1;
-    end
-    fclose(fh);
-catch exception
-    throw(exception);
-end
+iniFileContents = textFileRead(fileName);
+
 
 % read parameters to structure
 

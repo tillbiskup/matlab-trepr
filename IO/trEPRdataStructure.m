@@ -42,7 +42,7 @@ function varargout = trEPRdataStructure(varargin)
 % See also TREPRLOAD.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-17
 
 % Version string of data structure
 versionString = '1.13';
@@ -51,6 +51,108 @@ if ~nargin && ~nargout
     help trEPRdataStructure
     return;
 end
+
+
+if nargin && ischar(varargin{1})
+    switch lower(varargin{1})
+        case 'structure'
+            if nargout
+                varargout{1} = createDataStructure(versionString);
+            end
+        case 'model'
+            if nargout
+                varargout{1} = createDataModel;
+            end
+        case 'check'
+            if nargin < 2
+                fprintf('No structure to check...\n');
+                return;
+            end
+            if ~isstruct(varargin{2})
+                fprintf('%s has wrong type',inputname(2));
+                return;
+            end
+            
+            [missingFields,wrongType] = ...
+                checkStructure(createDataModel,varargin{2},inputname(2));
+
+            if ~isempty(missingFields)
+                fprintf('There are missing fields:\n');
+                for k=1:length(missingFields)
+                    fprintf('  %s\n',char(missingFields{k}));
+                end
+            end
+            if ~isempty(wrongType)
+                fprintf('There are fields with wrong type:\n');
+                for k=1:length(wrongType)
+                    fprintf('  %s\n',char(wrongType{k}));
+                end
+            end
+            if isempty(missingFields) && isempty(wrongType)
+                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
+                    fprintf('Basic test passed! Structure seems fine...\n');
+                end
+            end
+            
+            varargout{1} = missingFields;
+            varargout{2} = wrongType;
+            
+        case {'history','historystructure','hstructure'}
+            if nargout
+                varargout{1} = createHistoryStructure;
+            end
+        case {'historymodel','hmodel'}
+            if nargout
+                varargout{1} = createHistoryModel;
+            end
+        case {'historycheck','hcheck'}
+            if nargin < 2
+                fprintf('No structure to check...\n');
+                return;
+            end
+            if ~isstruct(varargin{2})
+                fprintf('%s has wrong type',inputname(2));
+                return;
+            end
+            
+            [missingFields,wrongType] = ...
+                checkStructure(createHistoryModel,varargin{2},inputname(2));
+
+            if ~isempty(missingFields)
+                fprintf('There are missing fields:\n');
+                for k=1:length(missingFields)
+                    fprintf('  %s\n',char(missingFields{k}));
+                end
+            end
+            if ~isempty(wrongType)
+                fprintf('There are fields with wrong type:\n');
+                for k=1:length(wrongType)
+                    fprintf('  %s\n',char(wrongType{k}));
+                end
+            end
+            if isempty(missingFields) && isempty(wrongType)
+                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
+                    fprintf('Basic test passed! Structure seems fine...\n');
+                end
+            end
+            
+            varargout{1} = missingFields;
+            varargout{2} = wrongType;
+            
+        otherwise
+            fprintf('Command ''%s'' unknown\n',varargin{1});
+            return;
+    end
+else
+    if nargout
+        varargout{1} = dataStructure;
+    end
+end
+
+end
+
+
+function dataStructure = createDataStructure(versionString)
 
 % Create empty trEPR toolbox data structure
 dataStructure = struct();
@@ -405,6 +507,11 @@ dataStructure.format = struct(...
     'name','trEPR toolbox', ...
     'version',versionString ...
     );
+
+end
+
+
+function dataModel = createDataModel()
 
 % Create trEPR toolbox data model (structure with field types as values)
 dataModel = struct();
@@ -771,6 +878,10 @@ dataModel.format = struct(...
     'version','ischar' ...
     );
 
+end
+
+function historyStructure = createHistoryStructure()
+
 % Create history record
 historyStructure = struct(...
     'date',datestr(now,31),...
@@ -796,6 +907,10 @@ if isempty(historyStructure.system.username)
     historyStructure.system.username = getenv('USER'); 
 end
 
+end
+
+function historyModel = createHistoryModel()
+
 % Create history record data model (structure with field types as values)
 historyModel = struct(...
     'date','ischar',...
@@ -810,102 +925,6 @@ historyModel = struct(...
     'info','isstruct'...
     );
 
-
-if nargin && ischar(varargin{1})
-    switch lower(varargin{1})
-        case 'structure'
-            if nargout
-                varargout{1} = dataStructure;
-            end
-        case 'model'
-            if nargout
-                varargout{1} = dataModel;
-            end
-        case 'check'
-            if nargin < 2
-                fprintf('No structure to check...\n');
-                return;
-            end
-            if ~isstruct(varargin{2})
-                fprintf('%s has wrong type',inputname(2));
-                return;
-            end
-            
-            [missingFields,wrongType] = ...
-                checkStructure(dataModel,varargin{2},inputname(2));
-
-            if ~isempty(missingFields)
-                fprintf('There are missing fields:\n');
-                for k=1:length(missingFields)
-                    fprintf('  %s\n',char(missingFields{k}));
-                end
-            end
-            if ~isempty(wrongType)
-                fprintf('There are fields with wrong type:\n');
-                for k=1:length(wrongType)
-                    fprintf('  %s\n',char(wrongType{k}));
-                end
-            end
-            if isempty(missingFields) && isempty(wrongType)
-                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
-                    fprintf('Basic test passed! Structure seems fine...\n');
-                end
-            end
-            
-            varargout{1} = missingFields;
-            varargout{2} = wrongType;
-            
-        case {'history','historystructure','hstructure'}
-            if nargout
-                varargout{1} = historyStructure;
-            end
-        case {'historymodel','hmodel'}
-            if nargout
-                varargout{1} = historyModel;
-            end
-        case {'historycheck','hcheck'}
-            if nargin < 2
-                fprintf('No structure to check...\n');
-                return;
-            end
-            if ~isstruct(varargin{2})
-                fprintf('%s has wrong type',inputname(2));
-                return;
-            end
-            
-            [missingFields,wrongType] = ...
-                checkStructure(historyModel,varargin{2},inputname(2));
-
-            if ~isempty(missingFields)
-                fprintf('There are missing fields:\n');
-                for k=1:length(missingFields)
-                    fprintf('  %s\n',char(missingFields{k}));
-                end
-            end
-            if ~isempty(wrongType)
-                fprintf('There are fields with wrong type:\n');
-                for k=1:length(wrongType)
-                    fprintf('  %s\n',char(wrongType{k}));
-                end
-            end
-            if isempty(missingFields) && isempty(wrongType)
-                if nargin == 3 && ~strcmpi(varargin{3},'quiet')
-                    fprintf('Basic test passed! Structure seems fine...\n');
-                end
-            end
-            
-            varargout{1} = missingFields;
-            varargout{2} = wrongType;
-            
-        otherwise
-            fprintf('Command ''%s'' unknown\n',varargin{1});
-            return;
-    end
-else
-    if nargout
-        varargout{1} = dataStructure;
-    end
-end
 
 end
 
