@@ -38,8 +38,8 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %
 % See also: trEPRiniFileWrite
 
-% Copyright (c) 2008-13, Till Biskup, Bernd Paulus
-% 2013-04-07
+% Copyright (c) 2008-15, Till Biskup, Bernd Paulus
+% 2015-10-14
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -129,7 +129,7 @@ for k=1:length(iniFileContents)
             if ~isfield(data,blockname)
                 data.(blockname) = '';
             end
-                        
+        
             data.(blockname) = setCascadedField(data.(blockname),...
                 strtrim(names.key),strtrim(names.val),typeConversion);
         end
@@ -158,7 +158,7 @@ function struct = setCascadedField(struct,fieldName,value,typeConversion)
         if ~isempty(curlies)
             % In case of cell array adjust fieldName
             fieldName = fieldName(1:min(curlies));
-            if typeConversion && regexp('[','[\[0-9.]?') && ...
+            if typeConversion && any(regexp(value,'[\[0-9.]?')) && ...
                     ~isempty(str2num(value)) %#ok<ST2NM>
                 struct.(fieldName){cellind} = str2num(value); %#ok<ST2NM>
             else
@@ -169,7 +169,7 @@ function struct = setCascadedField(struct,fieldName,value,typeConversion)
                 struct.(fieldName){cellind} = [];
             end
         else
-            if typeConversion && regexp('[','[\[0-9.]?') && ...
+            if typeConversion && any(regexp(value,'[\[0-9.]?')) && ...
                     ~isempty(str2num(value)) %#ok<ST2NM>
                 struct.(fieldName) = str2num(value); %#ok<ST2NM>
             else

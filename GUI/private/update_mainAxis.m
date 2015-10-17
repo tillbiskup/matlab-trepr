@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-17
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -105,7 +105,6 @@ if length(ad.control.data.visible) == 1 || ad.control.axis.onlyActive
     setappdata(mainWindow,'control',ad.control);
 end
 
-% Plot depending on display type settings
 x = ad.data{active}.axes.data(1).values;
 y = ad.data{active}.axes.data(2).values;
 
@@ -182,9 +181,19 @@ switch ad.control.axis.displayType
             clims(2) = clims(2)+0.000000001;
         end
         % Do the actual plotting
+        % surf, while better for nonequidistant axes, doesn't work with
+        % (a) plotting - axes get exported to PDF as bitmap
+        % (b) 1D data such as averages and slices
+        % Therefore, we need some workaround for displaying data with
+        % jumps in their axes, probably temporary interpolation assuming
+        % equidistant data on the axes
+        [data,y] = interpMissing(data,y);
         imagesc(x,y,data,clims);
-        set(gca,'YDir','normal');
-        set(gca,'Tag','mainAxis');
+%         surf(x,y,data,'edgecolor','interp');
+%         view(2);
+%         set(gca,'CLim',clims)
+%         set(gca,'YDir','normal');
+%         set(gca,'Tag','mainAxis');
         % Plot axis labels
         xlabel(gca,...
             sprintf('{\\it %s} / %s',...
@@ -333,7 +342,7 @@ switch ad.control.axis.displayType
                 y = filterfun(y,ad.data{k}.display.smoothing.data(1).parameters);
             end
             % Apply scaling if necessary
-            if (ad.data{k}.display.scaling.data(1) ~= 0)
+            if (ad.data{k}.display.scaling.data(1) ~= 1)
                 x = linspace(...
                     (((x(end)-x(1))/2)+x(1))-((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
                     (((x(end)-x(1))/2)+x(1))+((x(end)-x(1))*ad.data{k}.display.scaling.data(1)/2),...
@@ -661,13 +670,13 @@ switch ad.control.axis.displayType
                 x = filterfun(x,ad.data{k}.display.smoothing.data(2).parameters.width);
             end
             % Apply scaling if necessary
-            if (ad.data{k}.display.scaling.data(2) ~= 0)
+            if (ad.data{k}.display.scaling.data(2) ~= 1)
                 y = linspace(...
                     (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                     (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                     length(y));
             end
-            if (ad.data{k}.display.scaling.data(3) ~= 0)
+            if (ad.data{k}.display.scaling.data(3) ~= 1)
                 x = x * ad.data{k}.display.scaling.data(3);
             end
             if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
@@ -771,13 +780,13 @@ switch ad.control.axis.displayType
                     x = filterfun(x,ad.data{k}.display.smoothing.data(2).parameters.width);
                 end
                 % Apply scaling if necessary
-                if (ad.data{k}.display.scaling.data(2) ~= 0)
+                if (ad.data{k}.display.scaling.data(2) ~= 1)
                     y = linspace(...
                         (((y(end)-y(1))/2)+y(1))-((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                         (((y(end)-y(1))/2)+y(1))+((y(end)-y(1))*ad.data{k}.display.scaling.data(2)/2),...
                         length(y));
                 end
-                if (ad.data{k}.display.scaling.data(3) ~= 0)
+                if (ad.data{k}.display.scaling.data(3) ~= 1)
                     x = x * ad.data{k}.display.scaling.data(3);
                 end
                 if ad.control.axis.stdev && isfield(ad.data{k},'avg') ...
@@ -1363,3 +1372,42 @@ end
 
 end
 
+function TF = isEquidistant(vector)
+
+diffs = vector(2:end)-vector(1:end-1);
+TF = all(diffs==diffs(1));
+
+end
+
+function [interpData,interpAxis] = interpMissing(data,axis)
+
+interpData = data;
+interpAxis = axis;
+
+if isEquidistant(axis)
+    return;
+end
+
+diffs = axis(2:end)-axis(1:end-1);
+
+% Assume that the axis is generally equidistant, but has holes
+holes = find(~eq(diffs,diffs(1)));
+
+% ATTENTION: Matlab seems somewhat stupid and makes rounding errors that
+% end up with inequalities that are not there... therefore, we have to
+% check carefully for the difference between two traces.
+for hole = length(holes):-1:1
+    % As noMissingTraces will be used for indexing, it needs to be
+    % integer-like
+    noMissingTraces = ...
+        round(((axis(holes(hole)+1)-axis(holes(hole)))/diffs(1))-1);
+    if noMissingTraces > 0
+        interpData = [...
+            interpData(1:holes(hole),:) ; ...
+            zeros(noMissingTraces,size(data,2)) ; ...
+            interpData(holes(hole)+1:end,:) ...
+            ];
+    end
+end
+
+end
