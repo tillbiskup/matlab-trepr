@@ -1374,6 +1374,12 @@ end
 
 function TF = isEquidistant(vector)
 
+TF = true;
+
+if length(vector) < 2
+    return;
+end
+
 diffs = vector(2:end)-vector(1:end-1);
 TF = all(diffs==diffs(1));
 
