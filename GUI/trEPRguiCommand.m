@@ -21,8 +21,8 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-09-24
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-17
 
 status = 0;
 warnings = cell(0);
@@ -63,6 +63,16 @@ end
 % Handle comment lines - lines must start with comment character
 if any(strncmp(command,commentCharacter,1))
     status = -4;
+    return;
+end
+
+% Split multiple commands separated by "; "
+commandSeparator = '; ';
+if any(strfind(command,commandSeparator))
+    commands = regexp(command,commandSeparator,'split');
+    for iCommand = 1:length(commands)
+        [status,warnings] = trEPRguiCommand(commands{iCommand});
+    end
     return;
 end
 
@@ -129,14 +139,6 @@ ad = getappdata(mainWindow);
 ad.control.cmd.history{end+1} = command;
 ad.control.cmd.historypos = length(ad.control.cmd.history);
 setappdata(mainWindow,'control',ad.control);
-
-% Check whether to save history
-if ad.control.cmd.historysave
-    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(command);
-    if histsavestat
-        trEPRmsg(histsavewarn,'warn');
-    end
-end
 
 end
 

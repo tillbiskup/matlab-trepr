@@ -35,6 +35,14 @@ try
         end
     end
     
+    % Check whether to save history
+    if ad.control.cmd.historysave
+        [histsavestat,histsavewarn] = trEPRgui_cmd_saveHistory2File();
+        if histsavestat
+            trEPRmsg(histsavewarn,'warn');
+        end
+    end
+    
     % Close all GUI windows currently open
     delete(findobj('-regexp','Tag','trEPRgui_*'));
     

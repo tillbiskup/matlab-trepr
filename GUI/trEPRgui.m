@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-17
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -836,10 +836,7 @@ end
 % Check whether to save history -- and if so, write time stamp
 if ad.control.cmd.historysave
     timeStamp = ['%-- ' datestr(now,'yyyy-mm-dd HH:MM') ' --%'];
-    [histsavestat,histsavewarn] = trEPRgui_cmd_writeToFile(timeStamp);
-    if histsavestat
-        trEPRmsg(histsavewarn,'warn');
-    end
+    ad.control.cmd.history{end+1} = timeStamp;
 end
 
 % Make the GUI visible.

@@ -22,7 +22,7 @@ function trEPRplot(varargin)
 % (Hint: Matlab(r) input parser is used to parse parameters.)
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-05-30
+% 2015-10-17
 
 % PLEASE NOTE: The additional parameters are defined together with their
 %              default values in the subfunction parseAdditionalParameters
@@ -144,7 +144,8 @@ switch lower(parameters.dimension)
         end
     case '2d'
         % Plot
-        imagesc(x,y,dataset.data,parameters.zLimits);
+        [data,y] = interpMissing(dataset.data,y);
+        imagesc(x,y,data,parameters.zLimits);
         axisHandle.YDir = 'normal';
         axisHandle.XLim = parameters.xLimits;
         axisHandle.YLim = parameters.yLimits;
@@ -354,8 +355,10 @@ end
 function [dataset,x,y] = applyScaling(dataset,parameters,x,y)
 
 % Saling should be symmetric around the centre in x and y dimension
-x = (x-(max(x)-min(x))/2).*parameters.scaling(1) + (max(x)-min(x))/2;
-y = (y-(max(y)-min(y))/2).*parameters.scaling(2) + (max(y)-min(y))/2;
+x = (x-x(1)-(max(x)-min(x))/2).*parameters.scaling(1) ...
+    + (max(x)-min(x))/2 + x(1);
+y = (y-y(1)-(max(y)-min(y))/2).*parameters.scaling(2) ...
+    + (max(y)-min(y))/2 + y(1);
 dataset.data = dataset.data .* parameters.scaling(3);
 
 end
@@ -404,5 +407,52 @@ if isempty(unit) || all(isspace(unit))
 end
 
 axisLabel = sprintf('{\\it %s} / %s',measure,unit); 
+
+end
+
+
+function TF = isEquidistant(vector)
+
+TF = true;
+
+if length(vector) < 2
+    return;
+end
+
+diffs = vector(2:end)-vector(1:end-1);
+TF = all(diffs==diffs(1));
+
+end
+
+function [interpData,interpAxis] = interpMissing(data,axis)
+
+interpData = data;
+interpAxis = axis;
+
+if isEquidistant(axis)
+    return;
+end
+
+diffs = axis(2:end)-axis(1:end-1);
+
+% Assume that the axis is generally equidistant, but has holes
+holes = find(~eq(diffs,diffs(1)));
+
+% ATTENTION: Matlab seems somewhat stupid and makes rounding errors that
+% end up with inequalities that are not there... therefore, we have to
+% check carefully for the difference between two traces.
+for hole = length(holes):-1:1
+    % As noMissingTraces will be used for indexing, it needs to be
+    % integer-like
+    noMissingTraces = ...
+        round(((axis(holes(hole)+1)-axis(holes(hole)))/diffs(1))-1);
+    if noMissingTraces > 0
+        interpData = [...
+            interpData(1:holes(hole),:) ; ...
+            zeros(noMissingTraces,size(data,2)) ; ...
+            interpData(holes(hole)+1:end,:) ...
+            ];
+    end
+end
 
 end
