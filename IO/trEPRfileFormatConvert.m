@@ -13,7 +13,7 @@ function [data,varargout] = trEPRfileFormatConvert(data,varargin)
 % SEE ALSO TREPRLOAD, TREPRXMLZIPREAD
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-31
+% 2015-10-17
 
 % Parse input arguments using the inputParser functionality
 try
@@ -133,18 +133,6 @@ if commonVersionLessThan(version,'1.4')
 end
 
 if commonVersionLessThan(version,'1.5')
-    if isnumeric(data.parameters.field.start)
-        data.parameters.field.start.value = data.parameters.field.start;
-        data.parameters.field.start.unit = data.axes.y.unit;
-        data.parameters.field.stop.value = data.parameters.field.stop;
-        data.parameters.field.stop.unit = data.axes.y.unit;
-        data.parameters.field.step.value = data.parameters.field.step;
-        data.parameters.field.step.unit = data.axes.y.unit;
-    end
-    if isnumeric(data.parameters.transient.length)
-        data.parameters.transient.length.value = data.parameters.transient.length;
-        data.parameters.transient.length.unit = data.axes.x.unit;
-    end
     if ~isempty(data.parameters.bridge.calibration)
         if length(data.parameters.bridge.calibration) > 1
             data.parameters.bridge.calibration.start.value = ...
@@ -166,6 +154,18 @@ if commonVersionLessThan(version,'1.5')
 end
 
 if commonVersionLessThan(version,'1.6')
+    if isnumeric(data.parameters.field.start)
+        data.parameters.field.start.value = data.parameters.field.start;
+        data.parameters.field.start.unit = data.axes.y.unit;
+        data.parameters.field.stop.value = data.parameters.field.stop;
+        data.parameters.field.stop.unit = data.axes.y.unit;
+        data.parameters.field.step.value = data.parameters.field.step;
+        data.parameters.field.step.unit = data.axes.y.unit;
+    end
+    if isnumeric(data.parameters.transient.length)
+        data.parameters.transient.length.value = data.parameters.transient.length;
+        data.parameters.transient.length.unit = data.axes.x.unit;
+    end
     data.parameters.purpose = {''};
     data.sample.buffer = {''};
 end

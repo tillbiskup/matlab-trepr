@@ -17,7 +17,7 @@ function [data,warnings] = trEPRbrukerBES3Tload(filename)
 % In such case, warning may hold some further information what happened.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-17
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -168,7 +168,7 @@ try
     
     % Preassign values to the data struct
     data = trEPRdataStructure;
-        
+    
     % Create axes vectors
     data.axes.data(1).values = linspace(...
         parameters.XMIN,...
@@ -296,45 +296,10 @@ try
         31);
     
     % Handle origdata
-    content.origdata = content.data;
-    content.axes.origdata = content.axes.data;
+    data.origdata = data.data;
+    data.axes.origdata = data.axes.data;
 catch exception
     throw(exception);
 end
 
-end
-
-
-% --- Get field of cascaded struct
-function value = commonGetCascadedField (struct, fieldName)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    switch length(nDots)
-        case 0
-            value = struct.(fieldName);
-        case 1
-            value = struct.(fieldName(1:nDots(1)-1)).(...
-                fieldName(nDots(1)+1:length(fieldName)));
-        otherwise
-            value = '';
-    end
-end
-
-% --- Set field of cascaded struct
-function struct = commonSetCascadedField (struct, fieldName, value)
-    % Get number of "." in fieldName
-    nDots = strfind(fieldName,'.');
-    if isempty(nDots)
-        struct.(fieldName) = value;
-    else
-        if ~isfield(struct,fieldName(1:nDots(1)-1))
-            struct.(fieldName(1:nDots(1)-1)) = [];
-        end
-        innerstruct = struct.(fieldName(1:nDots(1)-1));
-        innerstruct = commonSetCascadedField(...
-            innerstruct,...
-            fieldName(nDots(1)+1:end),...
-            value);
-        struct.(fieldName(1:nDots(1)-1)) = innerstruct;
-    end
 end

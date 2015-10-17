@@ -27,7 +27,7 @@ function struct = commonSetCascadedField(struct, fieldName, value, varargin)
 
 % Copyright (c) 2011-15, Till Biskup
 % Copyright (c) 2011-13, Bernd Paulus
-% 2015-05-27
+% 2015-10-17
 
 try
     % Get number of "." in fieldName
@@ -35,6 +35,7 @@ try
     curlies = strfind(fieldName,'{');
     brackets = strfind(fieldName,'(');
     currentIsCell = false;
+    currentIsArray = false;
     % if target field is cell array
     if ~isempty(curlies)
         % ... get index of first cell array call
@@ -87,6 +88,14 @@ try
             % Set logical switch
             currentIsCell = true;
         end
+        % In case of array of structs adjust fieldName
+        if ~isempty(brackets) && min(brackets) < nDots(1)
+            fieldName(min(brackets):nDots(1)-1) = [];
+            % Don't forget to refresh nDots
+            nDots = strfind(fieldName,'.');
+            % Set logical switch
+            currentIsArray = true;
+        end
         % If fieldName is not a field of struct, remove it
         if ~isfield(struct,fieldName(1:nDots(1)-1))
             struct.(fieldName(1:nDots(1)-1)) = [];
@@ -98,7 +107,10 @@ try
                 struct.(fieldName(1:nDots(1)-1)) = cell(1);
             end
             innerstruct = struct.(fieldName(1:nDots(1)-1)){cellind};
+        elseif currentIsArray
+            innerstruct = struct.(fieldName(1:nDots(1)-1))(arrayind);
         else
+
             innerstruct = struct.(fieldName(1:nDots(1)-1));
         end
         % ... and call this function again
@@ -117,6 +129,8 @@ try
         % Write result to output
         if currentIsCell
             struct.(fieldName(1:nDots(1)-1)){cellind} = innerstruct;
+        elseif currentIsArray
+            struct.(fieldName(1:nDots(1)-1))(arrayind) = innerstruct;
         else
             struct.(fieldName(1:nDots(1)-1)) = innerstruct;
         end

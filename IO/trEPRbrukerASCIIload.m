@@ -18,7 +18,7 @@ function [ data, warnings ] = trEPRbrukerASCIIload(filename)
 % In such case, warning may hold some further information what happened.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-17
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -110,8 +110,8 @@ try
     data.parameters.transient.length.unit = data.axes.data(1).unit;
     
     % Handle origdata
-    content.origdata = content.data;
-    content.axes.origdata = content.axes.data;
+    data.origdata = data.data;
+    data.axes.origdata = data.axes.data;
 catch exception
     throw(exception);
 end
