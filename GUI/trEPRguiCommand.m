@@ -22,7 +22,7 @@ function [status,warnings] = trEPRguiCommand(command,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -35,13 +35,19 @@ if (nargin==0)
     return;
 end
 
-% Parse input arguments using the inputParser functionality
-p = inputParser;            % Create an instance of the inputParser class.
-p.FunctionName = mfilename; % Include function name in error messages
-p.KeepUnmatched = true;     % Enable errors on unmatched arguments
-p.StructExpand = true;      % Enable passing arguments in a structure
-p.addRequired('command', @(x)ischar(x));
-p.parse(command,varargin{:});
+try
+    % Parse input arguments using the inputParser functionality
+    p = inputParser;            % Create inputParser instance.
+    p.FunctionName = mfilename; % Include function name in error messages
+    p.KeepUnmatched = true;     % Enable errors on unmatched arguments
+    p.StructExpand = true;      % Enable passing arguments in a structure
+    p.addRequired('command', @(x)ischar(x));
+    p.addParamValue('writeHistory',logical(true),@islogical);
+    p.parse(command,varargin{:});
+catch exception
+    disp(['(EE) ' exception.message]);
+    return;
+end
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -60,6 +66,11 @@ if isempty(command)
     return;
 end
 
+% Add command to command history
+if p.Results.writeHistory
+    addCommandToHistory(command,mainWindow);
+end
+
 % Handle comment lines - lines must start with comment character
 if any(strncmp(command,commentCharacter,1))
     status = -4;
@@ -71,13 +82,11 @@ commandSeparator = '; ';
 if any(strfind(command,commandSeparator))
     commands = regexp(command,commandSeparator,'split');
     for iCommand = 1:length(commands)
-        [status,warnings] = trEPRguiCommand(commands{iCommand});
+        [status,warnings] = ...
+            trEPRguiCommand(commands{iCommand},'writeHistory',false);
     end
     return;
 end
-
-% Add command to command history
-addCommandToHistory(command,mainWindow);
 
 % For future use: parse command, split it at spaces, use first part as
 % command, all other parts as options

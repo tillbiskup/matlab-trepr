@@ -1,4 +1,4 @@
-function varargout = trEPRload(filename, varargin)
+function [data,warnings] = trEPRload(filename, varargin)
 % TREPRLOAD Load files or scans whole directories for readable files
 %
 % Usage
@@ -33,7 +33,7 @@ function varargout = trEPRload(filename, varargin)
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
 % Copyright (c) 2009-2015, Till Biskup
-% 2015-10-13
+% 2015-10-18
 
 % Assign default output
 data = struct();
@@ -99,6 +99,10 @@ if iscell(data) && p.Results.combine
     end
 end
 
+if isempty(filename)
+    return;
+end
+
 % Replace "filename" with single string
 if iscell(filename)
     filename = filename{1};
@@ -117,9 +121,6 @@ if ~nargout
     name = cleanFileName([name ext]);
     assignVariableInWorkspace(name,data);
     assignin('base','warnings',warnings);
-else
-    varargout{1} = data;
-    varargout{2} = warnings;
 end
     
 end
@@ -238,8 +239,6 @@ function [data,warnings] = loadFile(filename)
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
                     data.data = data;
-                else
-                    data = data;
                 end
                 if ~iscell(data)
                     data.file.name = filename;
@@ -258,8 +257,6 @@ function [data,warnings] = loadFile(filename)
                 [data,warnings] = functionHandle(filename);
                 if ~isstruct(data) && ~iscell(data)
                     data.data = data;
-                else
-                    data = data;
                 end
                 if ~iscell(data)
                     data.file.name = filename;
@@ -269,7 +266,7 @@ function [data,warnings] = loadFile(filename)
             end
         end
         % else try to handle it with importdata
-        if ~exist('data')
+        if ~exist('data','var')
             data = importdata(filename);
             if isfield(data,'textdata')
                 data.header = data.textdata;

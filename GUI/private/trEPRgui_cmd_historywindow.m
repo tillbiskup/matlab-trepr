@@ -191,7 +191,7 @@ try
     end
     
     % Get handles of GUI
-    gh = getappdata(hMainFigure,'guiHandles');
+    gh = getappdata(trEPRguiGetWindowHandle(mfilename),'guiHandles');
     
     switch lower(action)
         case 'evaluate'

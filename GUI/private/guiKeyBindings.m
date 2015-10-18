@@ -105,6 +105,11 @@ try
         case 'f10'
             trEPRgui_statuswindow();
             return;
+        case 'f12'
+            fn = fullfile(trEPRinfo('dir'),'GUI','private','helptexts',...
+                'main','internal','ee');
+            textWindow(fn);
+            return;
         case 'delete'
             if ~ad.control.data.active
                 return;
