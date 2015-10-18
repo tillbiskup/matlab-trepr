@@ -6,8 +6,8 @@ function handle = panelInternal(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -255,144 +255,143 @@ uicontrol('Tag','internal_panel_cmd_run_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        % Get handles of main window
-%         gh = guihandles(mainWindow);
-
-        switch lower(action)
-            case 'directories'
-                trEPRgui_setdirectorieswindow();
-            case 'snapshothelp'
-                trEPRgui_helpwindow();
-            case 'cmdhelp'
-                trEPRgui_cmd_helpwindow();
-            case 'cmdhistory'
-                trEPRgui_cmd_historywindow();
-            case 'cmdrun'
-                trEPRgui_cmd_scriptSelectWindow();
-            case 'snapshotsave'
-                fileNameSuggested = fullfile(...
-                    ad.control.dirs.lastSnapshot,[datestr(now,30) '.mat']);
-                % Ask user for file name
-                [fileName,pathName] = uiputfile(...
-                    '*.mat',...
-                    'Get filename to save snapshot of the GUI to',...
-                    fileNameSuggested);
-                % If user aborts process, return
-                if fileName == 0
-                    return;
-                end
-                % Set path in GUI
-                if pathName ~= 0
-                    ad.control.dirs.lastSnapshot = pathName;
-                end
-                [status,warnings] = cmdSnapshot(mainWindow,{'save',fileName});
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
-            case 'snapshotload'
-                startDir = ad.control.dirs.lastSnapshot;
-                [fileName,pathName,~] = uigetfile(...
-                    '*.mat',...
-                    'Get filename to load snapshot of the GUI from',...
-                    'MultiSelect','off',...
-                    startDir...
-                    );
-                if fileName == 0
-                    return;
-                end
-                % Set path in GUI
-                if pathName ~= 0
-                    ad.control.dirs.lastSnapshot = pathName;
-                end
-                [status,warnings] = cmdSnapshot(mainWindow,{'load',fileName});
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
-            case 'snapshotshow'
-                trEPRgui_snapshot_showwindow();
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case 'directories'
+            trEPRgui_setdirectorieswindow();
+        case 'snapshothelp'
+            trEPRgui_helpwindow();
+        case 'cmdhelp'
+            trEPRgui_cmd_helpwindow();
+        case 'cmdhistory'
+            trEPRgui_cmd_historywindow();
+        case 'cmdrun'
+            trEPRgui_cmd_scriptSelectWindow();
+        case 'snapshotsave'
+            fileNameSuggested = fullfile(...
+                ad.control.dirs.lastSnapshot,[datestr(now,30) '.mat']);
+            % Ask user for file name
+            [fileName,pathName] = uiputfile(...
+                '*.mat',...
+                'Get filename to save snapshot of the GUI to',...
+                fileNameSuggested);
+            % If user aborts process, return
+            if fileName == 0
+                return;
+            end
+            % Set path in GUI
+            if pathName ~= 0
+                ad.control.dirs.lastSnapshot = pathName;
+            end
+            [status,warnings] = cmdSnapshot(mainWindow,{'save',fileName});
+            if status
+                trEPRmsg(warnings,'warning');
+            end
+        case 'snapshotload'
+            startDir = ad.control.dirs.lastSnapshot;
+            [fileName,pathName,~] = uigetfile(...
+                '*.mat',...
+                'Get filename to load snapshot of the GUI from',...
+                'MultiSelect','off',...
+                startDir...
+                );
+            if fileName == 0
+                return;
+            end
+            % Set path in GUI
+            if pathName ~= 0
+                ad.control.dirs.lastSnapshot = pathName;
+            end
+            [status,warnings] = cmdSnapshot(mainWindow,{'load',fileName});
+            if status
+                trEPRmsg(warnings,'warning');
+            end
+        case 'snapshotshow'
+            trEPRgui_snapshot_showwindow();
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        values = cellstr(get(source,'String'));
-        value = values{get(source,'Value')};
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-
-        switch lower(action)
-            case 'debug'
-                ad.control.messages.debug.level = lower(value);
-            case 'display'
-                ad.control.messages.display.level = lower(value);
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Set appdata
-        setappdata(mainWindow,'control',ad.control);
-        
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    values = cellstr(get(source,'String'));
+    value = values{get(source,'Value')};
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case 'debug'
+            ad.control.messages.debug.level = lower(value);
+        case 'display'
+            ad.control.messages.display.level = lower(value);
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    
+    % Set appdata
+    setappdata(mainWindow,'control',ad.control);
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function checkbox_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-
-        switch lower(action)
-            case 'cmdsavehistory'
-                ad.control.cmd.historysave = get(source,'Value');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Set appdata
-        setappdata(mainWindow,'control',ad.control);
-        
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case 'cmdsavehistory'
+            ad.control.cmd.historysave = get(source,'Value');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    
+    % Set appdata
+    setappdata(mainWindow,'control',ad.control);
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-end

@@ -22,7 +22,7 @@ function [status,warnings] = cmdExport(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -143,7 +143,7 @@ if_warnings = cell(0);
 
 % Get appdata and handles of handle
 ad = getappdata(handle);
-gh = guihandles(handle);
+gh = ad.guiHandles;
 
 % Get export format
 figExportFormats = cellstr(...
@@ -297,7 +297,7 @@ if_warnings = cell(0);
 
 % Get appdata and handles of handle
 ad = getappdata(handle);
-gh = guihandles(handle);
+gh = ad.guiHandles;
 
 % Set default options
 multipleFiles = get(...
@@ -577,7 +577,7 @@ if_warnings = cell(0);
 
 % Get appdata and handles of handle
 ad = getappdata(handle);
-gh = guihandles(handle);
+gh = ad.guiHandles;
 
 % Handle additional options
 % Please note: These options of the internal function are a subset of the

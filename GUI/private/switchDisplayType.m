@@ -5,14 +5,14 @@ function status = switchDisplayType(displayType)
 %
 % status      - return value of the function. Either 0 (OK) or -1 (failed)
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 try
     % Get appdata and handles of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     if strcmpi(get(gh.displaytype_popupmenu,'Enable'),'Off')
         % The display type menu is disabled, meaning that there is no data

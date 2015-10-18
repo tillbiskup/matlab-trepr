@@ -7,8 +7,8 @@ function handle = panelMeasure(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-20
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -388,6 +388,8 @@ try
     ad = getappdata(mainWindow);
     
     % Get guihandles of main window
+    % Need to use "guihandles" here, as ad.guiHandles doesn't contain the
+    % necessary handles when initialising GUI during startup
     gh = guihandles(mainWindow);
     
     set(gh.measure_panel_setslider_checkbox,...
@@ -397,83 +399,83 @@ catch exception
 end
 
 
+end
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function checkbox_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        switch lower(action)
-            case 'point'
-                ad.control.measure.setslider = get(source,'Value');
-            case 'characteristics'
-                ad.control.measure.setcharacteristics = get(source,'Value');
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case 'point'
+            ad.control.measure.setslider = get(source,'Value');
+        case 'characteristics'
+            ad.control.measure.setcharacteristics = get(source,'Value');
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update slider panel
+    update_sliderPanel();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function togglebutton_Callback(source,~,action)
-    try
-        switch lower(action)
-            case 'point'
-                if (get(source,'Value'))
-                    trEPRguiSetMode('pick');
-                else
-                    trEPRguiSetMode('none');
-                end
-            case 'distance'
-                if (get(source,'Value'))
-                    trEPRguiSetMode('measure');
-                else
-                    trEPRguiSetMode('none');
-                end
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    switch lower(action)
+        case 'point'
+            if (get(source,'Value'))
+                trEPRguiSetMode('pick');
+            else
+                trEPRguiSetMode('none');
+            end
+        case 'distance'
+            if (get(source,'Value'))
+                trEPRguiSetMode('measure');
+            else
+                trEPRguiSetMode('none');
+            end
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function pushbutton_Callback(~,~,action)
-    try
-        switch lower(action)
-            case 'clear'
-                guiMeasure('clear',0);
-                trEPRguiSetMode('none');
-            case 'poi'
-                cmdPoi(trEPRguiGetWindowHandle,cell(0));
-            case 'doi'
-                cmdDoi(trEPRguiGetWindowHandle,cell(0));
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    switch lower(action)
+        case 'clear'
+            guiMeasure('clear',0);
+            trEPRguiSetMode('none');
+        case 'poi'
+            cmdPoi(trEPRguiGetWindowHandle,cell(0));
+        case 'doi'
+            cmdDoi(trEPRguiGetWindowHandle,cell(0));
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-end

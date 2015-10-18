@@ -6,8 +6,8 @@ function guiKeyBindings(src,evt)
 %     src - handle of calling source
 %     evt - actual event, struct with fields "Character", "Modifier", "Key"
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-09-22
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 try
     if isempty(evt.Character) && isempty(evt.Key)
@@ -19,7 +19,7 @@ try
     % Get appdata and handles of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % Use "src" to distinguish between callers - may be helpful later on
     

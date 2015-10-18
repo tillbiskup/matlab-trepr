@@ -3,8 +3,8 @@ function varargout = trEPRgui_moduleswindow()
 % installed for the trEPR toolbox, including links to the toolbox modules'
 % homepage.
 
-% Copyright (c) 2012-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2012-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -186,7 +186,7 @@ uicontrol('Tag','close_pushbutton',...
 
 % Set guihandles
 gh = guihandles;
-guidata(hMainFigure,gh);
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -246,7 +246,9 @@ end
     function listbox_Callback(source,~)
         try
             % Get gui handles
-            gh = guihandles(hMainFigure);
+            mainWindow = trEPRguiGetWindowHandle(mfilename);
+            ad = getappdata(mainWindow);
+            gh = ad.guiHandles;
             
             % Get name of currently selected list entry
             moduleNames = cellstr(get(source,'String'));
@@ -284,7 +286,7 @@ end
 
     function closeWindow(~,~)
         try
-            delete(hMainFigure);
+            delete(trEPRguiGetWindowHandle(mfilename));
             trEPRmsg('Modules window closed.','debug');
         catch exception
             trEPRexceptionHandling(exception);

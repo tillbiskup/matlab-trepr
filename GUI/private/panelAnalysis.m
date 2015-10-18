@@ -7,7 +7,7 @@ function handle = panelAnalysis(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -177,10 +177,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
-    
-    % Get handles of main window
-    gh = guihandles(mainWindow);
-    
+
     active = ad.control.data.active;
     
     switch lower(action)
@@ -188,7 +185,6 @@ try
             if ~ad.control.data.active
                 return;
             end
-            active = ad.control.data.active;
             if isscalar(ad.data{active}.parameters.bridge.MWfrequency.value) && ...
                     ~isfield(ad.data{active}.parameters.bridge.MWfrequency,'values') && ...
                     (~isfield(ad.data{active}.parameters.bridge.calibration,'values') || ...
@@ -205,7 +201,6 @@ try
             if ~ad.control.data.active
                 return;
             end
-            active = ad.control.data.active;
             if isscalar(ad.data{active}.axes.data(1).values) || ...
                     isscalar(ad.data{active}.axes.data(2).values)
                 msgbox('Currently active dataset has insufficient dimensions for net polarisation analysis.',...

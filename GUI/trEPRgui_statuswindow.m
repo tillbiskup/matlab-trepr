@@ -70,8 +70,8 @@ textdisplay = uicontrol('Tag','status_text',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
+% Store handles in appdata
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Apply configuration
 guiConfigApply(mfilename);

@@ -7,7 +7,7 @@ function varargout = trEPRgui_NetPolarisationwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -66,7 +66,7 @@ hButtonGroup = uibuttongroup('Tag','mainButtonGroup',...
     'Position', [guiSize(1)-mainPanelWidth-20 guiSize(2)-50 mainPanelWidth 30],...
     'Visible','on',...
     'SelectionChangeFcn',{@tbg_Callback});
-tb1 = uicontrol('Tag','analyse_togglebutton',...
+uicontrol('Tag','analyse_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -76,7 +76,7 @@ tb1 = uicontrol('Tag','analyse_togglebutton',...
     'pos',[0 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb2 = uicontrol('Tag','display_togglebutton',...
+uicontrol('Tag','display_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -86,7 +86,7 @@ tb2 = uicontrol('Tag','display_togglebutton',...
     'pos',[mainPanelWidth/3 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb3 = uicontrol('Tag','settings_togglebutton',...
+uicontrol('Tag','settings_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -1044,9 +1044,6 @@ exportFormats = trEPRiniFileRead(exportFormatsConfigFile);
 % Set export formats (geometries)
 set(hAxesExportFormat,'String',fieldnames(exportFormats));
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
-
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
 
@@ -1060,6 +1057,7 @@ setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 setappdata(hMainFigure,'NP',ad.NP);
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -1117,921 +1115,923 @@ colors = {...
     'k',[0 0 0]; ...
     'w',[1 1 1]; ...
     };
+setappdata(hMainFigure,'colors',colors);
 
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function tbg_Callback(source,~)
-    try 
-        switchPanel(get(get(source,'SelectedObject'),'String'));
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    switchPanel(get(get(source,'SelectedObject'),'String'));
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function edit_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-
-        value = str2double(strrep(get(source,'String'),',','.'));
-                
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        filterTypes = cellstr(...
-            get(gh.display_panel_smoothing_type_popupmenu,'String'));
-        filterType = filterTypes{...
-            get(gh.display_panel_smoothing_type_popupmenu,'Value')};
-        
-        active = ad.control.data.active;
-        NP = sum(ad.data{active}.data);
-        [~,x] = size(NP);
-        
-        switch lower(action)
-            case 'smoothingindex'
-                % Fix values: only integers >= 1
-                if (str2double(get(source,'String')) < 1) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String','1');
-                elseif (str2double(get(source,'String')) > x)
-                    set(source,'String',num2str(x));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String')))));
-                end
-                
-                % Set unit edit
-                time = linspace(1,x,x);
-                if (isfield(ad.data{active},'axes') ...
-                        && isfield(ad.data{active}.axes,'x') ...
-                        && isfield(ad.data{active}.axes.data(1),'values') ...
-                        && not (isempty(ad.data{active}.axes.data(1).values)))
-                    time = ad.data{active}.axes.data(1).values;
-                end
-                atomic = time(2)-time(1);
-                set(gh.processing_panel_smoothing_unit_edit,...
-                    'String',...
-                    num2str(atomic*str2double(get(source,'String')))...
-                    );
-                
-                ad.NP.smooth.window = ...
-                    str2double(get(source,'String'));
-                ad.NP.smooth.filterfun = ...
-                    sprintf('trEPRfilter_%s',filterType);
-
-                setappdata(mainWindow,'NP',ad.NP);
-                updateAxes();
-                return;                
-            case 'smoothingunit'
-                x = linspace(1,x,x);
-                if (isfield(ad.data{active},'axes') ...
-                        && isfield(ad.data{active}.axes,'x') ...
-                        && isfield(ad.data{active}.axes.data(1),'values') ...
-                        && not (isempty(ad.data{active}.axes.data(1).values)))
-                    x = ad.data{active}.axes.data(1).values;
-                end
-                
-                % Get "atomic" value
-                atomic = x(2)-x(1);
-                
-                % Fix values: only those in range of the axis are allowed
-                if (str2double(get(source,'String')) < atomic) || ...
-                        isnan(str2double(get(source,'String')))
-                    set(source,'String',num2str(atomic));
-                elseif (str2double(get(source,'String')) > (atomic*length(x)))
-                    set(source,'String',num2str(atomic*length(x)));
-                else
-                    set(source,...
-                        'String',...
-                        num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
-                        );
-                end
-                
-                set(gh.processing_panel_smoothing_points_edit,...
-                    'String',...
-                    num2str(round(str2double(get(source,'String'))/atomic))...
-                    );
-                
-                ad.NP.smooth.window = ...
-                    round(str2double(get(source,'String'))/atomic);
-                ad.NP.smooth.filterfun = ...
-                    sprintf('trEPRfilter_%s',filterType);
-
-                setappdata(mainWindow,'NP',ad.NP);
-                updateAxes();
-                return;                
-            case 'linewidth'
-                % Get line type
-                lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{ad.control.data.active}.display.lines.data.width = value;
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        ad.NP.line.width = value;
-                        setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        ad.NP.smooth.width = value;
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markersize'
-                % Get line type
-                lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{ad.control.data.active}.display.lines.data.marker.size = ...
-                            value;
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        ad.NP.line.marker.size = value;
-                        setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        ad.NP.smooth.marker.size = value;
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'averageareaalpha'
-                set(gh.areasettings_alpha_edit,'String',num2str(value));
-                ad.NP.area.patch.alpha = value;
-                setappdata(mainWindow,'NP',ad.NP);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    value = str2double(strrep(get(source,'String'),',','.'));
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    filterTypes = cellstr(...
+        get(gh.display_panel_smoothing_type_popupmenu,'String'));
+    filterType = filterTypes{...
+        get(gh.display_panel_smoothing_type_popupmenu,'Value')};
+    
+    active = ad.control.data.active;
+    NP = sum(ad.data{active}.data);
+    [~,x] = size(NP);
+    
+    switch lower(action)
+        case 'smoothingindex'
+            % Fix values: only integers >= 1
+            if (str2double(get(source,'String')) < 1) || ...
+                    isnan(str2double(get(source,'String')))
+                set(source,'String','1');
+            elseif (str2double(get(source,'String')) > x)
+                set(source,'String',num2str(x));
+            else
+                set(source,...
+                    'String',...
+                    num2str(round(str2double(get(source,'String')))));
+            end
+            
+            % Set unit edit
+            time = linspace(1,x,x);
+            if (isfield(ad.data{active},'axes') ...
+                    && isfield(ad.data{active}.axes,'x') ...
+                    && isfield(ad.data{active}.axes.data(1),'values') ...
+                    && not (isempty(ad.data{active}.axes.data(1).values)))
+                time = ad.data{active}.axes.data(1).values;
+            end
+            atomic = time(2)-time(1);
+            set(gh.processing_panel_smoothing_unit_edit,...
+                'String',...
+                num2str(atomic*str2double(get(source,'String')))...
+                );
+            
+            ad.NP.smooth.window = ...
+                str2double(get(source,'String'));
+            ad.NP.smooth.filterfun = ...
+                sprintf('trEPRfilter_%s',filterType);
+            
+            setappdata(mainWindow,'NP',ad.NP);
+            updateAxes();
+            return;
+        case 'smoothingunit'
+            x = linspace(1,x,x);
+            if (isfield(ad.data{active},'axes') ...
+                    && isfield(ad.data{active}.axes,'x') ...
+                    && isfield(ad.data{active}.axes.data(1),'values') ...
+                    && not (isempty(ad.data{active}.axes.data(1).values)))
+                x = ad.data{active}.axes.data(1).values;
+            end
+            
+            % Get "atomic" value
+            atomic = x(2)-x(1);
+            
+            % Fix values: only those in range of the axis are allowed
+            if (str2double(get(source,'String')) < atomic) || ...
+                    isnan(str2double(get(source,'String')))
+                set(source,'String',num2str(atomic));
+            elseif (str2double(get(source,'String')) > (atomic*length(x)))
+                set(source,'String',num2str(atomic*length(x)));
+            else
+                set(source,...
+                    'String',...
+                    num2str(round(str2double(get(source,'String'))/atomic)*atomic)...
+                    );
+            end
+            
+            set(gh.processing_panel_smoothing_points_edit,...
+                'String',...
+                num2str(round(str2double(get(source,'String'))/atomic))...
+                );
+            
+            ad.NP.smooth.window = ...
+                round(str2double(get(source,'String'))/atomic);
+            ad.NP.smooth.filterfun = ...
+                sprintf('trEPRfilter_%s',filterType);
+            
+            setappdata(mainWindow,'NP',ad.NP);
+            updateAxes();
+            return;
+        case 'linewidth'
+            % Get line type
+            lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+            switch lower(lineType)
+                case 'main'
+                    ad.data{ad.control.data.active}.display.lines.data.width = value;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    ad.NP.line.width = value;
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    ad.NP.smooth.width = value;
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markersize'
+            % Get line type
+            lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+            switch lower(lineType)
+                case 'main'
+                    ad.data{ad.control.data.active}.display.lines.data.marker.size = ...
+                        value;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    ad.NP.line.marker.size = value;
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    ad.NP.smooth.marker.size = value;
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'averageareaalpha'
+            set(gh.areasettings_alpha_edit,'String',num2str(value));
+            ad.NP.area.patch.alpha = value;
+            setappdata(mainWindow,'NP',ad.NP);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function togglebutton_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        % For those togglebuttons who do more complicated stuff
-        % Toggle button
-        if value % If toggle switched ON
-            switch lower(action)
-                case 'measurepick'
-                    % Switch off zoom
-                    zoom(mainWindow,'off');
-                    % Set pointer callback functions
-                    set(mainWindow,...
-                        'WindowButtonMotionFcn',@trackPointer);
-                    set(mainWindow,...
-                        'WindowButtonDownFcn',@switchMeasurePointer);
-                    return;
-                case 'zoom'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    % Reset other zoom toggle button
-                    zoom(mainWindow,'on');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridzero'
-                    ad.control.axis.grid.zero.visible = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'mean'
-                    ad.control.axis.mean = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'stdev'
-                    ad.control.axis.stdev = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'minmax'
-                    ad.control.axis.minmax = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        else % If toggle button switched OFF
-            switch lower(action)
-                case 'measurepick'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    return;
-                case 'zoom'
-                    zoom(mainWindow,'off');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridzero'
-                    ad.control.axis.grid.zero.visible = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'mean'
-                    ad.control.axis.mean = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'stdev'
-                    ad.control.axis.stdev = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'minmax'
-                    ad.control.axis.minmax = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    % For those togglebuttons who do more complicated stuff
+    % Toggle button
+    if value % If toggle switched ON
+        switch lower(action)
+            case 'measurepick'
+                % Switch off zoom
+                zoom(mainWindow,'off');
+                % Set pointer callback functions
+                set(mainWindow,...
+                    'WindowButtonMotionFcn',@trackPointer);
+                set(mainWindow,...
+                    'WindowButtonDownFcn',@switchMeasurePointer);
+                return;
+            case 'zoom'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                % Reset other zoom toggle button
+                zoom(mainWindow,'on');
+                return;
+            case 'gridx'
+                ad.control.axis.grid.x = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridy'
+                ad.control.axis.grid.y = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridzero'
+                ad.control.axis.grid.zero.visible = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'mean'
+                ad.control.axis.mean = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'stdev'
+                ad.control.axis.stdev = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'minmax'
+                ad.control.axis.minmax = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            otherwise
+                trEPRoptionUnknown(action);
+                return;
+        end
+    else % If toggle button switched OFF
+        switch lower(action)
+            case 'measurepick'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                return;
+            case 'zoom'
+                zoom(mainWindow,'off');
+                return;
+            case 'gridx'
+                ad.control.axis.grid.x = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridy'
+                ad.control.axis.grid.y = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridzero'
+                ad.control.axis.grid.zero.visible = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'mean'
+                ad.control.axis.mean = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'stdev'
+                ad.control.axis.stdev = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'minmax'
+                ad.control.axis.minmax = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            otherwise
+                trEPRoptionUnknown(action);
+                return;
+        end
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        % Make life easier
-        active = ad.control.data.active;
-        
-        % Return immediately if there is no active dataset
-        if isempty(active) || active == 0
-            return;
-        end
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-
-        switch action
-            case 'exportFigure'
-                % Open new figure window and make it invisible
-                newFig = figure('Visible','off');
-                
-                % Plot into new figure window
-                updateAxes(newFig);
-                
-                % Get export format
-                figExportFormats = cellstr(...
-                    get(gh.display_panel_axesexport_format_popupmenu,'String'));
-                exportFormat = figExportFormats{...
-                    get(gh.display_panel_axesexport_format_popupmenu,'Value')};
-                
-                % Get file type to save to
-                fileTypes = cellstr(...
-                    get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
-                fileType = fileTypes{...
-                    get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
-                
-                % Generate default file name if possible, be very defensive
-                if ad.control.data.visible
-                    [~,fileNameSuggested,~] = ...
-                        fileparts(ad.data{active}.file.name);
-                else
-                    fileNameSuggested = '';
-                end
-                
-                % Ask user for file name
-                [fileName,pathName] = uiputfile(...
-                    sprintf('*.%s',fileType),...
-                    'Get filename to export figure to',...
-                    [fileNameSuggested '-NetPolarisationPlot']);
-                % If user aborts process, return
-                if fileName == 0
-                    close(newFig);
-                    return;
-                end
-                % Create filename with full path
-                fileName = fullfile(pathName,fileName);
-                
-                % Save figure, depending on settings for file type and format
-                status = fig2file(newFig,fileName,...
-                    'fileType',fileType,'exportFormat',exportFormat);
-                if status
-                    trEPRmsg(status);
-                end
-                
-                % Close figure window
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Make life easier
+    active = ad.control.data.active;
+    
+    % Return immediately if there is no active dataset
+    if isempty(active) || active == 0
+        return;
+    end
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    switch action
+        case 'exportFigure'
+            % Open new figure window and make it invisible
+            newFig = figure('Visible','off');
+            
+            % Plot into new figure window
+            updateAxes(newFig);
+            
+            % Get export format
+            figExportFormats = cellstr(...
+                get(gh.display_panel_axesexport_format_popupmenu,'String'));
+            exportFormat = figExportFormats{...
+                get(gh.display_panel_axesexport_format_popupmenu,'Value')};
+            
+            % Get file type to save to
+            fileTypes = cellstr(...
+                get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
+            fileType = fileTypes{...
+                get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
+            
+            % Generate default file name if possible, be very defensive
+            if ad.control.data.visible
+                [~,fileNameSuggested,~] = ...
+                    fileparts(ad.data{active}.file.name);
+            else
+                fileNameSuggested = '';
+            end
+            
+            % Ask user for file name
+            [fileName,pathName] = uiputfile(...
+                sprintf('*.%s',fileType),...
+                'Get filename to export figure to',...
+                [fileNameSuggested '-NetPolarisationPlot']);
+            % If user aborts process, return
+            if fileName == 0
                 close(newFig);
                 return;
-            case 'lineColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.color)
-                            ad.data{active}.display.lines.data.color = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.color,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.data.color = uisetcolor(...
-                            ad.data{active}.display.lines.data.color,...
-                            'Set line colour');
+            end
+            % Create filename with full path
+            fileName = fullfile(pathName,fileName);
+            
+            % Save figure, depending on settings for file type and format
+            status = fig2file(newFig,fileName,...
+                'fileType',fileType,'exportFormat',exportFormat);
+            if status
+                trEPRmsg(status);
+            end
+            
+            % Close figure window
+            close(newFig);
+            return;
+        case 'lineColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.color)
+                        ad.data{active}.display.lines.data.color = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.color,...
+                            ad.colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.data.color = uisetcolor(...
+                        ad.data{active}.display.lines.data.color,...
+                        'Set line colour');
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    ad.NP.line.color = uisetcolor(...
+                        ad.NP.line.color,...
+                        'Set average frequency line colour');
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    ad.NP.smooth.color = uisetcolor(...
+                        ad.NP.line.color,...
+                        'Set average frequency line colour');
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerEdgeColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                        ad.data{active}.display.lines.data.marker.edgeColor = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
+                            ad.colors(:,1)),2};
+                    end
+                    newColour = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.edgeColor,...
+                        'Set line marker edge colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.data{active}.display.lines.data.marker.edgeColor = newColour;
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        ad.NP.line.color = uisetcolor(...
-                            ad.NP.line.color,...
-                            'Set average frequency line colour');
-                        setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        ad.NP.smooth.color = uisetcolor(...
-                            ad.NP.line.color,...
-                            'Set average frequency line colour');
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerEdgeColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
-                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                    end
+                case 'average pretrig np'
+                    if ischar(ad.NP.line.marker.edgeColor)
+                        if length(ad.NP.line.marker.edgeColor) == 1
+                            ad.NP.line.marker.edgeColor = ad.colors{...
                                 strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
-                                colors(:,1)),2};
+                                ad.colors(:,1)),2};
+                        else
+                            ad.NP.line.marker.edgeColor = [];
                         end
-                        newColour = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.edgeColor,...
-                            'Set line marker edge colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.display.lines.data.marker.edgeColor = newColour;
-                            setappdata(mainWindow,'data',ad.data);
+                    end
+                    newColour = uisetcolor(...
+                        ad.NP.line.marker.edgeColor,...
+                        'Set average line marker edge colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.NP.line.marker.edgeColor = newColour;
+                        setappdata(mainWindow,'NP',ad.NP);
+                    end
+                case 'smoothed np'
+                    if ischar(ad.NP.smooth.marker.edgeColor)
+                        if length(ad.NP.smooth.marker.edgeColor) == 1
+                            ad.NP.smooth.marker.edgeColor = ad.colors{...
+                                strcmpi(ad.data{active}.smooth.marker.edgeColor,...
+                                ad.colors(:,1)),2};
+                        else
+                            ad.NP.smooth.marker.edgeColor = [];
                         end
-                    case 'average pretrig np'
-                        if ischar(ad.NP.line.marker.edgeColor)
-                            if length(ad.NP.line.marker.edgeColor) == 1
-                                ad.NP.line.marker.edgeColor = colors{...
-                                    strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.NP.line.marker.edgeColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.NP.line.marker.edgeColor,...
-                            'Set average line marker edge colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.NP.line.marker.edgeColor = newColour;
-                            setappdata(mainWindow,'NP',ad.NP);
-                        end
-                    case 'smoothed np'
-                        if ischar(ad.NP.smooth.marker.edgeColor)
-                            if length(ad.NP.smooth.marker.edgeColor) == 1
-                                ad.NP.smooth.marker.edgeColor = colors{...
-                                    strcmpi(ad.data{active}.smooth.marker.edgeColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.NP.smooth.marker.edgeColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.NP.smooth.marker.edgeColor,...
-                            'Set smoothed NP line marker edge colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.NP.smooth.marker.edgeColor = newColour;
-                            setappdata(mainWindow,'NP',ad.NP);
-                        end
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerFaceColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
-                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
-                                colors(:,1)),2};
-                        end
-                        newColour = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.faceColor,...
-                            'Set MFoff line marker face colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.display.lines.data.marker.faceColor = newColour;
-                            setappdata(mainWindow,'data',ad.data);
-                        end
-                    case 'average pretrig np'
-                        if ischar(ad.NP.line.marker.faceColor)
-                            if length(ad.NP.line.marker.edgeColor) == 1
-                                ad.NP.line.marker.faceColor = colors{...
-                                    strcmpi(ad.NP.line.marker.faceColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.NP.line.marker.faceColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.NP.line.marker.faceColor,...
-                            'Set MFoff line marker face colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.NP.line.marker.faceColor = newColour;
-                            setappdata(mainWindow,'NP',ad.NP);
-                        end
-                    case 'smoothed np'
-                        if ischar(ad.NP.smooth.marker.faceColor)
-                            if length(ad.NP.smooth.marker.edgeColor) == 1
-                                ad.NP.smooth.marker.faceColor = colors{...
-                                    strcmpi(ad.NP.smooth.marker.faceColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.NP.smooth.marker.faceColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.NP.smooth.marker.faceColor,...
-                            'Set smoothed NP line marker face colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.NP.smooth.marker.faceColor = newColour;
-                            setappdata(mainWindow,'NP',ad.NP);
-                        end
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerDefaults'
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{active}.display.lines.data.marker.type = 'none';
-                        ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
-                        ad.data{active}.display.lines.data.marker.faceColor = 'none';
-                        ad.data{active}.display.lines.data.marker.size = 6;
+                    end
+                    newColour = uisetcolor(...
+                        ad.NP.smooth.marker.edgeColor,...
+                        'Set smoothed NP line marker edge colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.NP.smooth.marker.edgeColor = newColour;
+                        setappdata(mainWindow,'NP',ad.NP);
+                    end
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerFaceColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                        ad.data{active}.display.lines.data.marker.faceColor = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
+                            ad.colors(:,1)),2};
+                    end
+                    newColour = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.faceColor,...
+                        'Set MFoff line marker face colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.data{active}.display.lines.data.marker.faceColor = newColour;
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        ad.NP.line.marker.type = 'none';
-                        ad.NP.line.marker.edgeColor = 'auto';
-                        ad.NP.line.marker.faceColor = 'none';
-                        ad.NP.line.marker.size = 6;
+                    end
+                case 'average pretrig np'
+                    if ischar(ad.NP.line.marker.faceColor)
+                        if length(ad.NP.line.marker.edgeColor) == 1
+                            ad.NP.line.marker.faceColor = ad.colors{...
+                                strcmpi(ad.NP.line.marker.faceColor,...
+                                ad.colors(:,1)),2};
+                        else
+                            ad.NP.line.marker.faceColor = [];
+                        end
+                    end
+                    newColour = uisetcolor(...
+                        ad.NP.line.marker.faceColor,...
+                        'Set MFoff line marker face colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.NP.line.marker.faceColor = newColour;
                         setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        ad.NP.smooth.marker.type = 'none';
-                        ad.NP.smooth.marker.edgeColor = 'auto';
-                        ad.NP.smooth.marker.faceColor = 'none';
-                        ad.NP.smooth.marker.size = 6;
+                    end
+                case 'smoothed np'
+                    if ischar(ad.NP.smooth.marker.faceColor)
+                        if length(ad.NP.smooth.marker.edgeColor) == 1
+                            ad.NP.smooth.marker.faceColor = ad.colors{...
+                                strcmpi(ad.NP.smooth.marker.faceColor,...
+                                ad.colors(:,1)),2};
+                        else
+                            ad.NP.smooth.marker.faceColor = [];
+                        end
+                    end
+                    newColour = uisetcolor(...
+                        ad.NP.smooth.marker.faceColor,...
+                        'Set smoothed NP line marker face colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.NP.smooth.marker.faceColor = newColour;
                         setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;                
-            case 'averageareaColourPalette'
-                ad.NP.area.patch.color = uisetcolor(...
-                    ad.NP.area.patch.color,'Set std. dev. area colour');
-                setappdata(mainWindow,'NP',ad.NP);
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'avglineColourPalette'
-                ad.NP.line.color = uisetcolor(...
-                    ad.NP.line.color,'Set mean MW frequency line colour');
-                setappdata(mainWindow,'NP',ad.NP);
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'Close'
-                % Look for ACC GUI Help window and if its there, close as
-                % well
-                hHelpWindow = ...
-                    findobj('Tag','trEPRgui_NetPolarisation_helpwindow');
-                if ishandle(hHelpWindow)
-                    delete(hHelpWindow);
-                end
-                delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('Net polarisation analysis GUI window closed',...
-                    'debug');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+                    end
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerDefaults'
+            switch lower(lineType)
+                case 'main'
+                    ad.data{active}.display.lines.data.marker.type = 'none';
+                    ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
+                    ad.data{active}.display.lines.data.marker.faceColor = 'none';
+                    ad.data{active}.display.lines.data.marker.size = 6;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    ad.NP.line.marker.type = 'none';
+                    ad.NP.line.marker.edgeColor = 'auto';
+                    ad.NP.line.marker.faceColor = 'none';
+                    ad.NP.line.marker.size = 6;
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    ad.NP.smooth.marker.type = 'none';
+                    ad.NP.smooth.marker.edgeColor = 'auto';
+                    ad.NP.smooth.marker.faceColor = 'none';
+                    ad.NP.smooth.marker.size = 6;
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'averageareaColourPalette'
+            ad.NP.area.patch.color = uisetcolor(...
+                ad.NP.area.patch.color,'Set std. dev. area colour');
+            setappdata(mainWindow,'NP',ad.NP);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'avglineColourPalette'
+            ad.NP.line.color = uisetcolor(...
+                ad.NP.line.color,'Set mean MW frequency line colour');
+            setappdata(mainWindow,'NP',ad.NP);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'Close'
+            % Look for ACC GUI Help window and if its there, close as
+            % well
+            hHelpWindow = ...
+                findobj('Tag','trEPRgui_NetPolarisation_helpwindow');
+            if ishandle(hHelpWindow)
+                delete(hHelpWindow);
+            end
+            delete(trEPRguiGetWindowHandle(mfilename));
+            trEPRmsg('Net polarisation analysis GUI window closed',...
+                'debug');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata and handles of main window
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-        
-        % Get value
-        values = cellstr(get(source,'String'));
-        value = values{get(source,'Value')};
-
-        switch action
-            case 'line'
-                updateSettingsPanel();
-            case 'linestyle'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        switch value
-                            case 'solid'
-                                ad.data{active}.display.lines.data.style = '-';
-                            case 'dashed'
-                                ad.data{active}.display.lines.data.style = '--';
-                            case 'dotted'
-                                ad.data{active}.display.lines.data.style = ':';
-                            case 'dash-dotted'
-                                ad.data{active}.display.lines.data.style = '-.';
-                            case 'none'
-                                ad.data{active}.display.lines.data.style = 'none';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line style ' lineStyle]);
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        switch value
-                            case 'solid'
-                                ad.NP.line.style = '-';
-                            case 'dashed'
-                                ad.NP.line.style = '--';
-                            case 'dotted'
-                                ad.NP.line.style = ':';
-                            case 'dash-dotted'
-                                ad.NP.line.style = '-.';
-                            case 'none'
-                                ad.NP.line.style = 'none';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line style ' lineStyle]);
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        switch value
-                            case 'solid'
-                                ad.NP.smooth.style = '-';
-                            case 'dashed'
-                                ad.NP.smooth.style = '--';
-                            case 'dotted'
-                                ad.NP.smooth.style = ':';
-                            case 'dash-dotted'
-                                ad.NP.smooth.style = '-.';
-                            case 'none'
-                                ad.NP.smooth.style = 'none';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line style ' lineStyle]);
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'linemarker'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        switch value
-                            case 'none'
-                                ad.data{active}.display.lines.data.marker.type = 'none';
-                            case 'plus'
-                                ad.data{active}.display.lines.data.marker.type = '+';
-                            case 'circle'
-                                ad.data{active}.display.lines.data.marker.type = 'o';
-                            case 'asterisk'
-                                ad.data{active}.display.lines.data.marker.type = '*';
-                            case 'point'
-                                ad.data{active}.display.lines.data.marker.type = '.';
-                            case 'cross'
-                                ad.data{active}.display.lines.data.marker.type = 'x';
-                            case 'square'
-                                ad.data{active}.display.lines.data.marker.type = 's';
-                            case 'diamond'
-                                ad.data{active}.display.lines.data.marker.type = 'd';
-                            case 'triangle up'
-                                ad.data{active}.display.lines.data.marker.type = '^';
-                            case 'triangle down'
-                                ad.data{active}.display.lines.data.marker.type = 'v';
-                            case 'triangle right'
-                                ad.data{active}.display.lines.data.marker.type = '<';
-                            case 'triangle left'
-                                ad.data{active}.display.lines.data.marker.type = '>';
-                            case 'pentagram'
-                                ad.data{active}.display.lines.data.marker.type = 'p';
-                            case 'hexagram'
-                                ad.data{active}.display.lines.data.marker.type = 'h';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line marker ' lineMarker]);
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                        switch value
-                            case 'none'
-                                ad.NP.line.marker.type = 'none';
-                            case 'plus'
-                                ad.NP.line.marker.type = '+';
-                            case 'circle'
-                                ad.NP.line.marker.type = 'o';
-                            case 'asterisk'
-                                ad.NP.line.marker.type = '*';
-                            case 'point'
-                                ad.NP.line.marker.type = '.';
-                            case 'cross'
-                                ad.NP.line.marker.type = 'x';
-                            case 'square'
-                                ad.NP.line.marker.type = 's';
-                            case 'diamond'
-                                ad.NP.line.marker.type = 'd';
-                            case 'triangle up'
-                                ad.NP.line.marker.type = '^';
-                            case 'triangle down'
-                                ad.NP.line.marker.type = 'v';
-                            case 'triangle right'
-                                ad.NP.line.marker.type = '<';
-                            case 'triangle left'
-                                ad.NP.line.marker.type = '>';
-                            case 'pentagram'
-                                ad.NP.line.marker.type = 'p';
-                            case 'hexagram'
-                                ad.NP.line.marker.type = 'h';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line marker ' lineMarker]);
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    case 'smoothed np'
-                        switch value
-                            case 'none'
-                                ad.NP.smooth.marker.type = 'none';
-                            case 'plus'
-                                ad.NP.smooth.marker.type = '+';
-                            case 'circle'
-                                ad.NP.smooth.marker.type = 'o';
-                            case 'asterisk'
-                                ad.NP.smooth.marker.type = '*';
-                            case 'point'
-                                ad.NP.smooth.marker.type = '.';
-                            case 'cross'
-                                ad.NP.smooth.marker.type = 'x';
-                            case 'square'
-                                ad.NP.smooth.marker.type = 's';
-                            case 'diamond'
-                                ad.NP.smooth.marker.type = 'd';
-                            case 'triangle up'
-                                ad.NP.smooth.marker.type = '^';
-                            case 'triangle down'
-                                ad.NP.smooth.marker.type = 'v';
-                            case 'triangle right'
-                                ad.NP.smooth.marker.type = '<';
-                            case 'triangle left'
-                                ad.NP.smooth.marker.type = '>';
-                            case 'pentagram'
-                                ad.NP.smooth.marker.type = 'p';
-                            case 'hexagram'
-                                ad.NP.smooth.marker.type = 'h';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line marker ' lineMarker]);
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'markerEdgeColour'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.data.marker.edgeColor = ...
-                                ad.data{active}.display.lines.data.color;
-                        else
-                            ad.data{active}.display.lines.data.marker.edgeColor = value;
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                    case 'smoothed np'
-                        if strcmpi(value,'colour')
-                            ad.NP.smooth.marker.edgeColor = ...
-                                ad.NP.smooth.color;
-                        else
-                            ad.NP.smooth.marker.edgeColor = value;
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'markerFaceColour'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.data.marker.faceColor = ...
-                                ad.data{active}.display.lines.data.color;
-                        else
-                            ad.data{active}.display.lines.data.marker.faceColor = value;
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average pretrig np'
-                    case 'smoothed np'
-                        if strcmpi(value,'colour')
-                            ad.NP.smooth.marker.faceColor = ...
-                                ad.NP.smooth.color;
-                        else
-                            ad.NP.smooth.marker.faceColor = value;
-                        end
-                        setappdata(mainWindow,'NP',ad.NP);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata and handles of main window
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    % Get value
+    values = cellstr(get(source,'String'));
+    value = values{get(source,'Value')};
+    
+    switch action
+        case 'line'
+            updateSettingsPanel();
+        case 'linestyle'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    switch value
+                        case 'solid'
+                            ad.data{active}.display.lines.data.style = '-';
+                        case 'dashed'
+                            ad.data{active}.display.lines.data.style = '--';
+                        case 'dotted'
+                            ad.data{active}.display.lines.data.style = ':';
+                        case 'dash-dotted'
+                            ad.data{active}.display.lines.data.style = '-.';
+                        case 'none'
+                            ad.data{active}.display.lines.data.style = 'none';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line style ' lineStyle]);
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    switch value
+                        case 'solid'
+                            ad.NP.line.style = '-';
+                        case 'dashed'
+                            ad.NP.line.style = '--';
+                        case 'dotted'
+                            ad.NP.line.style = ':';
+                        case 'dash-dotted'
+                            ad.NP.line.style = '-.';
+                        case 'none'
+                            ad.NP.line.style = 'none';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line style ' lineStyle]);
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    switch value
+                        case 'solid'
+                            ad.NP.smooth.style = '-';
+                        case 'dashed'
+                            ad.NP.smooth.style = '--';
+                        case 'dotted'
+                            ad.NP.smooth.style = ':';
+                        case 'dash-dotted'
+                            ad.NP.smooth.style = '-.';
+                        case 'none'
+                            ad.NP.smooth.style = 'none';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line style ' lineStyle]);
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'linemarker'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    switch value
+                        case 'none'
+                            ad.data{active}.display.lines.data.marker.type = 'none';
+                        case 'plus'
+                            ad.data{active}.display.lines.data.marker.type = '+';
+                        case 'circle'
+                            ad.data{active}.display.lines.data.marker.type = 'o';
+                        case 'asterisk'
+                            ad.data{active}.display.lines.data.marker.type = '*';
+                        case 'point'
+                            ad.data{active}.display.lines.data.marker.type = '.';
+                        case 'cross'
+                            ad.data{active}.display.lines.data.marker.type = 'x';
+                        case 'square'
+                            ad.data{active}.display.lines.data.marker.type = 's';
+                        case 'diamond'
+                            ad.data{active}.display.lines.data.marker.type = 'd';
+                        case 'triangle up'
+                            ad.data{active}.display.lines.data.marker.type = '^';
+                        case 'triangle down'
+                            ad.data{active}.display.lines.data.marker.type = 'v';
+                        case 'triangle right'
+                            ad.data{active}.display.lines.data.marker.type = '<';
+                        case 'triangle left'
+                            ad.data{active}.display.lines.data.marker.type = '>';
+                        case 'pentagram'
+                            ad.data{active}.display.lines.data.marker.type = 'p';
+                        case 'hexagram'
+                            ad.data{active}.display.lines.data.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line marker ' lineMarker]);
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                    switch value
+                        case 'none'
+                            ad.NP.line.marker.type = 'none';
+                        case 'plus'
+                            ad.NP.line.marker.type = '+';
+                        case 'circle'
+                            ad.NP.line.marker.type = 'o';
+                        case 'asterisk'
+                            ad.NP.line.marker.type = '*';
+                        case 'point'
+                            ad.NP.line.marker.type = '.';
+                        case 'cross'
+                            ad.NP.line.marker.type = 'x';
+                        case 'square'
+                            ad.NP.line.marker.type = 's';
+                        case 'diamond'
+                            ad.NP.line.marker.type = 'd';
+                        case 'triangle up'
+                            ad.NP.line.marker.type = '^';
+                        case 'triangle down'
+                            ad.NP.line.marker.type = 'v';
+                        case 'triangle right'
+                            ad.NP.line.marker.type = '<';
+                        case 'triangle left'
+                            ad.NP.line.marker.type = '>';
+                        case 'pentagram'
+                            ad.NP.line.marker.type = 'p';
+                        case 'hexagram'
+                            ad.NP.line.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line marker ' lineMarker]);
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                case 'smoothed np'
+                    switch value
+                        case 'none'
+                            ad.NP.smooth.marker.type = 'none';
+                        case 'plus'
+                            ad.NP.smooth.marker.type = '+';
+                        case 'circle'
+                            ad.NP.smooth.marker.type = 'o';
+                        case 'asterisk'
+                            ad.NP.smooth.marker.type = '*';
+                        case 'point'
+                            ad.NP.smooth.marker.type = '.';
+                        case 'cross'
+                            ad.NP.smooth.marker.type = 'x';
+                        case 'square'
+                            ad.NP.smooth.marker.type = 's';
+                        case 'diamond'
+                            ad.NP.smooth.marker.type = 'd';
+                        case 'triangle up'
+                            ad.NP.smooth.marker.type = '^';
+                        case 'triangle down'
+                            ad.NP.smooth.marker.type = 'v';
+                        case 'triangle right'
+                            ad.NP.smooth.marker.type = '<';
+                        case 'triangle left'
+                            ad.NP.smooth.marker.type = '>';
+                        case 'pentagram'
+                            ad.NP.smooth.marker.type = 'p';
+                        case 'hexagram'
+                            ad.NP.smooth.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line marker ' lineMarker]);
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'markerEdgeColour'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.data.marker.edgeColor = ...
+                            ad.data{active}.display.lines.data.color;
+                    else
+                        ad.data{active}.display.lines.data.marker.edgeColor = value;
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                case 'smoothed np'
+                    if strcmpi(value,'colour')
+                        ad.NP.smooth.marker.edgeColor = ...
+                            ad.NP.smooth.color;
+                    else
+                        ad.NP.smooth.marker.edgeColor = value;
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'markerFaceColour'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.data.marker.faceColor = ...
+                            ad.data{active}.display.lines.data.color;
+                    else
+                        ad.data{active}.display.lines.data.marker.faceColor = value;
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average pretrig np'
+                case 'smoothed np'
+                    if strcmpi(value,'colour')
+                        ad.NP.smooth.marker.faceColor = ...
+                            ad.NP.smooth.color;
+                    else
+                        ad.NP.smooth.marker.faceColor = value;
+                    end
+                    setappdata(mainWindow,'NP',ad.NP);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function slider_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        switch lower(action)
-            case 'averageareaalpha'
-                set(gh.areasettings_alpha_edit,'String',num2str(value));
-                ad.NP.area.patch.alpha = value;
-                setappdata(mainWindow,'NP',ad.NP);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    switch lower(action)
+        case 'averageareaalpha'
+            set(gh.areasettings_alpha_edit,'String',num2str(value));
+            ad.NP.area.patch.alpha = value;
+            setappdata(mainWindow,'NP',ad.NP);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function keypress_Callback(src,evt)
-    try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier
-            % key was pressed...
-            return;
-        end
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                switch evt.Key
-                    case 'w'
-                        pushbutton_Callback(src,evt,'Close')
-                        return;
-                    case '1'
-                        switchPanel('Analysis');
-                        return;
-                    case '2'
-                        switchPanel('Display');
-                        return;
-                    case '3'
-                        switchPanel('Settings');
-                        return;
-                    case 'x'
-                        ad.control.axis.displayType = '1D along x';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'y'
-                        ad.control.axis.displayType = '1D along y';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'z'
-                        ad.control.axis.displayType = '2D plot';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                end
+try
+    if isempty(evt.Character) && isempty(evt.Key)
+        % In case "Character" is the empty string, i.e. only modifier
+        % key was pressed...
+        return;
+    end
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    if ~isempty(evt.Modifier)
+        if (strcmpi(evt.Modifier{1},'command')) || ...
+                (strcmpi(evt.Modifier{1},'control'))
+            switch evt.Key
+                case 'w'
+                    pushbutton_Callback(src,evt,'Close')
+                    return;
+                case '1'
+                    switchPanel('Analysis');
+                    return;
+                case '2'
+                    switchPanel('Display');
+                    return;
+                case '3'
+                    switchPanel('Settings');
+                    return;
+                case 'x'
+                    ad.control.axis.displayType = '1D along x';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'y'
+                    ad.control.axis.displayType = '1D along y';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'z'
+                    ad.control.axis.displayType = '2D plot';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
             end
         end
-        switch evt.Key
-            case 'f1'
-                trEPRgui_NetPolarisation_helpwindow();
-                return;
-            otherwise
-%                 disp(evt);
-%                 fprintf('       Caller: %i\n\n',src);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
     end
+    switch evt.Key
+        case 'f1'
+            trEPRgui_NetPolarisation_helpwindow();
+            return;
+        otherwise
+            %                 disp(evt);
+            %                 fprintf('       Caller: %i\n\n',src);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 
@@ -2040,520 +2040,528 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function switchPanel(panelName)
-    try
-        panels = [pp1 pp2 pp3];
-        buttons = [tb1 tb2 tb3];
-        switch lower(panelName)
-            case 'analysis'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp1,'Visible','on');
-                set(tb1,'Value',1);
-            case 'display'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp2,'Visible','on');
-                set(tb2,'Value',1);
-            case 'settings'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp3,'Visible','on');
-                set(tb3,'Value',1);
-            otherwise
-                trEPRoptionUnknown(panelName,'panel');
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    panels = [...
+        gh.dataset_panel ...
+        gh.accumulate_panel ...
+        gh.settings_panel ...
+        ];
+    buttons = [...
+        gh.analyse_togglebutton ...
+        gh.display_togglebutton ...
+        gh.settings_togglebutton ...
+        ];
+    switch lower(panelName)
+        case 'analysis'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.dataset_panel,'Visible','on');
+            set(gh.analyse_togglebutton,'Value',1);
+        case 'display'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.accumulate_panel,'Visible','on');
+            set(gh.display_togglebutton,'Value',1);
+        case 'settings'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.settings_panel,'Visible','on');
+            set(gh.settings_togglebutton,'Value',1);
+        otherwise
+            trEPRoptionUnknown(panelName,'panel');
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateAnalysisPanel()
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-        
-        % Get handles from main window
-        gh = guidata(mainWindow);
-        
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-        
-        % Set pretrigger statistics subpanel fields
-        NP = sum(getData(ad.data{active}));
-        PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
-        
-        NP = NP(find(ad.data{active}.axes.data(1).values>0,1):end);
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
 
-        set(gh.pretrigpol_min_edit,'String',num2str(min(PTNP),'%10.6f'));
-        set(gh.pretrigpol_max_edit,'String',num2str(max(PTNP),'%10.6f'));
-        set(gh.pretrigpol_delta_edit,...
-            'String',num2str(max(PTNP)-min(PTNP),7));
-        set(gh.pretrigpol_avg_edit,'String',num2str(mean(PTNP),'%10.6f'));
-        set(gh.pretrigpol_stdev_edit,'String',num2str(std(PTNP,1),'%10.6f'));
-        
-        % Set net polarisation subpanel fields
-        [minNPval,minNPind] = min(NP);
-        set(gh.netpol_min_edit,'String',num2str(minNPval));
-        set(gh.netpol_minpos_edit,'String',...
-            num2str(ad.data{active}.axes.data(1).values(minNPind+...
-            find(ad.data{active}.axes.data(1).values>0,1))));
-        [maxNPval,maxNPind] = max(NP);
-        set(gh.netpol_max_edit,'String',num2str(maxNPval));
-        set(gh.netpol_maxpos_edit,'String',...
-            num2str(ad.data{active}.axes.data(1).values(maxNPind+...
-            find(ad.data{active}.axes.data(1).values>0,1))));
-        
-        % Set unit fields
-%         set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
-%             'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
-%         set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
-%             'String',ad.data{active}.axes.data(2).unit);
-        
-        % Set background of deviation fields accordingly
-        if minNPval < (min(PTNP))
-            set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
-                'BackgroundColor',[0.7 0.9 1]);
-        elseif minNPval > (min(PTNP))
-            set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
-                'Background',[1 0.8 0.8]);
-        else
-            set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
-                'Background',[0.8 1 0.8]);
-        end
-        if maxNPval > (max(PTNP))
-            set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
-                'BackgroundColor',[1 0.8 0.8]);
-        elseif maxNPval < (max(PTNP))
-            set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
-                'Background',[0.7 0.9 1]);
-        else
-            set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
-                'Background',[0.8 1 0.8]);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
     end
+    
+    % Set pretrigger statistics subpanel fields
+    NP = sum(getData(ad.data{active}));
+    PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
+    
+    NP = NP(find(ad.data{active}.axes.data(1).values>0,1):end);
+    
+    set(gh.pretrigpol_min_edit,'String',num2str(min(PTNP),'%10.6f'));
+    set(gh.pretrigpol_max_edit,'String',num2str(max(PTNP),'%10.6f'));
+    set(gh.pretrigpol_delta_edit,...
+        'String',num2str(max(PTNP)-min(PTNP),7));
+    set(gh.pretrigpol_avg_edit,'String',num2str(mean(PTNP),'%10.6f'));
+    set(gh.pretrigpol_stdev_edit,'String',num2str(std(PTNP,1),'%10.6f'));
+    
+    % Set net polarisation subpanel fields
+    [minNPval,minNPind] = min(NP);
+    set(gh.netpol_min_edit,'String',num2str(minNPval));
+    set(gh.netpol_minpos_edit,'String',...
+        num2str(ad.data{active}.axes.data(1).values(minNPind+...
+        find(ad.data{active}.axes.data(1).values>0,1))));
+    [maxNPval,maxNPind] = max(NP);
+    set(gh.netpol_max_edit,'String',num2str(maxNPval));
+    set(gh.netpol_maxpos_edit,'String',...
+        num2str(ad.data{active}.axes.data(1).values(maxNPind+...
+        find(ad.data{active}.axes.data(1).values>0,1))));
+    
+    % Set unit fields
+    %         set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
+    %             'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
+    %         set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
+    %             'String',ad.data{active}.axes.data(2).unit);
+    
+    % Set background of deviation fields accordingly
+    if minNPval < (min(PTNP))
+        set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
+            'BackgroundColor',[0.7 0.9 1]);
+    elseif minNPval > (min(PTNP))
+        set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
+            'Background',[1 0.8 0.8]);
+    else
+        set([gh.netpol_min_edit,gh.netpol_minpos_edit],...
+            'Background',[0.8 1 0.8]);
+    end
+    if maxNPval > (max(PTNP))
+        set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
+            'BackgroundColor',[1 0.8 0.8]);
+    elseif maxNPval < (max(PTNP))
+        set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
+            'Background',[0.7 0.9 1]);
+    else
+        set([gh.netpol_max_edit,gh.netpol_maxpos_edit],...
+            'Background',[0.8 1 0.8]);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateSettingsPanel(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata and handles from main window
-        ad = getappdata(mainWindow);
-        gh = guidata(mainWindow);
-        
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-               
-        if nargin && strcmpi('defaults',varargin{1})
-            % Reset display settings
-            ad.control.axis.grid.x = ad.configuration.axis.grid.x;
-            ad.control.axis.grid.y = ad.configuration.axis.grid.y;
-            ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
-            ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
-            % Reset NP settings
-            ad.NP.area.patch.color = ad.configuration.NP.area.patch.color;
-            ad.NP.area.patch.alpha = ad.configuration.NP.area.patch.alpha;
-            ad.NP.line.color = ad.configuration.NP.line.color;
-            ad.NP.line.width = ad.configuration.NP.line.width;
-            ad.NP.line.style = ad.configuration.NP.line.style;
-            setappdata(mainWindow,'NP',ad.NP);
-            setappdata(mainWindow,'control',ad.control);
-        end
-        
-        set(gh.areasettings_coloursample_text,'Background',...
-            ad.NP.area.patch.color);
-        set(gh.areasettings_alpha_edit,'String',...
-            num2str(ad.NP.area.patch.alpha));
-        set(gh.areasettings_alpha_slider,'Value',...
-            ad.NP.area.patch.alpha);
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-
-        lineStyles = {'-','--',':','-.','none'};
-        lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
-
-        switch lower(lineType)
-            case 'main'
-                set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.data{active}.display.lines.data.color);
-                set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.data{active}.display.lines.data.width));
-                % Set line style
-                lineStyle = ad.data{active}.display.lines.data.style;
-                for k=1:length(lineStyles)
-                    if strcmp(lineStyles{k},lineStyle)
-                        lineStyleIndex = k;
-                    end
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata and handles from main window
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
+    end
+    
+    if nargin && strcmpi('defaults',varargin{1})
+        % Reset display settings
+        ad.control.axis.grid.x = ad.configuration.axis.grid.x;
+        ad.control.axis.grid.y = ad.configuration.axis.grid.y;
+        ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
+        ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
+        % Reset NP settings
+        ad.NP.area.patch.color = ad.configuration.NP.area.patch.color;
+        ad.NP.area.patch.alpha = ad.configuration.NP.area.patch.alpha;
+        ad.NP.line.color = ad.configuration.NP.line.color;
+        ad.NP.line.width = ad.configuration.NP.line.width;
+        ad.NP.line.style = ad.configuration.NP.line.style;
+        setappdata(mainWindow,'NP',ad.NP);
+        setappdata(mainWindow,'control',ad.control);
+    end
+    
+    set(gh.areasettings_coloursample_text,'Background',...
+        ad.NP.area.patch.color);
+    set(gh.areasettings_alpha_edit,'String',...
+        num2str(ad.NP.area.patch.alpha));
+    set(gh.areasettings_alpha_slider,'Value',...
+        ad.NP.area.patch.alpha);
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    lineStyles = {'-','--',':','-.','none'};
+    lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+    
+    switch lower(lineType)
+        case 'main'
+            set(gh.display_panel_linecoloursample_text,'Background',...
+                ad.data{active}.display.lines.data.color);
+            set(gh.display_panel_linewidth_edit,'String',...
+                num2str(ad.data{active}.display.lines.data.width));
+            % Set line style
+            lineStyle = ad.data{active}.display.lines.data.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
                 end
-                set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
-                
-                % Set line marker type
-                lineMarker = ad.data{active}.display.lines.data.marker.type;
-                for k=1:length(lineMarkers)
-                    if strcmp(lineMarkers{k},lineMarker)
-                        lineMarkerIndex = k;
-                    end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarker = ad.data{active}.display.lines.data.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
                 end
-                set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-                % Set line marker edge colour
-                lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
-                lineMarkerEdgeColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-                if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerEdgeColor,...
-                        lineMarkerEdgeColorPopupmenuValues)));
-                    switch lineMarkerEdgeColor
-                        case 'none'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.data{active}.display.lines.data.color);
-                    end
-                else
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-                    set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.display.lines.data.marker.edgeColor);
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.data{active}.display.lines.data.color);
                 end
-                % Set line marker face colour
-                lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
-                lineMarkerFaceColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-                if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerFaceColor,...
-                        lineMarkerFaceColorPopupmenuValues)));
-                    switch lineMarkerFaceColor
-                        case 'none'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(gca,'Color'));
-                    end
-                else
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-                    set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.data{active}.display.lines.data.marker.faceColor);
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.display.lines.data.marker.edgeColor);
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
                 end
-
-                % Set line marker size
-                set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.data{active}.display.lines.data.marker.size));
-            case 'average pretrig np'
-                set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.NP.line.color);
-                set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.NP.line.width));
-                % Set line style
-                lineStyle = ad.NP.line.style;
-                for k=1:length(lineStyles)
-                    if strcmp(lineStyles{k},lineStyle)
-                        lineStyleIndex = k;
-                    end
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.data{active}.display.lines.data.marker.faceColor);
+            end
+            
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.data{active}.display.lines.data.marker.size));
+        case 'average pretrig np'
+            set(gh.display_panel_linecoloursample_text,'Background',...
+                ad.NP.line.color);
+            set(gh.display_panel_linewidth_edit,'String',...
+                num2str(ad.NP.line.width));
+            % Set line style
+            lineStyle = ad.NP.line.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
                 end
-                set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
-                
-                % Set line marker type
-                lineMarker = ad.NP.line.marker.type;
-                for k=1:length(lineMarkers)
-                    if strcmp(lineMarkers{k},lineMarker)
-                        lineMarkerIndex = k;
-                    end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarker = ad.NP.line.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
                 end
-                set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-
-                % Set line marker edge colour
-                lineMarkerEdgeColor = ad.NP.line.marker.edgeColor;
-                lineMarkerEdgeColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-                if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerEdgeColor,...
-                        lineMarkerEdgeColorPopupmenuValues)));
-                    switch lineMarkerEdgeColor
-                        case 'none'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.NP.line.color);
-                    end
-                else
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-                    set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.NP.line.marker.edgeColor);
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.NP.line.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.NP.line.color);
                 end
-                % Set line marker face colour
-                lineMarkerFaceColor = ad.NP.line.marker.faceColor;
-                lineMarkerFaceColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-                if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerFaceColor,...
-                        lineMarkerFaceColorPopupmenuValues)));
-                    switch lineMarkerFaceColor
-                        case 'none'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(gca,'Color'));
-                    end
-                else
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-                    set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.NP.line.marker.faceColor);
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.NP.line.marker.edgeColor);
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.NP.line.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
                 end
-                % Set line marker size
-                set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.NP.line.marker.size));
-            case 'smoothed np'
-                set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.NP.smooth.color);
-                set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.NP.smooth.width));
-                % Set line style
-                lineStyle = ad.NP.smooth.style;
-                for k=1:length(lineStyles)
-                    if strcmp(lineStyles{k},lineStyle)
-                        lineStyleIndex = k;
-                    end
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.NP.line.marker.faceColor);
+            end
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.NP.line.marker.size));
+        case 'smoothed np'
+            set(gh.display_panel_linecoloursample_text,'Background',...
+                ad.NP.smooth.color);
+            set(gh.display_panel_linewidth_edit,'String',...
+                num2str(ad.NP.smooth.width));
+            % Set line style
+            lineStyle = ad.NP.smooth.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
                 end
-                set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
-                
-                % Set line marker type
-                lineMarker = ad.NP.smooth.marker.type;
-                for k=1:length(lineMarkers)
-                    if strcmp(lineMarkers{k},lineMarker)
-                        lineMarkerIndex = k;
-                    end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarker = ad.NP.smooth.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
                 end
-                set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-                % Set line marker edge colour
-                lineMarkerEdgeColor = ad.NP.smooth.marker.edgeColor;
-                lineMarkerEdgeColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-                if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerEdgeColor,...
-                        lineMarkerEdgeColorPopupmenuValues)));
-                    switch lineMarkerEdgeColor
-                        case 'none'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.NP.smooth.color);
-                    end
-                else
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-                    set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.NP.smooth.marker.edgeColor);
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.NP.smooth.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.NP.smooth.color);
                 end
-                % Set line marker face colour
-                lineMarkerFaceColor = ad.NP.smooth.marker.faceColor;
-                lineMarkerFaceColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-                if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerFaceColor,...
-                        lineMarkerFaceColorPopupmenuValues)));
-                    switch lineMarkerFaceColor
-                        case 'none'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(gca,'Color'));
-                    end
-                else
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-                    set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.NP.smooth.marker.faceColor);
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.NP.smooth.marker.edgeColor);
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.NP.smooth.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
                 end
-
-                % Set line marker size
-                set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.NP.smooth.marker.size));
-        end
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.NP.smooth.marker.faceColor);
+            end
+            
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.NP.smooth.marker.size));
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateAxes(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-
-        % See whether we have a currently active dataset, otherwise return
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-        
-        % Get axis handle
-        if nargin && ishandle(varargin{1})
-            mainAxes = newplot(varargin{1});
-        else
-            mainAxes = gca;
-        end
-        
-        % IMPORTANT: Set main axis to active axis
-        axes(mainAxes); %#ok<MAXES>
-
-        % Get data
-        data = getData(ad.data{active});
-        
-        % Get time axis
-        t = linspace(1,size(data,2),size(data,2));
-        if (isfield(ad.data{active},'axes') ...
-                && isfield(ad.data{active}.axes,'x') ...
-                && isfield(ad.data{active}.axes.data(1),'values') ...
-                && not (isempty(ad.data{active}.axes.data(1).values)))
-            t = ad.data{active}.axes.data(1).values;
-        end
-        % Get net polarisation
-        NP = sum(data);
-        PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
-
-        % Do the actual plotting
-        cla reset;
-        hold(mainAxes,'on');
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    
+    % See whether we have a currently active dataset, otherwise return
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
+    end
+    
+    % Get axis handle
+    if nargin && ishandle(varargin{1})
+        mainAxes = newplot(varargin{1});
+    else
+        mainAxes = gca;
+    end
+    
+    % IMPORTANT: Set main axis to active axis
+    axes(mainAxes);
+    
+    % Get data
+    data = getData(ad.data{active});
+    
+    % Get time axis
+    t = linspace(1,size(data,2),size(data,2));
+    if (isfield(ad.data{active},'axes') ...
+            && isfield(ad.data{active}.axes,'x') ...
+            && isfield(ad.data{active}.axes.data(1),'values') ...
+            && not (isempty(ad.data{active}.axes.data(1).values)))
+        t = ad.data{active}.axes.data(1).values;
+    end
+    % Get net polarisation
+    NP = sum(data);
+    PTNP = NP(1:find(ad.data{active}.axes.data(1).values>0,1)-1);
+    
+    % Do the actual plotting
+    cla reset;
+    hold(mainAxes,'on');
+    plot(...
+        t,...
+        NP,...
+        'Color',ad.data{active}.display.lines.data.color,...
+        'LineStyle',ad.data{active}.display.lines.data.style,...
+        'Marker',ad.data{active}.display.lines.data.marker.type,...
+        'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
+        'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
+        'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
+        'LineWidth',ad.data{active}.display.lines.data.width...
+        );
+    if ad.NP.smooth.window > 1
+        filterfun = str2func(ad.NP.smooth.filterfun);
         plot(...
             t,...
-            NP,...
-            'Color',ad.data{active}.display.lines.data.color,...
-            'LineStyle',ad.data{active}.display.lines.data.style,...
-            'Marker',ad.data{active}.display.lines.data.marker.type,...
-            'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
-            'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
-            'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
-            'LineWidth',ad.data{active}.display.lines.data.width...
+            filterfun(NP,ad.NP.smooth.window),...
+            'Color',ad.NP.smooth.color,...
+            'LineStyle',ad.NP.smooth.style,...
+            'Marker',ad.NP.smooth.marker.type,...
+            'MarkerEdgeColor',ad.NP.smooth.marker.edgeColor,...
+            'MarkerFaceColor',ad.NP.smooth.marker.faceColor,...
+            'MarkerSize',ad.NP.smooth.marker.size,...
+            'LineWidth',ad.NP.smooth.width...
             );
-        if ad.NP.smooth.window > 1
-            filterfun = str2func(ad.NP.smooth.filterfun);
-            plot(...
-                t,...
-                filterfun(NP,ad.NP.smooth.window),...
-                'Color',ad.NP.smooth.color,...
-                'LineStyle',ad.NP.smooth.style,...
-                'Marker',ad.NP.smooth.marker.type,...
-                'MarkerEdgeColor',ad.NP.smooth.marker.edgeColor,...
-                'MarkerFaceColor',ad.NP.smooth.marker.faceColor,...
-                'MarkerSize',ad.NP.smooth.marker.size,...
-                'LineWidth',ad.NP.smooth.width...
-                );
-        end
-        if ad.control.axis.mean
-            line(...
-                [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
-                [mean(PTNP) mean(PTNP)],...
-                'Color',ad.NP.line.color,...
-                'LineStyle',ad.NP.line.style,...
-                'Marker',ad.NP.line.marker.type,...
-                'MarkerEdgeColor',ad.NP.line.marker.edgeColor,...
-                'MarkerFaceColor',ad.NP.line.marker.faceColor,...
-                'MarkerSize',ad.NP.line.marker.size,...
-                'LineWidth',ad.NP.line.width,...
-                'Parent',mainAxes);
-        end
-        if ad.control.axis.grid.zero.visible
-            line(...
-                [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
-                [0 0],...
-                'Color',ad.control.axis.grid.zero.color,...
-                'LineWidth',ad.control.axis.grid.zero.width,...
-                'LineStyle',ad.control.axis.grid.zero.style,...
-                'Parent',mainAxes);
-        end
-        if ad.control.axis.stdev
-            patch(...
-                'XData',...
-                [ad.control.axis.limits.x.min ad.control.axis.limits.x.max ...
-                ad.control.axis.limits.x.max ad.control.axis.limits.x.min],...
-                'YData',...
-                [mean(PTNP)-std(PTNP,1) mean(PTNP)-std(PTNP,1) ...
-                mean(PTNP)+std(PTNP,1) mean(PTNP)+std(PTNP,1)],...
-                'ZData',[0 0 0 0],...
-                'EdgeColor',ad.NP.area.patch.edge,...
-                'FaceColor',ad.NP.area.patch.color,...
-                'FaceAlpha',ad.NP.area.patch.alpha,...
-                'Parent',mainAxes);
-        end
-        if ad.control.axis.minmax
-            patch(...
-                'XData',...
-                [ad.control.axis.limits.x.min ad.control.axis.limits.x.max ...
-                ad.control.axis.limits.x.max ad.control.axis.limits.x.min],...
-                'YData',...
-                [min(PTNP) min(PTNP) ...
-                max(PTNP) max(PTNP)],...
-                'ZData',[0 0 0 0],...
-                'EdgeColor',ad.NP.area.patch.edge,...
-                'FaceColor',ad.NP.area.patch.color,...
-                'FaceAlpha',ad.NP.area.patch.alpha,...
-                'Parent',mainAxes);
-        end
-        hold(mainAxes,'off');
-        set(mainAxes,...
-            'XLim',[min(t) max(t)],...
-            'YLim',[min(NP)-0.025*(max(NP)-min(NP)) ...
-            max(NP)+0.025*(max(NP)-min(NP))]...
-            );
-        if ad.control.axis.stdev
-            ylimits = get(mainAxes,'YLim');
-            if ylimits(1) > mean(NP)-std(NP,1)
-                ylimits(1) = (mean(NP)-std(NP,1))-...
-                    0.025*(max(NP)-min(NP));
-            end
-            if ylimits(2) < mean(NP)+std(NP,1)
-                ylimits(2) = (mean(NP)+std(NP,1))+...
-                    0.025*(max(NP)-min(NP));
-            end
-            set(mainAxes,'YLim',ylimits);
-        end
-        
-        % Plot axis labels
-        xlabel(mainAxes,...
-            sprintf('{\\it %s} / %s',...
-            ad.data{active}.axes.data(1).measure,...
-            ad.data{active}.axes.data(1).unit));
-        ylabel(mainAxes,...
-            sprintf('{\\it %s} / %s',...
-            'Net polarisation','a.u.'));
-        
-        % Set grid for main axis
-        set(mainAxes,'XGrid',ad.control.axis.grid.x);
-        set(mainAxes,'YGrid',ad.control.axis.grid.y);
-        if (isequal(ad.control.axis.grid.x,'on'))
-            set(mainAxes,'XMinorGrid',ad.control.axis.grid.minor);
-        end
-        if (isequal(ad.control.axis.grid.y,'on'))
-            set(mainAxes,'YMinorGrid',ad.control.axis.grid.minor);
-        end
-        
-    catch exception
-        trEPRexceptionHandling(exception)
     end
+    if ad.control.axis.mean
+        line(...
+            [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
+            [mean(PTNP) mean(PTNP)],...
+            'Color',ad.NP.line.color,...
+            'LineStyle',ad.NP.line.style,...
+            'Marker',ad.NP.line.marker.type,...
+            'MarkerEdgeColor',ad.NP.line.marker.edgeColor,...
+            'MarkerFaceColor',ad.NP.line.marker.faceColor,...
+            'MarkerSize',ad.NP.line.marker.size,...
+            'LineWidth',ad.NP.line.width,...
+            'Parent',mainAxes);
+    end
+    if ad.control.axis.grid.zero.visible
+        line(...
+            [ad.control.axis.limits.x.min ad.control.axis.limits.x.max],...
+            [0 0],...
+            'Color',ad.control.axis.grid.zero.color,...
+            'LineWidth',ad.control.axis.grid.zero.width,...
+            'LineStyle',ad.control.axis.grid.zero.style,...
+            'Parent',mainAxes);
+    end
+    if ad.control.axis.stdev
+        patch(...
+            'XData',...
+            [ad.control.axis.limits.x.min ad.control.axis.limits.x.max ...
+            ad.control.axis.limits.x.max ad.control.axis.limits.x.min],...
+            'YData',...
+            [mean(PTNP)-std(PTNP,1) mean(PTNP)-std(PTNP,1) ...
+            mean(PTNP)+std(PTNP,1) mean(PTNP)+std(PTNP,1)],...
+            'ZData',[0 0 0 0],...
+            'EdgeColor',ad.NP.area.patch.edge,...
+            'FaceColor',ad.NP.area.patch.color,...
+            'FaceAlpha',ad.NP.area.patch.alpha,...
+            'Parent',mainAxes);
+    end
+    if ad.control.axis.minmax
+        patch(...
+            'XData',...
+            [ad.control.axis.limits.x.min ad.control.axis.limits.x.max ...
+            ad.control.axis.limits.x.max ad.control.axis.limits.x.min],...
+            'YData',...
+            [min(PTNP) min(PTNP) ...
+            max(PTNP) max(PTNP)],...
+            'ZData',[0 0 0 0],...
+            'EdgeColor',ad.NP.area.patch.edge,...
+            'FaceColor',ad.NP.area.patch.color,...
+            'FaceAlpha',ad.NP.area.patch.alpha,...
+            'Parent',mainAxes);
+    end
+    hold(mainAxes,'off');
+    set(mainAxes,...
+        'XLim',[min(t) max(t)],...
+        'YLim',[min(NP)-0.025*(max(NP)-min(NP)) ...
+        max(NP)+0.025*(max(NP)-min(NP))]...
+        );
+    if ad.control.axis.stdev
+        ylimits = get(mainAxes,'YLim');
+        if ylimits(1) > mean(NP)-std(NP,1)
+            ylimits(1) = (mean(NP)-std(NP,1))-...
+                0.025*(max(NP)-min(NP));
+        end
+        if ylimits(2) < mean(NP)+std(NP,1)
+            ylimits(2) = (mean(NP)+std(NP,1))+...
+                0.025*(max(NP)-min(NP));
+        end
+        set(mainAxes,'YLim',ylimits);
+    end
+    
+    % Plot axis labels
+    xlabel(mainAxes,...
+        sprintf('{\\it %s} / %s',...
+        ad.data{active}.axes.data(1).measure,...
+        ad.data{active}.axes.data(1).unit));
+    ylabel(mainAxes,...
+        sprintf('{\\it %s} / %s',...
+        'Net polarisation','a.u.'));
+    
+    % Set grid for main axis
+    set(mainAxes,'XGrid',ad.control.axis.grid.x);
+    set(mainAxes,'YGrid',ad.control.axis.grid.y);
+    if (isequal(ad.control.axis.grid.x,'on'))
+        set(mainAxes,'XMinorGrid',ad.control.axis.grid.minor);
+    end
+    if (isequal(ad.control.axis.grid.y,'on'))
+        set(mainAxes,'YMinorGrid',ad.control.axis.grid.minor);
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
 end
-
 end

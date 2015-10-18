@@ -22,7 +22,7 @@ function varargout = trEPRgui_infowindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -4621,8 +4621,8 @@ uicontrol('Tag','close_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
+% Store handles in appdata
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
@@ -4922,13 +4922,11 @@ function parameter_edit_Callback(source,~,value)
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
 
         if isempty(ad.data)
             return;
         end
-        
-        % Get handles from info GUI
-        gh = guidata(mainWindow);
         
         active = ad.control.data.active;
         
@@ -6266,13 +6264,13 @@ function updateDatasets()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
             
         if isempty(ad.data)
             return;
         end
         
         % Get handle for loaded spectra listbox
-        gh = guidata(mainWindow);
         lbox = gh.main_panel_dataset_listbox;
         
         % Get indices of loaded spectra
@@ -6323,14 +6321,12 @@ function updateGeneralPanel()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         
         if isempty(ad.data)
             return;
         end
         
-        % Get handles from info GUI
-        gh = guidata(mainWindow);
-
         [filepath,filename,fileext] = ...
             fileparts(ad.data{ad.control.data.active}.file.name);
         if filepath
@@ -6365,7 +6361,7 @@ function updateParameterPanel()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata and handles from info GUI
         ad = getappdata(mainWindow);
-        gh = guidata(mainWindow);
+        gh = ad.guiHandles;
         
         % Make life easier
         active = ad.control.data.active;
@@ -6625,9 +6621,6 @@ function updateInfofilePanel()
             return;
         end
 
-        % Get handles from info GUI
-%         gh = guidata(mainWindow);
-
     catch exception
         trEPRexceptionHandling(exception)
     end 
@@ -6638,7 +6631,7 @@ function updateCharacteristicsPanel()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata and handles from info GUI
         ad = getappdata(mainWindow);
-        gh = guidata(mainWindow);
+        gh = ad.guiHandles;
         
         if isempty(ad.data)
             return;
@@ -7110,9 +7103,6 @@ function updateToolsPanel()
             return;
         end
 
-        % Get handles from info GUI
-%         gh = guidata(mainWindow);
-
     catch exception
         trEPRexceptionHandling(exception)
     end 
@@ -7123,9 +7113,7 @@ function updateHistoryPanel()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from info GUI
         ad = getappdata(mainWindow);
-        
-        % Get handles from info GUI
-        gh = guidata(mainWindow);
+        gh = ad.guiHandles;
         
         % To shorten lines, assign Id of currently active dataset
         selectedId = ad.control.data.active;

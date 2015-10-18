@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -19,8 +19,8 @@ if (isempty(mainWindow))
 end
 
 % Get handles and appdata from main window
-gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
 
 % Set current axes to the main axes of main GUI
 mainAxes = gh.mainAxis;
@@ -1189,7 +1189,7 @@ function plotProjection()
 % Get appdata from main GUI
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
-gh = ad.UsedByGUIData_m;
+gh = ad.guiHandles;
 
 active = ad.control.data.active;
 
@@ -1275,7 +1275,7 @@ function plotResiduals()
 % Get appdata from main GUI
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
-gh = ad.UsedByGUIData_m;
+gh = ad.guiHandles;
 
 active = ad.control.data.active;
 

@@ -6,8 +6,8 @@ function varargout = trEPRgui_snapshot_showwindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -216,7 +216,7 @@ uicontrol('Tag','close_pushbutton',...
 
 try
     % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    setappdata(hMainFigure,'guiHandles',guihandles);
     
     % Add keypress function to every element that can have one...
     handles = findall(...
@@ -248,6 +248,8 @@ catch exception
     trEPRexceptionHandling(exception);
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -258,7 +260,7 @@ function pushbutton_Callback(~,~,action)
             return;
         end
         
-        gh = guihandles(hMainFigure);
+        gh = getappdata(hMainFigure,'guiHandles');
         admain = getappdata(mainGUIHandle);
         
         switch lower(action)
@@ -314,10 +316,6 @@ function keypress_Callback(~,evt)
             % key was pressed...
             return;
         end
-        
-        % Get handles of GUI
-        %gh = guihandles(hMainFigure);
-        
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...
                     (strcmpi(evt.Modifier{1},'control'))
@@ -345,7 +343,7 @@ end
 
 function closeGUI(~,~)
     try
-        delete(hMainFigure);
+        delete(trEPRguiGetWindowHandle(mfilename));
         trEPRmsg('Snapshot window closed.','debug');
     catch exception
         trEPRexceptionHandling(exception);
@@ -355,10 +353,10 @@ end
 function updateWindow()
     try
         % Get appdata from main trEPR GUI handle
-        admain = getappdata(mainGUIHandle);
+        admain = getappdata(trEPRguiGetWindowHandle());
         
         % Get gui handles
-        gh = guihandles(hMainFigure);
+        gh = getappdata(trEPRguiGetWindowHandle(mfilename),'guiHandles');
 
         files = dir(admain.control.dirs.lastSnapshot);
         fileNames = cell(0);
@@ -372,6 +370,8 @@ function updateWindow()
         
         if ~isempty(fileNames)
             try
+                fullfile(admain.control.dirs.lastSnapshot,...
+                    char(fileNames(get(gh.filelist_panel_listbox,'Value'))))
                 AD = load(fullfile(admain.control.dirs.lastSnapshot,...
                     char(fileNames(get(gh.filelist_panel_listbox,'Value')))),...
                     '-mat');
@@ -389,7 +389,7 @@ function updateWindow()
                 else
                     set(gh.content_panel_dataset_listbox,'String','');
                 end
-            catch exception
+            catch 
                 set(gh.content_panel_format_content_text,'String',...
                     'File has unrecognised format');
             end
@@ -397,6 +397,4 @@ function updateWindow()
     catch exception
         trEPRexceptionHandling(exception);
     end
-end
-
 end

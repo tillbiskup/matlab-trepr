@@ -8,7 +8,7 @@ function handle = panelSlider(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-07-07
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -403,7 +403,7 @@ function edit_Callback(source,~,action)
         % Get appdata and gui handles of main window
         mainWindow = trEPRguiGetWindowHandle;
         ad = getappdata(mainWindow);
-        gh = guidata(mainWindow);
+        gh = ad.guiHandles;
 
         active = ad.control.data.active;
         
@@ -670,13 +670,6 @@ try
     if isempty(action)
         return;
     end
-    
-    % Get appdata of main window
-    mainWindow = trEPRguiGetWindowHandle();
-    ad = getappdata(mainWindow);
-    
-    % Get handles of main window
-    gh = guihandles(mainWindow);
     
     switch lower(action)
         case 'pickmin'

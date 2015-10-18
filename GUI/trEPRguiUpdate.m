@@ -8,7 +8,7 @@ function trEPRguiUpdate(varargin)
 % See also: update_*
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 if nargin && strcmpi(varargin{1},'mainwindow')
     updateMainWindow;
@@ -34,8 +34,7 @@ function updateMainWindow
 % get GUI handles and appdata
 mainGuiWindow = trEPRguiGetWindowHandle;
 ad = getappdata(mainGuiWindow);
-gh = ad.UsedByGUIData_m;
-%gh = guihandles(mainGuiWindow);
+gh = ad.guiHandles;
 
 switch ad.control.status.code
     case 'OK'

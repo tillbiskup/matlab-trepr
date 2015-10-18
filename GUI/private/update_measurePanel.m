@@ -6,8 +6,8 @@ function status = update_measurePanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-08-11
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -16,11 +16,9 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handles from main window
-gh = guidata(mainWindow);
-
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
 
 % Toggle state of the measure buttons
 if ~ad.control.data.active

@@ -7,7 +7,7 @@ function handle = panelProcessing(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-07-08
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -580,7 +580,7 @@ function pushbutton_Callback(~,~,action)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         active = ad.control.data.active;
         
@@ -717,7 +717,7 @@ function listbox_Callback(~,~,action)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         switch action
             case 'datasets'
@@ -761,7 +761,7 @@ function edit_Callback(source,~,action)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         active = ad.control.data.active;
         if isempty(active) || ~active
@@ -901,7 +901,7 @@ function popupmenu_Callback(source,~,action)
         % Get appdata and handles of main GUI
         mainWindow = trEPRguiGetWindowHandle();
         ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
 
         values = cellstr(get(source,'String'));
         value = values{get(source,'Value')};

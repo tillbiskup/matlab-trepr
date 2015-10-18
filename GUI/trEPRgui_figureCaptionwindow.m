@@ -6,8 +6,8 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -196,7 +196,10 @@ uicontrol('Tag','save_pushbutton',...
 
 try
     % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    setappdata(hMainFigure,'guiHandles',guihandles);
+    setappdata(hMainFigure,'figureFileName',figureFileName);
+    setappdata(hMainFigure,'captionFileName',captionFileName);
+    setappdata(hMainFigure,'captionFileExtension',captionFileExtension);
     
     % Add keypress function to every element that can have one...
     handles = findall(...
@@ -231,6 +234,8 @@ catch exception
     trEPRexceptionHandling(exception);
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -240,6 +245,10 @@ function pushbutton_Callback(~,~,action)
         if isempty(action)
             return;
         end
+
+        % Get handles of GUI
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
         
         switch lower(action)
             case 'chfilename'
@@ -247,7 +256,7 @@ function pushbutton_Callback(~,~,action)
                 [captionFileName,pathName] = uiputfile(...
                     sprintf('*%s',captionFileExtension),...
                     'Get filename to save figure caption to',...
-                    captionFileName);
+                    ad.captionFileName);
                 % If user aborts process, return
                 if captionFileName == 0
                     return;
@@ -255,6 +264,7 @@ function pushbutton_Callback(~,~,action)
                 % Create filename with full path
                 [~,fileName,~] = fileparts(captionFileName);
                 captionFileName = fullfile(pathName,fileName);
+                setappdata(mainWindow,'captionFileName',captionFileName);
             case 'save'
                 saveCaption();
                 closeGUI('','','saved');
@@ -278,7 +288,9 @@ function keypress_Callback(~,evt)
         end
         
         % Get handles of GUI
-        gh = guihandles(hMainFigure);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...
@@ -323,7 +335,9 @@ function closeGUI(~,~,varargin)
             action = '';
         end
         % Get handles of GUI
-        gh = guihandles(hMainFigure);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         
         % Important: Change focus away from text input, otherwise it will
         % not recognise the string as non-empty/changed
@@ -338,7 +352,7 @@ function closeGUI(~,~,varargin)
             end
         end
 
-        delete(hMainFigure);
+        delete(mainWindow);
         trEPRmsg('Figure Caption window closed.','debug');
     catch exception
         trEPRexceptionHandling(exception);
@@ -348,8 +362,10 @@ end
 function saveCaption()
     try
         % Get handles of GUI
-        gh = guihandles(hMainFigure);
-        % Get appdata of main GUI
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
+
         mainGuiWindow = trEPRguiGetWindowHandle();
         if ishghandle(mainGuiWindow)
             admain = getappdata(mainGuiWindow);
@@ -358,10 +374,10 @@ function saveCaption()
             sysinfo = struct();
         end
 
-        if isempty(captionFileName)
+        if isempty(ad.captionFileName)
             % Ask user for file name
             [captionFileName,pathName] = uiputfile(...
-                sprintf('*%s',captionFileExtension),...
+                sprintf('*%s',ad.captionFileExtension),...
                 'Get filename to save figure caption to',...
                 '');
             % If user aborts process, return
@@ -372,12 +388,12 @@ function saveCaption()
             captionFileName = fullfile(pathName,captionFileName);
         else
             % Otherwise append file extension to file name
-            captionFileName = [captionFileName captionFileExtension];
+            captionFileName = [ad.captionFileName ad.captionFileExtension];
         end
         % Collect contents for file
         fileContents = cell(0);
         fileContents{end+1,1} = 'GENERAL';
-        [~,fn,ext] = fileparts(figureFileName);
+        [~,fn,ext] = fileparts(ad.figureFileName);
         fileContents{end+1,1} = sprintf('Figure file:     %s',[fn ext]);
         fileContents{end+1,1} = sprintf('Date:            %s',datestr(now,31));
         if ~isempty(sysinfo)
@@ -405,9 +421,11 @@ end
 function updateWindow()
     try
         % Get handles of GUI
-        gh = guihandles(hMainFigure);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         % Write filename in appropriate edit box
-        set(gh.filename_edit,'String',captionFileName);        
+        set(gh.filename_edit,'String',ad.captionFileName);        
 
         % Get appdata of main GUI
         mainGuiWindow = trEPRguiGetWindowHandle();
@@ -454,7 +472,7 @@ function updateWindow()
                 datasetInfo(1:2) = [];
                 datasetInfo = ...
                     cellfun(@(x)['  ' x],datasetInfo,'UniformOutput',false);
-                infoText = [ infoText ; datasetInfo' ]; %#ok<AGROW>
+                infoText = [ infoText ; datasetInfo' ];
                 infoText{end+1,1} = '';
             end
             set(gh.information_text,'String',infoText);
@@ -462,6 +480,4 @@ function updateWindow()
     catch exception
         trEPRexceptionHandling(exception);
     end
-end
-
 end

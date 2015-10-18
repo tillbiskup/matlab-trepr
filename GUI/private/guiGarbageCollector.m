@@ -8,8 +8,8 @@ function guiGarbageCollector(varargin)
 %   command - string
 %             one of ...
 
-% Copyright (c) 2014, Till Biskup
-% 2014-10-19
+% Copyright (c) 2014-15, Till Biskup
+% 2015-10-18
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;            % Create instance of the inputParser class
@@ -51,25 +51,46 @@ end
 function timerExecuteFunction(varargin)
 
 try
+    mainGuiWindow = trEPRguiGetWindowHandle();
     % Ideas for sensible stuff:
     % * Save GUI state as snapshot
     % * Reset status indicator to "OK" if WW/EE is long enough ago
+    if ishandle(mainGuiWindow)
+        resetStatusDisplayInMainGUIWindow(mainGuiWindow);
+    end
     
     % Ideas for fun stuff:
     % * Display nice stuff if user worked long and hard (as obvious from
     %   status line entries)
     
     % Get IP address
-    address = java.net.InetAddress.getLocalHost;
-    IPaddress = char(address.getHostAddress);
+    try
+        address = java.net.InetAddress.getLocalHost;
+        IPaddress = char(address.getHostAddress);
+    catch
+        IPaddress = '';
+    end
     
-    if strcmpi(IPaddress,'10.4.18.34')
-        hMainFigure = trEPRguiGetWindowHandle();
-        ad = getappdata(hMainFigure);
+    try
+        [~,hostname] = system('hostname');
+    catch
+        hostname = '';
+    end
+    
+    try
+        username = getenv('USER');
+    catch
+        username = '';
+    end
+    
+    if strcmpi(IPaddress,'10.4.18.34') || ( ... 
+            strcmpi(hostname,char([109  101  121  101  114])) && ...
+            strcmpi(username,char([100  101   98  111  114   97  104])))
+        ad = getappdata(mainGuiWindow);
         ad.control.axis.labels.z.unit = 'Polarisation';
         ad.control.axis.labels.z.unit = char([...
             71 117 109 109 105 98 97 101 114 99 104 101 110]);
-        setappdata(hMainFigure,'control',ad.control);
+        setappdata(mainGuiWindow,'control',ad.control);
     end
 catch %#ok<CTCH>
 end

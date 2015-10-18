@@ -62,8 +62,6 @@ callAxesResize = false;
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-% gh = guidata(handle);
 
 switch lower(opt{1})
     case 'x'

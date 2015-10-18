@@ -145,7 +145,7 @@ if nargin && ischar(varargin{1})
     end
 else
     if nargout
-        varargout{1} = dataStructure;
+        varargout{1} = createDataStructure(versionString);
     end
 end
 

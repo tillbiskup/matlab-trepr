@@ -6,8 +6,8 @@ function varargout = trEPRgui_cmd_historywindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -146,7 +146,7 @@ uicontrol('Tag','close_pushbutton',...
 
 try
     % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    setappdata(hMainFigure,'guiHandles',guihandles);
     
     % Add keypress function to every element that can have one...
     handles = findall(...
@@ -178,70 +178,69 @@ catch exception
     trEPRexceptionHandling(exception);
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get handles of GUI
-        gh = guihandles(hMainFigure);
-        
-        switch lower(action)
-            case 'evaluate'
-                history = get(gh.history_panel_listbox,'String');
-                values = get(gh.history_panel_listbox,'Value');
-                for commands=1:length(values)
-                    [status,warning] = trEPRguiCommand(char(history(...
-                        values(commands))));
-                    if status
-                        trEPRmsg(warning,'warning');
-                    end
-                end
-            otherwise
-                disp(['Action ' action ' not understood.'])
-                return;
-        end
-        updateWindow()
-    catch exception
-        trEPRexceptionHandling(exception);
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get handles of GUI
+    gh = getappdata(hMainFigure,'guiHandles');
+    
+    switch lower(action)
+        case 'evaluate'
+            history = get(gh.history_panel_listbox,'String');
+            values = get(gh.history_panel_listbox,'Value');
+            for commands=1:length(values)
+                [status,warning] = trEPRguiCommand(char(history(...
+                    values(commands))));
+                if status
+                    trEPRmsg(warning,'warning');
+                end
+            end
+        otherwise
+            disp(['Action ' action ' not understood.'])
+            return;
+    end
+    updateWindow()
+catch exception
+    trEPRexceptionHandling(exception);
+end
 end
 
 function keypress_Callback(~,evt)
-    try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier
-            % key was pressed...
-            return;
-        end
-        
-        % Get handles of GUI
-        gh = guihandles(hMainFigure);
-        
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                switch evt.Key
-                    case 'w'
-                        closeGUI();
-                        return;
-                end
-            end
-        else
+try
+    if isempty(evt.Character) && isempty(evt.Key)
+        % In case "Character" is the empty string, i.e. only modifier
+        % key was pressed...
+        return;
+    end
+    
+    if ~isempty(evt.Modifier)
+        if (strcmpi(evt.Modifier{1},'command')) || ...
+                (strcmpi(evt.Modifier{1},'control'))
             switch evt.Key
-                case 'escape'
+                case 'w'
                     closeGUI();
                     return;
-            end                    
+            end
         end
-    catch exception
-        trEPRexceptionHandling(exception);
+    else
+        switch evt.Key
+            case 'escape'
+                closeGUI();
+                return;
+        end
     end
+catch exception
+    trEPRexceptionHandling(exception);
+end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -249,29 +248,27 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function closeGUI(~,~)
-    try
-        delete(hMainFigure);
-        trEPRmsg('Cmd history window closed.','debug');
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
+try
+    delete(trEPRguiGetWindowHandle(mfilename));
+    trEPRmsg('Cmd history window closed.','debug');
+catch exception
+    trEPRexceptionHandling(exception);
+end
 end
 
 function updateWindow()
-    try
-        % Get appdata from main trEPR GUI handle
-        admain = getappdata(mainGUIHandle);
-        
-        % Get gui handles
-        gh = guihandles(hMainFigure);
-        
-        set(gh.history_panel_listbox,'String',admain.control.cmd.history);
-        % Make last entry active
-        set(gh.history_panel_listbox,'Value',...
-            length(admain.control.cmd.history));
-    catch exception
-        trEPRexceptionHandling(exception);
-    end
+try
+    % Get appdata from main trEPR GUI handle
+    admain = getappdata(trEPRguiGetWindowHandle());
+    
+    % Get gui handles
+    gh = getappdata(trEPRguiGetWindowHandle(mfilename),'guiHandles');
+    
+    set(gh.history_panel_listbox,'String',admain.control.cmd.history);
+    % Make last entry active
+    set(gh.history_panel_listbox,'Value',...
+        length(admain.control.cmd.history));
+catch exception
+    trEPRexceptionHandling(exception);
 end
-
 end

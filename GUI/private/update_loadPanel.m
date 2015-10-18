@@ -6,8 +6,8 @@ function status = update_loadPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2014, Till Biskup
-% 2014-08-15
+% Copyright (c) 2014-15, Till Biskup
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -17,8 +17,8 @@ if (isempty(mainWindow))
 end
 
 % Get handles and appdata from main window
-gh = guidata(mainWindow);
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
 
 fileType = ad.control.panels.load.fileType;
 fields = fieldnames(ad.control.panels.load.fileTypes);

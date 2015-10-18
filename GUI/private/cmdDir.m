@@ -21,8 +21,8 @@ function [status,warnings] = cmdDir(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-05
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -41,8 +41,8 @@ handle = p.Results.handle;
 opt = p.Results.opt;
 
 % Get command name from mfilename
-cmd = mfilename;
-cmd = cmd(4:end);
+% cmd = mfilename;
+% cmd = cmd(4:end);
 
 % Is there the GUI requested?
 if (isempty(handle))
@@ -58,8 +58,6 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-% gh = guidata(handle);
 
 switch lower(opt{1})
     case {'load','loaddir'}

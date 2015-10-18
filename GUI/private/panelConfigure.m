@@ -6,8 +6,8 @@ function handle = panelConfigure(parentHandle,position)
 %
 %       Returns the handle of the added panel.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-18
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -254,7 +254,7 @@ function pushbutton_Callback(~,~,action)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
 
         switch lower(action)
             case 'conffilecreate'

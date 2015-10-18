@@ -7,7 +7,7 @@ function varargout = trEPRgui_AVGwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -50,7 +50,7 @@ panel_size = 240;
 guiSize = get(hMainFigure,'Position');
 guiSize = guiSize([3,4]);
 
-hPlotAxes = axes(...         % the axes for plotting selected plot
+axes(...         % the axes for plotting selected plot
     'Tag','axis',...
 	'Parent', hMainFigure, ...
     'FontUnit','Pixel','Fontsize',12,...
@@ -95,7 +95,7 @@ hButtonGroup = uibuttongroup('Tag','mainButtonGroup',...
     'Position', [guiSize(1)-mainPanelWidth-20 guiSize(2)-50 mainPanelWidth 30],...
     'Visible','on',...
     'SelectionChangeFcn',{@tbg_Callback});
-tb1 = uicontrol('Tag','datasets_togglebutton',...
+uicontrol('Tag','datasets_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -105,7 +105,7 @@ tb1 = uicontrol('Tag','datasets_togglebutton',...
     'pos',[0 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb2 = uicontrol('Tag','fit_togglebutton',...
+uicontrol('Tag','fit_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -115,7 +115,7 @@ tb2 = uicontrol('Tag','fit_togglebutton',...
     'pos',[mainPanelWidth/3 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb3 = uicontrol('Tag','settings_togglebutton',...
+uicontrol('Tag','settings_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -928,9 +928,6 @@ uicontrol('Tag','close_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
-
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
 
@@ -970,6 +967,7 @@ setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 setappdata(hMainFigure,'avg',ad.avg);
 setappdata(hMainFigure,'avgdata',ad.avgdata);
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -1006,7 +1004,6 @@ if ishghandle(mainGuiWindow)
     end
     
     updateSpectra();
-    ad = getappdata(hMainFigure);
 end
 
 updateAxes();
@@ -1019,6 +1016,7 @@ end
 % Create function-global cell array with the line styles
 % The first column contains the "names", the second column the values
 lineStyles = {'solid','-';'dashed','--';'dotted',':';'dash-dotted','-.'};
+setappdata(hMainFigure,'lineStyles',lineStyles);
 
 % Add keypress function to every element that can have one...
 handles = findall(...
@@ -1032,825 +1030,825 @@ for m=1:length(handles)
 end
 
 % Disable average draw button
-gh = guihandles(mainWindow);
-set(gh.average_draw_pushbutton,'Enable','Inactive');
+ad = getappdata(hMainFigure);
+set(ad.guiHandles.average_draw_pushbutton,'Enable','Inactive');
 
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function tbg_Callback(source,~)
-    try 
-        switchPanel(get(get(source,'SelectedObject'),'String'));
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    switchPanel(get(get(source,'SelectedObject'),'String'));
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function position_slider_Callback(source,~)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        % Depending on display type settings
-        switch ad.control.axis.displayType
-            case '1D along x'
-                ad.data{ad.control.data.active}.display.position.data(2) = ...
-                    int16(get(source,'value'));
-            case '1D along y'
-                ad.data{ad.control.data.active}.display.position.data(1) = ...
-                    int16(get(source,'value'));
-            otherwise
-                trEPRoptionUnknown(ad.control.axis.displayType,...
-                    'display type');
-        end
-        
-        % Set appdata from AVG GUI
-        setappdata(mainWindow,'data',ad.data);
-        
-        updateAxes();
-        update_position_display();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from AVG GUI
+    ad = getappdata(mainWindow);
+    
+    % Depending on display type settings
+    switch ad.control.axis.displayType
+        case '1D along x'
+            ad.data{ad.control.data.active}.display.position.data(2) = ...
+                int16(get(source,'value'));
+        case '1D along y'
+            ad.data{ad.control.data.active}.display.position.data(1) = ...
+                int16(get(source,'value'));
+        otherwise
+            trEPRoptionUnknown(ad.control.axis.displayType,...
+                'display type');
     end
+    
+    % Set appdata from AVG GUI
+    setappdata(mainWindow,'data',ad.data);
+    
+    updateAxes();
+    update_position_display();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function position_edit_Callback(source,~,position)
-    try
-        if isempty(position)
-            return;
-        end
-        
-        % If value is empty or NaN after conversion to numeric, restore
-        % previous entry and return
-        if (isempty(get(source,'String')) || isnan(str2double(get(source,'String')))...
-                || isnan(str2double(strrep(get(source,'String'),',','.'))) )
-            % Update slider panel
-            updateSliderPanel();
-            return;
-        end
-        
-        % Get appdata of AVG GUI
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        x = ad.data{ad.control.data.active}.axes.data(1).values;
-        y = ad.data{ad.control.data.active}.axes.data(2).values;
-        
-        switch position
-            case 'xindex'
-                value = round(str2double(get(source,'String')));
-                if (value > length(x)) 
-                    value = length(x); 
-                end
-                if (value < 1) 
-                    value = 1; 
-                end
-                ad.data{ad.control.data.active}.display.position.data(1) = ...
-                    value;
-            case 'xunit'
-                value = str2double(strrep(get(source,'String'),',','.'));
-                if (value < x(1)) 
-                    value = x(1); 
-                end
-                if (value > x(end)) 
-                    value = x(end); 
-                end
-                ad.data{ad.control.data.active}.display.position.data(1) = ...
-                    interp1(x,1:length(x),value,'nearest');
-            case 'yindex'
-                value = round(str2double(get(source,'String')));
-                if (value > length(y)) 
-                    value = length(y); 
-                end
-                if (value < 1) 
-                    value = 1; 
-                end
-                ad.data{ad.control.data.active}.display.position.data(2) = ...
-                    value;
-            case 'yunit'
-                value = str2double(strrep(get(source,'String'),',','.'));
-                if (value < y(1)) 
-                    value = y(1); 
-                end
-                if (value > y(end)) 
-                    value = y(end); 
-                end
-                ad.data{ad.control.data.active}.display.position.data(2) = ...
-                    interp1(y,1:length(y),value,'nearest');
-            otherwise
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider values display
-        updateSliderPanel()
-
-        %Update main axis
-        updateAxes();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(position)
+        return;
     end
+    
+    % If value is empty or NaN after conversion to numeric, restore
+    % previous entry and return
+    if (isempty(get(source,'String')) || isnan(str2double(get(source,'String')))...
+            || isnan(str2double(strrep(get(source,'String'),',','.'))) )
+        % Update slider panel
+        updateSliderPanel();
+        return;
+    end
+    
+    % Get appdata of AVG GUI
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    x = ad.data{ad.control.data.active}.axes.data(1).values;
+    y = ad.data{ad.control.data.active}.axes.data(2).values;
+    
+    switch position
+        case 'xindex'
+            value = round(str2double(get(source,'String')));
+            if (value > length(x))
+                value = length(x);
+            end
+            if (value < 1)
+                value = 1;
+            end
+            ad.data{ad.control.data.active}.display.position.data(1) = ...
+                value;
+        case 'xunit'
+            value = str2double(strrep(get(source,'String'),',','.'));
+            if (value < x(1))
+                value = x(1);
+            end
+            if (value > x(end))
+                value = x(end);
+            end
+            ad.data{ad.control.data.active}.display.position.data(1) = ...
+                interp1(x,1:length(x),value,'nearest');
+        case 'yindex'
+            value = round(str2double(get(source,'String')));
+            if (value > length(y))
+                value = length(y);
+            end
+            if (value < 1)
+                value = 1;
+            end
+            ad.data{ad.control.data.active}.display.position.data(2) = ...
+                value;
+        case 'yunit'
+            value = str2double(strrep(get(source,'String'),',','.'));
+            if (value < y(1))
+                value = y(1);
+            end
+            if (value > y(end))
+                value = y(end);
+            end
+            ad.data{ad.control.data.active}.display.position.data(2) = ...
+                interp1(y,1:length(y),value,'nearest');
+        otherwise
+            return;
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider values display
+    updateSliderPanel()
+    
+    %Update main axis
+    updateAxes();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function showposition_checkbox_Callback(source,~)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        ad.control.axis.position = get(source,'Value');
-        
-        % Set appdata from AVG GUI
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update display
-        updateAxes();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from AVG GUI
+    ad = getappdata(mainWindow);
+    
+    ad.control.axis.position = get(source,'Value');
+    
+    % Set appdata from AVG GUI
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update display
+    updateAxes();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function area_edit_Callback(source,~,position)
-    try
-        if isempty(position)
-            return;
-        end
-        
-        value = get(source,'String');
-        
-        % If value is empty, restore previous entry and return
-        if isempty(value)
-            % Update slider panel
-            updateAveragePanel();
-            return;
-        end
-        
-        % Get appdata of AVG GUI
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % Make code lines shorter and code easier to read
-        active = ad.control.data.active;
-
-        x = ad.data{active}.axes.data(1).values;
-        y = ad.data{active}.axes.data(2).values;
-        
-        if strcmpi(ad.avg.dimension,'x')
-            dim = x;
-        else
-            dim = y;
-        end
-        
-        switch position
-            case 'startindex'
-                value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
-                ad.data{active}.avg.start = value;
-                % Set stop value not overlapping
-                if ad.data{active}.avg.start > ad.data{active}.avg.stop
-                    % Check whether start + delta > length(dim)
-                    if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
-                        ad.data{active}.avg.stop = length(dim);
-                        ad.data{active}.avg.delta = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                    else
-                        ad.data{active}.avg.stop = ...
-                            ad.data{active}.avg.start+ad.data{active}.avg.delta;
-                    end
-                end
-                % Set delta value
-                ad.data{active}.avg.delta = ...
-                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
-            case 'startunit'
-                ad.data{active}.avg.start = ...
-                    trEPRguiSanitiseNumericInput(value,dim,'index',true);
-                % Set stop value not overlapping
-                if ad.data{active}.avg.start > ad.data{active}.avg.stop
-                    % Check whether start + delta > length(dim)
-                    if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
-                        ad.data{active}.avg.stop = length(dim);
-                        ad.data{active}.avg.delta = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                    else
-                        ad.data{active}.avg.stop = ...
-                            ad.data{active}.avg.start+ad.data{active}.avg.delta;
-                    end
-                end
-                % Set delta value
-                ad.data{active}.avg.delta = ...
-                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
-            case 'stopindex'
-                value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
-                ad.data{active}.avg.stop = value;
-                % Set start value not overlapping
-                if ad.data{active}.avg.start > ad.data{active}.avg.stop
-                    % Check whether stop - delta < length(dim)
-                    if (ad.data{active}.avg.stop - ad.data{active}.avg.delta < 1)
-                        ad.data{active}.avg.start = 1;
-                        ad.data{active}.avg.delta = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                    else
-                        ad.data{active}.avg.start = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.delta;
-                    end
-                end
-                % Set delta value
-                ad.data{active}.avg.delta = ...
-                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
-            case 'stopunit'
-                ad.data{active}.avg.stop = ...
-                    trEPRguiSanitiseNumericInput(value,dim,'index',true);
-                % Set start value not overlapping
-                if ad.data{active}.avg.start > ad.data{active}.avg.stop
-                    % Check whether stop - delta < length(dim)
-                    if (ad.data{active}.avg.stop - ad.data{active}.avg.delta < 1)
-                        ad.data{active}.avg.start = 1;
-                        ad.data{active}.avg.delta = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                    else
-                        ad.data{active}.avg.start = ...
-                            ad.data{active}.avg.stop-ad.data{active}.avg.delta;
-                    end
-                end
-                % Set delta value
-                ad.data{active}.avg.delta = ...
-                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
-            case 'deltaindex'
-                value = trEPRguiSanitiseNumericInput(value,0:length(dim),'round',true);
-                ad.data{active}.avg.delta = value;
-                % Check whether start + delta > length(dim)
-                if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
-                    ad.data{active}.avg.stop = length(dim);
-                    ad.data{active}.avg.delta = ...
-                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                else
-                    ad.data{active}.avg.stop = ...
-                        ad.data{active}.avg.start+ad.data{active}.avg.delta;
-                end
-            case 'deltaunit'
-                deltadim = 0+abs(dim(2)-dim(1)):abs(dim(2)-dim(1)):(abs(dim(2)-dim(1))*(length(dim)));
-                ad.data{active}.avg.delta = ...
-                    trEPRguiSanitiseNumericInput(value,deltadim,...
-                    'index',true);
-                if isnan(ad.data{active}.avg.delta)
-                    ad.data{active}.avg.delta = 0;
-                end
-                % Check whether start + delta > length(dim)
-                if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
-                    ad.data{active}.avg.stop = length(dim);
-                    ad.data{active}.avg.delta = ...
-                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
-                else
-                    ad.data{active}.avg.stop = ...
-                        ad.data{active}.avg.start+ad.data{active}.avg.delta;
-                end
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Set dimension and label for current averaging
-        ad.data{active}.avg.dimension = ad.avg.dimension;
-        ad.data{active}.avg.label = get(gh.label_edit,'String');
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-                
-        % Update average panel display
-        updateAveragePanel();
-
-        %Update main axis
-        updateAxes();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(position)
+        return;
     end
+    
+    value = get(source,'String');
+    
+    % If value is empty, restore previous entry and return
+    if isempty(value)
+        % Update slider panel
+        updateAveragePanel();
+        return;
+    end
+    
+    % Get appdata of AVG GUI
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Make code lines shorter and code easier to read
+    active = ad.control.data.active;
+    
+    x = ad.data{active}.axes.data(1).values;
+    y = ad.data{active}.axes.data(2).values;
+    
+    if strcmpi(ad.avg.dimension,'x')
+        dim = x;
+    else
+        dim = y;
+    end
+    
+    switch position
+        case 'startindex'
+            value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
+            ad.data{active}.avg.start = value;
+            % Set stop value not overlapping
+            if ad.data{active}.avg.start > ad.data{active}.avg.stop
+                % Check whether start + delta > length(dim)
+                if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
+                    ad.data{active}.avg.stop = length(dim);
+                    ad.data{active}.avg.delta = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
+                else
+                    ad.data{active}.avg.stop = ...
+                        ad.data{active}.avg.start+ad.data{active}.avg.delta;
+                end
+            end
+            % Set delta value
+            ad.data{active}.avg.delta = ...
+                ad.data{active}.avg.stop-ad.data{active}.avg.start;
+        case 'startunit'
+            ad.data{active}.avg.start = ...
+                trEPRguiSanitiseNumericInput(value,dim,'index',true);
+            % Set stop value not overlapping
+            if ad.data{active}.avg.start > ad.data{active}.avg.stop
+                % Check whether start + delta > length(dim)
+                if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
+                    ad.data{active}.avg.stop = length(dim);
+                    ad.data{active}.avg.delta = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
+                else
+                    ad.data{active}.avg.stop = ...
+                        ad.data{active}.avg.start+ad.data{active}.avg.delta;
+                end
+            end
+            % Set delta value
+            ad.data{active}.avg.delta = ...
+                ad.data{active}.avg.stop-ad.data{active}.avg.start;
+        case 'stopindex'
+            value = trEPRguiSanitiseNumericInput(value,1:length(dim),'round',true);
+            ad.data{active}.avg.stop = value;
+            % Set start value not overlapping
+            if ad.data{active}.avg.start > ad.data{active}.avg.stop
+                % Check whether stop - delta < length(dim)
+                if (ad.data{active}.avg.stop - ad.data{active}.avg.delta < 1)
+                    ad.data{active}.avg.start = 1;
+                    ad.data{active}.avg.delta = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
+                else
+                    ad.data{active}.avg.start = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.delta;
+                end
+            end
+            % Set delta value
+            ad.data{active}.avg.delta = ...
+                ad.data{active}.avg.stop-ad.data{active}.avg.start;
+        case 'stopunit'
+            ad.data{active}.avg.stop = ...
+                trEPRguiSanitiseNumericInput(value,dim,'index',true);
+            % Set start value not overlapping
+            if ad.data{active}.avg.start > ad.data{active}.avg.stop
+                % Check whether stop - delta < length(dim)
+                if (ad.data{active}.avg.stop - ad.data{active}.avg.delta < 1)
+                    ad.data{active}.avg.start = 1;
+                    ad.data{active}.avg.delta = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.start;
+                else
+                    ad.data{active}.avg.start = ...
+                        ad.data{active}.avg.stop-ad.data{active}.avg.delta;
+                end
+            end
+            % Set delta value
+            ad.data{active}.avg.delta = ...
+                ad.data{active}.avg.stop-ad.data{active}.avg.start;
+        case 'deltaindex'
+            value = trEPRguiSanitiseNumericInput(value,0:length(dim),'round',true);
+            ad.data{active}.avg.delta = value;
+            % Check whether start + delta > length(dim)
+            if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
+                ad.data{active}.avg.stop = length(dim);
+                ad.data{active}.avg.delta = ...
+                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
+            else
+                ad.data{active}.avg.stop = ...
+                    ad.data{active}.avg.start+ad.data{active}.avg.delta;
+            end
+        case 'deltaunit'
+            deltadim = 0+abs(dim(2)-dim(1)):abs(dim(2)-dim(1)):(abs(dim(2)-dim(1))*(length(dim)));
+            ad.data{active}.avg.delta = ...
+                trEPRguiSanitiseNumericInput(value,deltadim,...
+                'index',true);
+            if isnan(ad.data{active}.avg.delta)
+                ad.data{active}.avg.delta = 0;
+            end
+            % Check whether start + delta > length(dim)
+            if (ad.data{active}.avg.start + ad.data{active}.avg.delta > length(dim))
+                ad.data{active}.avg.stop = length(dim);
+                ad.data{active}.avg.delta = ...
+                    ad.data{active}.avg.stop-ad.data{active}.avg.start;
+            else
+                ad.data{active}.avg.stop = ...
+                    ad.data{active}.avg.start+ad.data{active}.avg.delta;
+            end
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    
+    % Set dimension and label for current averaging
+    ad.data{active}.avg.dimension = ad.avg.dimension;
+    ad.data{active}.avg.label = get(gh.label_edit,'String');
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update average panel display
+    updateAveragePanel();
+    
+    %Update main axis
+    updateAxes();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function visible_panel_listbox_Callback(source,~)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        ad.control.data.active = ad.control.data.visible(...
-            get(source,'Value')...
-            );
-        
-        % Set appdata from AVG GUI
-        setappdata(mainWindow,'control',ad.control);
-        
-        updateAxes();
-        update_position_display();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from AVG GUI
+    ad = getappdata(mainWindow);
+    
+    ad.control.data.active = ad.control.data.visible(...
+        get(source,'Value')...
+        );
+    
+    % Set appdata from AVG GUI
+    setappdata(mainWindow,'control',ad.control);
+    
+    updateAxes();
+    update_position_display();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function edit_Callback(source,~,field)
-    try
-        if isempty(field)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        value = get(source,'String');
-        
-        switch field
-            case 'label'
-                if ~isempty(value) && ad.data{ad.control.data.active}.avg.delta
-                    ad.data{ad.control.data.active}.avg.label = value;
-                    setappdata(mainWindow,'data',ad.data);
-                end
-                updateAveragePanel();
-            case 'averageareaAlpha'
-                value = str2double(strrep(get(source,'String'),',','.'));
-                if (isempty(value) || isnan(value))
-                    updateSettingsPanel();
-                    return;
-                end
-                set(gh.averageareasettings_alpha_edit,'String',num2str(value));
-                ad.avg.area.patch.alpha = value;
-                setappdata(mainWindow,'avg',ad.avg);
-                updateSettingsPanel();
-                updateAxes();
-            otherwise
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(field)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    value = get(source,'String');
+    
+    switch field
+        case 'label'
+            if ~isempty(value) && ad.data{ad.control.data.active}.avg.delta
+                ad.data{ad.control.data.active}.avg.label = value;
+                setappdata(mainWindow,'data',ad.data);
+            end
+            updateAveragePanel();
+        case 'averageareaAlpha'
+            value = str2double(strrep(get(source,'String'),',','.'));
+            if (isempty(value) || isnan(value))
+                updateSettingsPanel();
+                return;
+            end
+            set(gh.averageareasettings_alpha_edit,'String',num2str(value));
+            ad.avg.area.patch.alpha = value;
+            setappdata(mainWindow,'avg',ad.avg);
+            updateSettingsPanel();
+            updateAxes();
+        otherwise
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        values = cellstr(get(source,'String'));
-        value = values{get(source,'Value')};
-        
-        switch action
-            case 'dimension'
-                ad.avg.dimension = value(1);
-                setappdata(mainWindow,'avg',ad.avg);
-                % Reset average values (safest way to prevent trouble)
-                pushbutton_Callback('','','averageClear');
-                updateAxes();
-            case 'avglineWidth'
-                ad.avg.line.width = str2double(value(1));
-                setappdata(mainWindow,'avg',ad.avg);
-                updateAxes();
-            case 'avglineStyle'
-                % Get line style
-                [~,ind] = max(strcmp(value,lineStyles(:,1)));
-                ad.avg.line.style = char(lineStyles(ind,2));
-                setappdata(mainWindow,'avg',ad.avg);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end  
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    values = cellstr(get(source,'String'));
+    value = values{get(source,'Value')};
+    
+    switch action
+        case 'dimension'
+            ad.avg.dimension = value(1);
+            setappdata(mainWindow,'avg',ad.avg);
+            % Reset average values (safest way to prevent trouble)
+            pushbutton_Callback('','','averageClear');
+            updateAxes();
+        case 'avglineWidth'
+            ad.avg.line.width = str2double(value(1));
+            setappdata(mainWindow,'avg',ad.avg);
+            updateAxes();
+        case 'avglineStyle'
+            % Get line style
+            [~,ind] = max(strcmp(value,ad.lineStyles(:,1)));
+            ad.avg.line.style = char(ad.lineStyles(ind,2));
+            setappdata(mainWindow,'avg',ad.avg);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function togglebutton_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        % For those togglebuttons who do more complicated stuff
-        % Toggle button
-        if value % If toggle switched ON
-            switch lower(action)
-                case 'measurepick'
-                    % Switch off zoom
-                    zoom(mainWindow,'off');
-                    % Set pointer callback functions
-                    set(mainWindow,...
-                        'WindowButtonMotionFcn',@trackPointer);
-                    set(mainWindow,...
-                        'WindowButtonDownFcn',@switchMeasurePointer);
-                    return;
-                case 'zoom'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    % Reset other zoom toggle button
-                    zoom(mainWindow,'on');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridzero'
-                    ad.control.axis.grid.zero = value;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        else % If toggle button switched OFF
-            switch lower(action)
-                case 'measurepick'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    return;
-                case 'zoom'
-                    zoom(mainWindow,'off');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridzero'
-                    ad.control.axis.grid.zero = value;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        end
-        
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
-end
-        
-function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        switch action
-            case 'showMinimum'
-                % If no datasets are loaded, return
-                if isempty(ad.data)
-                    return;
-                end
-                [~,ximin] = min(min(ad.data{ad.control.data.active}.data));
-                [~,yimin] = min(ad.data{ad.control.data.active}.data(:,ximin));
-                ad.data{ad.control.data.active}.display.position.data(1) = ximin;
-                ad.data{ad.control.data.active}.display.position.data(2) = yimin;
-                
-                % Set appdata from AVG GUI
-                setappdata(mainWindow,'data',ad.data);
-                
-                updateAxes();
-                update_position_display();
-                return;
-            case 'showMaximum'
-                % If no datasets are loaded, return
-                if isempty(ad.data)
-                    return;
-                end
-                [~,ximax] = max(max(ad.data{ad.control.data.active}.data));
-                [~,yimax] = max(ad.data{ad.control.data.active}.data(:,ximax));
-                ad.data{ad.control.data.active}.display.position.data(1) = ximax;
-                ad.data{ad.control.data.active}.display.position.data(2) = yimax;
-                
-                % Set appdata from AVG GUI
-                setappdata(mainWindow,'data',ad.data);
-                
-                updateAxes();
-                update_position_display();
-                return;
-            case 'zoomReset'
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    % For those togglebuttons who do more complicated stuff
+    % Toggle button
+    if value % If toggle switched ON
+        switch lower(action)
+            case 'measurepick'
+                % Switch off zoom
                 zoom(mainWindow,'off');
-                set(gh.zoom_x_togglebutton,'Value',0);
-                set(gh.zoom_xy_togglebutton,'Value',0);
-                updateAxes();
+                % Set pointer callback functions
+                set(mainWindow,...
+                    'WindowButtonMotionFcn',@trackPointer);
+                set(mainWindow,...
+                    'WindowButtonDownFcn',@switchMeasurePointer);
                 return;
-            case'measureClear'
-                set(gh.measure_pick_togglebutton,'Value',0);
-                set(gh.measure_x_index_edit,'String','0');
-                set(gh.measure_x_unit_edit,'String','0');
-                set(gh.measure_y_index_edit,'String','0');
-                set(gh.measure_y_unit_edit,'String','0');
+            case 'zoom'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                % Reset other zoom toggle button
+                zoom(mainWindow,'on');
                 return;
-            case 'averageClear'
-                ad.data{ad.control.data.active}.avg.start = 1;
-                ad.data{ad.control.data.active}.avg.stop = 1;
-                ad.data{ad.control.data.active}.avg.delta = 0;
-                setappdata(mainWindow,'data',ad.data);
-                updateAveragePanel();
-                updateAxes();
-                return;
-            case 'Average'
-                if strcmp('x',ad.avg.dimension)
-                    ad.control.axis.displayType = '1D along y';
-                else
-                    ad.control.axis.displayType = '1D along x';
-                end
+            case 'gridx'
+                ad.control.axis.grid.x = 'on';
                 setappdata(mainWindow,'control',ad.control);
                 updateAxes();
                 return;
-            case 'averageareaColourPalette'
-                ad.avg.area.patch.color = uisetcolor(...
-                    ad.avg.area.patch.color,'Set average area colour');
-                setappdata(mainWindow,'avg',ad.avg);
-                updateSettingsPanel();
+            case 'gridy'
+                ad.control.axis.grid.y = 'on';
+                setappdata(mainWindow,'control',ad.control);
                 updateAxes();
                 return;
-            case 'avglineColourPalette'
-                ad.avg.line.color = uisetcolor(...
-                    ad.avg.line.color,'Set averaged data line colour');
-                setappdata(mainWindow,'avg',ad.avg);
-                updateSettingsPanel();
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'on';
+                setappdata(mainWindow,'control',ad.control);
                 updateAxes();
                 return;
-            case 'SettingsDefault'
-                updateSettingsPanel('defaults');
+            case 'gridzero'
+                ad.control.axis.grid.zero = value;
+                setappdata(mainWindow,'control',ad.control);
                 updateAxes();
                 return;
-            case 'Apply'
-                % Check for every dataset whether an average has been
-                % performed (avg.delta ~= 0) and if so, do proper AVG
-                ad.avgdata = cell(0);
-                for k=1:length(ad.data)
-                    if ad.data{k}.avg.delta
-                        avgparams = struct(...
-                            'dimension',ad.data{k}.avg.dimension,...
-                            'start',struct(...
-                                'index',ad.data{k}.avg.start,...
-                                'value',[],...
-                                'unit',''),...
-                            'stop',struct(...
-                                'index',ad.data{k}.avg.stop,...
-                                'value',[],...
-                                'unit',''),...
-                            'label',ad.data{k}.avg.label...
-                            );
-                        ad.avgdata{end+1} = trEPRAVG(ad.data{k},avgparams);
-                    end
-                end
-                setappdata(mainWindow,'avgdata',ad.avgdata);
-                return;
-            case 'Discard'
-                if isempty(ad.avgdata)
-                    return;
-                end
-                answer = questdlg(...
-                    {'Discard averaging for all datasets or'...
-                    'only for the dataset currently selected? '},...
-                    'Question: Discard all or only current...',...
-                    'All','Current','Cancel',...
-                    'Cancel');
-                switch answer
-                    case 'All'
-                        for k=1:length(ad.data)
-                            ad.data{k}.avg.start = 1;
-                            ad.data{k}.avg.stop = 1;
-                            ad.data{k}.avg.delta = 0;
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                        % Remove all datasets from ad.avgdata
-                        ad.avgdata = cell(0);
-                        setappdata(mainWindow,'avgdata',ad.avgdata);
-                        updateAveragePanel();
-                        updateAxes();
-                    case 'Current'
-                        ad.data{ad.control.data.active}.avg.start = 1;
-                        ad.data{ad.control.data.active}.avg.stop = 1;
-                        ad.data{ad.control.data.active}.avg.delta = 0;
-                        setappdata(mainWindow,'data',ad.data);
-                        updateAveragePanel();
-                        updateAxes();
-                        for k=length(ad.avgdata):-1:1
-                            if strcmp(ad.avgdata{k}.label,...
-                                    get(gh.label_edit,'String'))
-                                ad.avgdata(k) = [];
-                            end
-                        setappdata(mainWindow,'avgdata',ad.avgdata);
-                        end
-                    case 'Cancel'
-                        return;
-                    otherwise
-                        return;
-                end
-                return;
-            case 'Close'
-                if ~isempty(ad.avgdata)
-                    msgStr = {...
-                        ['Trying to append averaged data as new '...
-                        'datasets to main GUI.']...
-                        };
-                    trEPRmsg(msgStr,'info');
-                    % Return BLC data to main GUI
-                    for k=1:length(ad.avgdata)
-                        % Remove avg field in data structure
-                        if isfield(ad.avgdata{k},'avg')
-                            ad.avgdata{k}.avg = rmfield(ad.avgdata{k}.avg,'label');
-                        end
-                        status = trEPRappendDatasetToMainGUI(...
-                            ad.avgdata{k},...
-                            'modified',true);
-                        if status
-                            trEPRmsg(...
-                                ['Hmm... some problems with appending '...
-                                'baseline-correced dataset to main GUI.'],...
-                                'error');
-                        end
-                    end
-                end
-                % Look for AVG GUI Help window and if its there, close as
-                % well
-                hHelpWindow = findobj('Tag','trEPRgui_AVG_helpwindow');
-                if ishandle(hHelpWindow)
-                    delete(hHelpWindow);
-                end
-                delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('AVG GUI window closed.','debug');
             otherwise
                 trEPRoptionUnknown(action);
                 return;
         end
-    catch exception
-        trEPRexceptionHandling(exception)
+    else % If toggle button switched OFF
+        switch lower(action)
+            case 'measurepick'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                return;
+            case 'zoom'
+                zoom(mainWindow,'off');
+                return;
+            case 'gridx'
+                ad.control.axis.grid.x = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridy'
+                ad.control.axis.grid.y = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridzero'
+                ad.control.axis.grid.zero = value;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            otherwise
+                trEPRoptionUnknown(action);
+                return;
+        end
     end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function pushbutton_Callback(~,~,action)
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    switch action
+        case 'showMinimum'
+            % If no datasets are loaded, return
+            if isempty(ad.data)
+                return;
+            end
+            [~,ximin] = min(min(ad.data{ad.control.data.active}.data));
+            [~,yimin] = min(ad.data{ad.control.data.active}.data(:,ximin));
+            ad.data{ad.control.data.active}.display.position.data(1) = ximin;
+            ad.data{ad.control.data.active}.display.position.data(2) = yimin;
+            
+            % Set appdata from AVG GUI
+            setappdata(mainWindow,'data',ad.data);
+            
+            updateAxes();
+            update_position_display();
+            return;
+        case 'showMaximum'
+            % If no datasets are loaded, return
+            if isempty(ad.data)
+                return;
+            end
+            [~,ximax] = max(max(ad.data{ad.control.data.active}.data));
+            [~,yimax] = max(ad.data{ad.control.data.active}.data(:,ximax));
+            ad.data{ad.control.data.active}.display.position.data(1) = ximax;
+            ad.data{ad.control.data.active}.display.position.data(2) = yimax;
+            
+            % Set appdata from AVG GUI
+            setappdata(mainWindow,'data',ad.data);
+            
+            updateAxes();
+            update_position_display();
+            return;
+        case 'zoomReset'
+            zoom(mainWindow,'off');
+            set(gh.zoom_x_togglebutton,'Value',0);
+            set(gh.zoom_xy_togglebutton,'Value',0);
+            updateAxes();
+            return;
+        case'measureClear'
+            set(gh.measure_pick_togglebutton,'Value',0);
+            set(gh.measure_x_index_edit,'String','0');
+            set(gh.measure_x_unit_edit,'String','0');
+            set(gh.measure_y_index_edit,'String','0');
+            set(gh.measure_y_unit_edit,'String','0');
+            return;
+        case 'averageClear'
+            ad.data{ad.control.data.active}.avg.start = 1;
+            ad.data{ad.control.data.active}.avg.stop = 1;
+            ad.data{ad.control.data.active}.avg.delta = 0;
+            setappdata(mainWindow,'data',ad.data);
+            updateAveragePanel();
+            updateAxes();
+            return;
+        case 'Average'
+            if strcmp('x',ad.avg.dimension)
+                ad.control.axis.displayType = '1D along y';
+            else
+                ad.control.axis.displayType = '1D along x';
+            end
+            setappdata(mainWindow,'control',ad.control);
+            updateAxes();
+            return;
+        case 'averageareaColourPalette'
+            ad.avg.area.patch.color = uisetcolor(...
+                ad.avg.area.patch.color,'Set average area colour');
+            setappdata(mainWindow,'avg',ad.avg);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'avglineColourPalette'
+            ad.avg.line.color = uisetcolor(...
+                ad.avg.line.color,'Set averaged data line colour');
+            setappdata(mainWindow,'avg',ad.avg);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'SettingsDefault'
+            updateSettingsPanel('defaults');
+            updateAxes();
+            return;
+        case 'Apply'
+            % Check for every dataset whether an average has been
+            % performed (avg.delta ~= 0) and if so, do proper AVG
+            ad.avgdata = cell(0);
+            for k=1:length(ad.data)
+                if ad.data{k}.avg.delta
+                    avgparams = struct(...
+                        'dimension',ad.data{k}.avg.dimension,...
+                        'start',struct(...
+                        'index',ad.data{k}.avg.start,...
+                        'value',[],...
+                        'unit',''),...
+                        'stop',struct(...
+                        'index',ad.data{k}.avg.stop,...
+                        'value',[],...
+                        'unit',''),...
+                        'label',ad.data{k}.avg.label...
+                        );
+                    ad.avgdata{end+1} = trEPRAVG(ad.data{k},avgparams);
+                end
+            end
+            setappdata(mainWindow,'avgdata',ad.avgdata);
+            return;
+        case 'Discard'
+            if isempty(ad.avgdata)
+                return;
+            end
+            answer = questdlg(...
+                {'Discard averaging for all datasets or'...
+                'only for the dataset currently selected? '},...
+                'Question: Discard all or only current...',...
+                'All','Current','Cancel',...
+                'Cancel');
+            switch answer
+                case 'All'
+                    for k=1:length(ad.data)
+                        ad.data{k}.avg.start = 1;
+                        ad.data{k}.avg.stop = 1;
+                        ad.data{k}.avg.delta = 0;
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                    % Remove all datasets from ad.avgdata
+                    ad.avgdata = cell(0);
+                    setappdata(mainWindow,'avgdata',ad.avgdata);
+                    updateAveragePanel();
+                    updateAxes();
+                case 'Current'
+                    ad.data{ad.control.data.active}.avg.start = 1;
+                    ad.data{ad.control.data.active}.avg.stop = 1;
+                    ad.data{ad.control.data.active}.avg.delta = 0;
+                    setappdata(mainWindow,'data',ad.data);
+                    updateAveragePanel();
+                    updateAxes();
+                    for k=length(ad.avgdata):-1:1
+                        if strcmp(ad.avgdata{k}.label,...
+                                get(gh.label_edit,'String'))
+                            ad.avgdata(k) = [];
+                        end
+                        setappdata(mainWindow,'avgdata',ad.avgdata);
+                    end
+                case 'Cancel'
+                    return;
+                otherwise
+                    return;
+            end
+            return;
+        case 'Close'
+            if ~isempty(ad.avgdata)
+                msgStr = {...
+                    ['Trying to append averaged data as new '...
+                    'datasets to main GUI.']...
+                    };
+                trEPRmsg(msgStr,'info');
+                % Return BLC data to main GUI
+                for k=1:length(ad.avgdata)
+                    % Remove avg field in data structure
+                    if isfield(ad.avgdata{k},'avg')
+                        ad.avgdata{k}.avg = rmfield(ad.avgdata{k}.avg,'label');
+                    end
+                    status = trEPRappendDatasetToMainGUI(...
+                        ad.avgdata{k},...
+                        'modified',true);
+                    if status
+                        trEPRmsg(...
+                            ['Hmm... some problems with appending '...
+                            'baseline-correced dataset to main GUI.'],...
+                            'error');
+                    end
+                end
+            end
+            % Look for AVG GUI Help window and if its there, close as
+            % well
+            hHelpWindow = findobj('Tag','trEPRgui_AVG_helpwindow');
+            if ishandle(hHelpWindow)
+                delete(hHelpWindow);
+            end
+            delete(trEPRguiGetWindowHandle(mfilename));
+            trEPRmsg('AVG GUI window closed.','debug');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function slider_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        switch lower(action)
-            case 'averageareaalpha'
-                set(gh.averageareasettings_alpha_edit,'String',num2str(value));
-                ad.avg.area.patch.alpha = value;
-                setappdata(mainWindow,'avg',ad.avg);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
-end
     
-function displaytype_popupmenu_Callback(source,~)
-    try
-        % Get appdata of main window
-        ad = getappdata(hMainFigure);
-
-        % Get handles of main window
-        gh = guihandles(hMainFigure);
-        
-        displayTypes = cellstr(get(source,'String'));
-        ad.control.axis.displayType = displayTypes{get(source,'Value')};
-        
-        % Set appdata of main window
-        setappdata(hMainFigure,'control',ad.control);
-
-        % If no datasets are loaded, return
-        % NOTE: As we return only here, the display type gets set for later
-        if isempty(ad.data)
-            return;
-        end
-
-        switch ad.control.axis.displayType
-            case '2D plot'
-                set(gh.position_slider,'Enable','Off');
-                updateAxes()
-            case '1D along x'
-                set(gh.position_slider,'Enable','On');
-                updateAxes()
-            case '1D along y'
-                set(gh.position_slider,'Enable','On');
-                updateAxes()
-            otherwise
-                % unknown
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    switch lower(action)
+        case 'averageareaalpha'
+            set(gh.averageareasettings_alpha_edit,'String',num2str(value));
+            ad.avg.area.patch.alpha = value;
+            setappdata(mainWindow,'avg',ad.avg);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function displaytype_popupmenu_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    displayTypes = cellstr(get(source,'String'));
+    ad.control.axis.displayType = displayTypes{get(source,'Value')};
+    
+    % Set appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % If no datasets are loaded, return
+    % NOTE: As we return only here, the display type gets set for later
+    if isempty(ad.data)
+        return;
+    end
+    
+    switch ad.control.axis.displayType
+        case '2D plot'
+            set(gh.position_slider,'Enable','Off');
+            updateAxes()
+        case '1D along x'
+            set(gh.position_slider,'Enable','On');
+            updateAxes()
+        case '1D along y'
+            set(gh.position_slider,'Enable','On');
+            updateAxes()
+        otherwise
+            % unknown
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function keypress_Callback(src,evt)
-    try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier key
-            % was pressed...
-            return;
-        end
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                switch evt.Key
-                    case 'w'
-                        pushbutton_Callback(src,evt,'Close')
-                        return;
-                    case '1'
-                        switchPanel('Display');
-                        return;
-                    case '2'
-                        switchPanel('Average');
-                        return;
-                    case '3'
-                        switchPanel('Settings');
-                        return;
-                    case 'x'
-                        ad.control.axis.displayType = '1D along x';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'y'
-                        ad.control.axis.displayType = '1D along y';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'z'
-                        ad.control.axis.displayType = '2D plot';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                end
+try
+    if isempty(evt.Character) && isempty(evt.Key)
+        % In case "Character" is the empty string, i.e. only modifier key
+        % was pressed...
+        return;
+    end
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from AVG GUI
+    ad = getappdata(mainWindow);
+    
+    if ~isempty(evt.Modifier)
+        if (strcmpi(evt.Modifier{1},'command')) || ...
+                (strcmpi(evt.Modifier{1},'control'))
+            switch evt.Key
+                case 'w'
+                    pushbutton_Callback(src,evt,'Close')
+                    return;
+                case '1'
+                    switchPanel('Display');
+                    return;
+                case '2'
+                    switchPanel('Average');
+                    return;
+                case '3'
+                    switchPanel('Settings');
+                    return;
+                case 'x'
+                    ad.control.axis.displayType = '1D along x';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'y'
+                    ad.control.axis.displayType = '1D along y';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'z'
+                    ad.control.axis.displayType = '2D plot';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
             end
         end
-        switch evt.Key
-            case 'f1'
-                trEPRgui_AVG_helpwindow();
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
     end
+    switch evt.Key
+        case 'f1'
+            trEPRgui_AVG_helpwindow();
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1858,925 +1856,931 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function switchPanel(panelName)
-    try
-        panels = [pp1 pp2 pp3];
-        buttons = [tb1 tb2 tb3];
-        switch panelName
-            case 'Display'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp1,'Visible','on');
-                set(tb1,'Value',1);
-            case 'Average'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp2,'Visible','on');
-                set(tb2,'Value',1);
-                updateAveragePanel();
-            case 'Settings'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp3,'Visible','on');
-                set(tb3,'Value',1);
-                updateSettingsPanel();
-            otherwise
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    panels = [gh.display_panel gh.fit_panel gh.settings_panel];
+    buttons = [...
+        gh.datasets_togglebutton ...
+        gh.fit_togglebutton ...
+        gh.settings_togglebutton ...
+        ];
+    switch panelName
+        case 'Display'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.display_panel,'Visible','on');
+            set(gh.datasets_togglebutton,'Value',1);
+        case 'Average'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.fit_panel,'Visible','on');
+            set(gh.fit_togglebutton,'Value',1);
+            updateAveragePanel();
+        case 'Settings'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.settings_panel,'Visible','on');
+            set(gh.settings_togglebutton,'Value',1);
+            updateSettingsPanel();
+        otherwise
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateSliderPanel()
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata of AVG GUI
-        ad = getappdata(mainWindow);
-        
-        % Get handles of AVG GUI
-        gh = guihandles(mainWindow);
-        
-        if ~isfield(ad,'data') || isempty(ad.data)
-            set(findall(...
-                allchild(gh.sliderposition_panel),...
-                'Style','Edit'),'String','1');
-            return;
-        end
-
-        % Get dimensions and axes of current dataset
-        x = ad.data{ad.control.data.active}.axes.data(1).values;
-        y = ad.data{ad.control.data.active}.axes.data(2).values;
-        % In case that we loaded 1D data...
-        if isscalar(x)
-            x = [x x+1];
-        end
-        if isscalar(y)
-            y = [y y+1];
-        end
-        
-        % update position panel
-        set(...
-            gh.sliderposition_x_index_edit,...
-            'string',...
-            ad.data{ad.control.data.active}.display.position.data(1)...
-            );
-        set(...
-            gh.sliderposition_x_unit_edit,...
-            'string',...
-            x(ad.data{ad.control.data.active}.display.position.data(1))...
-            );
-        set(...
-            gh.sliderposition_y_index_edit,...
-            'string',...
-            ad.data{ad.control.data.active}.display.position.data(2)...
-            );
-        set(...
-            gh.sliderposition_y_unit_edit,...
-            'string',...
-            y(ad.data{ad.control.data.active}.display.position.data(2))...
-            );
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata of AVG GUI
+    ad = getappdata(mainWindow);
+    
+    % Get handles of AVG GUI
+    gh = ad.guiHandles;
+    
+    if ~isfield(ad,'data') || isempty(ad.data)
+        set(findall(...
+            allchild(gh.sliderposition_panel),...
+            'Style','Edit'),'String','1');
+        return;
     end
+    
+    % Get dimensions and axes of current dataset
+    x = ad.data{ad.control.data.active}.axes.data(1).values;
+    y = ad.data{ad.control.data.active}.axes.data(2).values;
+    % In case that we loaded 1D data...
+    if isscalar(x)
+        x = [x x+1];
+    end
+    if isscalar(y)
+        y = [y y+1];
+    end
+    
+    % update position panel
+    set(...
+        gh.sliderposition_x_index_edit,...
+        'string',...
+        ad.data{ad.control.data.active}.display.position.data(1)...
+        );
+    set(...
+        gh.sliderposition_x_unit_edit,...
+        'string',...
+        x(ad.data{ad.control.data.active}.display.position.data(1))...
+        );
+    set(...
+        gh.sliderposition_y_index_edit,...
+        'string',...
+        ad.data{ad.control.data.active}.display.position.data(2)...
+        );
+    set(...
+        gh.sliderposition_y_unit_edit,...
+        'string',...
+        y(ad.data{ad.control.data.active}.display.position.data(2))...
+        );
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateAveragePanel()
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata of AVG GUI
-        ad = getappdata(mainWindow);
-        
-        % Get handles of AVG GUI
-        gh = guihandles(mainWindow);
-        
-        if ~isfield(ad,'data') || isempty(ad.data)
-            set(findall(...
-                allchild(gh.sliderposition_panel),...
-                'Style','Edit'),'String','1');
-            return;
-        end
-
-        % Make codelines shorter and easier to read
-        active = ad.control.data.active;
-        
-        % Set label field
-        if isempty(ad.data{active}.avg.label)
-            ad.data{active}.avg.label = sprintf('%s (AVG, %s)',...
-                ad.data{active}.label,ad.avg.dimension);
-        end
-        set(gh.label_edit,'String',ad.data{active}.avg.label);
-        
-        % Get dimensions and axes of current dataset
-        x = ad.data{active}.axes.data(1).values;
-        y = ad.data{active}.axes.data(2).values;
-        % In case that we loaded 1D data...
-        if isscalar(x)
-            x = [x x+1];
-        end
-        if isscalar(y)
-            y = [y y+1];
-        end
-        
-        % update position panel
-        set(...
-            gh.average_start_index_edit,...
-            'string',...
-            ad.data{active}.avg.start...
-            );
-        set(...
-            gh.average_stop_index_edit,...
-            'string',...
-            ad.data{active}.avg.stop...
-            );
-        set(...
-            gh.average_delta_index_edit,...
-            'string',...
-            ad.data{active}.avg.delta...
-            );
-
-        if strcmpi(ad.avg.dimension,'x')
-            set(gh.average_start_unit_edit,...
-                'string',num2str(x(ad.data{active}.avg.start))...
-                );
-            set(gh.average_stop_unit_edit,...
-                'string',num2str(x(ad.data{active}.avg.stop))...
-                );
-            set(gh.average_delta_unit_edit,...
-                'string',num2str(abs(x(2)-x(1))*ad.data{active}.avg.delta)...
-                );
-        else
-            set(gh.average_start_unit_edit,...
-                'string',num2str(y(ad.data{active}.avg.start))...
-                );
-            set(gh.average_stop_unit_edit,...
-                'string',num2str(y(ad.data{active}.avg.stop))...
-                );
-            set(gh.average_delta_unit_edit,...
-                'string',num2str(abs(y(2)-y(1))*ad.data{active}.avg.delta)...
-                );
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata of AVG GUI
+    ad = getappdata(mainWindow);
+    
+    % Get handles of AVG GUI
+    gh = ad.guiHandles;
+    
+    if ~isfield(ad,'data') || isempty(ad.data)
+        set(findall(...
+            allchild(gh.sliderposition_panel),...
+            'Style','Edit'),'String','1');
+        return;
     end
+    
+    % Make codelines shorter and easier to read
+    active = ad.control.data.active;
+    
+    % Set label field
+    if isempty(ad.data{active}.avg.label)
+        ad.data{active}.avg.label = sprintf('%s (AVG, %s)',...
+            ad.data{active}.label,ad.avg.dimension);
+    end
+    set(gh.label_edit,'String',ad.data{active}.avg.label);
+    
+    % Get dimensions and axes of current dataset
+    x = ad.data{active}.axes.data(1).values;
+    y = ad.data{active}.axes.data(2).values;
+    % In case that we loaded 1D data...
+    if isscalar(x)
+        x = [x x+1];
+    end
+    if isscalar(y)
+        y = [y y+1];
+    end
+    
+    % update position panel
+    set(...
+        gh.average_start_index_edit,...
+        'string',...
+        ad.data{active}.avg.start...
+        );
+    set(...
+        gh.average_stop_index_edit,...
+        'string',...
+        ad.data{active}.avg.stop...
+        );
+    set(...
+        gh.average_delta_index_edit,...
+        'string',...
+        ad.data{active}.avg.delta...
+        );
+    
+    if strcmpi(ad.avg.dimension,'x')
+        set(gh.average_start_unit_edit,...
+            'string',num2str(x(ad.data{active}.avg.start))...
+            );
+        set(gh.average_stop_unit_edit,...
+            'string',num2str(x(ad.data{active}.avg.stop))...
+            );
+        set(gh.average_delta_unit_edit,...
+            'string',num2str(abs(x(2)-x(1))*ad.data{active}.avg.delta)...
+            );
+    else
+        set(gh.average_start_unit_edit,...
+            'string',num2str(y(ad.data{active}.avg.start))...
+            );
+        set(gh.average_stop_unit_edit,...
+            'string',num2str(y(ad.data{active}.avg.stop))...
+            );
+        set(gh.average_delta_unit_edit,...
+            'string',num2str(abs(y(2)-y(1))*ad.data{active}.avg.delta)...
+            );
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateSettingsPanel(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-
-        % Get handles from main window
-        gh = guidata(mainWindow);
-               
-        if nargin && strcmpi('defaults',varargin{1})
-            % Reset display settings
-            ad.control.axis.grid.x = ad.configuration.axis.grid.x;
-            ad.control.axis.grid.y = ad.configuration.axis.grid.y;
-            ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
-            ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
-            % Reset avg settings
-            ad.avg.area.patch.color = ad.configuration.avg.area.patch.color;
-            ad.avg.area.patch.alpha = ad.configuration.avg.area.patch.alpha;
-            ad.avg.line.color = ad.configuration.avg.line.color;
-            ad.avg.line.width = ad.configuration.avg.line.width;
-            ad.avg.line.style = ad.configuration.avg.line.style;
-            setappdata(mainWindow,'avg',ad.avg);
-            setappdata(mainWindow,'control',ad.control);
-        end
-        
-        if strcmpi('on',ad.control.axis.grid.x)
-            set(gh.grid_x_togglebutton,'Value',1);
-        else
-            set(gh.grid_x_togglebutton,'Value',0);
-        end
-        if strcmpi('on',ad.control.axis.grid.y)
-            set(gh.grid_y_togglebutton,'Value',1);
-        else
-            set(gh.grid_y_togglebutton,'Value',0);
-        end
-        if strcmpi('on',ad.control.axis.grid.minor)
-            set(gh.grid_minor_togglebutton,'Value',1);
-        else
-            set(gh.grid_minor_togglebutton,'Value',0);
-        end
-        set(gh.grid_zero_togglebutton,'Value',ad.control.axis.grid.zero);
-        
-        set(gh.averageareasettings_coloursample_text,'Background',...
-            ad.avg.area.patch.color);
-        set(gh.averageareasettings_alpha_edit,'String',...
-            num2str(ad.avg.area.patch.alpha));
-        set(gh.averageareasettings_alpha_slider,'Value',...
-            ad.avg.area.patch.alpha);
-        
-        set(gh.avglinesettings_coloursample_text,'Background',...
-            ad.avg.line.color);
-        % Line width
-        values = cellstr(get(gh.avglinesettings_width_popupmenu,'String'));
-        [~,ind] = max(strcmp(sprintf('%i px',ad.avg.line.width),values));
-        set(gh.avglinesettings_width_popupmenu,'Value',ind)
-        % Line style
-        values = cellstr(get(gh.avglinesettings_style_popupmenu,'String'));
-        [~,ind] = max(strcmp(ad.avg.line.style,lineStyles(:,2)));
-        [~,ind2] = max(strcmp(lineStyles(ind,2),values));
-        set(gh.avglinesettings_style_popupmenu,'Value',ind2)
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
-end
-        
-function updateSpectra()
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from AVG GUI
-        ad = getappdata(mainWindow);
-        
-        if isempty(ad.data) || isempty(ad.control.data.visible)
-            return;
-        end
-        
-        % Get handle for visible spectra listbox
-        gh = guidata(mainWindow);
-        visLbox = gh.visible_panel_listbox;
-        
-        % Get indices of invisible spectra
-        vis = ad.control.data.visible;
-        
-        % Get names for display in listbox
-        labels = cell(0);
-        for k=1:length(vis)
-            labels{k} = ad.data{vis(k)}.label;
-        end
-        
-        % Update status display
-        set(visLbox,'String',labels);
-        if (get(visLbox,'Value')>length(vis))
-            set(visLbox,'Value',length(vis));
-        end
-        if ((get(visLbox,'Value')==0) && ~isempty(vis))
-            set(visLbox,'Value',1);
-        end
-        
-        % Highlight currently active
-        if ad.control.data.active
-            set(visLbox,'Value',find(vis==ad.control.data.active));
-        end
-        
-        % Change enable status of pushbuttons and other elements
-        set(gh.slider_panel_maximum_pushbutton,'Enable','on');
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
-end
-
-function update_position_display()
+try
     mainWindow = trEPRguiGetWindowHandle(mfilename);
     % Get appdata from AVG GUI
     ad = getappdata(mainWindow);
+    
+    % Get handles from main window
+    gh = ad.guiHandles;
+    
+    if nargin && strcmpi('defaults',varargin{1})
+        % Reset display settings
+        ad.control.axis.grid.x = ad.configuration.axis.grid.x;
+        ad.control.axis.grid.y = ad.configuration.axis.grid.y;
+        ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
+        ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
+        % Reset avg settings
+        ad.avg.area.patch.color = ad.configuration.avg.area.patch.color;
+        ad.avg.area.patch.alpha = ad.configuration.avg.area.patch.alpha;
+        ad.avg.line.color = ad.configuration.avg.line.color;
+        ad.avg.line.width = ad.configuration.avg.line.width;
+        ad.avg.line.style = ad.configuration.avg.line.style;
+        setappdata(mainWindow,'avg',ad.avg);
+        setappdata(mainWindow,'control',ad.control);
+    end
+    
+    if strcmpi('on',ad.control.axis.grid.x)
+        set(gh.grid_x_togglebutton,'Value',1);
+    else
+        set(gh.grid_x_togglebutton,'Value',0);
+    end
+    if strcmpi('on',ad.control.axis.grid.y)
+        set(gh.grid_y_togglebutton,'Value',1);
+    else
+        set(gh.grid_y_togglebutton,'Value',0);
+    end
+    if strcmpi('on',ad.control.axis.grid.minor)
+        set(gh.grid_minor_togglebutton,'Value',1);
+    else
+        set(gh.grid_minor_togglebutton,'Value',0);
+    end
+    set(gh.grid_zero_togglebutton,'Value',ad.control.axis.grid.zero);
+    
+    set(gh.averageareasettings_coloursample_text,'Background',...
+        ad.avg.area.patch.color);
+    set(gh.averageareasettings_alpha_edit,'String',...
+        num2str(ad.avg.area.patch.alpha));
+    set(gh.averageareasettings_alpha_slider,'Value',...
+        ad.avg.area.patch.alpha);
+    
+    set(gh.avglinesettings_coloursample_text,'Background',...
+        ad.avg.line.color);
+    % Line width
+    values = cellstr(get(gh.avglinesettings_width_popupmenu,'String'));
+    [~,ind] = max(strcmp(sprintf('%i px',ad.avg.line.width),values));
+    set(gh.avglinesettings_width_popupmenu,'Value',ind)
+    % Line style
+    values = cellstr(get(gh.avglinesettings_style_popupmenu,'String'));
+    [~,ind] = max(strcmp(ad.avg.line.style,ad.lineStyles(:,2)));
+    [~,ind2] = max(strcmp(ad.lineStyles(ind,2),values));
+    set(gh.avglinesettings_style_popupmenu,'Value',ind2)
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function updateSpectra()
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from AVG GUI
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
 
     if isempty(ad.data) || isempty(ad.control.data.visible)
         return;
     end
     
     % Get handle for visible spectra listbox
-    gh = guidata(mainWindow);
+    visLbox = gh.visible_panel_listbox;
+    
+    % Get indices of invisible spectra
+    vis = ad.control.data.visible;
+    
+    % Get names for display in listbox
+    labels = cell(0);
+    for k=1:length(vis)
+        labels{k} = ad.data{vis(k)}.label;
+    end
+    
+    % Update status display
+    set(visLbox,'String',labels);
+    if (get(visLbox,'Value')>length(vis))
+        set(visLbox,'Value',length(vis));
+    end
+    if ((get(visLbox,'Value')==0) && ~isempty(vis))
+        set(visLbox,'Value',1);
+    end
+    
+    % Highlight currently active
+    if ad.control.data.active
+        set(visLbox,'Value',find(vis==ad.control.data.active));
+    end
+    
+    % Change enable status of pushbuttons and other elements
+    set(gh.slider_panel_maximum_pushbutton,'Enable','on');
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
 
-    try
-        % Set position in time edit boxes
-        set(gh.sliderposition_y_index_edit,...
-            'String',...
-            num2str(ad.data{ad.control.data.active}.display.position.data(2)));
-        % Set unit
-        y = ad.data{ad.control.data.active}.axes.data(2).values;
-        set(gh.sliderposition_y_unit_edit,...
-            'String',...
-            num2str(y(ad.data{ad.control.data.active}.display.position.data(2))));
-        
-        % Set position in time edit boxes
-        set(gh.sliderposition_x_index_edit,...
-            'String',...
-            num2str(ad.data{ad.control.data.active}.display.position.data(1)));
-        % Set unit
-        x = ad.data{ad.control.data.active}.axes.data(1).values;
-        set(gh.sliderposition_x_unit_edit,...
-            'String',...
-            num2str(x(ad.data{ad.control.data.active}.display.position.data(1))));
-        
-        % Set slider
-        switch ad.control.axis.displayType
-            case '1D along x'
-                set(gh.position_slider,'Value',...
-                    ad.data{ad.control.data.active}.display.position.data(2));
-            case '1D along y'
-                set(gh.position_slider,'Value',...
-                    ad.data{ad.control.data.active}.display.position.data(1));
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+function update_position_display()
+mainWindow = trEPRguiGetWindowHandle(mfilename);
+% Get appdata from AVG GUI
+ad = getappdata(mainWindow);
+
+if isempty(ad.data) || isempty(ad.control.data.visible)
+    return;
+end
+
+% Get handle for visible spectra listbox
+gh = ad.guiHandles;
+
+try
+    % Set position in time edit boxes
+    set(gh.sliderposition_y_index_edit,...
+        'String',...
+        num2str(ad.data{ad.control.data.active}.display.position.data(2)));
+    % Set unit
+    y = ad.data{ad.control.data.active}.axes.data(2).values;
+    set(gh.sliderposition_y_unit_edit,...
+        'String',...
+        num2str(y(ad.data{ad.control.data.active}.display.position.data(2))));
+    
+    % Set position in time edit boxes
+    set(gh.sliderposition_x_index_edit,...
+        'String',...
+        num2str(ad.data{ad.control.data.active}.display.position.data(1)));
+    % Set unit
+    x = ad.data{ad.control.data.active}.axes.data(1).values;
+    set(gh.sliderposition_x_unit_edit,...
+        'String',...
+        num2str(x(ad.data{ad.control.data.active}.display.position.data(1))));
+    
+    % Set slider
+    switch ad.control.axis.displayType
+        case '1D along x'
+            set(gh.position_slider,'Value',...
+                ad.data{ad.control.data.active}.display.position.data(2));
+        case '1D along y'
+            set(gh.position_slider,'Value',...
+                ad.data{ad.control.data.active}.display.position.data(1));
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 
 function updateAxes()
-    mainWindow = trEPRguiGetWindowHandle(mfilename);
-    % Get appdata from AVG GUI
-    ad = getappdata(mainWindow);
+mainWindow = trEPRguiGetWindowHandle(mfilename);
+% Get appdata from AVG GUI
+ad = getappdata(mainWindow);
 
-    % Get handles from main window
-    gh = guidata(mainWindow);
+% Get handles from main window
+gh = ad.guiHandles;
+
+if isempty(ad.data) || isempty(ad.control.data.visible)
+    %         % Display splash
+    %         try
+    %             set(mainWindow,'CurrentAxes',hPlotAxes);
+    %             splash = imread(fullfile(trEPRinfo('dir'),...
+    %                 'GUI','private','splashes','fitGUISplash.png'),'png');
+    %             image(splash);
+    %             axis off          % Remove axis ticks and numbers
+    %         catch exception
+    %             % If this happens, something probably more serious went wrong...
+    %             throw(exception);
+    %         end
+    return;
+end
+
+try
+    % Set displayType popupmenu
+    displayTypes = cellstr(...
+        get(gh.displaytype_popupmenu,'String'));
+    [~,index] = max(strcmp(ad.control.axis.displayType,displayTypes));
+    set(gh.displaytype_popupmenu,'Value',index);
     
-    if isempty(ad.data) || isempty(ad.control.data.visible)
-%         % Display splash
-%         try
-%             set(hMainFigure,'CurrentAxes',hPlotAxes);
-%             splash = imread(fullfile(trEPRinfo('dir'),...
-%                 'GUI','private','splashes','fitGUISplash.png'),'png');
-%             image(splash);
-%             axis off          % Remove axis ticks and numbers
-%         catch exception
-%             % If this happens, something probably more serious went wrong...
-%             throw(exception);
-%         end
-        return;
+    data = ad.data{ad.control.data.active}.data;
+    xvalues = ad.data{ad.control.data.active}.axes.data(1).values;
+    xmeasure = ad.data{ad.control.data.active}.axes.data(1).measure;
+    xunit = ad.data{ad.control.data.active}.axes.data(1).unit;
+    yvalues = ad.data{ad.control.data.active}.axes.data(2).values;
+    ymeasure = ad.data{ad.control.data.active}.axes.data(2).measure;
+    yunit = ad.data{ad.control.data.active}.axes.data(2).unit;
+    
+    [y,x] = size(data);
+    
+    cla(gh.axis,'reset');
+    axes(gh.axis);
+    switch ad.control.axis.displayType
+        case '2D plot'
+            % Disable position slider
+            set(gh.position_slider,'Enable','off');
+            
+            z = [ min(min(data)) max(max(data)) ];
+            hold on;
+            % Plot 2D data
+            imagesc(...
+                xvalues,...
+                yvalues,...
+                data,'Parent',gh.axis);
+            if ad.control.axis.position
+                % Plot red line with position in time
+                plot(gh.axis,...
+                    [xvalues(ad.data{ad.control.data.active}.display.position.data(1)) ...
+                    xvalues(ad.data{ad.control.data.active}.display.position.data(1))],...
+                    [yvalues(1) yvalues(end)],...
+                    'r-');
+                % Plot red line with position in field
+                plot(gh.axis,...
+                    [xvalues(1) xvalues(end)],...
+                    [yvalues(ad.data{ad.control.data.active}.display.position.data(2)) ...
+                    yvalues(ad.data{ad.control.data.active}.display.position.data(2))],...
+                    'r-');
+            end
+            hold off;
+            if isscalar(xvalues)
+                set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+            else
+                set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+            end
+            if isscalar(yvalues)
+                set(gh.axis,'YLim',[yvalues(1)-1 yvalues(1)+1]);
+            else
+                set(gh.axis,'YLim',[yvalues(1) yvalues(end)]);
+            end
+            set(gh.axis,'YDir','normal');
+            set(gh.axis,'CLim',z);
+            xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
+            ylabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
+            
+        case '1D along x'
+            % Enable position slider only if second axis has more than one value
+            if (y>1)
+                set(gh.position_slider,...
+                    'Min',1,'Max',y,...
+                    'Value',...
+                    ad.data{ad.control.data.active}.display.position.data(2),...
+                    'SliderStep',[1/(y-1) 10/(y-1)],...
+                    'Enable','on');
+            else
+                set(gh.position_slider,...
+                    'Enable','off'...
+                    );
+            end
+            % Plot time trace at given position in spectrum
+            hold on;
+            plot(gh.axis,...
+                xvalues,...
+                data(...
+                ad.data{ad.control.data.active}.display.position.data(2),:),...
+                'k-');
+            if isscalar(xvalues)
+                set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+            else
+                set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
+            end
+            z = [ min(min(data)) max(max(data)) ];
+            ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
+            set(gh.axis,'YLim',ZLim);
+            if ad.control.axis.position
+                % Plot red line with position in time
+                plot(gh.axis,...
+                    [xvalues(ad.data{ad.control.data.active}.display.position.data(1)) ...
+                    xvalues(ad.data{ad.control.data.active}.display.position.data(1))],...
+                    ZLim,...
+                    'r-');
+            end
+            if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'y')
+                % Plot average spectrum
+                plot(gh.axis,...
+                    xvalues,...
+                    mean(data(ad.data{ad.control.data.active}.avg.start:...
+                    ad.data{ad.control.data.active}.avg.stop,:),1),...
+                    'LineStyle',ad.avg.line.style,...
+                    'Color',ad.avg.line.color,...
+                    'LineWidth',ad.avg.line.width);
+            end
+            hold off;
+            if (ad.control.axis.grid.zero)
+                line(...
+                    [xvalues(1) xvalues(end)],...
+                    [0 0],...
+                    'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                    'Parent',gh.axis);
+            end
+            set(gh.axis,'YTickLabel',[]);
+            xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
+            if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'x')
+                ylim = get(gh.axis,'YLim');
+                patch(...
+                    'XData',[...
+                    xvalues(ad.data{ad.control.data.active}.avg.start) ...
+                    xvalues(ad.data{ad.control.data.active}.avg.start)...
+                    xvalues(ad.data{ad.control.data.active}.avg.stop) ...
+                    xvalues(ad.data{ad.control.data.active}.avg.stop)],...
+                    'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
+                    'ZData',[0 0 0 0],...
+                    'EdgeColor',ad.avg.area.patch.edge,...
+                    'FaceColor',ad.avg.area.patch.color,...
+                    'FaceAlpha',ad.avg.area.patch.alpha,...
+                    'Parent',gh.axis);
+            end
+        case '1D along y'
+            % Enable position slider only if second axis has more than one value
+            if (x>1)
+                set(gh.position_slider,...
+                    'Min',1,'Max',x,...
+                    'Value',...
+                    ad.data{ad.control.data.active}.display.position.data(1),...
+                    'SliderStep',[1/(x-1) 10/(x-1)],...
+                    'Enable','on');
+            else
+                set(gh.position_slider,...
+                    'Enable','off'...
+                    );
+            end
+            % Plot B0 spectrum at given position in time
+            hold on;
+            % Including this (redundand) line here seems to prevent
+            % Matlab from crashing due to stupid errors (plot: vectors
+            % must be of same length) when being too fast with the
+            % sliders.
+            plot(gh.axis,...
+                yvalues,...
+                data(...
+                :,ad.data{ad.control.data.active}.display.position.data(1)),...
+                'k-');
+            if isscalar(yvalues)
+                set(gh.axis,'XLim',[yvalues(1)-1 yvalues(1)+1]);
+            else
+                set(gh.axis,'XLim',[yvalues(1) yvalues(end)]);
+            end
+            z = [ min(min(data)) max(max(data)) ];
+            ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
+            set(gh.axis,'YLim',ZLim);
+            if ad.control.axis.position
+                % Plot red line with position in time
+                plot(gh.axis,...
+                    [yvalues(ad.data{ad.control.data.active}.display.position.data(2)) ...
+                    yvalues(ad.data{ad.control.data.active}.display.position.data(2))],...
+                    ZLim,...
+                    'r-');
+            end
+            if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'x')
+                % Plot average spectrum
+                plot(gh.axis,...
+                    yvalues,...
+                    mean(data(:,ad.data{ad.control.data.active}.avg.start:ad.data{ad.control.data.active}.avg.stop),2),...
+                    'LineStyle',ad.avg.line.style,...
+                    'Color',ad.avg.line.color,...
+                    'LineWidth',ad.avg.line.width);
+            end
+            hold off;
+            if (ad.control.axis.grid.zero)
+                line(...
+                    [yvalues(1) yvalues(end)],...
+                    [0 0],...
+                    'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                    'Parent',gh.axis);
+            end
+            set(gh.axis,'YTickLabel',[]);
+            xlabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
+            if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'y')
+                ylim = get(gh.axis,'YLim');
+                patch(...
+                    'XData',[...
+                    yvalues(ad.data{ad.control.data.active}.avg.start)...
+                    yvalues(ad.data{ad.control.data.active}.avg.start)...
+                    yvalues(ad.data{ad.control.data.active}.avg.stop)...
+                    yvalues(ad.data{ad.control.data.active}.avg.stop)],...
+                    'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
+                    'ZData',[0 0 0 0],...
+                    'EdgeColor',ad.avg.area.patch.edge,...
+                    'FaceColor',ad.avg.area.patch.color,...
+                    'FaceAlpha',ad.avg.area.patch.alpha,...
+                    'Parent',gh.axis);
+            end
     end
     
-    try
-        % Set displayType popupmenu
-        displayTypes = cellstr(...
-            get(gh.displaytype_popupmenu,'String'));
-        [~,index] = max(strcmp(ad.control.axis.displayType,displayTypes));
-        set(gh.displaytype_popupmenu,'Value',index);
-        
-        data = ad.data{ad.control.data.active}.data;
-        xvalues = ad.data{ad.control.data.active}.axes.data(1).values;
-        xmeasure = ad.data{ad.control.data.active}.axes.data(1).measure;
-        xunit = ad.data{ad.control.data.active}.axes.data(1).unit;
-        yvalues = ad.data{ad.control.data.active}.axes.data(2).values;
-        ymeasure = ad.data{ad.control.data.active}.axes.data(2).measure;
-        yunit = ad.data{ad.control.data.active}.axes.data(2).unit;
-
-        [y,x] = size(data);
-        
-        cla(gh.axis,'reset');
-        axes(gh.axis);
-        switch ad.control.axis.displayType
-            case '2D plot'
-                % Disable position slider
-                set(gh.position_slider,'Enable','off');
-
-                z = [ min(min(data)) max(max(data)) ];
-                hold on;
-                % Plot 2D data
-                imagesc(...
-                    xvalues,...
-                    yvalues,...
-                    data,'Parent',gh.axis);
-                if ad.control.axis.position
-                    % Plot red line with position in time
-                    plot(gh.axis,...
-                        [xvalues(ad.data{ad.control.data.active}.display.position.data(1)) ...
-                        xvalues(ad.data{ad.control.data.active}.display.position.data(1))],...
-                        [yvalues(1) yvalues(end)],...
-                        'r-');
-                    % Plot red line with position in field
-                    plot(gh.axis,...
-                        [xvalues(1) xvalues(end)],...
-                        [yvalues(ad.data{ad.control.data.active}.display.position.data(2)) ...
-                        yvalues(ad.data{ad.control.data.active}.display.position.data(2))],...
-                        'r-');
-                end
-                hold off;
-                if isscalar(xvalues)
-                    set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
-                else
-                    set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
-                end
-                if isscalar(yvalues)
-                    set(gh.axis,'YLim',[yvalues(1)-1 yvalues(1)+1]);
-                else
-                    set(gh.axis,'YLim',[yvalues(1) yvalues(end)]);
-                end
-                set(gh.axis,'YDir','normal');
-                set(gh.axis,'CLim',z);
-                xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
-                ylabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
-
-            case '1D along x'
-                % Enable position slider only if second axis has more than one value
-                if (y>1)
-                    set(gh.position_slider,...
-                        'Min',1,'Max',y,...
-                        'Value',...
-                        ad.data{ad.control.data.active}.display.position.data(2),...
-                        'SliderStep',[1/(y-1) 10/(y-1)],...
-                        'Enable','on');
-                else
-                    set(gh.position_slider,...
-                        'Enable','off'...
-                        );
-                end
-                % Plot time trace at given position in spectrum
-                hold on;
-                plot(gh.axis,...
-                    xvalues,...
-                    data(...
-                    ad.data{ad.control.data.active}.display.position.data(2),:),...
-                    'k-');
-                if isscalar(xvalues)
-                    set(gh.axis,'XLim',[xvalues(1)-1 xvalues(1)+1]);
-                else
-                    set(gh.axis,'XLim',[xvalues(1) xvalues(end)]);
-                end
-                z = [ min(min(data)) max(max(data)) ];
-                ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
-                set(gh.axis,'YLim',ZLim);
-                if ad.control.axis.position
-                    % Plot red line with position in time
-                    plot(gh.axis,...
-                        [xvalues(ad.data{ad.control.data.active}.display.position.data(1)) ...
-                        xvalues(ad.data{ad.control.data.active}.display.position.data(1))],...
-                        ZLim,...
-                        'r-');
-                end
-                if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'y')
-                    % Plot average spectrum
-                    plot(gh.axis,...
-                        xvalues,...
-                        mean(data(ad.data{ad.control.data.active}.avg.start:...
-                        ad.data{ad.control.data.active}.avg.stop,:),1),...
-                        'LineStyle',ad.avg.line.style,...
-                        'Color',ad.avg.line.color,...
-                        'LineWidth',ad.avg.line.width);
-                end
-                hold off;
-                if (ad.control.axis.grid.zero)
-                    line(...
-                        [xvalues(1) xvalues(end)],...
-                        [0 0],...
-                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
-                        'Parent',gh.axis);
-                end
-                set(gh.axis,'YTickLabel',[]);
-                xlabel(gh.axis,sprintf('{\\it %s} / %s',xmeasure,xunit));
-                if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'x')
-                    ylim = get(gh.axis,'YLim');
-                    patch(...
-                        'XData',[...
-                        xvalues(ad.data{ad.control.data.active}.avg.start) ...
-                        xvalues(ad.data{ad.control.data.active}.avg.start)...
-                        xvalues(ad.data{ad.control.data.active}.avg.stop) ...
-                        xvalues(ad.data{ad.control.data.active}.avg.stop)],...
-                        'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
-                        'ZData',[0 0 0 0],...
-                        'EdgeColor',ad.avg.area.patch.edge,...
-                        'FaceColor',ad.avg.area.patch.color,...
-                        'FaceAlpha',ad.avg.area.patch.alpha,...
-                        'Parent',gh.axis);
-                end
-            case '1D along y'
-                % Enable position slider only if second axis has more than one value
-                if (x>1)
-                    set(gh.position_slider,...
-                        'Min',1,'Max',x,...
-                        'Value',...
-                        ad.data{ad.control.data.active}.display.position.data(1),...
-                        'SliderStep',[1/(x-1) 10/(x-1)],...
-                        'Enable','on');
-                else
-                    set(gh.position_slider,...
-                        'Enable','off'...
-                        );
-                end
-                % Plot B0 spectrum at given position in time
-                hold on;
-                % Including this (redundand) line here seems to prevent
-                % Matlab from crashing due to stupid errors (plot: vectors
-                % must be of same length) when being too fast with the
-                % sliders.
-                plot(gh.axis,...
-                    yvalues,...
-                    data(...
-                    :,ad.data{ad.control.data.active}.display.position.data(1)),...
-                    'k-');
-                if isscalar(yvalues)
-                    set(gh.axis,'XLim',[yvalues(1)-1 yvalues(1)+1]);
-                else
-                    set(gh.axis,'XLim',[yvalues(1) yvalues(end)]);
-                end
-                z = [ min(min(data)) max(max(data)) ];
-                ZLim = [z(1)-((z(2)-z(1))/20) z(2)+((z(2)-z(1))/20)];
-                set(gh.axis,'YLim',ZLim);
-                if ad.control.axis.position
-                    % Plot red line with position in time
-                    plot(gh.axis,...
-                        [yvalues(ad.data{ad.control.data.active}.display.position.data(2)) ...
-                        yvalues(ad.data{ad.control.data.active}.display.position.data(2))],...
-                        ZLim,...
-                        'r-');
-                end
-                if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'x')
-                    % Plot average spectrum
-                    plot(gh.axis,...
-                        yvalues,...
-                        mean(data(:,ad.data{ad.control.data.active}.avg.start:ad.data{ad.control.data.active}.avg.stop),2),...
-                        'LineStyle',ad.avg.line.style,...
-                        'Color',ad.avg.line.color,...
-                        'LineWidth',ad.avg.line.width);
-                end
-                hold off;
-                if (ad.control.axis.grid.zero)
-                    line(...
-                        [yvalues(1) yvalues(end)],...
-                        [0 0],...
-                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
-                        'Parent',gh.axis);
-                end
-                set(gh.axis,'YTickLabel',[]);
-                xlabel(gh.axis,sprintf('{\\it %s} / %s',ymeasure,yunit));
-                if ad.data{ad.control.data.active}.avg.delta && strcmpi(ad.avg.dimension,'y')
-                    ylim = get(gh.axis,'YLim');
-                    patch(...
-                        'XData',[...
-                        yvalues(ad.data{ad.control.data.active}.avg.start)...
-                        yvalues(ad.data{ad.control.data.active}.avg.start)...
-                        yvalues(ad.data{ad.control.data.active}.avg.stop)...
-                        yvalues(ad.data{ad.control.data.active}.avg.stop)],...
-                        'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
-                        'ZData',[0 0 0 0],...
-                        'EdgeColor',ad.avg.area.patch.edge,...
-                        'FaceColor',ad.avg.area.patch.color,...
-                        'FaceAlpha',ad.avg.area.patch.alpha,...
-                        'Parent',gh.axis);
-                end
-        end
-        
-        switch ad.avg.dimension
-            case 'x'
-                cla(gh.axis2,'reset');
-                hold on;
-                plot(gh.axis2,...
-                    xvalues,...
-                    data(...
-                    ad.data{ad.control.data.active}.display.position.data(2),:),...
-                    'k-');
-                if (ad.control.axis.grid.zero)
-                    line(...
-                        [xvalues(1) xvalues(end)],...
-                        [0 0],...
-                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
-                        'Parent',gh.axis2);
-                end
-                hold off;
-                set(gh.axis2,'YTickLabel',[]);
-                if isscalar(xvalues)
-                    set(gh.axis2,'XLim',[xvalues(1)-1 xvalues(1)+1]);
-                else
-                    set(gh.axis2,'XLim',[xvalues(1) xvalues(end)]);
-                end
-                set(gh.axis2,'YTickLabel',[]);
-                xlabel(gh.axis2,sprintf('{\\it %s} / %s',xmeasure,xunit));
-                if ad.data{ad.control.data.active}.avg.delta
-                    ylim = get(gh.axis2,'YLim');
-                    patch(...
-                        'XData',[...
-                        xvalues(ad.data{ad.control.data.active}.avg.start)...
-                        xvalues(ad.data{ad.control.data.active}.avg.start)...
-                        xvalues(ad.data{ad.control.data.active}.avg.stop)...
-                        xvalues(ad.data{ad.control.data.active}.avg.stop)],...
-                        'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
-                        'ZData',[0 0 0 0],...
-                        'EdgeColor',ad.avg.area.patch.edge,...
-                        'FaceColor',ad.avg.area.patch.color,...
-                        'FaceAlpha',ad.avg.area.patch.alpha,...
-                        'Parent',gh.axis2);
-                end
-            case 'y'
-                cla(gh.axis2,'reset');
-                hold on;
-                plot(gh.axis2,...
-                    yvalues,...
-                    data(...
-                    :,ad.data{ad.control.data.active}.display.position.data(1)),...
-                    'k-');
-                if (ad.control.axis.grid.zero)
-                    line(...
-                        [yvalues(1) yvalues(end)],...
-                        [0 0],...
-                        'Color',[0.5 0.5 0.5],'LineStyle','--',...
-                        'Parent',gh.axis2);
-                end
-                hold off;
-                set(gh.axis2,'YTickLabel',[]);
-                if isscalar(yvalues)
-                    set(gh.axis2,'XLim',[yvalues(1)-1 yvalues(1)+1]);
-                else
-                    set(gh.axis2,'XLim',[yvalues(1) yvalues(end)]);
-                end
-                set(gh.axis2,'YTickLabel',[]);
-                xlabel(gh.axis2,sprintf('{\\it %s} / %s',ymeasure,yunit));
-                if ad.data{ad.control.data.active}.avg.delta
-                    ylim = get(gh.axis2,'YLim');
-                    patch(...
-                        'XData',[...
-                        yvalues(ad.data{ad.control.data.active}.avg.start)...
-                        yvalues(ad.data{ad.control.data.active}.avg.start)...
-                        yvalues(ad.data{ad.control.data.active}.avg.stop)...
-                        yvalues(ad.data{ad.control.data.active}.avg.stop)],...
-                        'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
-                        'ZData',[0 0 0 0],...
-                        'EdgeColor',ad.avg.area.patch.edge,...
-                        'FaceColor',ad.avg.area.patch.color,...
-                        'FaceAlpha',ad.avg.area.patch.alpha,...
-                        'Parent',gh.axis2);
-                end
-            otherwise
-                trEPRoptionUnknown(ad.avg.dimension,'AVG dimension');
-        end
-        
-        % Set grid for main axis
-        set(gh.axis,'XGrid',ad.control.axis.grid.x);
-        set(gh.axis,'YGrid',ad.control.axis.grid.y);
-        if (isequal(ad.control.axis.grid.x,'on'))
-            set(gh.axis,'XMinorGrid',ad.control.axis.grid.minor);
-        end
-        if (isequal(ad.control.axis.grid.y,'on'))
-            set(gh.axis,'YMinorGrid',ad.control.axis.grid.minor);
-        end
-        % Set grid for auxilliary axis
-        set(gh.axis2,'XGrid',ad.control.axis.grid.x);
-        set(gh.axis2,'YGrid',ad.control.axis.grid.y);
-        if (isequal(ad.control.axis.grid.x,'on'))
-            set(gh.axis2,'XMinorGrid',ad.control.axis.grid.minor);
-        end
-        if (isequal(ad.control.axis.grid.y,'on'))
-            set(gh.axis2,'YMinorGrid',ad.control.axis.grid.minor);
-        end        
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+    switch ad.avg.dimension
+        case 'x'
+            cla(gh.axis2,'reset');
+            hold on;
+            plot(gh.axis2,...
+                xvalues,...
+                data(...
+                ad.data{ad.control.data.active}.display.position.data(2),:),...
+                'k-');
+            if (ad.control.axis.grid.zero)
+                line(...
+                    [xvalues(1) xvalues(end)],...
+                    [0 0],...
+                    'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                    'Parent',gh.axis2);
+            end
+            hold off;
+            set(gh.axis2,'YTickLabel',[]);
+            if isscalar(xvalues)
+                set(gh.axis2,'XLim',[xvalues(1)-1 xvalues(1)+1]);
+            else
+                set(gh.axis2,'XLim',[xvalues(1) xvalues(end)]);
+            end
+            set(gh.axis2,'YTickLabel',[]);
+            xlabel(gh.axis2,sprintf('{\\it %s} / %s',xmeasure,xunit));
+            if ad.data{ad.control.data.active}.avg.delta
+                ylim = get(gh.axis2,'YLim');
+                patch(...
+                    'XData',[...
+                    xvalues(ad.data{ad.control.data.active}.avg.start)...
+                    xvalues(ad.data{ad.control.data.active}.avg.start)...
+                    xvalues(ad.data{ad.control.data.active}.avg.stop)...
+                    xvalues(ad.data{ad.control.data.active}.avg.stop)],...
+                    'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
+                    'ZData',[0 0 0 0],...
+                    'EdgeColor',ad.avg.area.patch.edge,...
+                    'FaceColor',ad.avg.area.patch.color,...
+                    'FaceAlpha',ad.avg.area.patch.alpha,...
+                    'Parent',gh.axis2);
+            end
+        case 'y'
+            cla(gh.axis2,'reset');
+            hold on;
+            plot(gh.axis2,...
+                yvalues,...
+                data(...
+                :,ad.data{ad.control.data.active}.display.position.data(1)),...
+                'k-');
+            if (ad.control.axis.grid.zero)
+                line(...
+                    [yvalues(1) yvalues(end)],...
+                    [0 0],...
+                    'Color',[0.5 0.5 0.5],'LineStyle','--',...
+                    'Parent',gh.axis2);
+            end
+            hold off;
+            set(gh.axis2,'YTickLabel',[]);
+            if isscalar(yvalues)
+                set(gh.axis2,'XLim',[yvalues(1)-1 yvalues(1)+1]);
+            else
+                set(gh.axis2,'XLim',[yvalues(1) yvalues(end)]);
+            end
+            set(gh.axis2,'YTickLabel',[]);
+            xlabel(gh.axis2,sprintf('{\\it %s} / %s',ymeasure,yunit));
+            if ad.data{ad.control.data.active}.avg.delta
+                ylim = get(gh.axis2,'YLim');
+                patch(...
+                    'XData',[...
+                    yvalues(ad.data{ad.control.data.active}.avg.start)...
+                    yvalues(ad.data{ad.control.data.active}.avg.start)...
+                    yvalues(ad.data{ad.control.data.active}.avg.stop)...
+                    yvalues(ad.data{ad.control.data.active}.avg.stop)],...
+                    'YData',[ylim(1) ylim(end) ylim(end) ylim(1)],...
+                    'ZData',[0 0 0 0],...
+                    'EdgeColor',ad.avg.area.patch.edge,...
+                    'FaceColor',ad.avg.area.patch.color,...
+                    'FaceAlpha',ad.avg.area.patch.alpha,...
+                    'Parent',gh.axis2);
+            end
+        otherwise
+            trEPRoptionUnknown(ad.avg.dimension,'AVG dimension');
+    end
+    
+    % Set grid for main axis
+    set(gh.axis,'XGrid',ad.control.axis.grid.x);
+    set(gh.axis,'YGrid',ad.control.axis.grid.y);
+    if (isequal(ad.control.axis.grid.x,'on'))
+        set(gh.axis,'XMinorGrid',ad.control.axis.grid.minor);
+    end
+    if (isequal(ad.control.axis.grid.y,'on'))
+        set(gh.axis,'YMinorGrid',ad.control.axis.grid.minor);
+    end
+    % Set grid for auxilliary axis
+    set(gh.axis2,'XGrid',ad.control.axis.grid.x);
+    set(gh.axis2,'YGrid',ad.control.axis.grid.y);
+    if (isequal(ad.control.axis.grid.x,'on'))
+        set(gh.axis2,'XMinorGrid',ad.control.axis.grid.minor);
+    end
+    if (isequal(ad.control.axis.grid.y,'on'))
+        set(gh.axis2,'YMinorGrid',ad.control.axis.grid.minor);
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function switchMeasurePointer(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        % Get handles from main window
-        gh = guidata(mainWindow);
-        
-        % Reset pointer callback functions
-        set(mainWindow,'WindowButtonMotionFcn','');
-        set(mainWindow,'WindowButtonDownFcn','');
-        
-        % Reset pointer
-        set(mainWindow,'Pointer','arrow');
-        
-        % Switch off togglebuttons
-        set(gh.measure_pick_togglebutton,'Value',0);
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles from main window
+    gh = ad.guiHandles;
+    
+    % Reset pointer callback functions
+    set(mainWindow,'WindowButtonMotionFcn','');
+    set(mainWindow,'WindowButtonDownFcn','');
+    
+    % Reset pointer
+    set(mainWindow,'Pointer','arrow');
+    
+    % Switch off togglebuttons
+    set(gh.measure_pick_togglebutton,'Value',0);
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function trackPointer(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    
+    % Get appdata of main window
+    ad = getappdata(mainWindow);
+    % Get handles of mainwindow
+    gh = ad.guiHandles;
+    
+    % Get position of mainAxis (axis coordinates)
+    axisPosition = get(gh.axis,'Position');
+    % Coordinates are "real" x,y pairs relative to the mainWindow
+    axisCoordinates = [ ...
+        axisPosition(1)-1 ...
+        axisPosition(2)-1 ...
+        axisPosition(1)+axisPosition(3) ...
+        axisPosition(2)+axisPosition(4) ...
+        ];
+    
+    % Get current position of pointer
+    pointerPosition = get(mainWindow,'CurrentPoint');
+    
+    % Create CData for custom pointer
+    pointerShapeCData = ones(16)*nan;
+    pointerShapeCData([1 8 15],[1:6 10:15]) = 1;
+    pointerShapeCData([1:6 10:15],[1 8 15]) = 1;
+    
+    % As long as we are inside the mainAxis
+    if pointerPosition(1) > axisCoordinates(1) && ...
+            pointerPosition(1) < axisCoordinates(3) && ...
+            pointerPosition(2) > axisCoordinates(2) && ...
+            pointerPosition(2) < axisCoordinates(4)
         
-        % Get handles of mainwindow
-        gh = guihandles(mainWindow);
+        % Get pointer position coordinates relative to axis
+        pointerPositionInAxis = ...
+            pointerPosition - [axisCoordinates(1) axisCoordinates(2)];
         
-        % Get appdata of main window
-        ad = getappdata(mainWindow);
+        % Set pointer shape
+        %set(mainWindow,'Pointer','crosshair');
+        set(mainWindow,'Pointer','custom',...
+            'PointerShapeCData',pointerShapeCData,...
+            'PointerShapeHotSpot',[9 9]);
         
-        % Get position of mainAxis (axis coordinates)
-        axisPosition = get(hPlotAxes,'Position');
-        % Coordinates are "real" x,y pairs relative to the mainWindow
-        axisCoordinates = [ ...
-            axisPosition(1)-1 ...
-            axisPosition(2)-1 ...
-            axisPosition(1)+axisPosition(3) ...
-            axisPosition(2)+axisPosition(4) ...
-            ];
-        
-        % Get current position of pointer
-        pointerPosition = get(mainWindow,'CurrentPoint');
-        
-        % Create CData for custom pointer
-        pointerShapeCData = ones(16)*nan;
-        pointerShapeCData([1 8 15],[1:6 10:15]) = 1;
-        pointerShapeCData([1:6 10:15],[1 8 15]) = 1;
-        
-        % As long as we are inside the mainAxis
-        if pointerPosition(1) > axisCoordinates(1) && ...
-                pointerPosition(1) < axisCoordinates(3) && ...
-                pointerPosition(2) > axisCoordinates(2) && ...
-                pointerPosition(2) < axisCoordinates(4)
-            
-            % Get pointer position coordinates relative to axis
-            pointerPositionInAxis = ...
-                pointerPosition - [axisCoordinates(1) axisCoordinates(2)];
-            
-            % Set pointer shape
-            %set(mainWindow,'Pointer','crosshair');
-            set(mainWindow,'Pointer','custom',...
-                'PointerShapeCData',pointerShapeCData,...
-                'PointerShapeHotSpot',[9 9]);
-            
-            % Get xdata and ydata of currently active dataset
-            if (strcmp(ad.control.axis.displayType,'2D plot'))
-                xdata = get(...
-                    findobj('Parent',hPlotAxes,'-and','Type','image'),...
-                    'xdata');
-                ydata = get(...
-                    findobj('Parent',hPlotAxes,'-and','Type','image'),...
-                    'ydata');
-            else
-                xdata = get(...
-                    findobj('Parent',hPlotAxes,'-and','Type','line'),...
-                    'xdata');
-                ydata = get(...
-                    findobj('Parent',hPlotAxes,'-and','Type','line'),...
-                    'ydata');
-            end
-            
-            % If we are in 1D display mode and there are more than one spectrum
-            % and/or a zero line displayed
-            if ( (strcmp(ad.control.axis.displayType,'1D along x') || ...
-                    strcmp(ad.control.axis.displayType,'1D along y')) ) && ...
-                    (iscell(xdata) && iscell(ydata))
-                if ad.control.axis.grid.zero 
-                    xdata = xdata{2};
-                    ydata = ydata{2};
-                else
-                    xdata = xdata{1};
-                    ydata = ydata{1};
-                end
-            end
-            
-            % Create vectors with indices for xdata and ydata
-            % Those are used in case of axis limits <> dataset limits
-            xindex = 1 : length(xdata);
-            yindex = 1 : length(ydata);
-            
-            % Handle situation that axis limits and dataset limits don't coincide.
-            % Therefore, in case of the dataset being smaller than axis limits, pad
-            % it with the first/last value to fill xdata/ydata, respectively.
-            % Alternatively, the dataset being larger than axis limits, cut out
-            % part from the dataset that's currently displayed.
-            % To find out how many points to pad, use interp1 to get ending points
-            % of dataset in current axis.
-            
-            % IMPORTANT: DON'T MESS UP THE CODE BELOW, IF YOU'RE NOT ABSOLUTELY
-            % SURE WHAT YOU'RE DOING. I SPEND A WHOLE DAY FIGHTING WITH IT UNTIL IT
-            % WORKED SOMEWHAT FINE.
-            
-            % Get x and y limits of axes
-            axisXLim = get(hPlotAxes,'XLim');
-            axisYLim = get(hPlotAxes,'YLim');
-            % Get x and y limits of currently active dataset
-            datasetXLim = [ xdata(1) xdata(end) ];
-            datasetYLim = [ ydata(1) ydata(end) ];
-            
-            % Get dataset limits in axis coordinates
-            if (axisXLim(1) > datasetXLim(1))
-                % In case dataset is larger than current axis limits
-                
-                % Need to come up with a good variable name for that, but it looks
-                % like we get here the position of the axis limit in the data
-                % vector, what would be very useful
-                newDatasetXmin=interp1(...
-                    linspace(datasetXLim(1),datasetXLim(2),length(xdata)),...
-                    linspace(1,length(xdata),length(xdata)),...
-                    axisXLim(1),'nearest');
-                newXdata = xdata(newDatasetXmin:end);
-                newXindex = xindex(newDatasetXmin:end);
-            else
-                newDatasetXmin=interp1(...
-                    linspace(axisXLim(1),axisXLim(2),length(xdata)),...
-                    linspace(1,length(xdata),length(xdata)),...
-                    xdata(1),'nearest');
-                newXdata = [ones(1,newDatasetXmin)*xdata(1) xdata];
-                newXindex = [ones(1,newDatasetXmin)*xindex(1) xindex];
-            end
-            if (axisXLim(2) < datasetXLim(2))
-                % In case dataset is larger than current axis limits
-                
-                % Need to come up with a good variable name for that, but it looks
-                % like we get here the position of the axis limit in the data
-                % vector, what would be very useful
-                newDatasetXmax=interp1(...
-                    linspace(datasetXLim(1),datasetXLim(end),length(xdata)),...
-                    linspace(1,length(xdata),length(xdata)),...
-                    axisXLim(2),'nearest');
-                newXdata = newXdata(1:end-(length(xdata)-newDatasetXmax));
-                newXindex = newXindex(1:end-(length(xindex)-newDatasetXmax));
-            else
-                newDatasetXmax=interp1(...
-                    linspace(axisXLim(1),axisXLim(2),length(xdata)),...
-                    linspace(1,length(xdata),length(xdata)),...
-                    xdata(end),'nearest');
-                newXdata = [newXdata ones(1,length(xdata)-newDatasetXmax)*xdata(end)];
-                newXindex = [newXindex ones(1,length(xindex)-newDatasetXmax)*xindex(end)];
-            end
-            
-            if (strcmp(ad.control.axis.displayType,'2D plot'))
-                if (axisYLim(1) > datasetYLim(1))
-                    % In case dataset is larger than current axis limits
-                    
-                    % Need to come up with a good variable name for that, but it looks
-                    % like we get here the position of the axis limit in the data
-                    % vector, what would be very useful
-                    newDatasetYmin=interp1(...
-                        linspace(datasetYLim(1),datasetYLim(2),length(ydata)),...
-                        linspace(1,length(ydata),length(ydata)),...
-                        axisYLim(1),'nearest');
-                    newYdata = ydata(newDatasetYmin:end);
-                    newYindex = yindex(newDatasetYmin:end);
-                else
-                    newDatasetYmin=interp1(...
-                        linspace(axisYLim(1),axisYLim(2),length(ydata)),...
-                        linspace(1,length(ydata),length(ydata)),...
-                        ydata(1),'nearest');
-                    newYdata = [ones(1,newDatasetYmin)*ydata(1) ydata];
-                    newYindex = [ones(1,newDatasetYmin)*yindex(1) yindex];
-                end
-                if (axisYLim(2) < datasetYLim(2))
-                    % In case dataset is larger than current axis limits
-                    
-                    % Need to come up with a good variable name for that, but it looks
-                    % like we get here the position of the axis limit in the data
-                    % vector, what would be very useful
-                    newDatasetYmax=interp1(...
-                        linspace(datasetYLim(1),datasetYLim(end),length(ydata)),...
-                        linspace(1,length(ydata),length(ydata)),...
-                        axisYLim(2),'nearest');
-                    newYdata = newYdata(1:end-(length(ydata)-newDatasetYmax));
-                    newYindex = newYindex(1:end-(length(yindex)-newDatasetYmax));
-                else
-                    newDatasetYmax=interp1(...
-                        linspace(axisYLim(1),axisYLim(2),length(ydata)),...
-                        linspace(1,length(ydata),length(ydata)),...
-                        ydata(end),'nearest');
-                    newYdata = [newYdata ones(1,length(ydata)-newDatasetYmax)*ydata(end)];
-                    newYindex = [newYindex ones(1,length(yindex)-newDatasetYmax)*yindex(end)];
-                end
-            end
-            
-            switch ad.control.axis.displayType
-                case '2D plot'
-                    % Get index of current point in dataset
-                    indx=interp1(...
-                        linspace(1,axisPosition(3),length(newXdata)),...
-                        newXindex,...
-                        pointerPositionInAxis(1),'nearest');
-                    indy=interp1(...
-                        linspace(1,axisPosition(4),length(newYdata)),...
-                        newYindex,...
-                        pointerPositionInAxis(2),'nearest');
-                case '1D along x'
-                    % Get index of current point in dataset
-                    indx=interp1(...
-                        linspace(1,axisPosition(3),length(newXdata)),...
-                        newXindex,...
-                        pointerPositionInAxis(1),'nearest');
-                    indy=indx;
-                case '1D along y'
-                    % Get index of current point in dataset
-                    indx=interp1(...
-                        linspace(1,axisPosition(3),length(newXdata)),...
-                        newXindex,...
-                        pointerPositionInAxis(1),'nearest');
-                    indy=indx;
-                otherwise
-                    trEPRoptionUnknown(ad.control.axis.displayType,...
-                        'display type');
-                    set(mainWindow,'Pointer','arrow');
-                    return;
-            end
-            
-            % Get value (in units) of current point in dataset
-            valx = xdata(indx);
-            valy = ydata(indy);
-            
-            % Set display
-            % Update display of first point
-            set(gh.measure_x_index_edit,'String',num2str(indx));
-            set(gh.measure_x_unit_edit,'String',num2str(valx));
-            set(gh.measure_y_index_edit,'String',num2str(indy));
-            set(gh.measure_y_unit_edit,'String',num2str(valy));
+        % Get xdata and ydata of currently active dataset
+        if (strcmp(ad.control.axis.displayType,'2D plot'))
+            xdata = get(...
+                findobj('Parent',gh.axis,'-and','Type','image'),...
+                'xdata');
+            ydata = get(...
+                findobj('Parent',gh.axis,'-and','Type','image'),...
+                'ydata');
         else
-            set(mainWindow,'Pointer','arrow');
+            xdata = get(...
+                findobj('Parent',gh.axis,'-and','Type','line'),...
+                'xdata');
+            ydata = get(...
+                findobj('Parent',gh.axis,'-and','Type','line'),...
+                'ydata');
         end
         
-    catch exception
-        trEPRexceptionHandling(exception)
+        % If we are in 1D display mode and there are more than one spectrum
+        % and/or a zero line displayed
+        if ( (strcmp(ad.control.axis.displayType,'1D along x') || ...
+                strcmp(ad.control.axis.displayType,'1D along y')) ) && ...
+                (iscell(xdata) && iscell(ydata))
+            if ad.control.axis.grid.zero
+                xdata = xdata{2};
+                ydata = ydata{2};
+            else
+                xdata = xdata{1};
+                ydata = ydata{1};
+            end
+        end
+        
+        % Create vectors with indices for xdata and ydata
+        % Those are used in case of axis limits <> dataset limits
+        xindex = 1 : length(xdata);
+        yindex = 1 : length(ydata);
+        
+        % Handle situation that axis limits and dataset limits don't coincide.
+        % Therefore, in case of the dataset being smaller than axis limits, pad
+        % it with the first/last value to fill xdata/ydata, respectively.
+        % Alternatively, the dataset being larger than axis limits, cut out
+        % part from the dataset that's currently displayed.
+        % To find out how many points to pad, use interp1 to get ending points
+        % of dataset in current axis.
+        
+        % IMPORTANT: DON'T MESS UP THE CODE BELOW, IF YOU'RE NOT ABSOLUTELY
+        % SURE WHAT YOU'RE DOING. I SPEND A WHOLE DAY FIGHTING WITH IT UNTIL IT
+        % WORKED SOMEWHAT FINE.
+        
+        % Get x and y limits of axes
+        axisXLim = get(gh.axis,'XLim');
+        axisYLim = get(gh.axis,'YLim');
+        % Get x and y limits of currently active dataset
+        datasetXLim = [ xdata(1) xdata(end) ];
+        datasetYLim = [ ydata(1) ydata(end) ];
+        
+        % Get dataset limits in axis coordinates
+        if (axisXLim(1) > datasetXLim(1))
+            % In case dataset is larger than current axis limits
+            
+            % Need to come up with a good variable name for that, but it looks
+            % like we get here the position of the axis limit in the data
+            % vector, what would be very useful
+            newDatasetXmin=interp1(...
+                linspace(datasetXLim(1),datasetXLim(2),length(xdata)),...
+                linspace(1,length(xdata),length(xdata)),...
+                axisXLim(1),'nearest');
+            newXdata = xdata(newDatasetXmin:end);
+            newXindex = xindex(newDatasetXmin:end);
+        else
+            newDatasetXmin=interp1(...
+                linspace(axisXLim(1),axisXLim(2),length(xdata)),...
+                linspace(1,length(xdata),length(xdata)),...
+                xdata(1),'nearest');
+            newXdata = [ones(1,newDatasetXmin)*xdata(1) xdata];
+            newXindex = [ones(1,newDatasetXmin)*xindex(1) xindex];
+        end
+        if (axisXLim(2) < datasetXLim(2))
+            % In case dataset is larger than current axis limits
+            
+            % Need to come up with a good variable name for that, but it looks
+            % like we get here the position of the axis limit in the data
+            % vector, what would be very useful
+            newDatasetXmax=interp1(...
+                linspace(datasetXLim(1),datasetXLim(end),length(xdata)),...
+                linspace(1,length(xdata),length(xdata)),...
+                axisXLim(2),'nearest');
+            newXdata = newXdata(1:end-(length(xdata)-newDatasetXmax));
+            newXindex = newXindex(1:end-(length(xindex)-newDatasetXmax));
+        else
+            newDatasetXmax=interp1(...
+                linspace(axisXLim(1),axisXLim(2),length(xdata)),...
+                linspace(1,length(xdata),length(xdata)),...
+                xdata(end),'nearest');
+            newXdata = [newXdata ones(1,length(xdata)-newDatasetXmax)*xdata(end)];
+            newXindex = [newXindex ones(1,length(xindex)-newDatasetXmax)*xindex(end)];
+        end
+        
+        if (strcmp(ad.control.axis.displayType,'2D plot'))
+            if (axisYLim(1) > datasetYLim(1))
+                % In case dataset is larger than current axis limits
+                
+                % Need to come up with a good variable name for that, but it looks
+                % like we get here the position of the axis limit in the data
+                % vector, what would be very useful
+                newDatasetYmin=interp1(...
+                    linspace(datasetYLim(1),datasetYLim(2),length(ydata)),...
+                    linspace(1,length(ydata),length(ydata)),...
+                    axisYLim(1),'nearest');
+                newYdata = ydata(newDatasetYmin:end);
+                newYindex = yindex(newDatasetYmin:end);
+            else
+                newDatasetYmin=interp1(...
+                    linspace(axisYLim(1),axisYLim(2),length(ydata)),...
+                    linspace(1,length(ydata),length(ydata)),...
+                    ydata(1),'nearest');
+                newYdata = [ones(1,newDatasetYmin)*ydata(1) ydata];
+                newYindex = [ones(1,newDatasetYmin)*yindex(1) yindex];
+            end
+            if (axisYLim(2) < datasetYLim(2))
+                % In case dataset is larger than current axis limits
+                
+                % Need to come up with a good variable name for that, but it looks
+                % like we get here the position of the axis limit in the data
+                % vector, what would be very useful
+                newDatasetYmax=interp1(...
+                    linspace(datasetYLim(1),datasetYLim(end),length(ydata)),...
+                    linspace(1,length(ydata),length(ydata)),...
+                    axisYLim(2),'nearest');
+                newYdata = newYdata(1:end-(length(ydata)-newDatasetYmax));
+                newYindex = newYindex(1:end-(length(yindex)-newDatasetYmax));
+            else
+                newDatasetYmax=interp1(...
+                    linspace(axisYLim(1),axisYLim(2),length(ydata)),...
+                    linspace(1,length(ydata),length(ydata)),...
+                    ydata(end),'nearest');
+                newYdata = [newYdata ones(1,length(ydata)-newDatasetYmax)*ydata(end)];
+                newYindex = [newYindex ones(1,length(yindex)-newDatasetYmax)*yindex(end)];
+            end
+        end
+        
+        switch ad.control.axis.displayType
+            case '2D plot'
+                % Get index of current point in dataset
+                indx=interp1(...
+                    linspace(1,axisPosition(3),length(newXdata)),...
+                    newXindex,...
+                    pointerPositionInAxis(1),'nearest');
+                indy=interp1(...
+                    linspace(1,axisPosition(4),length(newYdata)),...
+                    newYindex,...
+                    pointerPositionInAxis(2),'nearest');
+            case '1D along x'
+                % Get index of current point in dataset
+                indx=interp1(...
+                    linspace(1,axisPosition(3),length(newXdata)),...
+                    newXindex,...
+                    pointerPositionInAxis(1),'nearest');
+                indy=indx;
+            case '1D along y'
+                % Get index of current point in dataset
+                indx=interp1(...
+                    linspace(1,axisPosition(3),length(newXdata)),...
+                    newXindex,...
+                    pointerPositionInAxis(1),'nearest');
+                indy=indx;
+            otherwise
+                trEPRoptionUnknown(ad.control.axis.displayType,...
+                    'display type');
+                set(mainWindow,'Pointer','arrow');
+                return;
+        end
+        
+        % Get value (in units) of current point in dataset
+        valx = xdata(indx);
+        valy = ydata(indy);
+        
+        % Set display
+        % Update display of first point
+        set(gh.measure_x_index_edit,'String',num2str(indx));
+        set(gh.measure_x_unit_edit,'String',num2str(valx));
+        set(gh.measure_y_index_edit,'String',num2str(indy));
+        set(gh.measure_y_unit_edit,'String',num2str(valy));
+    else
+        set(mainWindow,'Pointer','arrow');
     end
+    
+catch exception
+    trEPRexceptionHandling(exception)
 end
-
 end

@@ -22,7 +22,7 @@ function [status,warnings] = cmdGet(handle,opt,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-05-31
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -56,8 +56,6 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-% gh = guidata(handle);
 
 if isempty(opt)
     return;

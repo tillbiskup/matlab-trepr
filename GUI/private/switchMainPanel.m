@@ -7,14 +7,14 @@ function status = switchMainPanel(panelName)
 %
 % status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-08-16
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 try
     % Get handles of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     panels = [...
         gh.load_panel ...

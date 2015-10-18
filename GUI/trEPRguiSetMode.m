@@ -25,7 +25,7 @@ function [status,warnings] = trEPRguiSetMode(mode,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -57,8 +57,7 @@ end
 % Get appdata from mainwindow
 ad = getappdata(mainWindow);
 % Get handles from main GUI
-%gh = guidata(mainWindow);
-gh = ad.UsedByGUIData_m;
+gh = ad.guiHandles;
 
 % Check for availability of necessary fields in appdata
 if ~isfield(ad,'control') || ~isfield(ad.control,'status')

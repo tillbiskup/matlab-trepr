@@ -7,8 +7,8 @@ function status = update_invisibleSpectra()
 %           -1: no tEPRgui_statuswindow found
 %            0: successfully updated panels listing the spectra
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-06-06
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -17,12 +17,11 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handle for invisible spectra listbox
-gh = guihandles(mainWindow);
-invLbox = gh.data_panel_invisible_listbox;
-
 % Get appdata from main GUI
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
+
+invLbox = gh.data_panel_invisible_listbox;
 
 % Get indices of invisible spectra
 inv = ad.control.data.invisible;

@@ -10,7 +10,7 @@ function axesResize
 
 % Get appdata and handles from main figure
 ad = getappdata(trEPRguiGetWindowHandle);
-gh = ad.UsedByGUIData_m;
+gh = ad.guiHandles;
 
 % TODO: Need to handle this differently!
 mainAxisPosition = [70 95 500 500];

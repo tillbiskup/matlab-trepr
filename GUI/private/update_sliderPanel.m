@@ -7,7 +7,7 @@ function status = update_sliderPanel()
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-07-07
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -16,11 +16,9 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handles from main window
-gh = guidata(mainWindow);
-
-% Get appdata from main GUI
+% Get handles and appdata from main window
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
 
 if (isempty(ad.control.data.visible))
     return;

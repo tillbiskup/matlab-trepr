@@ -23,8 +23,8 @@ function status = trEPRmsg(message,varargin)
 % NOTE: If there is currently no trEPR GUI window open, the message will
 % get displayed on the Matlab(tm) command line.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-09-23
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 if isempty(message)
     return;
@@ -75,8 +75,6 @@ end
 
 % Get appdata from mainwindow
 ad = getappdata(mainWindow);
-% Get handles from main GUI
-gh = guidata(mainWindow);
 
 % Check for availability of necessary fields in appdata
 if ~isfield(ad,'control') || ~isfield(ad.control,'status')

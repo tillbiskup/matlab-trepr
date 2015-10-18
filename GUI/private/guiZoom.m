@@ -6,19 +6,15 @@ function guiZoom(action)
 %                 Action to be performed: on|off|reset
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gh = ad.UsedByGUIData_m;
-    %gh = guihandles(mainWindow);
-    
-    % Somehow, MATLAB(TM) seems inapt to save the main Axis handle to gh
-    mainAxis = ad.UsedByGUIData_m.mainAxis;
-    
+    gh = ad.guiHandles;
+ 
     % Set position for dataset
     switch lower(action)
         case 'on'
@@ -35,30 +31,30 @@ try
             set(zh,'Enable','off');
             refresh;
             % Get current x and y limits of main axis
-            currentXLim = get(mainAxis,'XLim');
-            currentYLim = get(mainAxis,'YLim');
+            currentXLim = get(gh.mainAxis,'XLim');
+            currentYLim = get(gh.mainAxis,'YLim');
             switch lower(ad.control.axis.displayType)
                 case '2d plot'
                     setXLim = [ ad.control.axis.limits.x.min ...
                         ad.control.axis.limits.x.max];
                     setYLim = [ ad.control.axis.limits.y.min ...
                         ad.control.axis.limits.y.max];
-                    ad.control.axis.zoom.x = get(mainAxis,'XLim');
-                    ad.control.axis.zoom.y = get(mainAxis,'YLim');
+                    ad.control.axis.zoom.x = get(gh.mainAxis,'XLim');
+                    ad.control.axis.zoom.y = get(gh.mainAxis,'YLim');
                 case '1d along x'
                     setXLim = [ ad.control.axis.limits.x.min ...
                         ad.control.axis.limits.x.max];
                     setYLim = [ ad.control.axis.limits.z.min ...
                         ad.control.axis.limits.z.max];
-                    ad.control.axis.zoom.x = get(mainAxis,'XLim');
-                    ad.control.axis.zoom.z = get(mainAxis,'YLim');
+                    ad.control.axis.zoom.x = get(gh.mainAxis,'XLim');
+                    ad.control.axis.zoom.z = get(gh.mainAxis,'YLim');
                 case '1d along y'
                     setXLim = [ ad.control.axis.limits.y.min ...
                         ad.control.axis.limits.y.max];
                     setYLim = [ ad.control.axis.limits.z.min ...
                         ad.control.axis.limits.z.max];
-                    ad.control.axis.zoom.y = get(mainAxis,'XLim');
-                    ad.control.axis.zoom.z = get(mainAxis,'YLim');
+                    ad.control.axis.zoom.y = get(gh.mainAxis,'XLim');
+                    ad.control.axis.zoom.z = get(gh.mainAxis,'YLim');
             end
             if all(currentXLim == setXLim) && all(currentYLim == setYLim)
                 ad.control.axis.zoom.enable = false;

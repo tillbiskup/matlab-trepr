@@ -6,8 +6,8 @@ function varargout = trEPRgui_setdirectorieswindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -274,7 +274,7 @@ uicontrol('Tag','close_pushbutton',...
 
 try
     % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    setappdata(hMainFigure,'guiHandles',guihandles);
     
     % Add keypress function to every element that can have one...
     handles = findall(...
@@ -302,6 +302,8 @@ try
     end
 catch exception
     trEPRexceptionHandling(exception);
+end
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -418,7 +420,7 @@ function keypress_Callback(~,evt)
         end
         
         % Get handles of GUI
-        gh = guihandles(hMainFigure);
+        gh = getappdata(hMainFigure,'guiHandles');
         
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...
@@ -466,7 +468,7 @@ end
 function closeGUI(~,~)
     try
         clear('jObject');
-        delete(hMainFigure);
+        delete(trEPRguiGetWindowHandle(mfilename));
         trEPRmsg('Show/Set directories window closed.','debug');
     catch exception
         trEPRexceptionHandling(exception);
@@ -476,10 +478,10 @@ end
 function updateWindow()
     try
         % Get appdata from main trEPR GUI handle
-        admain = getappdata(mainGUIHandle);
+        admain = getappdata(trEPRguiGetWindowHandle());
         
         % Get gui handles
-        gh = guihandles(hMainFigure);
+        gh = getappdata(trEPRguiGetWindowHandle(mfilename),'guiHandles');
         
         set(gh.loaddir_panel_edit,'String',admain.control.dirs.lastLoad);
         set(gh.savedir_panel_edit,'String',admain.control.dirs.lastSave);
@@ -490,6 +492,4 @@ function updateWindow()
     catch exception
         trEPRexceptionHandling(exception);
     end
-end
-
 end

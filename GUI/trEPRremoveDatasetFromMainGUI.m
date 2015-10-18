@@ -12,8 +12,8 @@ function [status,message] = trEPRremoveDatasetFromMainGUI(dataset,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-07-29
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -146,7 +146,7 @@ ad.control.data.modified(ad.control.data.modified>datasetIdx) = ...
 
 % Handle active dataset
 % Get handles from handle
-gh = guidata(ad.UsedByGUIData_m.trEPRgui);
+gh = ad.guiHandles;
 visSelected = get(gh.data_panel_visible_listbox,'Value');
 
 if isempty(ad.control.data.visible)

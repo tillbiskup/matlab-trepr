@@ -11,8 +11,8 @@ function varargout = trEPRgui_setLabelWindow(varargin)
 % Output
 %   status    - return value of the function. Either 0 (OK) or -1 (failed)
 
-% Copyright (c) 2011-13, Till Biskup, Bernd Paulus
-% 2013-02-04
+% Copyright (c) 2011-15, Till Biskup, Bernd Paulus
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -115,8 +115,8 @@ uicontrol('Tag','apply_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
+% Store handles in appdata
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');

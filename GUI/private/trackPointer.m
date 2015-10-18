@@ -16,7 +16,7 @@ function status = trackPointer(varargin)
 %            0: successful
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -25,15 +25,13 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handles of mainwindow
-gh = guihandles(mainWindow);
-
 % Get appdata of main window
 mainWindow = trEPRguiGetWindowHandle();
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
 
 % Check for availability of necessary GUI elements
-mainAxis = ad.UsedByGUIData_m.mainAxis;
+mainAxis = gh.mainAxis;
 
 if isempty(mainAxis)
     status = -2;

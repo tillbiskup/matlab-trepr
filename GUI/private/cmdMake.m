@@ -21,8 +21,8 @@ function [status,warnings] = cmdMake(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-02-06
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -59,8 +59,6 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-% gh = guidata(handle);
 
 % For convenience and shorter lines
 active = ad.control.data.active;

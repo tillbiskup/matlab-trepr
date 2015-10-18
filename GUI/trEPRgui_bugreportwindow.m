@@ -3,8 +3,8 @@ function trEPRgui_bugreportwindow(varargin)
 % exception that has been thrown, making it easier for the user to report a
 % proper bug report.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-09
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -171,8 +171,8 @@ uicontrol('Tag','bugreportwindow_close_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
+% Store handles in appdata
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');

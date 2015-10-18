@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -523,6 +523,11 @@ uicontrol('Tag','tbConfigure',...
     'parent',hbg,...
     'HandleVisibility','off');
 
+gh = guihandles;
+gh.mainAxis = hPlotAxes;
+% Add handles to appdata
+setappdata(hMainFigure,'guiHandles',gh);
+
 % Create the main control panels
 
 try
@@ -760,6 +765,11 @@ uicontrol('Tag','status_panel_status_text',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+gh = guihandles;
+gh.mainAxis = hPlotAxes;
+% Add handles to appdata
+setappdata(hMainFigure,'guiHandles',gh);
+
 % Apply configuration
 guiConfigApply(mfilename);
 % Get appdata for immediate use
@@ -784,9 +794,6 @@ catch exception
     throw(exception);
 end
 
-gh = guihandles;
-gh.mainAxis = hPlotAxes;
-guidata(hMainFigure,gh);
 if (nargout == 1)
     varargout{1} = hMainFigure;
 end
@@ -880,269 +887,265 @@ if ad.configuration.start.updatecheck
     trEPRguiUpdateCheck;
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function slider_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-
-        guiZoom('off');
-        
-        active = ad.control.data.active;
-        
-        % Depending on display type settings
-        switch lower(action)
-            case 'scroll'
-                switch lower(ad.control.axis.displayType)
-                    case '2d plot'
-                        return;
-                    case '1d along x'
-                        ad.data{active}.display.position.data(2) = ...
-                            int16(get(source,'Value'));
-                    case '1d along y'
-                        ad.data{active}.display.position.data(1) = ...
-                            int16(get(source,'Value'));
-                end
-            case 'displaceh'
-                switch ad.control.axis.displayType
-                    case {'2D plot','1D along x'}
-                        ad.data{active}.display.displacement.data(1) = ...
-                            get(source,'Value');
-                    case '1D along y'
-                        ad.data{active}.display.displacement.data(2) = ...
-                            get(source,'Value');
-                    otherwise
-                        trEPRoptionUnknown(ad.control.axis.displayType,...
-                            'display type');
-                end
-            case 'displacev'
-                switch ad.control.axis.displayType
-                    case '2D plot'
-                        ad.data{active}.display.displacement.data(2) = ...
-                            get(source,'Value');
-                    case {'1D along x','1D along y'}
-                        ad.data{active}.display.displacement.data(3) = ...
-                            get(source,'Value');
-                    otherwise
-                        trEPRoptionUnknown(ad.control.axis.displayType,...
-                            'display type');
-                end
-            case 'scaleh'
-                % Convert slider value to scaling factor
-                if (get(source,'Value') > 0)
-                    scalingFactor = get(source,'Value')+1;
-                else
-                    scalingFactor = 1/(abs(get(source,'Value'))+1);
-                end
-                
-                % Depending on display type settings
-                switch ad.control.axis.displayType
-                    case {'2D plot','1D along x'}
-                        ad.data{active}.display.scaling.data(1) = scalingFactor;
-                    case '1D along y'
-                        ad.data{active}.display.scaling.data(2) = scalingFactor;
-                    otherwise
-                        trEPRoptionUnknown(ad.control.axis.displayType,...
-                            'display type');
-                end
-            case 'scalev'
-                % Convert slider value to scaling factor
-                if (get(source,'Value') > 0)
-                    scalingFactor = get(source,'Value')+1;
-                else
-                    scalingFactor = 1/(abs(get(source,'Value'))+1);
-                end
-                switch lower(ad.control.axis.displayType)
-                    case '2d plot'
-                        ad.data{active}.display.scaling.data(2) = scalingFactor;
-                    case {'1d along x','1d along y'}
-                        ad.data{active}.display.scaling.data(3) = scalingFactor;
-                end
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    
+    guiZoom('off');
+    
+    active = ad.control.data.active;
+    
+    % Depending on display type settings
+    switch lower(action)
+        case 'scroll'
+            switch lower(ad.control.axis.displayType)
+                case '2d plot'
+                    return;
+                case '1d along x'
+                    ad.data{active}.display.position.data(2) = ...
+                        int16(get(source,'Value'));
+                case '1d along y'
+                    ad.data{active}.display.position.data(1) = ...
+                        int16(get(source,'Value'));
+            end
+        case 'displaceh'
+            switch ad.control.axis.displayType
+                case {'2D plot','1D along x'}
+                    ad.data{active}.display.displacement.data(1) = ...
+                        get(source,'Value');
+                case '1D along y'
+                    ad.data{active}.display.displacement.data(2) = ...
+                        get(source,'Value');
+                otherwise
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
+                        'display type');
+            end
+        case 'displacev'
+            switch ad.control.axis.displayType
+                case '2D plot'
+                    ad.data{active}.display.displacement.data(2) = ...
+                        get(source,'Value');
+                case {'1D along x','1D along y'}
+                    ad.data{active}.display.displacement.data(3) = ...
+                        get(source,'Value');
+                otherwise
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
+                        'display type');
+            end
+        case 'scaleh'
+            % Convert slider value to scaling factor
+            if (get(source,'Value') > 0)
+                scalingFactor = get(source,'Value')+1;
+            else
+                scalingFactor = 1/(abs(get(source,'Value'))+1);
+            end
+            
+            % Depending on display type settings
+            switch ad.control.axis.displayType
+                case {'2D plot','1D along x'}
+                    ad.data{active}.display.scaling.data(1) = scalingFactor;
+                case '1D along y'
+                    ad.data{active}.display.scaling.data(2) = scalingFactor;
+                otherwise
+                    trEPRoptionUnknown(ad.control.axis.displayType,...
+                        'display type');
+            end
+        case 'scalev'
+            % Convert slider value to scaling factor
+            if (get(source,'Value') > 0)
+                scalingFactor = get(source,'Value')+1;
+            else
+                scalingFactor = 1/(abs(get(source,'Value'))+1);
+            end
+            switch lower(ad.control.axis.displayType)
+                case '2d plot'
+                    ad.data{active}.display.scaling.data(2) = scalingFactor;
+                case {'1d along x','1d along y'}
+                    ad.data{active}.display.scaling.data(3) = scalingFactor;
+            end
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    
+    % Update slider panel
+    update_sliderPanel();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function togglebutton_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        switch lower(action)
-            case 'zoom'
-                if (get(source,'Value'))
-                    guiZoom('on');
-                    trEPRguiSetMode('zoom');
-                else
-                    guiZoom('off');
-                    trEPRguiSetMode('none');
-                end
-            otherwise
-                trEPRoptionUnknown(action)
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    switch lower(action)
+        case 'zoom'
+            if (get(source,'Value'))
+                guiZoom('on');
+                trEPRguiSetMode('zoom');
+            else
+                guiZoom('off');
+                trEPRguiSetMode('none');
+            end
+        otherwise
+            trEPRoptionUnknown(action)
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function pushbutton_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        
-        active = ad.control.data.active;
-
-        switch lower(action)
-            case 'fullscale'
-                guiZoom('reset');
-                trEPRguiSetMode('none');
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    
+    active = ad.control.data.active;
+    
+    switch lower(action)
+        case 'fullscale'
+            guiZoom('reset');
+            trEPRguiSetMode('none');
+            return;
+        case 'reset'
+            if (get(source,'Value') == 0) || ~active || isempty(active)
                 return;
-            case 'reset'
-                if (get(source,'Value') == 0) || ~active || isempty(active)
-                    return;
-                end
-                cmdReset(mainWindow,{});
-                return;
-            case 'detach'
-                % Open new figure window
-                newFig = figure();
-                
-                % Plot into new figure window
-                update_mainAxis(newFig);
-                return;
-            case 'next'
-                cmdShow(mainWindow,{'next'});
-                return;
-            case 'previous'
-                cmdShow(mainWindow,{'prev'});
-                return;
-            case 'cmdexecutescript'
-                trEPRgui_cmd_scriptSelectWindow();
-            case 'cmdhelpwindow'
-                trEPRgui_cmd_helpwindow();
-                return;
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+            end
+            cmdReset(mainWindow,{});
+            return;
+        case 'detach'
+            % Open new figure window
+            newFig = figure();
+            
+            % Plot into new figure window
+            update_mainAxis(newFig);
+            return;
+        case 'next'
+            cmdShow(mainWindow,{'next'});
+            return;
+        case 'previous'
+            cmdShow(mainWindow,{'prev'});
+            return;
+        case 'cmdexecutescript'
+            trEPRgui_cmd_scriptSelectWindow();
+        case 'cmdhelpwindow'
+            trEPRgui_cmd_helpwindow();
+            return;
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function tbg_Callback(source,~)
-    try 
-        status = switchMainPanel(get(get(source,'SelectedObject'),'String'));
-        
-        if status
-            st = dbstack;
-            trEPRmsg(...
-                [st.name ' :' ...
-                'Something went wrong with switching the panels.'],...
-                'warning');
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    status = switchMainPanel(get(get(source,'SelectedObject'),'String'));
+    
+    if status
+        st = dbstack;
+        trEPRmsg(...
+            [st.name ' :' ...
+            'Something went wrong with switching the panels.'],...
+            'warning');
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        switch lower(action)
-            case 'displaytype'
-                displayTypes = cellstr(get(source,'String'));
-                switch lower(displayTypes{get(source,'Value')})
-                    case '2d'
-                        ad.control.axis.displayType = '2D plot';
-                    case 'x (time)'
-                        ad.control.axis.displayType = '1D along x';
-                    case 'y (field)'
-                        ad.control.axis.displayType = '1D along y';
-                end                
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                update_mainAxis();
-                axesResize();
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case 'displaytype'
+            displayTypes = cellstr(get(source,'String'));
+            switch lower(displayTypes{get(source,'Value')})
+                case '2d'
+                    ad.control.axis.displayType = '2D plot';
+                case 'x (time)'
+                    ad.control.axis.displayType = '1D along x';
+                case 'y (field)'
+                    ad.control.axis.displayType = '1D along y';
+            end
+            % Update appdata of main window
+            setappdata(mainWindow,'control',ad.control);
+            
+            update_mainAxis();
+            axesResize();
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function command_Callback(source,~)
-    try
-        [status,warning] = trEPRguiCommand(get(source,'String'));
-        % In case that the command ended the GUI, check for its existence
-        if isempty(trEPRguiGetWindowHandle)
-            return;
-        end
-        if status && ~isempty(warning)
-            trEPRmsg(warning,'warning');
-        end
-        set(source,'String','');
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    [status,warning] = trEPRguiCommand(get(source,'String'));
+    % In case that the command ended the GUI, check for its existence
+    if isempty(trEPRguiGetWindowHandle)
+        return;
     end
+    if status && ~isempty(warning)
+        trEPRmsg(warning,'warning');
+    end
+    set(source,'String','');
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function command_keypress_Callback(source,evt)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        switch evt.Key
-            case 'uparrow'
-                if ad.control.cmd.historypos
-                    set(source,'String',ad.control.cmd.history{...
-                        ad.control.cmd.historypos});
-                    ad.control.cmd.historypos = ad.control.cmd.historypos-1;
-                end
-            case 'downarrow'
-                if ad.control.cmd.historypos < length(ad.control.cmd.history)
-                    set(source,'String',ad.control.cmd.history{...
-                        ad.control.cmd.historypos+1});
-                    ad.control.cmd.historypos = ad.control.cmd.historypos+1;
-                else
-                    set(source,'String','');
-                end
-            otherwise
-                guiKeyBindings(source,evt);
-                return;
-        end
-        setappdata(mainWindow,'control',ad.control);
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    switch evt.Key
+        case 'uparrow'
+            if ad.control.cmd.historypos
+                set(source,'String',ad.control.cmd.history{...
+                    ad.control.cmd.historypos});
+                ad.control.cmd.historypos = ad.control.cmd.historypos-1;
+            end
+        case 'downarrow'
+            if ad.control.cmd.historypos < length(ad.control.cmd.history)
+                set(source,'String',ad.control.cmd.history{...
+                    ad.control.cmd.historypos+1});
+                ad.control.cmd.historypos = ad.control.cmd.historypos+1;
+            else
+                set(source,'String','');
+            end
+        otherwise
+            guiKeyBindings(source,evt);
+            return;
     end
+    setappdata(mainWindow,'control',ad.control);
+catch exception
+    trEPRexceptionHandling(exception)
 end
 
 end

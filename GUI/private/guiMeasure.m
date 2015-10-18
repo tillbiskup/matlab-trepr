@@ -8,15 +8,14 @@ function guiMeasure(action,nPoints)
 %               Number of points: 1 - pick mode; 2 - measure mode
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-10-17
+% 2015-10-18
 
 try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gu = ad.UsedByGUIData_m;
-    %gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % Set position for dataset
     switch lower(action)
@@ -105,7 +104,7 @@ try
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % Reset edit fields
     set(gh.measure_panel_point1_x_index_edit,'String','0');
@@ -186,9 +185,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    
-    % Get guihandles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % Reset nPoints to measure in appdata
     ad.control.measure.nPoints = 0;
@@ -225,9 +222,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    
-    % Get guihandles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % To shorten lines, assign id of currently active dataset to var
     active = ad.control.data.active;

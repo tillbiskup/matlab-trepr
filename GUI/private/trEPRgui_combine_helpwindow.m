@@ -3,8 +3,8 @@ function varargout = trEPRgui_combine_helpwindow(varargin)
 %          Comments displayed at the command line in response 
 %          to the help command. 
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-10-10
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -125,14 +125,13 @@ uicontrol('Tag','close_pushbutton',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 try
-    % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    % Store handles in appdata
+    setappdata(hMainFigure,'guiHandles',guihandles);
     
     % Make the GUI visible.
     set(hMainFigure,'Visible','on');
     trEPRmsg('Combine GUI help window opened.','debug');
-    
-    guidata(hMainFigure,guihandles);
+
     if (nargout == 1)
         varargout{1} = hMainFigure;
     end

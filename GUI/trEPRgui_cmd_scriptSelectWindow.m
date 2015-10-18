@@ -15,8 +15,8 @@ function varargout = trEPRgui_cmd_scriptSelectWindow(varargin)
 %   position  - vector (2x1)
 %            	position of the window relative to the screen.
 
-% Copyright (c) 2014, Till Biskup
-% 2014-10-10
+% Copyright (c) 2014-15, Till Biskup
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -160,8 +160,8 @@ uicontrol('Tag','close_pushbutton',...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 try
-    % Store handles in guidata
-    guidata(hMainFigure,guihandles);
+    % Store handles in appdata
+    setappdata(hMainFigure,'guiHandles',guihandles);
     
     adMain = getappdata(mainGuiWindow);
     scriptDir = adMain.control.dirs.lastScript;

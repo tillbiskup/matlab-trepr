@@ -7,7 +7,7 @@ function handle = panelDatasets(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -557,7 +557,7 @@ try
     ad = getappdata(mainWindow);
     
     % Get handles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     switch lower(action)
         case 'show'
@@ -635,7 +635,7 @@ try
     ad = getappdata(mainWindow);
     
     % Get handles of main window
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     ad.control.data.active = ad.control.data.visible(...
         get(gh.data_panel_visible_listbox,'Value')...
@@ -693,7 +693,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-    gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     switch lower(action)
         case 'showonlyactive'

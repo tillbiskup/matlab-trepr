@@ -23,7 +23,7 @@ function [status,warnings] = cmdLoad(handle,varargin)
 %             Contains warnings/error messages if any, otherwise empty
 
 % Copyright (c) 2013-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -53,8 +53,6 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-gh = guidata(handle);
 
 if isempty(opt)
     FileName = getFileName();
@@ -297,7 +295,6 @@ FilterSpec = '*.*';
 % Get the appdata of the main window
 mainWindow = trEPRguiGetWindowHandle;
 ad = getappdata(mainWindow);
-gh = guihandles(mainWindow);
 
 % Set directory where to load files from
 if isfield(ad,'control') && isfield(ad.control,'dirs') && ...

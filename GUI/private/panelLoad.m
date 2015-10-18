@@ -7,7 +7,7 @@ function handle = panelLoad(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-31
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components

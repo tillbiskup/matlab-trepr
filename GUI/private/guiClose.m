@@ -9,7 +9,7 @@ try
     % Get appdata of main window
     mainWindow = trEPRguiGetWindowHandle;
     ad = getappdata(mainWindow);
-
+    
     % TODO: Check whether there is anything that is not saved...
     if ~isempty(ad.control.data.modified)
         answer = questionDialogue(...
@@ -18,6 +18,7 @@ try
             'you <em>loose all your unsaved changes</em>.'...
             '<br>Alternative option: Cancel and return to GUI.'],...
             'title','Warning: Modified datasets...',...
+            'tag','trEPRgui_closeDialogue',...
             'icon','warning',...
             'WindowStyle','modal',...
             'Buttons',{'Close','Cancel'},...
@@ -48,6 +49,13 @@ try
     
     % Stop garbage collector
     guiGarbageCollector('stop');
+    
+    % Stop timer
+    timerHandle = timerfind('Name','trEPRupdateCheckTimer');
+    if ~isempty(timerHandle)
+        stop(timerHandle);
+        delete(timerHandle)
+    end
 
 catch exception
     % Hm... that should really not happen.

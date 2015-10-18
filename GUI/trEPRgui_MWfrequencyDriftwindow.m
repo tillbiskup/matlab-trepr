@@ -8,7 +8,7 @@ function varargout = trEPRgui_MWfrequencyDriftwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -67,7 +67,7 @@ hButtonGroup = uibuttongroup('Tag','mainButtonGroup',...
     'Position', [guiSize(1)-mainPanelWidth-20 guiSize(2)-50 mainPanelWidth 30],...
     'Visible','on',...
     'SelectionChangeFcn',{@tbg_Callback});
-tb1 = uicontrol('Tag','analyse_togglebutton',...
+uicontrol('Tag','analyse_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -77,7 +77,7 @@ tb1 = uicontrol('Tag','analyse_togglebutton',...
     'pos',[0 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb2 = uicontrol('Tag','display_togglebutton',...
+uicontrol('Tag','display_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -87,7 +87,7 @@ tb2 = uicontrol('Tag','display_togglebutton',...
     'pos',[mainPanelWidth/3 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb3 = uicontrol('Tag','settings_togglebutton',...
+uicontrol('Tag','settings_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -936,19 +936,11 @@ uicontrol('Tag','close_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Define constants needed for calculations
-hplanck = 6.62606957e-34;     % J * s
-bohrmagneton = 9.2740154e-24; % J * T^-1
-gelectron = 2.00232;
-
 % Read configuration for export formats (geometries) from ini file
 exportFormatsConfigFile = fullfile(trEPRinfo('dir'),'figure','fig2file.ini');
 exportFormats = trEPRiniFileRead(exportFormatsConfigFile);
 % Set export formats (geometries)
 set(hAxesExportFormat,'String',fieldnames(exportFormats));
-
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
 
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
@@ -963,6 +955,7 @@ setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 setappdata(hMainFigure,'MWfreq',ad.MWfreq);
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -988,8 +981,6 @@ if ishghandle(mainGuiWindow)
     updateAxes();
     updateAnalysisPanel();
 end
-
-%updateAxes();
 
 if (nargout == 1)
     varargout{1} = hMainFigure;
@@ -1017,697 +1008,699 @@ colors = {...
     'k',[0 0 0]; ...
     'w',[1 1 1]; ...
     };
+setappdata(hMainFigure,'colors',colors);
 
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function tbg_Callback(source,~)
-    try 
-        switchPanel(get(get(source,'SelectedObject'),'String'));
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
+try
+    switchPanel(get(get(source,'SelectedObject'),'String'));
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function edit_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-
-        value = str2double(strrep(get(source,'String'),',','.'));
-                
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        switch lower(action)
-            case 'linewidth'
-                % Get line type
-                lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{ad.control.data.active}.display.lines.data.width = value;
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        ad.MWfreq.line.width = value;
-                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markersize'
-                % Get line type
-                lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{ad.control.data.active}.display.lines.data.marker.size = ...
-                            value;
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        ad.MWfreq.line.marker.size = value;
-                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'averageareaalpha'
-                set(gh.stdevsettings_alpha_edit,'String',num2str(value));
-                ad.MWfreq.area.patch.alpha = value;
-                setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    value = str2double(strrep(get(source,'String'),',','.'));
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    switch lower(action)
+        case 'linewidth'
+            % Get line type
+            lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+            switch lower(lineType)
+                case 'main'
+                    ad.data{ad.control.data.active}.display.lines.data.width = value;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    ad.MWfreq.line.width = value;
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markersize'
+            % Get line type
+            lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+            switch lower(lineType)
+                case 'main'
+                    ad.data{ad.control.data.active}.display.lines.data.marker.size = ...
+                        value;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    ad.MWfreq.line.marker.size = value;
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'averageareaalpha'
+            set(gh.stdevsettings_alpha_edit,'String',num2str(value));
+            ad.MWfreq.area.patch.alpha = value;
+            setappdata(mainWindow,'MWfreq',ad.MWfreq);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function togglebutton_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        % For those togglebuttons who do more complicated stuff
-        % Toggle button
-        if value % If toggle switched ON
-            switch lower(action)
-                case 'measurepick'
-                    % Switch off zoom
-                    zoom(mainWindow,'off');
-                    % Set pointer callback functions
-                    set(mainWindow,...
-                        'WindowButtonMotionFcn',@trackPointer);
-                    set(mainWindow,...
-                        'WindowButtonDownFcn',@switchMeasurePointer);
-                    return;
-                case 'zoom'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    % Reset other zoom toggle button
-                    zoom(mainWindow,'on');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'on';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'mean'
-                    ad.control.axis.mean = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'stdev'
-                    ad.control.axis.stdev = 1;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        else % If toggle button switched OFF
-            switch lower(action)
-                case 'measurepick'
-                    % Reset pointer callback functions
-                    set(mainWindow,'WindowButtonMotionFcn','');
-                    set(mainWindow,'WindowButtonDownFcn','');
-                    return;
-                case 'zoom'
-                    zoom(mainWindow,'off');
-                    return;
-                case 'gridx'
-                    ad.control.axis.grid.x = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridy'
-                    ad.control.axis.grid.y = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'gridminor'
-                    ad.control.axis.grid.minor = 'off';
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'mean'
-                    ad.control.axis.mean = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                case 'stdev'
-                    ad.control.axis.stdev = 0;
-                    setappdata(mainWindow,'control',ad.control);
-                    updateAxes();
-                    return;
-                otherwise
-                    trEPRoptionUnknown(action);
-                    return;
-            end
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    % For those togglebuttons who do more complicated stuff
+    % Toggle button
+    if value % If toggle switched ON
+        switch lower(action)
+            case 'measurepick'
+                % Switch off zoom
+                zoom(mainWindow,'off');
+                % Set pointer callback functions
+                set(mainWindow,...
+                    'WindowButtonMotionFcn',@trackPointer);
+                set(mainWindow,...
+                    'WindowButtonDownFcn',@switchMeasurePointer);
+                return;
+            case 'zoom'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                % Reset other zoom toggle button
+                zoom(mainWindow,'on');
+                return;
+            case 'gridx'
+                ad.control.axis.grid.x = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridy'
+                ad.control.axis.grid.y = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'on';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'mean'
+                ad.control.axis.mean = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'stdev'
+                ad.control.axis.stdev = 1;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            otherwise
+                trEPRoptionUnknown(action);
+                return;
+        end
+    else % If toggle button switched OFF
+        switch lower(action)
+            case 'measurepick'
+                % Reset pointer callback functions
+                set(mainWindow,'WindowButtonMotionFcn','');
+                set(mainWindow,'WindowButtonDownFcn','');
+                return;
+            case 'zoom'
+                zoom(mainWindow,'off');
+                return;
+            case 'gridx'
+                ad.control.axis.grid.x = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridy'
+                ad.control.axis.grid.y = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'gridminor'
+                ad.control.axis.grid.minor = 'off';
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'mean'
+                ad.control.axis.mean = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            case 'stdev'
+                ad.control.axis.stdev = 0;
+                setappdata(mainWindow,'control',ad.control);
+                updateAxes();
+                return;
+            otherwise
+                trEPRoptionUnknown(action);
+                return;
+        end
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        % Make life easier
-        active = ad.control.data.active;
-        
-        % Return immediately if there is no active dataset
-        if isempty(active) || active == 0
-            return;
-        end
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-
-        switch action
-            case 'exportFigure'
-                % Open new figure window and make it invisible
-                newFig = figure('Visible','off');
-                
-                % Plot into new figure window
-                updateAxes(newFig);
-                
-                % Get export format
-                figExportFormats = cellstr(...
-                    get(gh.display_panel_axesexport_format_popupmenu,'String'));
-                exportFormat = figExportFormats{...
-                    get(gh.display_panel_axesexport_format_popupmenu,'Value')};
-                
-                % Get file type to save to
-                fileTypes = cellstr(...
-                    get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
-                fileType = fileTypes{...
-                    get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
-                
-                % Generate default file name if possible, be very defensive
-                if ad.control.data.visible
-                    [~,fileNameSuggested,~] = ...
-                        fileparts(ad.data{active}.file.name);
-                else
-                    fileNameSuggested = '';
-                end
-                
-                % Ask user for file name
-                [fileName,pathName] = uiputfile(...
-                    sprintf('*.%s',fileType),...
-                    'Get filename to export figure to',...
-                    [fileNameSuggested '-MWfreqDriftPlot']);
-                % If user aborts process, return
-                if fileName == 0
-                    close(newFig);
-                    return;
-                end
-                % Create filename with full path
-                fileName = fullfile(pathName,fileName);
-                
-                % Save figure, depending on settings for file type and format
-                status = fig2file(newFig,fileName,...
-                    'fileType',fileType,'exportFormat',exportFormat);
-                if status
-                    trEPRmsg(status);
-                end
-                
-                % Close figure window
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Make life easier
+    active = ad.control.data.active;
+    
+    % Return immediately if there is no active dataset
+    if isempty(active) || active == 0
+        return;
+    end
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    switch action
+        case 'exportFigure'
+            % Open new figure window and make it invisible
+            newFig = figure('Visible','off');
+            
+            % Plot into new figure window
+            updateAxes(newFig);
+            
+            % Get export format
+            figExportFormats = cellstr(...
+                get(gh.display_panel_axesexport_format_popupmenu,'String'));
+            exportFormat = figExportFormats{...
+                get(gh.display_panel_axesexport_format_popupmenu,'Value')};
+            
+            % Get file type to save to
+            fileTypes = cellstr(...
+                get(gh.display_panel_axesexport_filetype_popupmenu,'String'));
+            fileType = fileTypes{...
+                get(gh.display_panel_axesexport_filetype_popupmenu,'Value')};
+            
+            % Generate default file name if possible, be very defensive
+            if ad.control.data.visible
+                [~,fileNameSuggested,~] = ...
+                    fileparts(ad.data{active}.file.name);
+            else
+                fileNameSuggested = '';
+            end
+            
+            % Ask user for file name
+            [fileName,pathName] = uiputfile(...
+                sprintf('*.%s',fileType),...
+                'Get filename to export figure to',...
+                [fileNameSuggested '-MWfreqDriftPlot']);
+            % If user aborts process, return
+            if fileName == 0
                 close(newFig);
                 return;
-            case 'lineColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.color)
-                            ad.data{active}.display.lines.data.color = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.color,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.data.color = uisetcolor(...
-                            ad.data{active}.display.lines.data.color,...
-                            'Set line colour');
+            end
+            % Create filename with full path
+            fileName = fullfile(pathName,fileName);
+            
+            % Save figure, depending on settings for file type and format
+            status = fig2file(newFig,fileName,...
+                'fileType',fileType,'exportFormat',exportFormat);
+            if status
+                trEPRmsg(status);
+            end
+            
+            % Close figure window
+            close(newFig);
+            return;
+        case 'lineColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.color)
+                        ad.data{active}.display.lines.data.color = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.color,...
+                            ad.colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.data.color = uisetcolor(...
+                        ad.data{active}.display.lines.data.color,...
+                        'Set line colour');
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    ad.MWfreq.line.color = uisetcolor(...
+                        ad.MWfreq.line.color,...
+                        'Set average frequency line colour');
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerEdgeColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                        ad.data{active}.display.lines.data.marker.edgeColor = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
+                            ad.colors(:,1)),2};
+                    end
+                    newColour = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.edgeColor,...
+                        'Set line marker edge colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.data{active}.display.lines.data.marker.edgeColor = newColour;
                         setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        ad.MWfreq.line.color = uisetcolor(...
-                            ad.MWfreq.line.color,...
-                            'Set average frequency line colour');
-                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerEdgeColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
-                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                    end
+                case 'average mwfreq'
+                    if ischar(ad.MWfreq.line.marker.edgeColor)
+                        if length(ad.MWfreq.line.marker.edgeColor) == 1
+                            ad.MWfreq.line.marker.edgeColor = ad.colors{...
                                 strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
-                                colors(:,1)),2};
+                                ad.colors(:,1)),2};
+                        else
+                            ad.MWfreq.line.marker.edgeColor = [];
                         end
-                        newColour = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.edgeColor,...
-                            'Set line marker edge colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.display.lines.data.marker.edgeColor = newColour;
-                            setappdata(mainWindow,'data',ad.data);
-                        end
-                    case 'average mwfreq'
-                        if ischar(ad.MWfreq.line.marker.edgeColor)
-                            if length(ad.MWfreq.line.marker.edgeColor) == 1
-                                ad.MWfreq.line.marker.edgeColor = colors{...
-                                    strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.MWfreq.line.marker.edgeColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.MWfreq.line.marker.edgeColor,...
-                            'Set average line marker edge colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.MWfreq.line.marker.edgeColor = newColour;
-                            setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                        end
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerFaceColourPalette'
-                switch lower(lineType)
-                    case 'main'
-                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
-                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
-                                colors(:,1)),2};
-                        end
-                        newColour = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.faceColor,...
-                            'Set MFoff line marker face colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.data{active}.display.lines.data.marker.faceColor = newColour;
-                            setappdata(mainWindow,'data',ad.data);
-                        end
-                    case 'average mwfreq'
-                        if ischar(ad.MWfreq.line.marker.faceColor)
-                            if length(ad.MWfreq.line.marker.edgeColor) == 1
-                                ad.MWfreq.line.marker.faceColor = colors{...
-                                    strcmpi(ad.MWfreq.line.marker.faceColor,...
-                                    colors(:,1)),2};
-                            else
-                                ad.MWfreq.line.marker.faceColor = [];
-                            end
-                        end
-                        newColour = uisetcolor(...
-                            ad.MWfreq.line.marker.faceColor,...
-                            'Set MFoff line marker face colour');
-                        if isnumeric(newColour) && length(newColour) == 3
-                            ad.MWfreq.line.marker.faceColor = newColour;
-                            setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                        end
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'markerDefaults'
-                switch lower(lineType)
-                    case 'main'
-                        ad.data{active}.line.marker.type = 'none';
-                        ad.data{active}.line.marker.edgeColor = 'auto';
-                        ad.data{active}.line.marker.faceColor = 'none';
-                        ad.data{active}.line.marker.size = 6;
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        ad.MWfreq.line.marker.type = 'none';
-                        ad.MWfreq.line.marker.edgeColor = 'auto';
-                        ad.MWfreq.line.marker.faceColor = 'none';
-                        ad.MWfreq.line.marker.size = 6;
+                    end
+                    newColour = uisetcolor(...
+                        ad.MWfreq.line.marker.edgeColor,...
+                        'Set average line marker edge colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.MWfreq.line.marker.edgeColor = newColour;
                         setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': pushbutton_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateSettingsPanel();
-                updateAxes();
-                return;                
-            case 'averageareaColourPalette'
-                ad.MWfreq.area.patch.color = uisetcolor(...
-                    ad.MWfreq.area.patch.color,'Set std. dev. area colour');
-                setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'avglineColourPalette'
-                ad.MWfreq.line.color = uisetcolor(...
-                    ad.MWfreq.line.color,'Set mean MW frequency line colour');
-                setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                updateSettingsPanel();
-                updateAxes();
-                return;
-            case 'Close'
-                % Look for ACC GUI Help window and if its there, close as
-                % well
-                hHelpWindow = ...
-                    findobj('Tag','trEPRgui_MWfrequencyDrift_helpwindow');
-                if ishandle(hHelpWindow)
-                    delete(hHelpWindow);
-                end
-                delete(trEPRguiGetWindowHandle(mfilename));
-                trEPRmsg('MWfrequency drift window closed','debug');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+                    end
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerFaceColourPalette'
+            switch lower(lineType)
+                case 'main'
+                    if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                        ad.data{active}.display.lines.data.marker.faceColor = ad.colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
+                            ad.colors(:,1)),2};
+                    end
+                    newColour = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.faceColor,...
+                        'Set MFoff line marker face colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.data{active}.display.lines.data.marker.faceColor = newColour;
+                        setappdata(mainWindow,'data',ad.data);
+                    end
+                case 'average mwfreq'
+                    if ischar(ad.MWfreq.line.marker.faceColor)
+                        if length(ad.MWfreq.line.marker.edgeColor) == 1
+                            ad.MWfreq.line.marker.faceColor = ad.colors{...
+                                strcmpi(ad.MWfreq.line.marker.faceColor,...
+                                ad.colors(:,1)),2};
+                        else
+                            ad.MWfreq.line.marker.faceColor = [];
+                        end
+                    end
+                    newColour = uisetcolor(...
+                        ad.MWfreq.line.marker.faceColor,...
+                        'Set MFoff line marker face colour');
+                    if isnumeric(newColour) && length(newColour) == 3
+                        ad.MWfreq.line.marker.faceColor = newColour;
+                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                    end
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'markerDefaults'
+            switch lower(lineType)
+                case 'main'
+                    ad.data{active}.line.marker.type = 'none';
+                    ad.data{active}.line.marker.edgeColor = 'auto';
+                    ad.data{active}.line.marker.faceColor = 'none';
+                    ad.data{active}.line.marker.size = 6;
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    ad.MWfreq.line.marker.type = 'none';
+                    ad.MWfreq.line.marker.edgeColor = 'auto';
+                    ad.MWfreq.line.marker.faceColor = 'none';
+                    ad.MWfreq.line.marker.size = 6;
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': pushbutton_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'averageareaColourPalette'
+            ad.MWfreq.area.patch.color = uisetcolor(...
+                ad.MWfreq.area.patch.color,'Set std. dev. area colour');
+            setappdata(mainWindow,'MWfreq',ad.MWfreq);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'avglineColourPalette'
+            ad.MWfreq.line.color = uisetcolor(...
+                ad.MWfreq.line.color,'Set mean MW frequency line colour');
+            setappdata(mainWindow,'MWfreq',ad.MWfreq);
+            updateSettingsPanel();
+            updateAxes();
+            return;
+        case 'Close'
+            % Look for ACC GUI Help window and if its there, close as
+            % well
+            hHelpWindow = ...
+                findobj('Tag','trEPRgui_MWfrequencyDrift_helpwindow');
+            if ishandle(hHelpWindow)
+                delete(hHelpWindow);
+            end
+            delete(trEPRguiGetWindowHandle(mfilename));
+            trEPRmsg('MWfrequency drift window closed','debug');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata and handles of main window
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-        
-        % Get value
-        values = cellstr(get(source,'String'));
-        value = values{get(source,'Value')};
-
-        switch action
-            case 'line'
-                updateSettingsPanel();
-            case 'linestyle'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        switch value
-                            case 'solid'
-                                ad.data{active}.line.style = '-';
-                            case 'dashed'
-                                ad.data{active}.line.style = '--';
-                            case 'dotted'
-                                ad.data{active}.line.style = ':';
-                            case 'dash-dotted'
-                                ad.data{active}.line.style = '-.';
-                            case 'none'
-                                ad.data{active}.line.style = 'none';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line style ' lineStyle]);
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        switch value
-                            case 'solid'
-                                ad.MWfreq.line.style = '-';
-                            case 'dashed'
-                                ad.MWfreq.line.style = '--';
-                            case 'dotted'
-                                ad.MWfreq.line.style = ':';
-                            case 'dash-dotted'
-                                ad.MWfreq.line.style = '-.';
-                            case 'none'
-                                ad.MWfreq.line.style = 'none';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line style ' lineStyle]);
-                        end
-                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'linemarker'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        switch value
-                            case 'none'
-                                ad.data{active}.line.marker.type = 'none';
-                            case 'plus'
-                                ad.data{active}.line.marker.type = '+';
-                            case 'circle'
-                                ad.data{active}.line.marker.type = 'o';
-                            case 'asterisk'
-                                ad.data{active}.line.marker.type = '*';
-                            case 'point'
-                                ad.data{active}.line.marker.type = '.';
-                            case 'cross'
-                                ad.data{active}.line.marker.type = 'x';
-                            case 'square'
-                                ad.data{active}.line.marker.type = 's';
-                            case 'diamond'
-                                ad.data{active}.line.marker.type = 'd';
-                            case 'triangle up'
-                                ad.data{active}.line.marker.type = '^';
-                            case 'triangle down'
-                                ad.data{active}.line.marker.type = 'v';
-                            case 'triangle right'
-                                ad.data{active}.line.marker.type = '<';
-                            case 'triangle left'
-                                ad.data{active}.line.marker.type = '>';
-                            case 'pentagram'
-                                ad.data{active}.line.marker.type = 'p';
-                            case 'hexagram'
-                                ad.data{active}.line.marker.type = 'h';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line marker ' lineMarker]);
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                        switch value
-                            case 'none'
-                                ad.MWfreq.line.marker.type = 'none';
-                            case 'plus'
-                                ad.MWfreq.line.marker.type = '+';
-                            case 'circle'
-                                ad.MWfreq.line.marker.type = 'o';
-                            case 'asterisk'
-                                ad.MWfreq.line.marker.type = '*';
-                            case 'point'
-                                ad.MWfreq.line.marker.type = '.';
-                            case 'cross'
-                                ad.MWfreq.line.marker.type = 'x';
-                            case 'square'
-                                ad.MWfreq.line.marker.type = 's';
-                            case 'diamond'
-                                ad.MWfreq.line.marker.type = 'd';
-                            case 'triangle up'
-                                ad.MWfreq.line.marker.type = '^';
-                            case 'triangle down'
-                                ad.MWfreq.line.marker.type = 'v';
-                            case 'triangle right'
-                                ad.MWfreq.line.marker.type = '<';
-                            case 'triangle left'
-                                ad.MWfreq.line.marker.type = '>';
-                            case 'pentagram'
-                                ad.MWfreq.line.marker.type = 'p';
-                            case 'hexagram'
-                                ad.MWfreq.line.marker.type = 'h';
-                            otherwise
-                                % That shall never happen
-                                disp([mfilename ': popupmenu_Callback(): '...
-                                    'Unknown line marker ' lineMarker]);
-                        end
-                        setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'markerEdgeColour'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.edgeColor = ...
-                                ad.data{active}.line.color;
-                        else
-                            ad.data{active}.line.marker.edgeColor = value;
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            case 'markerFaceColour'
-                switch lower(lineType)
-                    case 'main'
-                        active = ad.control.data.active;
-                        if strcmpi(value,'colour')
-                            ad.data{active}.line.marker.faceColor = ...
-                                ad.data{active}.line.color;
-                        else
-                            ad.data{active}.line.marker.faceColor = value;
-                        end
-                        setappdata(mainWindow,'data',ad.data);
-                    case 'average mwfreq'
-                    otherwise
-                        disp([mfilename ': popupmenu_Callback(): '...
-                            'Unknown line type ' lineType]);
-                end
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata and handles of main window
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    % Get value
+    values = cellstr(get(source,'String'));
+    value = values{get(source,'Value')};
+    
+    switch action
+        case 'line'
+            updateSettingsPanel();
+        case 'linestyle'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    switch value
+                        case 'solid'
+                            ad.data{active}.line.style = '-';
+                        case 'dashed'
+                            ad.data{active}.line.style = '--';
+                        case 'dotted'
+                            ad.data{active}.line.style = ':';
+                        case 'dash-dotted'
+                            ad.data{active}.line.style = '-.';
+                        case 'none'
+                            ad.data{active}.line.style = 'none';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line style ' lineStyle]);
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    switch value
+                        case 'solid'
+                            ad.MWfreq.line.style = '-';
+                        case 'dashed'
+                            ad.MWfreq.line.style = '--';
+                        case 'dotted'
+                            ad.MWfreq.line.style = ':';
+                        case 'dash-dotted'
+                            ad.MWfreq.line.style = '-.';
+                        case 'none'
+                            ad.MWfreq.line.style = 'none';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line style ' lineStyle]);
+                    end
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'linemarker'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    switch value
+                        case 'none'
+                            ad.data{active}.line.marker.type = 'none';
+                        case 'plus'
+                            ad.data{active}.line.marker.type = '+';
+                        case 'circle'
+                            ad.data{active}.line.marker.type = 'o';
+                        case 'asterisk'
+                            ad.data{active}.line.marker.type = '*';
+                        case 'point'
+                            ad.data{active}.line.marker.type = '.';
+                        case 'cross'
+                            ad.data{active}.line.marker.type = 'x';
+                        case 'square'
+                            ad.data{active}.line.marker.type = 's';
+                        case 'diamond'
+                            ad.data{active}.line.marker.type = 'd';
+                        case 'triangle up'
+                            ad.data{active}.line.marker.type = '^';
+                        case 'triangle down'
+                            ad.data{active}.line.marker.type = 'v';
+                        case 'triangle right'
+                            ad.data{active}.line.marker.type = '<';
+                        case 'triangle left'
+                            ad.data{active}.line.marker.type = '>';
+                        case 'pentagram'
+                            ad.data{active}.line.marker.type = 'p';
+                        case 'hexagram'
+                            ad.data{active}.line.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line marker ' lineMarker]);
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                    switch value
+                        case 'none'
+                            ad.MWfreq.line.marker.type = 'none';
+                        case 'plus'
+                            ad.MWfreq.line.marker.type = '+';
+                        case 'circle'
+                            ad.MWfreq.line.marker.type = 'o';
+                        case 'asterisk'
+                            ad.MWfreq.line.marker.type = '*';
+                        case 'point'
+                            ad.MWfreq.line.marker.type = '.';
+                        case 'cross'
+                            ad.MWfreq.line.marker.type = 'x';
+                        case 'square'
+                            ad.MWfreq.line.marker.type = 's';
+                        case 'diamond'
+                            ad.MWfreq.line.marker.type = 'd';
+                        case 'triangle up'
+                            ad.MWfreq.line.marker.type = '^';
+                        case 'triangle down'
+                            ad.MWfreq.line.marker.type = 'v';
+                        case 'triangle right'
+                            ad.MWfreq.line.marker.type = '<';
+                        case 'triangle left'
+                            ad.MWfreq.line.marker.type = '>';
+                        case 'pentagram'
+                            ad.MWfreq.line.marker.type = 'p';
+                        case 'hexagram'
+                            ad.MWfreq.line.marker.type = 'h';
+                        otherwise
+                            % That shall never happen
+                            disp([mfilename ': popupmenu_Callback(): '...
+                                'Unknown line marker ' lineMarker]);
+                    end
+                    setappdata(mainWindow,'MWfreq',ad.MWfreq);
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'markerEdgeColour'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    if strcmpi(value,'colour')
+                        ad.data{active}.line.marker.edgeColor = ...
+                            ad.data{active}.line.color;
+                    else
+                        ad.data{active}.line.marker.edgeColor = value;
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        case 'markerFaceColour'
+            switch lower(lineType)
+                case 'main'
+                    active = ad.control.data.active;
+                    if strcmpi(value,'colour')
+                        ad.data{active}.line.marker.faceColor = ...
+                            ad.data{active}.line.color;
+                    else
+                        ad.data{active}.line.marker.faceColor = value;
+                    end
+                    setappdata(mainWindow,'data',ad.data);
+                case 'average mwfreq'
+                otherwise
+                    disp([mfilename ': popupmenu_Callback(): '...
+                        'Unknown line type ' lineType]);
+            end
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function slider_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-
-        % Get state of toggle button
-        value = get(source,'Value');
-        
-        switch lower(action)
-            case 'averageareaalpha'
-                set(gh.stdevsettings_alpha_edit,'String',num2str(value));
-                ad.MWfreq.area.patch.alpha = value;
-                setappdata(mainWindow,'MWfreq',ad.MWfreq);
-                updateAxes();
-            otherwise
-                trEPRoptionUnknown(action);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % Get state of toggle button
+    value = get(source,'Value');
+    
+    switch lower(action)
+        case 'averageareaalpha'
+            set(gh.stdevsettings_alpha_edit,'String',num2str(value));
+            ad.MWfreq.area.patch.alpha = value;
+            setappdata(mainWindow,'MWfreq',ad.MWfreq);
+            updateAxes();
+        otherwise
+            trEPRoptionUnknown(action);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function keypress_Callback(src,evt)
-    try
-        if isempty(evt.Character) && isempty(evt.Key)
-            % In case "Character" is the empty string, i.e. only modifier
-            % key was pressed...
-            return;
-        end
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-        if ~isempty(evt.Modifier)
-            if (strcmpi(evt.Modifier{1},'command')) || ...
-                    (strcmpi(evt.Modifier{1},'control'))
-                switch evt.Key
-                    case 'w'
-                        pushbutton_Callback(src,evt,'Close')
-                        return;
-                    case '1'
-                        switchPanel('Analysis');
-                        return;
-                    case '2'
-                        switchPanel('Display');
-                        return;
-                    case '3'
-                        switchPanel('Settings');
-                        return;
-                    case 'x'
-                        ad.control.axis.displayType = '1D along x';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'y'
-                        ad.control.axis.displayType = '1D along y';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                    case 'z'
-                        ad.control.axis.displayType = '2D plot';
-                        setappdata(mainWindow,'control',ad.control);
-                        updateAxes();
-                        return;
-                end
+try
+    if isempty(evt.Character) && isempty(evt.Key)
+        % In case "Character" is the empty string, i.e. only modifier
+        % key was pressed...
+        return;
+    end
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    if ~isempty(evt.Modifier)
+        if (strcmpi(evt.Modifier{1},'command')) || ...
+                (strcmpi(evt.Modifier{1},'control'))
+            switch evt.Key
+                case 'w'
+                    pushbutton_Callback(src,evt,'Close')
+                    return;
+                case '1'
+                    switchPanel('Analysis');
+                    return;
+                case '2'
+                    switchPanel('Display');
+                    return;
+                case '3'
+                    switchPanel('Settings');
+                    return;
+                case 'x'
+                    ad.control.axis.displayType = '1D along x';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'y'
+                    ad.control.axis.displayType = '1D along y';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
+                case 'z'
+                    ad.control.axis.displayType = '2D plot';
+                    setappdata(mainWindow,'control',ad.control);
+                    updateAxes();
+                    return;
             end
         end
-        switch evt.Key
-            case 'f1'
-                trEPRgui_MWfrequencyDrift_helpwindow();
-                return;
-            otherwise
-%                 disp(evt);
-%                 fprintf('       Caller: %i\n\n',src);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
     end
+    switch evt.Key
+        case 'f1'
+            trEPRgui_MWfrequencyDrift_helpwindow();
+            return;
+        otherwise
+            %                 disp(evt);
+            %                 fprintf('       Caller: %i\n\n',src);
+            return;
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 
@@ -1716,472 +1709,484 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function switchPanel(panelName)
-    try
-        panels = [pp1 pp2 pp3];
-        buttons = [tb1 tb2 tb3];
-        switch lower(panelName)
-            case 'analysis'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp1,'Visible','on');
-                set(tb1,'Value',1);
-            case 'display'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp2,'Visible','on');
-                set(tb2,'Value',1);
-            case 'settings'
-                set(panels,'Visible','off');
-                set(buttons,'Value',0);
-                set(pp3,'Visible','on');
-                set(tb3,'Value',1);
-            otherwise
-                trEPRoptionUnknown(panelName,'panel');
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    panels = [...
+        gh.dataset_panel ...
+        gh.accumulate_panel ...
+        gh.settings_panel ...
+        ];
+    buttons = [...
+        gh.analyse_togglebutton ...
+        gh.display_togglebutton ...
+        gh.settings_togglebutton ...
+        ];
+    switch lower(panelName)
+        case 'analysis'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.dataset_panel,'Visible','on');
+            set(gh.analyse_togglebutton,'Value',1);
+        case 'display'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.accumulate_panel,'Visible','on');
+            set(gh.display_togglebutton,'Value',1);
+        case 'settings'
+            set(panels,'Visible','off');
+            set(buttons,'Value',0);
+            set(gh.settings_panel,'Visible','on');
+            set(gh.settings_togglebutton,'Value',1);
+        otherwise
+            trEPRoptionUnknown(panelName,'panel');
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateAnalysisPanel()
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-        
-        % Get handles from main window
-        gh = guidata(mainWindow);
-        
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-        
-        % Set Frequency subpanel fields
-        if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
-            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
-        else
-            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
-        end
-        if isscalar(MWfreq) && length(ad.data{active}.parameters.bridge.calibration.values) > 1
-            MWfreq = ad.data{active}.parameters.bridge.calibration.values;
-        end
-        
-        set(gh.mwfrequency_min_edit,'String',num2str(min(MWfreq),'%10.6f'));
-        set(gh.mwfrequency_max_edit,'String',num2str(max(MWfreq),'%10.6f'));
-        set(gh.mwfrequency_delta_edit,...
-            'String',num2str(max(MWfreq)-min(MWfreq),7));
-        set(gh.mwfrequency_avg_edit,'String',num2str(mean(MWfreq),'%10.6f'));
-        set(gh.mwfrequency_stdev_edit,'String',num2str(std(MWfreq,1),'%10.6f'));
-        
-        % Set Field subpanel fields
-        set(gh.field_step_edit,'String',...
-            num2str(ad.data{active}.parameters.field.step.value));
-        set(gh.field_sequence_edit,'String',...
-            num2str(ad.data{active}.parameters.field.sequence));
-        
-        fieldDeviationDelta = (max(MWfreq)-min(MWfreq))*1e9*hplanck /...
-            (gelectron*bohrmagneton);
-        fieldDeviationStdev = std(MWfreq,1)*2*1e9*hplanck /...
-            (gelectron*bohrmagneton);
-        switch lower(ad.data{active}.axes.data(2).unit)
-            case 'g'
-                fieldDeviationDelta = fieldDeviationDelta * 1e4;
-                fieldDeviationStdev = fieldDeviationStdev * 1e4;
-            case 'mt'
-                fieldDeviationDelta = fieldDeviationDelta * 1e3;
-                fieldDeviationStdev = fieldDeviationStdev * 1e3;
-            otherwise
-                st = dbstack;
-                trEPRmsg(...
-                    [st.name ' : unknown field unit "' ...
-                    ad.data{active}.axes.data(2).unit '". '...
-                    'Assuming Gauss. Values might be wrong!'],...
-                    'warning');
-                fieldDeviationDelta = fieldDeviationDelta * 1e4;
-                fieldDeviationStdev = fieldDeviationStdev * 1e4;
-        end
-        
-        set(gh.field_deviation_delta_edit,...
-            'String',num2str(fieldDeviationDelta,'%10.6f'));
-        set(gh.field_deviation_stdev_edit,...
-            'String',num2str(fieldDeviationStdev,'%10.6f'));
-        
-        % Set unit fields
-        set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
-            'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
-        set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
-            'String',ad.data{active}.axes.data(2).unit);
-        
-        % Set background of deviation fields accordingly
-        if fieldDeviationDelta > ad.data{active}.parameters.field.step.value
-            set(gh.field_deviation_delta_edit,...
-                'BackgroundColor',[1 0.8 0.8]);
-        elseif fieldDeviationDelta > 0.5*ad.data{active}.parameters.field.step.value
-            set(gh.field_deviation_delta_edit,...
-                'Background',[1 1 0.8]);
-        else
-            set(gh.field_deviation_delta_edit,...
-                'Background',[0.8 1 0.8]);
-        end
-        if fieldDeviationStdev > ad.data{active}.parameters.field.step.value
-            set(gh.field_deviation_stdev_edit,...
-                'BackgroundColor',[1 0.8 0.8]);
-        elseif fieldDeviationStdev > 0.5*ad.data{active}.parameters.field.step.value
-            set(gh.field_deviation_stdev_edit,...
-                'Background',[1 1 0.8]);
-        else
-            set(gh.field_deviation_stdev_edit,...
-                'Background',[0.8 1 0.8]);
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    % Define constants needed for calculations
+    hplanck = 6.62606957e-34;     % J * s
+    bohrmagneton = 9.2740154e-24; % J * T^-1
+    gelectron = 2.00232;
+    
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
     end
+    
+    % Set Frequency subpanel fields
+    if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
+        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
+    else
+        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+    end
+    if isscalar(MWfreq) && length(ad.data{active}.parameters.bridge.calibration.values) > 1
+        MWfreq = ad.data{active}.parameters.bridge.calibration.values;
+    end
+    
+    set(gh.mwfrequency_min_edit,'String',num2str(min(MWfreq),'%10.6f'));
+    set(gh.mwfrequency_max_edit,'String',num2str(max(MWfreq),'%10.6f'));
+    set(gh.mwfrequency_delta_edit,...
+        'String',num2str(max(MWfreq)-min(MWfreq),7));
+    set(gh.mwfrequency_avg_edit,'String',num2str(mean(MWfreq),'%10.6f'));
+    set(gh.mwfrequency_stdev_edit,'String',num2str(std(MWfreq,1),'%10.6f'));
+    
+    % Set Field subpanel fields
+    set(gh.field_step_edit,'String',...
+        num2str(ad.data{active}.parameters.field.step.value));
+    set(gh.field_sequence_edit,'String',...
+        num2str(ad.data{active}.parameters.field.sequence));
+    
+    fieldDeviationDelta = (max(MWfreq)-min(MWfreq))*1e9*hplanck /...
+        (gelectron*bohrmagneton);
+    fieldDeviationStdev = std(MWfreq,1)*2*1e9*hplanck /...
+        (gelectron*bohrmagneton);
+    switch lower(ad.data{active}.axes.data(2).unit)
+        case 'g'
+            fieldDeviationDelta = fieldDeviationDelta * 1e4;
+            fieldDeviationStdev = fieldDeviationStdev * 1e4;
+        case 'mt'
+            fieldDeviationDelta = fieldDeviationDelta * 1e3;
+            fieldDeviationStdev = fieldDeviationStdev * 1e3;
+        otherwise
+            st = dbstack;
+            trEPRmsg(...
+                [st.name ' : unknown field unit "' ...
+                ad.data{active}.axes.data(2).unit '". '...
+                'Assuming Gauss. Values might be wrong!'],...
+                'warning');
+            fieldDeviationDelta = fieldDeviationDelta * 1e4;
+            fieldDeviationStdev = fieldDeviationStdev * 1e4;
+    end
+    
+    set(gh.field_deviation_delta_edit,...
+        'String',num2str(fieldDeviationDelta,'%10.6f'));
+    set(gh.field_deviation_stdev_edit,...
+        'String',num2str(fieldDeviationStdev,'%10.6f'));
+    
+    % Set unit fields
+    set(findall(mainWindow,'-regexp','Tag','mwfrequency.*unit_edit'),...
+        'String',ad.data{active}.parameters.bridge.MWfrequency.unit);
+    set(findall(mainWindow,'-regexp','Tag','field.*unit_edit'),...
+        'String',ad.data{active}.axes.data(2).unit);
+    
+    % Set background of deviation fields accordingly
+    if fieldDeviationDelta > ad.data{active}.parameters.field.step.value
+        set(gh.field_deviation_delta_edit,...
+            'BackgroundColor',[1 0.8 0.8]);
+    elseif fieldDeviationDelta > 0.5*ad.data{active}.parameters.field.step.value
+        set(gh.field_deviation_delta_edit,...
+            'Background',[1 1 0.8]);
+    else
+        set(gh.field_deviation_delta_edit,...
+            'Background',[0.8 1 0.8]);
+    end
+    if fieldDeviationStdev > ad.data{active}.parameters.field.step.value
+        set(gh.field_deviation_stdev_edit,...
+            'BackgroundColor',[1 0.8 0.8]);
+    elseif fieldDeviationStdev > 0.5*ad.data{active}.parameters.field.step.value
+        set(gh.field_deviation_stdev_edit,...
+            'Background',[1 1 0.8]);
+    else
+        set(gh.field_deviation_stdev_edit,...
+            'Background',[0.8 1 0.8]);
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateSettingsPanel(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata and handles from main window
-        ad = getappdata(mainWindow);
-        gh = guidata(mainWindow);
-        
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-               
-        if nargin && strcmpi('defaults',varargin{1})
-            % Reset display settings
-            ad.control.axis.grid.x = ad.configuration.axis.grid.x;
-            ad.control.axis.grid.y = ad.configuration.axis.grid.y;
-            ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
-            ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
-            % Reset MWfreq settings
-            ad.MWfreq.area.patch.color = ad.configuration.MWfreq.area.patch.color;
-            ad.MWfreq.area.patch.alpha = ad.configuration.MWfreq.area.patch.alpha;
-            ad.MWfreq.line.color = ad.configuration.MWfreq.line.color;
-            ad.MWfreq.line.width = ad.configuration.MWfreq.line.width;
-            ad.MWfreq.line.style = ad.configuration.MWfreq.line.style;
-            setappdata(mainWindow,'MWfreq',ad.MWfreq);
-            setappdata(mainWindow,'control',ad.control);
-        end
-        
-        set(gh.stdevsettings_coloursample_text,'Background',...
-            ad.MWfreq.area.patch.color);
-        set(gh.stdevsettings_alpha_edit,'String',...
-            num2str(ad.MWfreq.area.patch.alpha));
-        set(gh.stdevsettings_alpha_slider,'Value',...
-            ad.MWfreq.area.patch.alpha);
-
-        % Get line type
-        lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
-        lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
-
-        lineStyles = {'-','--',':','-.','none'};
-        lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
-
-        switch lower(lineType)
-            case 'main'
-                set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.data{active}.display.lines.data.color);
-                set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.data{active}.display.lines.data.width));
-                % Set line style
-                lineStyle = ad.data{active}.display.lines.data.style;
-                for k=1:length(lineStyles)
-                    if strcmp(lineStyles{k},lineStyle)
-                        lineStyleIndex = k;
-                    end
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata and handles from main window
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
+    end
+    
+    if nargin && strcmpi('defaults',varargin{1})
+        % Reset display settings
+        ad.control.axis.grid.x = ad.configuration.axis.grid.x;
+        ad.control.axis.grid.y = ad.configuration.axis.grid.y;
+        ad.control.axis.grid.minor = ad.configuration.axis.grid.minor;
+        ad.control.axis.grid.zero = ad.configuration.axis.grid.zero;
+        % Reset MWfreq settings
+        ad.MWfreq.area.patch.color = ad.configuration.MWfreq.area.patch.color;
+        ad.MWfreq.area.patch.alpha = ad.configuration.MWfreq.area.patch.alpha;
+        ad.MWfreq.line.color = ad.configuration.MWfreq.line.color;
+        ad.MWfreq.line.width = ad.configuration.MWfreq.line.width;
+        ad.MWfreq.line.style = ad.configuration.MWfreq.line.style;
+        setappdata(mainWindow,'MWfreq',ad.MWfreq);
+        setappdata(mainWindow,'control',ad.control);
+    end
+    
+    set(gh.stdevsettings_coloursample_text,'Background',...
+        ad.MWfreq.area.patch.color);
+    set(gh.stdevsettings_alpha_edit,'String',...
+        num2str(ad.MWfreq.area.patch.alpha));
+    set(gh.stdevsettings_alpha_slider,'Value',...
+        ad.MWfreq.area.patch.alpha);
+    
+    % Get line type
+    lineTypes = cellstr(get(gh.display_panel_line_popupmenu,'String'));
+    lineType = lineTypes{get(gh.display_panel_line_popupmenu,'Value')};
+    
+    lineStyles = {'-','--',':','-.','none'};
+    lineMarkers = {'none','+','o','*','.','x','s','d','^','v','>','<','p','h'};
+    
+    switch lower(lineType)
+        case 'main'
+            set(gh.display_panel_linecoloursample_text,'Background',...
+                ad.data{active}.display.lines.data.color);
+            set(gh.display_panel_linewidth_edit,'String',...
+                num2str(ad.data{active}.display.lines.data.width));
+            % Set line style
+            lineStyle = ad.data{active}.display.lines.data.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
                 end
-                set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
-                
-                % Set line marker type
-                lineMarker = ad.data{active}.display.lines.data.marker.type;
-                for k=1:length(lineMarkers)
-                    if strcmp(lineMarkers{k},lineMarker)
-                        lineMarkerIndex = k;
-                    end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarker = ad.data{active}.display.lines.data.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
                 end
-                set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-                % Set line marker edge colour
-                lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
-                lineMarkerEdgeColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-                if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerEdgeColor,...
-                        lineMarkerEdgeColorPopupmenuValues)));
-                    switch lineMarkerEdgeColor
-                        case 'none'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',...
-                                ad.data{active}.display.lines.data.color);
-                    end
-                else
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-                    set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',...
-                        ad.data{active}.display.lines.data.marker.edgeColor);
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.data{active}.display.lines.data.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',...
+                            ad.data{active}.display.lines.data.color);
                 end
-                % Set line marker face colour
-                lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
-                lineMarkerFaceColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-                if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerFaceColor,...
-                        lineMarkerFaceColorPopupmenuValues)));
-                    switch lineMarkerFaceColor
-                        case 'none'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(gca,'Color'));
-                    end
-                else
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-                    set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',...
-                        ad.data{active}.display.lines.data.marker.faceColor);
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',...
+                    ad.data{active}.display.lines.data.marker.edgeColor);
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.data{active}.display.lines.data.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
                 end
-
-                % Set line marker size
-                set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.data{active}.display.lines.data.marker.size));
-            case 'average mwfreq'
-                set(gh.display_panel_linecoloursample_text,'Background',...
-                    ad.MWfreq.line.color);
-                set(gh.display_panel_linewidth_edit,'String',...
-                    num2str(ad.MWfreq.line.width));
-                % Set line style
-                lineStyle = ad.MWfreq.line.style;
-                for k=1:length(lineStyles)
-                    if strcmp(lineStyles{k},lineStyle)
-                        lineStyleIndex = k;
-                    end
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',...
+                    ad.data{active}.display.lines.data.marker.faceColor);
+            end
+            
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.data{active}.display.lines.data.marker.size));
+        case 'average mwfreq'
+            set(gh.display_panel_linecoloursample_text,'Background',...
+                ad.MWfreq.line.color);
+            set(gh.display_panel_linewidth_edit,'String',...
+                num2str(ad.MWfreq.line.width));
+            % Set line style
+            lineStyle = ad.MWfreq.line.style;
+            for k=1:length(lineStyles)
+                if strcmp(lineStyles{k},lineStyle)
+                    lineStyleIndex = k;
                 end
-                set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
-                
-                % Set line marker type
-                lineMarker = ad.MWfreq.line.marker.type;
-                for k=1:length(lineMarkers)
-                    if strcmp(lineMarkers{k},lineMarker)
-                        lineMarkerIndex = k;
-                    end
+            end
+            set(gh.display_panel_linestyle_popupmenu,'Value',lineStyleIndex);
+            
+            % Set line marker type
+            lineMarker = ad.MWfreq.line.marker.type;
+            for k=1:length(lineMarkers)
+                if strcmp(lineMarkers{k},lineMarker)
+                    lineMarkerIndex = k;
                 end
-                set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
-
-                % Set line marker edge colour
-                lineMarkerEdgeColor = ad.MWfreq.line.marker.edgeColor;
-                lineMarkerEdgeColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
-                if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerEdgeColor,...
-                        lineMarkerEdgeColorPopupmenuValues)));
-                    switch lineMarkerEdgeColor
-                        case 'none'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markeredgecoloursample_text,...
-                                'BackgroundColor',ad.MWfreq.line.color);
-                    end
-                else
-                    set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
-                    set(gh.display_panel_markeredgecoloursample_text,...
-                        'BackgroundColor',ad.MWfreq.line.marker.edgeColor);
+            end
+            set(gh.display_panel_linemarker_popupmenu,'Value',lineMarkerIndex);
+            
+            % Set line marker edge colour
+            lineMarkerEdgeColor = ad.MWfreq.line.marker.edgeColor;
+            lineMarkerEdgeColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markeredgecolour_popupmenu,'String'));
+            if ischar(lineMarkerEdgeColor) && length(lineMarkerEdgeColor)>1
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerEdgeColor,...
+                    lineMarkerEdgeColorPopupmenuValues)));
+                switch lineMarkerEdgeColor
+                    case 'none'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markeredgecoloursample_text,...
+                            'BackgroundColor',ad.MWfreq.line.color);
                 end
-                % Set line marker face colour
-                lineMarkerFaceColor = ad.MWfreq.line.marker.faceColor;
-                lineMarkerFaceColorPopupmenuValues = ...
-                    cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
-                if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi(lineMarkerFaceColor,...
-                        lineMarkerFaceColorPopupmenuValues)));
-                    switch lineMarkerFaceColor
-                        case 'none'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(mainWindow,'Color'))
-                        case 'auto'
-                            set(gh.display_panel_markerfacecoloursample_text,...
-                                'BackgroundColor',get(gca,'Color'));
-                    end
-                else
-                    set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
-                        find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
-                    set(gh.display_panel_markerfacecoloursample_text,...
-                        'BackgroundColor',ad.MWfreq.line.marker.faceColor);
+            else
+                set(gh.display_panel_markeredgecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerEdgeColorPopupmenuValues)));
+                set(gh.display_panel_markeredgecoloursample_text,...
+                    'BackgroundColor',ad.MWfreq.line.marker.edgeColor);
+            end
+            % Set line marker face colour
+            lineMarkerFaceColor = ad.MWfreq.line.marker.faceColor;
+            lineMarkerFaceColorPopupmenuValues = ...
+                cellstr(get(gh.display_panel_markerfacecolour_popupmenu,'String'));
+            if ischar(lineMarkerFaceColor) && length(lineMarkerFaceColor)>1
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi(lineMarkerFaceColor,...
+                    lineMarkerFaceColorPopupmenuValues)));
+                switch lineMarkerFaceColor
+                    case 'none'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(mainWindow,'Color'))
+                    case 'auto'
+                        set(gh.display_panel_markerfacecoloursample_text,...
+                            'BackgroundColor',get(gca,'Color'));
                 end
-                % Set line marker size
-                set(gh.display_panel_markersize_edit,'String',...
-                    num2str(ad.MWfreq.line.marker.size));
-        end
-
-    catch exception
-        trEPRexceptionHandling(exception)
-    end 
+            else
+                set(gh.display_panel_markerfacecolour_popupmenu,'Value',...
+                    find(strcmpi('colour',lineMarkerFaceColorPopupmenuValues)));
+                set(gh.display_panel_markerfacecoloursample_text,...
+                    'BackgroundColor',ad.MWfreq.line.marker.faceColor);
+            end
+            % Set line marker size
+            set(gh.display_panel_markersize_edit,'String',...
+                num2str(ad.MWfreq.line.marker.size));
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function updateAxes(varargin)
-    try
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        % Get appdata from ACC GUI
-        ad = getappdata(mainWindow);
-
-        % See whether we have a currently active dataset, otherwise return
-        active = ad.control.data.active;
-        if isempty(active) || active == 0
-            return;
-        end
-        
-        % Get axis handle
-        if nargin && ishandle(varargin{1})
-            mainAxes = newplot(varargin{1});
-        else
-            mainAxes = gca;
-        end
-        
-        % IMPORTANT: Set main axis to active axis
-        axes(mainAxes); %#ok<MAXES>
-
-        % Get data
-        data = getData(ad.data{active});
-        
-        % Get magnetic field
-        B0 = linspace(1,size(data,1),size(data,1));
-        if (isfield(ad.data{active},'axes') ...
-                && isfield(ad.data{active}.axes,'y') ...
-                && isfield(ad.data{active}.axes.data(2),'values') ...
-                && not (isempty(ad.data{active}.axes.data(2).values)))
-            B0 = ad.data{active}.axes.data(2).values;
-        end
-        % Get MW frequency
-        if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
-            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
-        else
-            MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
-        end
-        if isscalar(MWfreq)
-            if length(ad.data{active}.parameters.bridge.calibration.values) == 2
-                MWfreq = ad.data{active}.parameters.bridge.calibration.values;
-                B0 = B0([1,end]);                
-            else
-                MWfreq = ones(length(B0)) * ...
-                    ad.data{active}.parameters.bridge.MWfrequency.value;
-            end
-        elseif length(MWfreq) == 2
-            B0 = B0([1,end]);
-        elseif length(MWfreq) ~= length(B0)
-            disp('Plot: Wrong number of elements in MW freq. vector.');
-            return;
-        end
-
-        % Do the actual plotting
-        cla reset;
-        hold(mainAxes,'on');
-        plot(...
-            B0,...
-            MWfreq,...
-            'Color',ad.data{active}.display.lines.data.color,...
-            'LineStyle',ad.data{active}.display.lines.data.style,...
-            'Marker',ad.data{active}.display.lines.data.marker.type,...
-            'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
-            'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
-            'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
-            'LineWidth',ad.data{active}.display.lines.data.width...
-            );
-        if ad.control.axis.mean
-            line(...
-                [ad.control.axis.limits.y.min ad.control.axis.limits.y.max],...
-                [mean(MWfreq) mean(MWfreq)],...
-                'Color',ad.MWfreq.line.color,...
-                'LineStyle',ad.MWfreq.line.style,...
-                'Marker',ad.MWfreq.line.marker.type,...
-                'MarkerEdgeColor',ad.MWfreq.line.marker.edgeColor,...
-                'MarkerFaceColor',ad.MWfreq.line.marker.faceColor,...
-                'MarkerSize',ad.MWfreq.line.marker.size,...
-                'LineWidth',ad.MWfreq.line.width,...
-                'Parent',mainAxes);
-        end
-        if ad.control.axis.stdev
-            patch(...
-                'XData',...
-                [ad.control.axis.limits.y.min ad.control.axis.limits.y.max ...
-                ad.control.axis.limits.y.max ad.control.axis.limits.y.min],...
-                'YData',...
-                [mean(MWfreq)-std(MWfreq,1) mean(MWfreq)-std(MWfreq,1) ...
-                mean(MWfreq)+std(MWfreq,1) mean(MWfreq)+std(MWfreq,1)],...
-                'ZData',[0 0 0 0],...
-                'EdgeColor',ad.MWfreq.area.patch.edge,...
-                'FaceColor',ad.MWfreq.area.patch.color,...
-                'FaceAlpha',ad.MWfreq.area.patch.alpha,...
-                'Parent',mainAxes);
-        end
-        hold(mainAxes,'off');
-        set(mainAxes,...
-            'XLim',[min(B0) max(B0)],...
-            'YLim',[min(MWfreq)-0.025*(max(MWfreq)-min(MWfreq)) ...
-            max(MWfreq)+0.025*(max(MWfreq)-min(MWfreq))]...
-            );
-        if ad.control.axis.stdev
-            ylimits = get(mainAxes,'YLim');
-            if ylimits(1) > mean(MWfreq)-std(MWfreq,1)
-                ylimits(1) = (mean(MWfreq)-std(MWfreq,1))-...
-                    0.025*(max(MWfreq)-min(MWfreq));
-            end
-            if ylimits(2) < mean(MWfreq)+std(MWfreq,1)
-                ylimits(2) = (mean(MWfreq)+std(MWfreq,1))+...
-                    0.025*(max(MWfreq)-min(MWfreq));
-            end
-            set(mainAxes,'YLim',ylimits);
-        end
-        
-        % Plot axis labels
-        xlabel(mainAxes,...
-            sprintf('{\\it %s} / %s',...
-            ad.data{active}.axes.data(2).measure,...
-            ad.data{active}.axes.data(2).unit));
-        ylabel(mainAxes,...
-            sprintf('{\\it %s} / %s',...
-            'MW frequency',...
-            ad.data{active}.parameters.bridge.MWfrequency.unit));
-        % Force more digits on frequency axis ticks if necessary
-        ylabels = get(gca,'YTickLabel');
-        if size(ylabels,2) > 1
-            for k = 2:size(ylabels,2)
-                if strcmp(ylabels(k,end-1:end),ylabels(k-1,end-1:end))
-                    set(gca,'YTickLabel',...
-                        sprintf(['%' num2str(size(ylabels,2)+1) '.' ...
-                        num2str(size(ylabels,2)-find(ylabels(1,:)=='.',1,'first')+1) ...
-                        'f|'],get(gca,'YTick'))...
-                        )
-                    break
-                end
-            end
-        end
-        % Set grid for main axis
-        set(mainAxes,'XGrid',ad.control.axis.grid.x);
-        set(mainAxes,'YGrid',ad.control.axis.grid.y);
-        if (isequal(ad.control.axis.grid.x,'on'))
-            set(mainAxes,'XMinorGrid',ad.control.axis.grid.minor);
-        end
-        if (isequal(ad.control.axis.grid.y,'on'))
-            set(mainAxes,'YMinorGrid',ad.control.axis.grid.minor);
-        end
-        
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    mainWindow = trEPRguiGetWindowHandle(mfilename);
+    % Get appdata from ACC GUI
+    ad = getappdata(mainWindow);
+    
+    % See whether we have a currently active dataset, otherwise return
+    active = ad.control.data.active;
+    if isempty(active) || active == 0
+        return;
     end
+    
+    % Get axis handle
+    if nargin && ishandle(varargin{1})
+        mainAxes = newplot(varargin{1});
+    else
+        mainAxes = gca;
+    end
+    
+    % IMPORTANT: Set main axis to active axis
+    axes(mainAxes);
+    
+    % Get data
+    data = getData(ad.data{active});
+    
+    % Get magnetic field
+    B0 = linspace(1,size(data,1),size(data,1));
+    if (isfield(ad.data{active},'axes') ...
+            && isfield(ad.data{active}.axes,'y') ...
+            && isfield(ad.data{active}.axes.data(2),'values') ...
+            && not (isempty(ad.data{active}.axes.data(2).values)))
+        B0 = ad.data{active}.axes.data(2).values;
+    end
+    % Get MW frequency
+    if isfield(ad.data{active}.parameters.bridge.MWfrequency,'values')
+        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.values;
+    else
+        MWfreq = ad.data{active}.parameters.bridge.MWfrequency.value;
+    end
+    if isscalar(MWfreq)
+        if length(ad.data{active}.parameters.bridge.calibration.values) == 2
+            MWfreq = ad.data{active}.parameters.bridge.calibration.values;
+            B0 = B0([1,end]);
+        else
+            MWfreq = ones(length(B0)) * ...
+                ad.data{active}.parameters.bridge.MWfrequency.value;
+        end
+    elseif length(MWfreq) == 2
+        B0 = B0([1,end]);
+    elseif length(MWfreq) ~= length(B0)
+        disp('Plot: Wrong number of elements in MW freq. vector.');
+        return;
+    end
+    
+    % Do the actual plotting
+    cla reset;
+    hold(mainAxes,'on');
+    plot(...
+        B0,...
+        MWfreq,...
+        'Color',ad.data{active}.display.lines.data.color,...
+        'LineStyle',ad.data{active}.display.lines.data.style,...
+        'Marker',ad.data{active}.display.lines.data.marker.type,...
+        'MarkerEdgeColor',ad.data{active}.display.lines.data.marker.edgeColor,...
+        'MarkerFaceColor',ad.data{active}.display.lines.data.marker.faceColor,...
+        'MarkerSize',ad.data{active}.display.lines.data.marker.size,...
+        'LineWidth',ad.data{active}.display.lines.data.width...
+        );
+    if ad.control.axis.mean
+        line(...
+            [ad.control.axis.limits.y.min ad.control.axis.limits.y.max],...
+            [mean(MWfreq) mean(MWfreq)],...
+            'Color',ad.MWfreq.line.color,...
+            'LineStyle',ad.MWfreq.line.style,...
+            'Marker',ad.MWfreq.line.marker.type,...
+            'MarkerEdgeColor',ad.MWfreq.line.marker.edgeColor,...
+            'MarkerFaceColor',ad.MWfreq.line.marker.faceColor,...
+            'MarkerSize',ad.MWfreq.line.marker.size,...
+            'LineWidth',ad.MWfreq.line.width,...
+            'Parent',mainAxes);
+    end
+    if ad.control.axis.stdev
+        patch(...
+            'XData',...
+            [ad.control.axis.limits.y.min ad.control.axis.limits.y.max ...
+            ad.control.axis.limits.y.max ad.control.axis.limits.y.min],...
+            'YData',...
+            [mean(MWfreq)-std(MWfreq,1) mean(MWfreq)-std(MWfreq,1) ...
+            mean(MWfreq)+std(MWfreq,1) mean(MWfreq)+std(MWfreq,1)],...
+            'ZData',[0 0 0 0],...
+            'EdgeColor',ad.MWfreq.area.patch.edge,...
+            'FaceColor',ad.MWfreq.area.patch.color,...
+            'FaceAlpha',ad.MWfreq.area.patch.alpha,...
+            'Parent',mainAxes);
+    end
+    hold(mainAxes,'off');
+    set(mainAxes,...
+        'XLim',[min(B0) max(B0)],...
+        'YLim',[min(MWfreq)-0.025*(max(MWfreq)-min(MWfreq)) ...
+        max(MWfreq)+0.025*(max(MWfreq)-min(MWfreq))]...
+        );
+    if ad.control.axis.stdev
+        ylimits = get(mainAxes,'YLim');
+        if ylimits(1) > mean(MWfreq)-std(MWfreq,1)
+            ylimits(1) = (mean(MWfreq)-std(MWfreq,1))-...
+                0.025*(max(MWfreq)-min(MWfreq));
+        end
+        if ylimits(2) < mean(MWfreq)+std(MWfreq,1)
+            ylimits(2) = (mean(MWfreq)+std(MWfreq,1))+...
+                0.025*(max(MWfreq)-min(MWfreq));
+        end
+        set(mainAxes,'YLim',ylimits);
+    end
+    
+    % Plot axis labels
+    xlabel(mainAxes,...
+        sprintf('{\\it %s} / %s',...
+        ad.data{active}.axes.data(2).measure,...
+        ad.data{active}.axes.data(2).unit));
+    ylabel(mainAxes,...
+        sprintf('{\\it %s} / %s',...
+        'MW frequency',...
+        ad.data{active}.parameters.bridge.MWfrequency.unit));
+    % Force more digits on frequency axis ticks if necessary
+    ylabels = get(gca,'YTickLabel');
+    if size(ylabels,2) > 1
+        for k = 2:size(ylabels,2)
+            if strcmp(ylabels(k,end-1:end),ylabels(k-1,end-1:end))
+                set(gca,'YTickLabel',...
+                    sprintf(['%' num2str(size(ylabels,2)+1) '.' ...
+                    num2str(size(ylabels,2)-find(ylabels(1,:)=='.',1,'first')+1) ...
+                    'f|'],get(gca,'YTick'))...
+                    )
+                break
+            end
+        end
+    end
+    % Set grid for main axis
+    set(mainAxes,'XGrid',ad.control.axis.grid.x);
+    set(mainAxes,'YGrid',ad.control.axis.grid.y);
+    if (isequal(ad.control.axis.grid.x,'on'))
+        set(mainAxes,'XMinorGrid',ad.control.axis.grid.minor);
+    end
+    if (isequal(ad.control.axis.grid.y,'on'))
+        set(mainAxes,'YMinorGrid',ad.control.axis.grid.minor);
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
 end
-
 end

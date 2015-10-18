@@ -7,7 +7,7 @@ function varargout = trEPRgui_ACCwindow(varargin)
 % See also TREPRGUI
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -76,7 +76,7 @@ hButtonGroup = uibuttongroup('Tag','mainButtonGroup',...
     'Position', [guiSize(1)-mainPanelWidth-20 guiSize(2)-50 mainPanelWidth 30],...
     'Visible','on',...
     'SelectionChangeFcn',{@tbg_Callback});
-tb1 = uicontrol('Tag','datasets_togglebutton',...
+uicontrol('Tag','datasets_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -86,7 +86,7 @@ tb1 = uicontrol('Tag','datasets_togglebutton',...
     'pos',[0 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb2 = uicontrol('Tag','accumulate_togglebutton',...
+uicontrol('Tag','accumulate_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -96,7 +96,7 @@ tb2 = uicontrol('Tag','accumulate_togglebutton',...
     'pos',[mainPanelWidth/3 0 (mainPanelWidth)/3 30],...
     'Enable','on'...
     );
-tb3 = uicontrol('Tag','settings_togglebutton',...
+uicontrol('Tag','settings_togglebutton',...
     'Style','Toggle',...
 	'Parent', hButtonGroup, ...
     'BackgroundColor',defaultBackground,...
@@ -1073,9 +1073,6 @@ uicontrol('Tag','close_pushbutton',...
 %  Initialization tasks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Store handles in guidata
-guidata(hMainFigure,guihandles);
-
 % Create appdata structure
 ad = trEPRguiDataStructure('guiappdatastructure');
 
@@ -1095,6 +1092,7 @@ setappdata(hMainFigure,'origdata',ad.origdata);
 setappdata(hMainFigure,'configuration',ad.configuration);
 setappdata(hMainFigure,'control',ad.control);
 setappdata(hMainFigure,'acc',ad.acc);
+setappdata(hMainFigure,'guiHandles',guihandles);
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
@@ -1183,6 +1181,8 @@ for m=1:length(handles)
     set(handles(m),'KeyPressFcn',@keypress_Callback);
 end
 
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1245,7 +1245,7 @@ function accumulated_listbox_Callback(~,~)
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         ad.control.data.active = ad.control.data.accumulated(...
             get(gh.accumulated_listbox,'Value')...
@@ -1266,6 +1266,10 @@ end
 
 function position_edit_Callback(source,~,position)
     try
+        % Get appdata of main window
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+
         if isempty(position) || ~isfield(ad.acc,'data') || ...
                 isempty(ad.acc.data)
             return;
@@ -1382,10 +1386,6 @@ function edit_Callback(~,~,position)
         if isempty(position)
             return;
         end
-        
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle(mfilename);
-        ad = getappdata(mainWindow);
 
         % IDEA: If user types "end", replace that with the maximum index in
         % the respective dimension - would be a very convenient way for the
@@ -1528,7 +1528,7 @@ function pushbutton_Callback(~,~,action)
         % Get appdata and handles of main window
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         switch action
             case 'add'
@@ -1785,11 +1785,9 @@ function popupmenu_Callback(source,~,action)
             return;
         end
         
-        % Get appdata of main window
-        ad = getappdata(hMainFigure);
-
-        % Get handles of main window
-        gh = guihandles(hMainFigure);
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         
         switch action
             case 'displaytype'
@@ -1798,7 +1796,7 @@ function popupmenu_Callback(source,~,action)
                     displayTypes{get(source,'Value')};
                 
                 % Set appdata of main window
-                setappdata(hMainFigure,'control',ad.control);
+                setappdata(mainWindow,'control',ad.control);
                 
                 % If no datasets are loaded, return
                 % NOTE: As we return only here, the display type gets set
@@ -1911,24 +1909,36 @@ end
 
 function switchPanel(panelName)
     try
-        panels = [pp1 pp2 pp3];
-        buttons = [tb1 tb2 tb3];
+        mainWindow = trEPRguiGetWindowHandle(mfilename);
+        ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
+
+        panels = [...
+            gh.dataset_panel ...
+            gh.accumulate_panel ...
+            gh.settings_panel ...
+            ];
+        buttons = [...
+            gh.datasets_togglebutton ...
+            gh.accumulate_togglebutton ...
+            gh.settings_togglebutton ...
+            ];
         switch panelName
             case 'Datasets'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
-                set(pp1,'Visible','on');
-                set(tb1,'Value',1);
+                set(gh.dataset_panel,'Visible','on');
+                set(gh.datasets_togglebutton,'Value',1);
             case 'Accumulate'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
-                set(pp2,'Visible','on');
-                set(tb2,'Value',1);
+                set(gh.accumulate_panel,'Visible','on');
+                set(gh.accumulate_togglebutton,'Value',1);
             case 'Settings'
                 set(panels,'Visible','off');
                 set(buttons,'Value',0);
-                set(pp3,'Visible','on');
-                set(tb3,'Value',1);
+                set(gh.settings_panel,'Visible','on');
+                set(gh.settings_togglebutton,'Value',1);
             otherwise
                 trEPRoptionUnknown(panelName,'panel');
         end
@@ -1946,9 +1956,7 @@ function updateDimensionPanel(panel)
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
-
-        % Get handles from main window
-        gh = guidata(mainWindow);
+        gh = ad.guiHandles;
         
         if isempty(ad.data)
             return;
@@ -2032,13 +2040,13 @@ function updateSpectra()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
+        gh = ad.guiHandles;
         
         if isempty(ad.data)
             return;
         end
         
         % Get handle for (not) accumulated spectra listbox
-        gh = guidata(mainWindow);
         naccLbox = gh.notaccumulated_listbox;
         accLbox = gh.accumulated_listbox;
         
@@ -2127,7 +2135,7 @@ function updateSliderPanel()
         ad = getappdata(mainWindow);
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         if ~isfield(ad.acc,'data') || isempty(ad.acc.data) || ...
                 ~isfield(ad,'data') || isempty(ad.data)
@@ -2181,10 +2189,8 @@ function updateAxes()
         mainWindow = trEPRguiGetWindowHandle(mfilename);
         % Get appdata from ACC GUI
         ad = getappdata(mainWindow);
-        
-        % Get handles from main window
-        gh = guidata(mainWindow);
-        
+        gh = ad.guiHandles;
+       
         % Set displayType popupmenu
         displayTypes = cellstr(...
             get(gh.displaytype_popupmenu,'String'));
@@ -2618,7 +2624,7 @@ function setAccParameters()
         end
         
         % Get handles of main window
-        gh = guihandles(mainWindow);
+        gh = ad.guiHandles;
         
         % Ids of datasets to accumulate
         ad.acc.datasets = ad.control.data.accumulated;
@@ -2665,6 +2671,4 @@ function setAccParameters()
     catch exception
         trEPRexceptionHandling(exception)
     end
-end
-
 end

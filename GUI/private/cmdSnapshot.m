@@ -21,8 +21,8 @@ function [status,warnings] = cmdSnapshot(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-04-07
+% Copyright (c) 2013-15, Till Biskup
+% 2015-10-18
 
 status = 0;
 warnings = cell(0);
@@ -58,8 +58,6 @@ end
 
 % Get appdata from handle
 ad = getappdata(handle);
-% Get handles from handle
-% gh = guidata(handle);
 
 switch lower(opt{1})
     case {'load','l'}
@@ -93,8 +91,10 @@ switch lower(opt{1})
                 end
             end
             appdataFields = fieldnames(AD.ad);
-            % Remove field "UsedByGUIData_m" to prevent problems
-            appdataFields((strcmpi(appdataFields,'UsedByGUIData_m'))) = [];
+            % Remove field "guiHandles" to prevent problems
+            if any(strcmp(appdataFields,'guiHandles'))
+                appdataFields((strcmpi(appdataFields,'guiHandles'))) = [];
+            end
             for k=1:length(appdataFields)
                 setappdata(handle,appdataFields{k},AD.ad.(appdataFields{k}));
             end

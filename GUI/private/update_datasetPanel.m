@@ -6,8 +6,8 @@ function status = update_datasetPanel()
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-12, Till Biskup
-% 2012-05-31
+% Copyright (c) 2011-15, Till Biskup
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -16,11 +16,9 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handles from main window
-gh = guidata(mainWindow);
-
-% Get appdata from main GUI
+% Get handles and appdata from main window
 ad = getappdata(mainWindow);
+%gh = ad.guiHandles;
 
 % Update display type popupmenu
 % displayTypes = cellstr(get(gh.data_panel_displaytype_popupmenu,'String'));

@@ -8,7 +8,7 @@ function handle = panelDisplay(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-05-30
+% 2015-10-18
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1903,1162 +1903,144 @@ exportFormats = trEPRiniFileRead(exportFormatsConfigFile);
 set(hAxesExportFormat,'String',fieldnames(exportFormats));
 set(h3DExportFormat,'String',fieldnames(exportFormats));
 
+end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Callbacks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 function pages_buttongroup_Callback(source,~)
-    try
-        page_panels = [handle_pp1 handle_pp2 handle_pp3 handle_pp4...
-            handle_pp5 handle_pp6 handle_pp7];
-        val = get(get(source,'SelectedObject'),'String');
-        switch val
-            case '1'
-                set(page_panels,'Visible','off');
-                set(handle_pp1,'Visible','on');
-            case '2'
-                set(page_panels,'Visible','off');
-                set(handle_pp2,'Visible','on');
-            case '3'
-                set(page_panels,'Visible','off');
-                set(handle_pp3,'Visible','on');
-            case '4'
-                set(page_panels,'Visible','off');
-                set(handle_pp4,'Visible','on');
-            case '5'
-                set(page_panels,'Visible','off');
-                set(handle_pp5,'Visible','on');
-            case '6'
-                set(page_panels,'Visible','off');
-                set(handle_pp6,'Visible','on');
-            case '7'
-                set(page_panels,'Visible','off');
-                set(handle_pp7,'Visible','on');
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Get appdata and GUI handles of main GUI
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+
+    page_panels = [...
+        gh.display_panel_page1_panel ...
+        gh.display_panel_page2_panel ...
+        gh.display_panel_page3_panel ...
+        gh.display_panel_page4_panel ...
+        gh.display_panel_page5_panel ...
+        gh.display_panel_page6_panel ...
+        gh.display_panel_page7_panel ...
+        ];
+    val = get(get(source,'SelectedObject'),'String');
+    switch val
+        case '1'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page1_panel,'Visible','on');
+        case '2'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page2_panel,'Visible','on');
+        case '3'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page3_panel,'Visible','on');
+        case '4'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page4_panel,'Visible','on');
+        case '5'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page5_panel,'Visible','on');
+        case '6'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page6_panel,'Visible','on');
+        case '7'
+            set(page_panels,'Visible','off');
+            set(gh.display_panel_page7_panel,'Visible','on');
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function checkbox_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and GUI handles of main GUI
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        switch lower(action)
-            case 'showyaxis'
-                ad.control.axis.yaxis = get(source,'Value');
-            case 'showyticks'
-                ad.control.axis.yticks = get(source,'Value');
-            case 'showtitle'
-                ad.control.axis.title = get(source,'Value');
-            case 'showbox'
-                ad.control.axis.box = get(source,'Value');
-            case 'stdev'
-                ad.control.axis.stdev = get(source,'Value');
-            case 'sim'
-                ad.control.axis.sim = get(source,'Value');
-            case 'legendbox'
-                ad.control.axis.legend.box = get(source,'Value');
-            case 'multiple1file'
-                % Turn off "multiplefiles" checkbox
-                set(gh.display_panel_dataexport_multiplefiles_checkbox,...
-                    'Value',0);
-            case 'multiplefiles'
-                % Turn off "multiple1file" checkbox
-                set(gh.display_panel_dataexport_multiple1file_checkbox,...
-                    'Value',0);
-            case 'characteristics'
-                ad.control.axis.characteristics = get(source,'Value');
-            case 'colormapindividual'
-                ad.control.axis.colormap.individual = get(source,'Value');
-            case 'colormapsymmetric'
-                ad.control.axis.colormap.symmetric = get(source,'Value');
-            case 'colorbar'
-                ad.control.axis.colormap.colorbar = get(source,'Value');
-            case '3dreduction'
-                ad.control.axis.vis3d.reduction.auto = get(source,'Value');
-            case 'projectionaxes'
-                ad.control.axis.projectionAxes.enable = get(source,'Value');
-            case 'residualsaxis'
-                ad.control.axis.residualsAxes.enable = get(source,'Value');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        setappdata(mainWindow,'control',ad.control);
-        
-        update_displayPanel();
-        % Update main axis
-        update_mainAxis();
-        if any(strcmpi(action,{'projectionaxes','residualsaxis'}))
-            axesResize();
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
+    
+    % Get appdata and GUI handles of main GUI
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    switch lower(action)
+        case 'showyaxis'
+            ad.control.axis.yaxis = get(source,'Value');
+        case 'showyticks'
+            ad.control.axis.yticks = get(source,'Value');
+        case 'showtitle'
+            ad.control.axis.title = get(source,'Value');
+        case 'showbox'
+            ad.control.axis.box = get(source,'Value');
+        case 'stdev'
+            ad.control.axis.stdev = get(source,'Value');
+        case 'sim'
+            ad.control.axis.sim = get(source,'Value');
+        case 'legendbox'
+            ad.control.axis.legend.box = get(source,'Value');
+        case 'multiple1file'
+            % Turn off "multiplefiles" checkbox
+            set(gh.display_panel_dataexport_multiplefiles_checkbox,...
+                'Value',0);
+        case 'multiplefiles'
+            % Turn off "multiple1file" checkbox
+            set(gh.display_panel_dataexport_multiple1file_checkbox,...
+                'Value',0);
+        case 'characteristics'
+            ad.control.axis.characteristics = get(source,'Value');
+        case 'colormapindividual'
+            ad.control.axis.colormap.individual = get(source,'Value');
+        case 'colormapsymmetric'
+            ad.control.axis.colormap.symmetric = get(source,'Value');
+        case 'colorbar'
+            ad.control.axis.colormap.colorbar = get(source,'Value');
+        case '3dreduction'
+            ad.control.axis.vis3d.reduction.auto = get(source,'Value');
+        case 'projectionaxes'
+            ad.control.axis.projectionAxes.enable = get(source,'Value');
+        case 'residualsaxis'
+            ad.control.axis.residualsAxes.enable = get(source,'Value');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    setappdata(mainWindow,'control',ad.control);
+    
+    update_displayPanel();
+    % Update main axis
+    update_mainAxis();
+    if any(strcmpi(action,{'projectionaxes','residualsaxis'}))
+        axesResize();
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function popupmenu_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and handles of main GUI
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        values = cellstr(get(source,'String'));
-        value = values{get(source,'Value')};
-        
-        active = ad.control.data.active;
-        
-        switch action
-            case 'line'
-                % Probably, no action needs to be taken except of the
-                % "update_displayPanel()" after the switch-case statement.
-            case 'markerEdgeColour'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.data.marker.edgeColor = ...
-                                ad.data{active}.display.lines.data.color;
-                        else
-                            ad.data{active}.display.lines.data.marker.edgeColor = value;
-                        end
-                    case 'calculated'
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.calculated.marker.edgeColor = ...
-                                ad.data{active}.display.lines.calculated.color;
-                        else
-                            ad.data{active}.display.lines.calculated.marker.edgeColor = value;
-                        end
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-            case 'markerFaceColour'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.data.marker.faceColor = ...
-                                ad.data{active}.display.lines.data.color;
-                        else
-                            ad.data{active}.display.lines.data.marker.faceColor = value;
-                        end
-                    case 'calculated'
-                        if strcmpi(value,'colour')
-                            ad.data{active}.display.lines.calculated.marker.faceColor = ...
-                                ad.data{active}.display.lines.calculated.color;
-                        else
-                            ad.data{active}.display.lines.calculated.marker.faceColor = value;
-                        end
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-            case '3Doffset'
-                ad.control.axis.vis3d.offset.type = value;
-            case '3Dtype'
-                ad.control.axis.vis3d.type = value;
-            case 'projectionaxesmode'
-                ad.control.axis.projectionAxes.mode = value;
-            case 'residualsaxismode'
-                ad.control.axis.residualsAxes.mode = value;
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        setappdata(mainWindow,'data',ad.data);
-        setappdata(mainWindow,'control',ad.control);
-        % Update display panel
-        update_displayPanel();
-        % Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    if isempty(action)
+        return;
     end
-end
-
-function edit_Callback(source,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and handles of main GUI
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        active = ad.control.data.active;
-        if isempty(active) && ~active
-            return;
-        end
-        
-        value = trEPRguiSanitiseNumericInput(get(source,'String'));
-        if isnan(value)
-            update_displayPanel();
-            return;
-        end
-        
-        switch action
-            case 'zeroLineWidth'
-                ad.control.axis.grid.zero.width = value;
-            case 'markerSize'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        ad.data{active}.display.lines.data.marker.size = value;
-                    case 'calculated'
-                        ad.data{active}.display.lines.calculated.marker.size = value;
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-            case 'projectionaxeshheight'
-                ad.control.axis.projectionAxes.horizontal.height = ...
-                    trEPRguiSanitiseNumericInput(...
-                    get(source,'String'),[20 250]);
-            case 'projectionaxesvheight'
-                ad.control.axis.projectionAxes.vertical.height = ...
-                    trEPRguiSanitiseNumericInput(...
-                    get(source,'String'),[20 250]);
-            case 'residualsaxisheight'
-                ad.control.axis.residualsAxes.height = ...
-                    trEPRguiSanitiseNumericInput(...
-                    get(source,'String'),[20 250]);
-            case 'residualsaxisgap'
-                ad.control.axis.residualsAxes.gap = ...
-                    trEPRguiSanitiseNumericInput(...
-                    get(source,'String'),[0 50]);
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        setappdata(mainWindow,'control',ad.control);
-        setappdata(mainWindow,'data',ad.data);
-        % Update display panel
-        update_displayPanel();
-        % Resize axes
-        if any(strcmpi(action,{'projectionaxeshheight',...
-                'projectionaxesvheight','residualsaxisheight',...
-                'residualsaxisgap'}))
-            axesResize();
-        end
-        % Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function pushbutton_Callback(~,~,action)
-    try
-        if isempty(action)
-            return;
-        end
-        
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle();
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        % Make life easier
-        active = ad.control.data.active;
-        
-        % Return immediately if there is no active dataset
-        if active == 0 && ~strcmpi(action,'zerolinecolourpalette') 
-            return;
-        end
-        
-        colors = {...
-            'b',[0 0 1]; ...
-            'g',[0 1 0]; ...
-            'r',[1 0 0]; ...
-            'c',[0 1 1]; ...
-            'm',[1 0 1]; ...
-            'y',[1 1 0]; ...
-            'k',[0 0 0]; ...
-            'w',[1 1 1]; ...
-            };
-        
-        switch action
-            case 'zeroLineColourPalette'
-                if ischar(ad.control.axis.grid.zero.color)
-                    ad.control.axis.grid.zero.color = colors{...
-                        strcmpi(ad.control.axis.grid.zero.color,...
-                        colors(:,1)),2};
-                end
-                ad.control.axis.grid.zero.color = uisetcolor(...
-                    ad.control.axis.grid.zero.color,...
-                    'Set zero line colour');
-        
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'zeroLineDefaults'
-                ad.control.axis.grid.zero = ...
-                    ad.configuration.display.grid.zero;
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'legendFont'
-                if ~isempty(ad.control.axis.legend.handle) && ...
-                        ishandle(ad.control.axis.legend.handle)
-                    legendFontSettings = uisetfont(...
-                        ad.control.axis.legend.handle,...
-                        'Set legend font');
-                else
-                    legendFontSettings = uisetfont('Set legend font');
-                end
-                if isstruct(legendFontSettings)
-                    ad.control.axis.legend.FontName = ...
-                        legendFontSettings.FontName;
-                    ad.control.axis.legend.FontSize = ...
-                        legendFontSettings.FontSize;
-                    ad.control.axis.legend.FontWeight = ...
-                        legendFontSettings.FontWeight;
-                    ad.control.axis.legend.FontAngle = ...
-                        legendFontSettings.FontAngle;
-                end
-        
-                % Update appdata of main window
-                setappdata(mainWindow,'control',ad.control);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'colourPalette'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        if ischar(ad.data{active}.display.lines.data.color)
-                            ad.data{active}.display.lines.data.color = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.color,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.data.color = uisetcolor(...
-                            ad.data{active}.display.lines.data.color,...
-                            'Set measured line colour');
-                    case 'calculated'
-                        if ischar(ad.data{active}.display.lines.calculated.color)
-                            ad.data{active}.display.lines.calculated.color = ...
-                                colors{...
-                                strcmpi(ad.data{active}.display.lines.calculated.color,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.calculated.color = ...
-                            uisetcolor(...
-                            ad.data{active}.display.lines.calculated.color,...
-                            'Set calculated line colour');
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-        
-                % Update appdata of main window
-                setappdata(mainWindow,'data',ad.data);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'markerEdgeColourPalette'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
-                            ad.data{active}.display.lines.data.marker.edgeColor = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.data.marker.edgeColor = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.edgeColor,...
-                            'Set line marker edge colour');
-                    case 'calculated'
-                        if ischar(ad.data{active}.display.lines.calculated.marker.edgeColor)
-                            ad.data{active}.display.lines.calculated.marker.edgeColor = ...
-                                colors{...
-                                strcmpi(ad.data{active}.display.lines.calculated.marker.edgeColor,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.calculated.marker.edgeColor = ...
-                            uisetcolor(...
-                            ad.data{active}.display.lines.calculated.marker.edgeColor,...
-                            'Set line marker edge colour');
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-        
-                % Update appdata of main window
-                setappdata(mainWindow,'data',ad.data);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'markerFaceColourPalette'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        if ischar(ad.data{active}.display.lines.data.marker.faceColor)
-                            ad.data{active}.display.lines.data.marker.faceColor = colors{...
-                                strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.data.marker.faceColor = uisetcolor(...
-                            ad.data{active}.display.lines.data.marker.faceColor,...
-                            'Set line marker face colour');
-                    case 'calculated'
-                        if ischar(ad.data{active}.display.lines.calculated.marker.faceColor)
-                            ad.data{active}.display.lines.calculated.marker.faceColor = ...
-                                colors{...
-                                strcmpi(ad.data{active}.display.lines.calculated.marker.faceColor,...
-                                colors(:,1)),2};
-                        end
-                        ad.data{active}.display.lines.calculated.marker.faceColor = ...
-                            uisetcolor(...
-                            ad.data{active}.display.lines.calculated.marker.faceColor,...
-                            'Set line marker face colour');
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-        
-                % Update appdata of main window
-                setappdata(mainWindow,'data',ad.data);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;
-            case 'markerDefaults'
-                % Make settings depending on the line selected
-                lineTypes = cellstr(...
-                    get(gh.display_panel_line_popupmenu,'String'));
-                lineType = lineTypes{...
-                    get(gh.display_panel_line_popupmenu,'Value')};
-                switch lineType
-                    case 'measured'
-                        ad.data{active}.display.lines.data.marker.type = 'none';
-                        ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
-                        ad.data{active}.display.lines.data.marker.faceColor = 'none';
-                        ad.data{active}.display.lines.data.marker.size = 6;
-                    case 'calculated'
-                        ad.data{active}.display.lines.calculated.marker.type = 'none';
-                        ad.data{active}.display.lines.calculated.marker.edgeColor = 'auto';
-                        ad.data{active}.display.lines.calculated.marker.faceColor = 'none';
-                        ad.data{active}.display.lines.calculated.marker.size = 6;
-                    otherwise
-                        trEPRoptionUnknown(lineType,'line type');
-                        return;
-                end
-                
-                % Update appdata of main window
-                setappdata(mainWindow,'data',ad.data);
-                
-                % Update display panel
-                update_displayPanel();
-                
-                % Update main axis
-                update_mainAxis();
-                return;                
-            case 'dataExport'
-                [status,warnings] = cmdExport(mainWindow,{'1D'});
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
-            case 'axisExport'
-                [status,warnings] = cmdExport(mainWindow,{'axis'});
-                if status
-                    trEPRmsg(warnings,'warning');
-                end
-            case 'setvoi'
-                cmdVoi(trEPRguiGetWindowHandle,cell(0));
-            case 'show3D'
-                % Make 3D representation window effectively a singleton
-                singleton = findobj('Tag','trEPRgui_3Drepresentation');
-                if ishghandle(singleton)
-                    figure(singleton);
-                    return;
-                end
-                
-                % Return if there is no currently active spectrum
-                if isempty(active) || ~active
-                    return;
-                end
-                
-                figHandle = threeDrepresentation(...
-                    ad.data{ad.control.data.active},...
-                    ad.control.axis.vis3d);
-                
-                % Set tag for figure window containing 3D representation
-                set(figHandle,'Tag','trEPRgui_3Drepresentation');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function axislabels_edit_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        switch lower(action)
-            case {'xmeasure','xunit','ymeasure','yunit','zmeasure','zunit'}
-                ad.control.axis.labels.(action(1)).(action(2:end)) = ...
-                    get(source,'String');
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        if (isempty(ad.control.data.active))
-            return;
-        end
-        
-        if (isfield(ad.data{ad.control.data.active},'axes'))
-            if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(1),'measure'))
-                ad.control.axis.labels.x.measure = ...
-                    ad.data{ad.control.data.active}.axes.data(1).measure;
-            end
-            if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(1),'unit'))
-                ad.control.axis.labels.x.unit = ...
-                    ad.data{ad.control.data.active}.axes.data(1).unit;
-            end
-            if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(2),'measure'))
-                ad.control.axis.labels.y.measure = ...
-                    ad.data{ad.control.data.active}.axes.data(2).measure;
-            end
-            if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(2),'unit'))
-                ad.control.axis.labels.y.unit = ...
-                    ad.data{ad.control.data.active}.axes.data(2).unit;
-            end
-            if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(3),'measure'))
-                ad.control.axis.labels.z.measure = ...
-                    ad.data{ad.control.data.active}.axes.data(3).measure;
-            end
-            if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
-                    isfield(ad.data{ad.control.data.active}.axes.data(3),'unit'))
-                ad.control.axis.labels.z.unit = ...
-                    ad.data{ad.control.data.active}.axes.data(3).unit;
-            end
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update display panel
-        update_displayPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function axislimits_edit_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        value = trEPRguiSanitiseNumericInput(get(source,'String'));
-        if isnan(value)
-            update_displayPanel();
-            return;
-        end
-        
-        switch lower(action)
-            case {'xmin','ymin','zmin'}
-                ad.control.axis.limits.(action(1)).(action(2:end)) = value;
-            case {'xmax','ymax','zmax'}
-                % Test whether value is larger than min for same axis
-                if (value > ad.control.axis.limits.(action(1)).min)
-                    ad.control.axis.limits.(action(1)).max = value;
-                else
-                    update_displayPanel();
-                    st = dbstack;
-                    trEPRmsg(...
-                        [st.name ' : Upper limit of an axis must be '...
-                        'always bigger than lower limit'],'warning');
-                    return;
-                end
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-
-        %Update display panel
-        update_displayPanel();
-
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function axislimits_auto_checkbox_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        ad.control.axis.limits.auto = get(source,'Value');
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update display panel
-        update_displayPanel();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function highlight_checkbox_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        if (get(source,'Value'))
-            set(gh.display_panel_highlight_method_popupmenu,...
-                'Enable','On');
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Enable','On');
-            highlightTypes = ...
-                cellstr(get(gh.display_panel_highlight_method_popupmenu,'String'));
-            highlightType = ...
-                highlightTypes{get(gh.display_panel_highlight_method_popupmenu,'Value')};
-            ad.control.axis.highlight.method = highlightType;
-        else
-            set(gh.display_panel_highlight_method_popupmenu,...
-                'Enable','Off');
-            set(gh.display_panel_highlight_value_popupmenu,...
-                'Enable','Off');
-            ad.control.axis.highlight.method = '';
-        end
-        
-        % Set both highlight checkboxes
-        set(gh.display_panel_highlight_checkbox,'Value',...
-            get(source,'Value'));
-        set(gh.display_panel_highlight2_checkbox,'Value',...
-            get(source,'Value'));
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function highlight_method_popupmenu_Callback(source,eventdata)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        highlightTypes = cellstr(get(source,'String'));
-        highlightType = highlightTypes{get(source,'Value')};
-        ad.control.axis.highlight.method = highlightType;
-        
-        switch highlightType
-            case 'color'
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'String','blue|green|red|cyan|magenta|yellow|black');
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'Value',1);
-            case 'linewidth'
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'String','1 px|2 px|3 px|4 px|5 px');
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'Value',1);
-            case 'linestyle'
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'String','solid|dashed|dotted|dash-dotted');
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'Value',1);
-            case 'marker'
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'String','plus|circle|asterisk|point|cross|square|diamond|triangle up|triangle down|triangle right|triangle left|pentagram|hexagram');
-                set(gh.display_panel_highlight_value_popupmenu,...
-                    'Value',1);
-            otherwise
-                trEPRoptionUnknown(highlightType,'highlight type');
-                return;
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update highlight_value_popupmenu
-        highlight_value_popupmenu_Callback(source,eventdata);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function highlight_value_popupmenu_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        highlightValues = ...
-            cellstr(get(gh.display_panel_highlight_value_popupmenu,'String'));
-        highlightValue = ...
-            highlightValues{get(gh.display_panel_highlight_value_popupmenu,'Value')};
-        
-        highlight = struct();
-        highlight.color = struct(...
-            'blue','b',...
-            'green','g',...
-            'red','r',...
-            'cyan','c',...
-            'magenta','m',...
-            'yellow','y',...
-            'black','k');
-        highlight.linewidth = struct(...
-            'n1px',1,...
-            'n2px',2,...
-            'n3px',3,...
-            'n4px',4,...
-            'n5px',5);
-        highlight.linestyle = struct(...
-            'solid','-',...
-            'dashed','--',...
-            'dotted',':',...
-            'dashdotted','-.');
-        highlight.marker = struct(...
-            'plus','+',...
-            'circle','o',...
-            'asterisk','*',...
-            'point','.',...
-            'cross','x',...
-            'square','s',...
-            'diamond','d',...
-            'triangleup','^',...
-            'triangledown','v',...
-            'triangleright','>',...
-            'triangleleft','<',...
-            'pentagram','p',...
-            'hexagram','h');
-
-        ad.control.axis.highlight.value = ...
-            highlight.(ad.control.axis.highlight.method).(...
-            regexprep(strrep(strrep(highlightValue,' ',''),'-',''),...
-            '^([0-9])','n$1'));
-
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function grid_x_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        if (get(source,'Value'))
-            ad.control.axis.grid.x = 'on';
-        else
-            ad.control.axis.grid.x = 'off';
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function grid_y_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        if (get(source,'Value'))
-            ad.control.axis.grid.y = 'on';
-        else
-            ad.control.axis.grid.y = 'off';
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function grid_minor_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        if (get(source,'Value'))
-            ad.control.axis.grid.minor = 'on';
-        else
-            ad.control.axis.grid.minor = 'off';
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function grid_zero_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        ad.control.axis.grid.zero.visible = get(source,'Value');
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function grid_legend_togglebutton_Callback(source,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        % For some currently unknown reason, findobj seems not to work. The
-        % parent handle behaves weird...
-        legendButtons = [...
-            gh.display_panel_legend_auto_togglebutton ...
-            gh.display_panel_legend_nw_togglebutton ...
-            gh.display_panel_legend_ne_togglebutton ...
-            gh.display_panel_legend_sw_togglebutton ...
-            gh.display_panel_legend_se_togglebutton ...
-            ];
-        
-        switch source
-            case gh.display_panel_legend_auto_togglebutton
-                if (get(source,'Value'))
-                    ad.control.axis.legend.location = 'Best';
-                    set(legendButtons,'Value',0);
-                    set(source,'Value',1);
-                else
-                    ad.control.axis.legend.location = 'none';
-                    set(legendButtons,'Value',0);
-                end
-            case gh.display_panel_legend_nw_togglebutton
-                if (get(source,'Value'))
-                    ad.control.axis.legend.location = 'NorthWest';
-                    set(legendButtons,'Value',0);
-                    set(source,'Value',1);
-                else
-                    ad.control.axis.legend.location = 'none';
-                    set(legendButtons,'Value',0);
-                end
-            case gh.display_panel_legend_ne_togglebutton
-                if (get(source,'Value'))
-                    ad.control.axis.legend.location = 'NorthEast';
-                    set(legendButtons,'Value',0);
-                    set(source,'Value',1);
-                else
-                    ad.control.axis.legend.location = 'none';
-                    set(legendButtons,'Value',0);
-                end
-            case gh.display_panel_legend_sw_togglebutton
-                if (get(source,'Value'))
-                    ad.control.axis.legend.location = 'SouthWest';
-                    set(legendButtons,'Value',0);
-                    set(source,'Value',1);
-                else
-                    ad.control.axis.legend.location = 'none';
-                    set(legendButtons,'Value',0);
-                end
-            case gh.display_panel_legend_se_togglebutton
-                if (get(source,'Value'))
-                    ad.control.axis.legend.location = 'SouthEast';
-                    set(legendButtons,'Value',0);
-                    set(source,'Value',1);
-                else
-                    ad.control.axis.legend.location = 'none';
-                    set(legendButtons,'Value',0);
-                end
-        end
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function togglebutton_Callback(source,~,action)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        switch lower(action)
-            case {'normalise1d','normalise2d'}
-                % For some currently unknown reason, findobj seems not to work. The
-                % parent handle behaves weird...
-                normaliseButtons = [...
-                    gh.display_panel_normalise_1d_togglebutton ...
-                    gh.display_panel_normalise_2d_togglebutton ...
-                    ];
-                % Switch normalisation on or off
-                dimension = upper(action(end-1:end));
-                if (get(source,'Value'))
-                    ad.control.axis.normalisation.enable = true;
-                    ad.control.axis.normalisation.dimension = dimension;
-                    ad.control.axis.normalisation.type = lower(get(get(...
-                        gh.display_panel_normalise_buttongroup,...
-                        'SelectedObject'),'String'));
-                    set(normaliseButtons,'Value',0);
-                    set(source,'Value',1);
-                    set(gh.status_panel_normalisation_text,...
-                        'String',dimension,...
-                        'BackgroundColor',[1 1 0.5]);
-                else
-                    ad.control.axis.normalisation.enable = false;
-                    set(normaliseButtons,'Value',0);
-                    set(gh.status_panel_normalisation_text,...
-                        'String','no',...
-                        'BackgroundColor',[1 1 1]);
-                end
-        end
-                
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-        
-        %Update slider panel
-        update_sliderPanel();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function normalise_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        ad.control.axis.normalisation.type = lower(get(get(...
-            gh.display_panel_normalise_buttongroup,'SelectedObject'),...
-            'String'));
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        %Update main axis
-        update_mainAxis();
-        
-        %Update slider panel
-        update_sliderPanel();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function datasets_listbox_Callback(~,~)
-    try
-        % Get appdata of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        
-        % Get handles of main window
-        gh = guihandles(mainWindow);
-        
-        ad.control.data.active = ad.control.data.visible(...
-            get(gh.display_panel_datasets_listbox,'Value')...
-            );
-        
-        % Update appdata of main window
-        setappdata(mainWindow,'control',ad.control);
-        
-        % If user double clicked on list entry
-        if strcmp(get(gcf,'SelectionType'),'open')
-            cmdLabel(mainWindow,{});
-        end
-        
-        % Update display panel
-        update_displayPanel();
-        
-        % Update processing panel
-        update_processingPanel();
-        
-        % Update slider panel
-        update_sliderPanel();
-        
-        % Update visible spectra listboxes (in diverse panels!)
-        update_visibleSpectra();
-        
-        %Update main axis
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function linewidth_popupmenu_Callback(~,~)
-    try
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        lineWidths = ...
-            cellstr(get(gh.display_panel_linewidth_popupmenu,'String'));
-        lineWidth = ...
-            lineWidths{get(gh.display_panel_linewidth_popupmenu,'Value')};
-                
-        if ad.control.data.active
-            active = ad.control.data.active;
+    
+    % Get appdata and handles of main GUI
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    values = cellstr(get(source,'String'));
+    value = values{get(source,'Value')};
+    
+    active = ad.control.data.active;
+    
+    switch action
+        case 'line'
+            % Probably, no action needs to be taken except of the
+            % "update_displayPanel()" after the switch-case statement.
+        case 'markerEdgeColour'
             % Make settings depending on the line selected
             lineTypes = cellstr(...
                 get(gh.display_panel_line_popupmenu,'String'));
@@ -3066,10 +2048,266 @@ function linewidth_popupmenu_Callback(~,~)
                 get(gh.display_panel_line_popupmenu,'Value')};
             switch lineType
                 case 'measured'
-                    ad.data{active}.display.lines.data.width = str2double(lineWidth(1));
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.data.marker.edgeColor = ...
+                            ad.data{active}.display.lines.data.color;
+                    else
+                        ad.data{active}.display.lines.data.marker.edgeColor = value;
+                    end
                 case 'calculated'
-                    ad.data{active}.display.lines.calculated.width = ...
-                        str2double(lineWidth(1));
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                            ad.data{active}.display.lines.calculated.color;
+                    else
+                        ad.data{active}.display.lines.calculated.marker.edgeColor = value;
+                    end
+                otherwise
+                    trEPRoptionUnknown(lineType,'line type');
+                    return;
+            end
+        case 'markerFaceColour'
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.data.marker.faceColor = ...
+                            ad.data{active}.display.lines.data.color;
+                    else
+                        ad.data{active}.display.lines.data.marker.faceColor = value;
+                    end
+                case 'calculated'
+                    if strcmpi(value,'colour')
+                        ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                            ad.data{active}.display.lines.calculated.color;
+                    else
+                        ad.data{active}.display.lines.calculated.marker.faceColor = value;
+                    end
+                otherwise
+                    trEPRoptionUnknown(lineType,'line type');
+                    return;
+            end
+        case '3Doffset'
+            ad.control.axis.vis3d.offset.type = value;
+        case '3Dtype'
+            ad.control.axis.vis3d.type = value;
+        case 'projectionaxesmode'
+            ad.control.axis.projectionAxes.mode = value;
+        case 'residualsaxismode'
+            ad.control.axis.residualsAxes.mode = value;
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'control',ad.control);
+    % Update display panel
+    update_displayPanel();
+    % Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function edit_Callback(source,~,action)
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata and handles of main GUI
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    active = ad.control.data.active;
+    if isempty(active) && ~active
+        return;
+    end
+    
+    value = trEPRguiSanitiseNumericInput(get(source,'String'));
+    if isnan(value)
+        update_displayPanel();
+        return;
+    end
+    
+    switch action
+        case 'zeroLineWidth'
+            ad.control.axis.grid.zero.width = value;
+        case 'markerSize'
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    ad.data{active}.display.lines.data.marker.size = value;
+                case 'calculated'
+                    ad.data{active}.display.lines.calculated.marker.size = value;
+                otherwise
+                    trEPRoptionUnknown(lineType,'line type');
+                    return;
+            end
+        case 'projectionaxeshheight'
+            ad.control.axis.projectionAxes.horizontal.height = ...
+                trEPRguiSanitiseNumericInput(...
+                get(source,'String'),[20 250]);
+        case 'projectionaxesvheight'
+            ad.control.axis.projectionAxes.vertical.height = ...
+                trEPRguiSanitiseNumericInput(...
+                get(source,'String'),[20 250]);
+        case 'residualsaxisheight'
+            ad.control.axis.residualsAxes.height = ...
+                trEPRguiSanitiseNumericInput(...
+                get(source,'String'),[20 250]);
+        case 'residualsaxisgap'
+            ad.control.axis.residualsAxes.gap = ...
+                trEPRguiSanitiseNumericInput(...
+                get(source,'String'),[0 50]);
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    setappdata(mainWindow,'control',ad.control);
+    setappdata(mainWindow,'data',ad.data);
+    % Update display panel
+    update_displayPanel();
+    % Resize axes
+    if any(strcmpi(action,{'projectionaxeshheight',...
+            'projectionaxesvheight','residualsaxisheight',...
+            'residualsaxisgap'}))
+        axesResize();
+    end
+    % Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function pushbutton_Callback(~,~,action)
+try
+    if isempty(action)
+        return;
+    end
+    
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle();
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    % Make life easier
+    active = ad.control.data.active;
+    
+    % Return immediately if there is no active dataset
+    if active == 0 && ~strcmpi(action,'zerolinecolourpalette')
+        return;
+    end
+    
+    colors = {...
+        'b',[0 0 1]; ...
+        'g',[0 1 0]; ...
+        'r',[1 0 0]; ...
+        'c',[0 1 1]; ...
+        'm',[1 0 1]; ...
+        'y',[1 1 0]; ...
+        'k',[0 0 0]; ...
+        'w',[1 1 1]; ...
+        };
+    
+    switch action
+        case 'zeroLineColourPalette'
+            if ischar(ad.control.axis.grid.zero.color)
+                ad.control.axis.grid.zero.color = colors{...
+                    strcmpi(ad.control.axis.grid.zero.color,...
+                    colors(:,1)),2};
+            end
+            ad.control.axis.grid.zero.color = uisetcolor(...
+                ad.control.axis.grid.zero.color,...
+                'Set zero line colour');
+            
+            % Update appdata of main window
+            setappdata(mainWindow,'control',ad.control);
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
+            update_mainAxis();
+            return;
+        case 'zeroLineDefaults'
+            ad.control.axis.grid.zero = ...
+                ad.configuration.display.grid.zero;
+            % Update appdata of main window
+            setappdata(mainWindow,'control',ad.control);
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
+            update_mainAxis();
+            return;
+        case 'legendFont'
+            if ~isempty(ad.control.axis.legend.handle) && ...
+                    ishandle(ad.control.axis.legend.handle)
+                legendFontSettings = uisetfont(...
+                    ad.control.axis.legend.handle,...
+                    'Set legend font');
+            else
+                legendFontSettings = uisetfont('Set legend font');
+            end
+            if isstruct(legendFontSettings)
+                ad.control.axis.legend.FontName = ...
+                    legendFontSettings.FontName;
+                ad.control.axis.legend.FontSize = ...
+                    legendFontSettings.FontSize;
+                ad.control.axis.legend.FontWeight = ...
+                    legendFontSettings.FontWeight;
+                ad.control.axis.legend.FontAngle = ...
+                    legendFontSettings.FontAngle;
+            end
+            
+            % Update appdata of main window
+            setappdata(mainWindow,'control',ad.control);
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
+            update_mainAxis();
+            return;
+        case 'colourPalette'
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    if ischar(ad.data{active}.display.lines.data.color)
+                        ad.data{active}.display.lines.data.color = colors{...
+                            strcmpi(ad.data{active}.display.lines.data.color,...
+                            colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.data.color = uisetcolor(...
+                        ad.data{active}.display.lines.data.color,...
+                        'Set measured line colour');
+                case 'calculated'
+                    if ischar(ad.data{active}.display.lines.calculated.color)
+                        ad.data{active}.display.lines.calculated.color = ...
+                            colors{...
+                            strcmpi(ad.data{active}.display.lines.calculated.color,...
+                            colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.calculated.color = ...
+                        uisetcolor(...
+                        ad.data{active}.display.lines.calculated.color,...
+                        'Set calculated line colour');
                 otherwise
                     trEPRoptionUnknown(lineType,'line type');
                     return;
@@ -3077,117 +2315,14 @@ function linewidth_popupmenu_Callback(~,~)
             
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
-            % Update main axes
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
             update_mainAxis();
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function linestyle_popupmenu_Callback(source,~,action)
-    try
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        lineStyles = ...
-            cellstr(get(source,'String'));
-        lineStyle = ...
-            lineStyles{get(source,'Value')};
-
-        switch lower(action)
-            case 'line'
-                if ad.control.data.active
-                    active = ad.control.data.active;
-                    % Make settings depending on the line selected
-                    lineTypes = cellstr(...
-                        get(gh.display_panel_line_popupmenu,'String'));
-                    lineType = lineTypes{...
-                        get(gh.display_panel_line_popupmenu,'Value')};
-                    switch lineType
-                        case 'measured'
-                            switch lineStyle
-                                case 'solid'
-                                    ad.data{active}.display.lines.data.style = '-';
-                                case 'dashed'
-                                    ad.data{active}.display.lines.data.style = '--';
-                                case 'dotted'
-                                    ad.data{active}.display.lines.data.style = ':';
-                                case 'dash-dotted'
-                                    ad.data{active}.display.lines.data.style = '-.';
-                                case 'none'
-                                    ad.data{active}.display.lines.data.style = 'none';
-                                otherwise
-                                    trEPRoptionUnknown(lineStyle,...
-                                        'line style');
-                            end
-                        case 'calculated'
-                            switch lineStyle
-                                case 'solid'
-                                    ad.data{active}.display.lines.calculated.style = '-';
-                                case 'dashed'
-                                    ad.data{active}.display.lines.calculated.style = '--';
-                                case 'dotted'
-                                    ad.data{active}.display.lines.calculated.style = ':';
-                                case 'dash-dotted'
-                                    ad.data{active}.display.lines.calculated.style = '-.';
-                                case 'none'
-                                    ad.data{active}.display.lines.calculated.style = 'none';
-                                otherwise
-                                    trEPRoptionUnknown(lineStyle,...
-                                        'line style');
-                            end
-                        otherwise
-                            trEPRoptionUnknown(lineType,'line type');
-                            return;
-                    end
-                end
-            case 'zeroline'
-                switch lineStyle
-                    case 'solid'
-                        ad.control.axis.grid.zero.style = '-';
-                    case 'dashed'
-                        ad.control.axis.grid.zero.style = '--';
-                    case 'dotted'
-                        ad.control.axis.grid.zero.style = ':';
-                    case 'dash-dotted'
-                        ad.control.axis.grid.zero.style = '-.';
-                    case 'none'
-                        ad.control.axis.grid.zero.style = 'none';
-                    otherwise
-                        trEPRoptionUnknown(lineStyle,'line style');
-                end
-            otherwise
-                trEPRoptionUnknown(action);
-                return;
-        end
-        % Update appdata of main window
-        setappdata(mainWindow,'data',ad.data);
-        setappdata(mainWindow,'control',ad.control);
-        % Update main axes
-        update_mainAxis();
-    catch exception
-        trEPRexceptionHandling(exception)
-    end
-end
-
-function linemarker_popupmenu_Callback(~,~)
-    try
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-
-        lineMarkers = ...
-            cellstr(get(gh.display_panel_linemarker_popupmenu,'String'));
-        lineMarker = ...
-            lineMarkers{get(gh.display_panel_linemarker_popupmenu,'Value')};
-
-        active = ad.control.data.active;
-                        
-        if ad.control.data.active
+            return;
+        case 'markerEdgeColourPalette'
             % Make settings depending on the line selected
             lineTypes = cellstr(...
                 get(gh.display_panel_line_popupmenu,'String'));
@@ -3195,193 +2330,1071 @@ function linemarker_popupmenu_Callback(~,~)
                 get(gh.display_panel_line_popupmenu,'Value')};
             switch lineType
                 case 'measured'
-                    switch lineMarker
-                        case 'none'
-                            ad.data{active}.display.lines.data.marker.type = 'none';
-                        case 'plus'
-                            ad.data{active}.display.lines.data.marker.type = '+';
-                        case 'circle'
-                            ad.data{active}.display.lines.data.marker.type = 'o';
-                        case 'asterisk'
-                            ad.data{active}.display.lines.data.marker.type = '*';
-                        case 'point'
-                            ad.data{active}.display.lines.data.marker.type = '.';
-                        case 'cross'
-                            ad.data{active}.display.lines.data.marker.type = 'x';
-                        case 'square'
-                            ad.data{active}.display.lines.data.marker.type = 's';
-                        case 'diamond'
-                            ad.data{active}.display.lines.data.marker.type = 'd';
-                        case 'triangle up'
-                            ad.data{active}.display.lines.data.marker.type = '^';
-                        case 'triangle down'
-                            ad.data{active}.display.lines.data.marker.type = 'v';
-                        case 'triangle right'
-                            ad.data{active}.display.lines.data.marker.type = '<';
-                        case 'triangle left'
-                            ad.data{active}.display.lines.data.marker.type = '>';
-                        case 'pentagram'
-                            ad.data{active}.display.lines.data.marker.type = 'p';
-                        case 'hexagram'
-                            ad.data{active}.display.lines.data.marker.type = 'h';
-                        otherwise
-                            trEPRoptionUnknown(lineMarker,'line marker');
+                    if ischar(ad.data{active}.display.lines.data.marker.edgeColor)
+                        ad.data{active}.display.lines.data.marker.edgeColor = colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.edgeColor,...
+                            colors(:,1)),2};
                     end
+                    ad.data{active}.display.lines.data.marker.edgeColor = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.edgeColor,...
+                        'Set line marker edge colour');
                 case 'calculated'
-                    switch lineMarker
-                        case 'none'
-                            ad.data{active}.display.lines.calculated.marker.type = 'none';
-                        case 'plus'
-                            ad.data{active}.display.lines.calculated.marker.type = '+';
-                        case 'circle'
-                            ad.data{active}.display.lines.calculated.marker.type = 'o';
-                        case 'asterisk'
-                            ad.data{active}.display.lines.calculated.marker.type = '*';
-                        case 'point'
-                            ad.data{active}.display.lines.calculated.marker.type = '.';
-                        case 'cross'
-                            ad.data{active}.display.lines.calculated.marker.type = 'x';
-                        case 'square'
-                            ad.data{active}.display.lines.calculated.marker.type = 's';
-                        case 'diamond'
-                            ad.data{active}.display.lines.calculated.marker.type = 'd';
-                        case 'triangle up'
-                            ad.data{active}.display.lines.calculated.marker.type = '^';
-                        case 'triangle down'
-                            ad.data{active}.display.lines.calculated.marker.type = 'v';
-                        case 'triangle right'
-                            ad.data{active}.display.lines.calculated.marker.type = '<';
-                        case 'triangle left'
-                            ad.data{active}.display.lines.calculated.marker.type = '>';
-                        case 'pentagram'
-                            ad.data{active}.display.lines.calculated.marker.type = 'p';
-                        case 'hexagram'
-                            ad.data{active}.display.lines.calculated.marker.type = 'h';
-                        otherwise
-                            trEPRoptionUnknown(lineMarker,'line marker');
+                    if ischar(ad.data{active}.display.lines.calculated.marker.edgeColor)
+                        ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                            colors{...
+                            strcmpi(ad.data{active}.display.lines.calculated.marker.edgeColor,...
+                            colors(:,1)),2};
                     end
+                    ad.data{active}.display.lines.calculated.marker.edgeColor = ...
+                        uisetcolor(...
+                        ad.data{active}.display.lines.calculated.marker.edgeColor,...
+                        'Set line marker edge colour');
                 otherwise
-                    trEPRoptionUnknown(action);
+                    trEPRoptionUnknown(lineType,'line type');
                     return;
             end
             
             % Update appdata of main window
             setappdata(mainWindow,'data',ad.data);
-            % Update main axes
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
             update_mainAxis();
-        end
-    catch exception
-        trEPRexceptionHandling(exception)
+            return;
+        case 'markerFaceColourPalette'
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    if ischar(ad.data{active}.display.lines.data.marker.faceColor)
+                        ad.data{active}.display.lines.data.marker.faceColor = colors{...
+                            strcmpi(ad.data{active}.display.lines.data.marker.faceColor,...
+                            colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.data.marker.faceColor = uisetcolor(...
+                        ad.data{active}.display.lines.data.marker.faceColor,...
+                        'Set line marker face colour');
+                case 'calculated'
+                    if ischar(ad.data{active}.display.lines.calculated.marker.faceColor)
+                        ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                            colors{...
+                            strcmpi(ad.data{active}.display.lines.calculated.marker.faceColor,...
+                            colors(:,1)),2};
+                    end
+                    ad.data{active}.display.lines.calculated.marker.faceColor = ...
+                        uisetcolor(...
+                        ad.data{active}.display.lines.calculated.marker.faceColor,...
+                        'Set line marker face colour');
+                otherwise
+                    trEPRoptionUnknown(lineType,'line type');
+                    return;
+            end
+            
+            % Update appdata of main window
+            setappdata(mainWindow,'data',ad.data);
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
+            update_mainAxis();
+            return;
+        case 'markerDefaults'
+            % Make settings depending on the line selected
+            lineTypes = cellstr(...
+                get(gh.display_panel_line_popupmenu,'String'));
+            lineType = lineTypes{...
+                get(gh.display_panel_line_popupmenu,'Value')};
+            switch lineType
+                case 'measured'
+                    ad.data{active}.display.lines.data.marker.type = 'none';
+                    ad.data{active}.display.lines.data.marker.edgeColor = 'auto';
+                    ad.data{active}.display.lines.data.marker.faceColor = 'none';
+                    ad.data{active}.display.lines.data.marker.size = 6;
+                case 'calculated'
+                    ad.data{active}.display.lines.calculated.marker.type = 'none';
+                    ad.data{active}.display.lines.calculated.marker.edgeColor = 'auto';
+                    ad.data{active}.display.lines.calculated.marker.faceColor = 'none';
+                    ad.data{active}.display.lines.calculated.marker.size = 6;
+                otherwise
+                    trEPRoptionUnknown(lineType,'line type');
+                    return;
+            end
+            
+            % Update appdata of main window
+            setappdata(mainWindow,'data',ad.data);
+            
+            % Update display panel
+            update_displayPanel();
+            
+            % Update main axis
+            update_mainAxis();
+            return;
+        case 'dataExport'
+            [status,warnings] = cmdExport(mainWindow,{'1D'});
+            if status
+                trEPRmsg(warnings,'warning');
+            end
+        case 'axisExport'
+            [status,warnings] = cmdExport(mainWindow,{'axis'});
+            if status
+                trEPRmsg(warnings,'warning');
+            end
+        case 'setvoi'
+            cmdVoi(trEPRguiGetWindowHandle,cell(0));
+        case 'show3D'
+            % Make 3D representation window effectively a singleton
+            singleton = findobj('Tag','trEPRgui_3Drepresentation');
+            if ishghandle(singleton)
+                figure(singleton);
+                return;
+            end
+            
+            % Return if there is no currently active spectrum
+            if isempty(active) || ~active
+                return;
+            end
+            
+            figHandle = threeDrepresentation(...
+                ad.data{ad.control.data.active},...
+                ad.control.axis.vis3d);
+            
+            % Set tag for figure window containing 3D representation
+            set(figHandle,'Tag','trEPRgui_3Drepresentation');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
-function show3d_edit_Callback(source,~,label)
-    try
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
+function axislabels_edit_Callback(source,~,action)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    switch lower(action)
+        case {'xmeasure','xunit','ymeasure','yunit','zmeasure','zunit'}
+            ad.control.axis.labels.(action(1)).(action(2:end)) = ...
+                get(source,'String');
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function axislabels_getfromactivedataset_pushbutton_Callback(~,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    if (isempty(ad.control.data.active))
+        return;
+    end
+    
+    if (isfield(ad.data{ad.control.data.active},'axes'))
+        if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(1),'measure'))
+            ad.control.axis.labels.x.measure = ...
+                ad.data{ad.control.data.active}.axes.data(1).measure;
+        end
+        if (isfield(ad.data{ad.control.data.active}.axes,'x') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(1),'unit'))
+            ad.control.axis.labels.x.unit = ...
+                ad.data{ad.control.data.active}.axes.data(1).unit;
+        end
+        if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(2),'measure'))
+            ad.control.axis.labels.y.measure = ...
+                ad.data{ad.control.data.active}.axes.data(2).measure;
+        end
+        if (isfield(ad.data{ad.control.data.active}.axes,'y') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(2),'unit'))
+            ad.control.axis.labels.y.unit = ...
+                ad.data{ad.control.data.active}.axes.data(2).unit;
+        end
+        if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(3),'measure'))
+            ad.control.axis.labels.z.measure = ...
+                ad.data{ad.control.data.active}.axes.data(3).measure;
+        end
+        if (isfield(ad.data{ad.control.data.active}.axes,'z') && ...
+                isfield(ad.data{ad.control.data.active}.axes.data(3),'unit'))
+            ad.control.axis.labels.z.unit = ...
+                ad.data{ad.control.data.active}.axes.data(3).unit;
+        end
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update display panel
+    update_displayPanel();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function axislimits_edit_Callback(source,~,action)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    value = trEPRguiSanitiseNumericInput(get(source,'String'));
+    if isnan(value)
+        update_displayPanel();
+        return;
+    end
+    
+    switch lower(action)
+        case {'xmin','ymin','zmin'}
+            ad.control.axis.limits.(action(1)).(action(2:end)) = value;
+        case {'xmax','ymax','zmax'}
+            % Test whether value is larger than min for same axis
+            if (value > ad.control.axis.limits.(action(1)).min)
+                ad.control.axis.limits.(action(1)).max = value;
+            else
+                update_displayPanel();
+                st = dbstack;
+                trEPRmsg(...
+                    [st.name ' : Upper limit of an axis must be '...
+                    'always bigger than lower limit'],'warning');
+                return;
+            end
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update display panel
+    update_displayPanel();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function axislimits_auto_checkbox_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    ad.control.axis.limits.auto = get(source,'Value');
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update display panel
+    update_displayPanel();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function highlight_checkbox_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    if (get(source,'Value'))
+        set(gh.display_panel_highlight_method_popupmenu,...
+            'Enable','On');
+        set(gh.display_panel_highlight_value_popupmenu,...
+            'Enable','On');
+        highlightTypes = ...
+            cellstr(get(gh.display_panel_highlight_method_popupmenu,'String'));
+        highlightType = ...
+            highlightTypes{get(gh.display_panel_highlight_method_popupmenu,'Value')};
+        ad.control.axis.highlight.method = highlightType;
+    else
+        set(gh.display_panel_highlight_method_popupmenu,...
+            'Enable','Off');
+        set(gh.display_panel_highlight_value_popupmenu,...
+            'Enable','Off');
+        ad.control.axis.highlight.method = '';
+    end
+    
+    % Set both highlight checkboxes
+    set(gh.display_panel_highlight_checkbox,'Value',...
+        get(source,'Value'));
+    set(gh.display_panel_highlight2_checkbox,'Value',...
+        get(source,'Value'));
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function highlight_method_popupmenu_Callback(source,eventdata)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    highlightTypes = cellstr(get(source,'String'));
+    highlightType = highlightTypes{get(source,'Value')};
+    ad.control.axis.highlight.method = highlightType;
+    
+    switch highlightType
+        case 'color'
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'String','blue|green|red|cyan|magenta|yellow|black');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Value',1);
+        case 'linewidth'
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'String','1 px|2 px|3 px|4 px|5 px');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Value',1);
+        case 'linestyle'
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'String','solid|dashed|dotted|dash-dotted');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Value',1);
+        case 'marker'
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'String','plus|circle|asterisk|point|cross|square|diamond|triangle up|triangle down|triangle right|triangle left|pentagram|hexagram');
+            set(gh.display_panel_highlight_value_popupmenu,...
+                'Value',1);
+        otherwise
+            trEPRoptionUnknown(highlightType,'highlight type');
+            return;
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update highlight_value_popupmenu
+    highlight_value_popupmenu_Callback(source,eventdata);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function highlight_value_popupmenu_Callback(~,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    highlightValues = ...
+        cellstr(get(gh.display_panel_highlight_value_popupmenu,'String'));
+    highlightValue = ...
+        highlightValues{get(gh.display_panel_highlight_value_popupmenu,'Value')};
+    
+    highlight = struct();
+    highlight.color = struct(...
+        'blue','b',...
+        'green','g',...
+        'red','r',...
+        'cyan','c',...
+        'magenta','m',...
+        'yellow','y',...
+        'black','k');
+    highlight.linewidth = struct(...
+        'n1px',1,...
+        'n2px',2,...
+        'n3px',3,...
+        'n4px',4,...
+        'n5px',5);
+    highlight.linestyle = struct(...
+        'solid','-',...
+        'dashed','--',...
+        'dotted',':',...
+        'dashdotted','-.');
+    highlight.marker = struct(...
+        'plus','+',...
+        'circle','o',...
+        'asterisk','*',...
+        'point','.',...
+        'cross','x',...
+        'square','s',...
+        'diamond','d',...
+        'triangleup','^',...
+        'triangledown','v',...
+        'triangleright','>',...
+        'triangleleft','<',...
+        'pentagram','p',...
+        'hexagram','h');
+    
+    ad.control.axis.highlight.value = ...
+        highlight.(ad.control.axis.highlight.method).(...
+        regexprep(strrep(strrep(highlightValue,' ',''),'-',''),...
+        '^([0-9])','n$1'));
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function grid_x_togglebutton_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    if (get(source,'Value'))
+        ad.control.axis.grid.x = 'on';
+    else
+        ad.control.axis.grid.x = 'off';
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function grid_y_togglebutton_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    if (get(source,'Value'))
+        ad.control.axis.grid.y = 'on';
+    else
+        ad.control.axis.grid.y = 'off';
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function grid_minor_togglebutton_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    if (get(source,'Value'))
+        ad.control.axis.grid.minor = 'on';
+    else
+        ad.control.axis.grid.minor = 'off';
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function grid_zero_togglebutton_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    ad.control.axis.grid.zero.visible = get(source,'Value');
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function grid_legend_togglebutton_Callback(source,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    % For some currently unknown reason, findobj seems not to work. The
+    % parent handle behaves weird...
+    legendButtons = [...
+        gh.display_panel_legend_auto_togglebutton ...
+        gh.display_panel_legend_nw_togglebutton ...
+        gh.display_panel_legend_ne_togglebutton ...
+        gh.display_panel_legend_sw_togglebutton ...
+        gh.display_panel_legend_se_togglebutton ...
+        ];
+    
+    switch source
+        case gh.display_panel_legend_auto_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.legend.location = 'Best';
+                set(legendButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.legend.location = 'none';
+                set(legendButtons,'Value',0);
+            end
+        case gh.display_panel_legend_nw_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.legend.location = 'NorthWest';
+                set(legendButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.legend.location = 'none';
+                set(legendButtons,'Value',0);
+            end
+        case gh.display_panel_legend_ne_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.legend.location = 'NorthEast';
+                set(legendButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.legend.location = 'none';
+                set(legendButtons,'Value',0);
+            end
+        case gh.display_panel_legend_sw_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.legend.location = 'SouthWest';
+                set(legendButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.legend.location = 'none';
+                set(legendButtons,'Value',0);
+            end
+        case gh.display_panel_legend_se_togglebutton
+            if (get(source,'Value'))
+                ad.control.axis.legend.location = 'SouthEast';
+                set(legendButtons,'Value',0);
+                set(source,'Value',1);
+            else
+                ad.control.axis.legend.location = 'none';
+                set(legendButtons,'Value',0);
+            end
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function togglebutton_Callback(source,~,action)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    switch lower(action)
+        case {'normalise1d','normalise2d'}
+            % For some currently unknown reason, findobj seems not to work. The
+            % parent handle behaves weird...
+            normaliseButtons = [...
+                gh.display_panel_normalise_1d_togglebutton ...
+                gh.display_panel_normalise_2d_togglebutton ...
+                ];
+            % Switch normalisation on or off
+            dimension = upper(action(end-1:end));
+            if (get(source,'Value'))
+                ad.control.axis.normalisation.enable = true;
+                ad.control.axis.normalisation.dimension = dimension;
+                ad.control.axis.normalisation.type = lower(get(get(...
+                    gh.display_panel_normalise_buttongroup,...
+                    'SelectedObject'),'String'));
+                set(normaliseButtons,'Value',0);
+                set(source,'Value',1);
+                set(gh.status_panel_normalisation_text,...
+                    'String',dimension,...
+                    'BackgroundColor',[1 1 0.5]);
+            else
+                ad.control.axis.normalisation.enable = false;
+                set(normaliseButtons,'Value',0);
+                set(gh.status_panel_normalisation_text,...
+                    'String','no',...
+                    'BackgroundColor',[1 1 1]);
+            end
+    end
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+    
+    %Update slider panel
+    update_sliderPanel();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function normalise_Callback(~,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    ad.control.axis.normalisation.type = lower(get(get(...
+        gh.display_panel_normalise_buttongroup,'SelectedObject'),...
+        'String'));
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    %Update main axis
+    update_mainAxis();
+    
+    %Update slider panel
+    update_sliderPanel();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function datasets_listbox_Callback(~,~)
+try
+    % Get appdata of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    
+    % Get handles of main window
+    gh = ad.guiHandles;
+    
+    ad.control.data.active = ad.control.data.visible(...
+        get(gh.display_panel_datasets_listbox,'Value')...
+        );
+    
+    % Update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+    
+    % If user double clicked on list entry
+    if strcmp(get(gcf,'SelectionType'),'open')
+        cmdLabel(mainWindow,{});
+    end
+    
+    % Update display panel
+    update_displayPanel();
+    
+    % Update processing panel
+    update_processingPanel();
+    
+    % Update slider panel
+    update_sliderPanel();
+    
+    % Update visible spectra listboxes (in diverse panels!)
+    update_visibleSpectra();
+    
+    %Update main axis
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function linewidth_popupmenu_Callback(~,~)
+try
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    lineWidths = ...
+        cellstr(get(gh.display_panel_linewidth_popupmenu,'String'));
+    lineWidth = ...
+        lineWidths{get(gh.display_panel_linewidth_popupmenu,'Value')};
+    
+    if ad.control.data.active
+        active = ad.control.data.active;
+        % Make settings depending on the line selected
+        lineTypes = cellstr(...
+            get(gh.display_panel_line_popupmenu,'String'));
+        lineType = lineTypes{...
+            get(gh.display_panel_line_popupmenu,'Value')};
+        switch lineType
+            case 'measured'
+                ad.data{active}.display.lines.data.width = str2double(lineWidth(1));
+            case 'calculated'
+                ad.data{active}.display.lines.calculated.width = ...
+                    str2double(lineWidth(1));
+            otherwise
+                trEPRoptionUnknown(lineType,'line type');
+                return;
+        end
         
-        value = get(source,'String');
-       
-        [dimy,dimx] = size(ad.data{ad.control.data.active}.data);
-        
-        switch label
-            case 'xfactor'
-                numValue = trEPRguiSanitiseNumericInput(...
-                    value,[1 dimx],'round',true);
-                ad.control.axis.vis3d.reduction.x = numValue;
-            case 'yfactor'
-                numValue = trEPRguiSanitiseNumericInput(...
-                    value,[1 dimy],'round',true);
-                ad.control.axis.vis3d.reduction.y = numValue;
-            case 'xoffset'
-                numValue = trEPRguiSanitiseNumericInput(...
-                    value,[0 dimx-str2double(...
-                        get(gh.display_panel_3D_size_x_edit,'String'))],...
-                        'round',true);
-                ad.control.axis.vis3d.offset.x = numValue;
-            case 'yoffset'
-                numValue = trEPRguiSanitiseNumericInput(...
-                    value,[0 dimy-str2double(...
-                        get(gh.display_panel_3D_size_y_edit,'String'))],...
-                        'round',true);
-                ad.control.axis.vis3d.offset.y = numValue;
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        % Update main axes
+        update_mainAxis();
+    end
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function linestyle_popupmenu_Callback(source,~,action)
+try
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    lineStyles = ...
+        cellstr(get(source,'String'));
+    lineStyle = ...
+        lineStyles{get(source,'Value')};
+    
+    switch lower(action)
+        case 'line'
+            if ad.control.data.active
+                active = ad.control.data.active;
+                % Make settings depending on the line selected
+                lineTypes = cellstr(...
+                    get(gh.display_panel_line_popupmenu,'String'));
+                lineType = lineTypes{...
+                    get(gh.display_panel_line_popupmenu,'Value')};
+                switch lineType
+                    case 'measured'
+                        switch lineStyle
+                            case 'solid'
+                                ad.data{active}.display.lines.data.style = '-';
+                            case 'dashed'
+                                ad.data{active}.display.lines.data.style = '--';
+                            case 'dotted'
+                                ad.data{active}.display.lines.data.style = ':';
+                            case 'dash-dotted'
+                                ad.data{active}.display.lines.data.style = '-.';
+                            case 'none'
+                                ad.data{active}.display.lines.data.style = 'none';
+                            otherwise
+                                trEPRoptionUnknown(lineStyle,...
+                                    'line style');
+                        end
+                    case 'calculated'
+                        switch lineStyle
+                            case 'solid'
+                                ad.data{active}.display.lines.calculated.style = '-';
+                            case 'dashed'
+                                ad.data{active}.display.lines.calculated.style = '--';
+                            case 'dotted'
+                                ad.data{active}.display.lines.calculated.style = ':';
+                            case 'dash-dotted'
+                                ad.data{active}.display.lines.calculated.style = '-.';
+                            case 'none'
+                                ad.data{active}.display.lines.calculated.style = 'none';
+                            otherwise
+                                trEPRoptionUnknown(lineStyle,...
+                                    'line style');
+                        end
+                    otherwise
+                        trEPRoptionUnknown(lineType,'line type');
+                        return;
+                end
+            end
+        case 'zeroline'
+            switch lineStyle
+                case 'solid'
+                    ad.control.axis.grid.zero.style = '-';
+                case 'dashed'
+                    ad.control.axis.grid.zero.style = '--';
+                case 'dotted'
+                    ad.control.axis.grid.zero.style = ':';
+                case 'dash-dotted'
+                    ad.control.axis.grid.zero.style = '-.';
+                case 'none'
+                    ad.control.axis.grid.zero.style = 'none';
+                otherwise
+                    trEPRoptionUnknown(lineStyle,'line style');
+            end
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    % Update appdata of main window
+    setappdata(mainWindow,'data',ad.data);
+    setappdata(mainWindow,'control',ad.control);
+    % Update main axes
+    update_mainAxis();
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function linemarker_popupmenu_Callback(~,~)
+try
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    lineMarkers = ...
+        cellstr(get(gh.display_panel_linemarker_popupmenu,'String'));
+    lineMarker = ...
+        lineMarkers{get(gh.display_panel_linemarker_popupmenu,'Value')};
+    
+    active = ad.control.data.active;
+    
+    if ad.control.data.active
+        % Make settings depending on the line selected
+        lineTypes = cellstr(...
+            get(gh.display_panel_line_popupmenu,'String'));
+        lineType = lineTypes{...
+            get(gh.display_panel_line_popupmenu,'Value')};
+        switch lineType
+            case 'measured'
+                switch lineMarker
+                    case 'none'
+                        ad.data{active}.display.lines.data.marker.type = 'none';
+                    case 'plus'
+                        ad.data{active}.display.lines.data.marker.type = '+';
+                    case 'circle'
+                        ad.data{active}.display.lines.data.marker.type = 'o';
+                    case 'asterisk'
+                        ad.data{active}.display.lines.data.marker.type = '*';
+                    case 'point'
+                        ad.data{active}.display.lines.data.marker.type = '.';
+                    case 'cross'
+                        ad.data{active}.display.lines.data.marker.type = 'x';
+                    case 'square'
+                        ad.data{active}.display.lines.data.marker.type = 's';
+                    case 'diamond'
+                        ad.data{active}.display.lines.data.marker.type = 'd';
+                    case 'triangle up'
+                        ad.data{active}.display.lines.data.marker.type = '^';
+                    case 'triangle down'
+                        ad.data{active}.display.lines.data.marker.type = 'v';
+                    case 'triangle right'
+                        ad.data{active}.display.lines.data.marker.type = '<';
+                    case 'triangle left'
+                        ad.data{active}.display.lines.data.marker.type = '>';
+                    case 'pentagram'
+                        ad.data{active}.display.lines.data.marker.type = 'p';
+                    case 'hexagram'
+                        ad.data{active}.display.lines.data.marker.type = 'h';
+                    otherwise
+                        trEPRoptionUnknown(lineMarker,'line marker');
+                end
+            case 'calculated'
+                switch lineMarker
+                    case 'none'
+                        ad.data{active}.display.lines.calculated.marker.type = 'none';
+                    case 'plus'
+                        ad.data{active}.display.lines.calculated.marker.type = '+';
+                    case 'circle'
+                        ad.data{active}.display.lines.calculated.marker.type = 'o';
+                    case 'asterisk'
+                        ad.data{active}.display.lines.calculated.marker.type = '*';
+                    case 'point'
+                        ad.data{active}.display.lines.calculated.marker.type = '.';
+                    case 'cross'
+                        ad.data{active}.display.lines.calculated.marker.type = 'x';
+                    case 'square'
+                        ad.data{active}.display.lines.calculated.marker.type = 's';
+                    case 'diamond'
+                        ad.data{active}.display.lines.calculated.marker.type = 'd';
+                    case 'triangle up'
+                        ad.data{active}.display.lines.calculated.marker.type = '^';
+                    case 'triangle down'
+                        ad.data{active}.display.lines.calculated.marker.type = 'v';
+                    case 'triangle right'
+                        ad.data{active}.display.lines.calculated.marker.type = '<';
+                    case 'triangle left'
+                        ad.data{active}.display.lines.calculated.marker.type = '>';
+                    case 'pentagram'
+                        ad.data{active}.display.lines.calculated.marker.type = 'p';
+                    case 'hexagram'
+                        ad.data{active}.display.lines.calculated.marker.type = 'h';
+                    otherwise
+                        trEPRoptionUnknown(lineMarker,'line marker');
+                end
             otherwise
                 trEPRoptionUnknown(action);
                 return;
         end
-        set(source,'String',num2str(numValue));
-        setappdata(mainWindow,'control',ad.control);
-        update_displayPanel();
-    catch exception
-        trEPRexceptionHandling(exception)
+        
+        % Update appdata of main window
+        setappdata(mainWindow,'data',ad.data);
+        % Update main axes
+        update_mainAxis();
     end
+catch exception
+    trEPRexceptionHandling(exception)
+end
+end
+
+function show3d_edit_Callback(source,~,label)
+try
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    value = get(source,'String');
+    
+    [dimy,dimx] = size(ad.data{ad.control.data.active}.data);
+    
+    switch label
+        case 'xfactor'
+            numValue = trEPRguiSanitiseNumericInput(...
+                value,[1 dimx],'round',true);
+            ad.control.axis.vis3d.reduction.x = numValue;
+        case 'yfactor'
+            numValue = trEPRguiSanitiseNumericInput(...
+                value,[1 dimy],'round',true);
+            ad.control.axis.vis3d.reduction.y = numValue;
+        case 'xoffset'
+            numValue = trEPRguiSanitiseNumericInput(...
+                value,[0 dimx-str2double(...
+                get(gh.display_panel_3D_size_x_edit,'String'))],...
+                'round',true);
+            ad.control.axis.vis3d.offset.x = numValue;
+        case 'yoffset'
+            numValue = trEPRguiSanitiseNumericInput(...
+                value,[0 dimy-str2double(...
+                get(gh.display_panel_3D_size_y_edit,'String'))],...
+                'round',true);
+            ad.control.axis.vis3d.offset.y = numValue;
+        otherwise
+            trEPRoptionUnknown(action);
+            return;
+    end
+    set(source,'String',num2str(numValue));
+    setappdata(mainWindow,'control',ad.control);
+    update_displayPanel();
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 function export3d_pushbutton_Callback(~,~)
-    try
-        % Look for 3D representation window
-        figHandle = findobj('Tag','trEPRgui_3Drepresentation');
-        if isempty(figHandle)
-            return;
-        end
-        
-        % Get appdata and handles of main window
-        mainWindow = trEPRguiGetWindowHandle;
-        ad = getappdata(mainWindow);
-        gh = guihandles(mainWindow);
-        
-        % Set focus on figure window with 3D representation
-        figure(figHandle);
-
-        % Get export format
-        figExportFormats = cellstr(...
-            get(gh.display_panel_3D_format_popupmenu,'String'));
-        exportFormat = figExportFormats{...
-            get(gh.display_panel_3D_format_popupmenu,'Value')};
-
-        % Get file type to save to
-        fileTypes = cellstr(...
-            get(gh.display_panel_3D_filetype_popupmenu,'String'));
-        fileType = fileTypes{...
-            get(gh.display_panel_3D_filetype_popupmenu,'Value')};
-        
-        % Generate default file name if possible, be very defensive
-        if ad.control.data.visible
-            [~,fileNameSuggested,~] = ...
-                fileparts(ad.data{ad.control.data.active}.file.name);
-            fileNameSuggested = [fileNameSuggested '-3D'];
-        else
-            fileNameSuggested = '';
-        end
-        
-        % Ask user for file name
-        [fileName,pathName] = uiputfile(...
-            sprintf('*.%s',fileType),...
-            'Get filename to export 3D representation to',...
-            fileNameSuggested);
-        % If user aborts process, return
-        if fileName == 0
-            return;
-        end
-        % Create filename with full path
-        fileName = fullfile(pathName,fileName);
-        
-        % Save figure, depending on settings for file type and format
-        status = fig2file(figHandle,fileName,...
-            'fileType',fileType,'exportFormat',exportFormat);
-        if status
-            trEPRmsg(msg,'warning');
-        end
-        
-    catch exception
-        trEPRexceptionHandling(exception)
+try
+    % Look for 3D representation window
+    figHandle = findobj('Tag','trEPRgui_3Drepresentation');
+    if isempty(figHandle)
+        return;
     end
+    
+    % Get appdata and handles of main window
+    mainWindow = trEPRguiGetWindowHandle;
+    ad = getappdata(mainWindow);
+    gh = ad.guiHandles;
+    
+    % Set focus on figure window with 3D representation
+    figure(figHandle);
+    
+    % Get export format
+    figExportFormats = cellstr(...
+        get(gh.display_panel_3D_format_popupmenu,'String'));
+    exportFormat = figExportFormats{...
+        get(gh.display_panel_3D_format_popupmenu,'Value')};
+    
+    % Get file type to save to
+    fileTypes = cellstr(...
+        get(gh.display_panel_3D_filetype_popupmenu,'String'));
+    fileType = fileTypes{...
+        get(gh.display_panel_3D_filetype_popupmenu,'Value')};
+    
+    % Generate default file name if possible, be very defensive
+    if ad.control.data.visible
+        [~,fileNameSuggested,~] = ...
+            fileparts(ad.data{ad.control.data.active}.file.name);
+        fileNameSuggested = [fileNameSuggested '-3D'];
+    else
+        fileNameSuggested = '';
+    end
+    
+    % Ask user for file name
+    [fileName,pathName] = uiputfile(...
+        sprintf('*.%s',fileType),...
+        'Get filename to export 3D representation to',...
+        fileNameSuggested);
+    % If user aborts process, return
+    if fileName == 0
+        return;
+    end
+    % Create filename with full path
+    fileName = fullfile(pathName,fileName);
+    
+    % Save figure, depending on settings for file type and format
+    status = fig2file(figHandle,fileName,...
+        'fileType',fileType,'exportFormat',exportFormat);
+    if status
+        trEPRmsg(msg,'warning');
+    end
+    
+catch exception
+    trEPRexceptionHandling(exception)
+end
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Utility functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-end

@@ -11,7 +11,7 @@ function status = update_visibleSpectra()
 %            0: successfully updated panels listing the spectra
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-07-23
+% 2015-10-18
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -20,12 +20,12 @@ if (isempty(mainWindow))
     return;
 end
 
-% Get handle for visible spectra listbox
-gh = guidata(mainWindow);
-visLbox = gh.data_panel_visible_listbox;
-
-% Get appdata from main GUI
+% Get handles and appdata from main window
 ad = getappdata(mainWindow);
+gh = ad.guiHandles;
+
+% Get handle for visible spectra listbox
+visLbox = gh.data_panel_visible_listbox;
 
 % Get indices of visible spectra
 vis = ad.control.data.visible;

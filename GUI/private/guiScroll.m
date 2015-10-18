@@ -14,8 +14,7 @@ try
     mainWindow = trEPRguiGetWindowHandle();
     ad = getappdata(mainWindow);
     % Get guihandles of main window
-    gh = ad.UsedByGUIData_m;
-    %gh = guihandles(mainWindow);
+    gh = ad.guiHandles;
     
     % For convenience and shorter lines
     active = ad.control.data.active;
