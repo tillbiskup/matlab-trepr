@@ -203,16 +203,3 @@ end
 
 end
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Utility functions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-function resetStatusDisplayInMainGUIWindow(mainGuiWindow)
-
-ad = getappdata(mainGuiWindow);
-ad.control.status.code = 'OK';
-setappdata(mainGuiWindow,'control',ad.control);
-trEPRguiUpdate('mainWindow');
-
-end

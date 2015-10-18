@@ -420,7 +420,7 @@ function keypress_Callback(~,evt)
         end
         
         % Get handles of GUI
-        gh = getappdata(hMainFigure,'guiHandles');
+        gh = getappdata(trEPRguiGetWindowHandle(mfilename),'guiHandles');
         
         if ~isempty(evt.Modifier)
             if (strcmpi(evt.Modifier{1},'command')) || ...

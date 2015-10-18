@@ -21,6 +21,9 @@ ad = getappdata(mainWindow);
 gh = ad.guiHandles;
 
 fileType = ad.control.panels.load.fileType;
+if isfield(gh,'load_filetype_popupmenu')
+    set(gh.load_filetype_popupmenu,'Value',fileType);
+end
 fields = fieldnames(ad.control.panels.load.fileTypes);
 for field = 1:length(fields)
     tagname = ['load_' fields{field} '_checkbox'];

@@ -224,8 +224,7 @@ if ~isempty(fileTypes)
 end
 
 % Set fileTypes popupmenu
-fileTypesCell = struct2cell(ad.control.panels.load.fileTypes);
-set(hFiletypesMenu,'String',fileTypesCell(1,1,:));
+set(hFiletypesMenu,'String',{ad.control.panels.load.fileTypes.name});
 
 end
 

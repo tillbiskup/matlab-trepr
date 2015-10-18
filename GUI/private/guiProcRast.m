@@ -13,8 +13,8 @@ function guiProcRast(varargin)
 %              all. It makes use of some things that might break quite
 %              easily in the future. Don't blame the author... ;-)
 
-% Copyright (c) 2014, Till Biskup
-% 2014-07-29
+% Copyright (c) 2014-15, Till Biskup
+% 2015-10-18
 
 if ~nargin && ~ischar(varargin{1})
     return;
@@ -54,6 +54,17 @@ switch lower(varargin{1})
         if exist('e','var')
             showSomethingThird(e,f);
         end
+    case char([110 105 99 104 116 108 117 115 116 105 103])
+        trEPRbusyWindow('start',['Deutschsprachig?...<br>'...
+            '(besser isses...)']);
+        try
+            [aa,bb] = getSomethingFourth;
+        catch  %#ok<CTCH>
+        end
+        trEPRbusyWindow('delete');
+        if exist('aa','var')
+            showSomethingFourth(aa,bb);
+        end
     otherwise
         return;
 end
@@ -74,11 +85,10 @@ else
     uriContent = urlread(URL);
 end
 % Parse URL for link to strip
-stripURLpart = regexp(uriContent,...
-    '(/dyn/str_strip/[0-9/]*.strip.zoom.gif)','match');
-stripURL = [ URL stripURLpart{1} ];
+stripURL = regexp(uriContent,...
+    '(http://assets.amuniversal.com/[a-z0-9]*)','match');
 % Get image
-[img,map] = imread(stripURL);
+[img,map] = imread(stripURL{1});
 
 end
 
@@ -122,7 +132,7 @@ imgUrl = regexp(imgTag,'src="([^"]*)"','tokens');
 imgTitle = regexp(imgTag,'title="([^"]*)"','tokens');
 
 % Get image
-img = imread(imgUrl{1}{1});
+img = imread(['http:' imgUrl{1}{1}]);
 title = imgTitle{1}{1};
 end
 
@@ -166,8 +176,8 @@ startMatch = ['id=' char([99 111 109 105 99]) ' name=' ...
 % Parse URL for link to strip
 startMatchPos = strfind(uriContent,startMatch);
 
-imgUrl = uriContent(startMatchPos+length(startMatch) : ...
-    startMatchPos+length(startMatch)+54);
+imgUrl = strtrim(uriContent(startMatchPos+length(startMatch) : ...
+    startMatchPos+length(startMatch)+54));
 
 % Get image
 [img,map] = imread(imgUrl);
@@ -188,6 +198,44 @@ set(gcf,'unit','pixels','position',[(screenSize(3)-imgSize(2))/2 ...
     'Name',[ char([112 104 100 99 111 109 105 99 115]) ' ' ...
     char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ' ' ...
     'http://' char([112 104 100 99 111 109 105 99 115]) '.com/']); 
+set(gca,'unit','pixels','position',[0 1 imgSize(2)-1 imgSize(1)-1]);
+
+end
+
+function [img,map] = getSomethingFourth
+
+URL = ['http://' char([110 105 99 104 116 108 117 115 116 105 103]) '.de/' ...
+    'main.html'];
+
+% Read URL
+uriContent = urlread(URL);
+startMatch = '<link rel="image_src" href="';
+
+% Parse URL for link to strip
+startMatchPos = strfind(uriContent,startMatch);
+
+imgUrl = strtrim(uriContent(startMatchPos+length(startMatch) : ...
+    startMatchPos+length(startMatch)+50));
+
+% Get image
+[img,map] = imread(imgUrl);
+end
+
+function showSomethingFourth(img,map)
+
+figure();
+image(img); 
+colormap(map); 
+axis off; 
+axis image; 
+imgSize = size(img);
+screenSize = get(0,'ScreenSize');
+set(gcf,'unit','pixels','position',[(screenSize(3)-imgSize(2))/2 ...
+    (screenSize(4)-imgSize(1))/2 imgSize(2)-3 imgSize(1)-1],...
+    'MenuBar','none','NumberTitle','off',...
+    'Name',[ char([110 105 99 104 116 108 117 115 116 105 103]) ' ' ...
+    char([67 111 109 105 99]) ' ' char([83 116 114 105 112]) ' ' ...
+    'http://' char([110 105 99 104 116 108 117 115 116 105 103]) '.de/']); 
 set(gca,'unit','pixels','position',[0 1 imgSize(2)-1 imgSize(1)-1]);
 
 end
