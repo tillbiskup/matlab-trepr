@@ -10,7 +10,7 @@ function varargout = trEPRinstall()
 %
 
 % Copyright (c) 2012-15, Till Biskup
-% 2015-05-31
+% 2015-10-20
 
 status = 0;
 
@@ -105,15 +105,24 @@ if installed
     else
         fprintf('\n\n')
         for k=1:length(confFiles)
-            tocopy = trEPRiniFileRead(confFiles{k},'typeConversion',true);
-            master = trEPRiniFileRead([confFiles{k} '.dist'],...
-                'typeConversion',true);
-            newConf = commonStructCopy(master,tocopy);
-            header = 'Configuration file for trEPR toolbox';
-            trEPRiniFileWrite(confFiles{k},...
-                newConf,'header',header,'overwrite',true);
             [~,cfname,cfext] = fileparts(confFiles{k});
             fprintf('  merging %s%s\n',cfname,cfext);
+            try
+                tocopy = trEPRiniFileRead(confFiles{k},...
+                    'typeConversion',true);
+                master = trEPRiniFileRead([confFiles{k} '.dist'],...
+                    'typeConversion',true);
+                newConf = commonStructCopy(master,tocopy);
+                header = 'Configuration file for trEPR toolbox';
+                trEPRiniFileWrite(confFiles{k},...
+                    newConf,'header',header,'overwrite',true);
+            catch exception
+                status = exception.message;
+                fprintf('    (EE) some problems occurred...\n');
+                fprintf('    (EE) "%s"\n    (EE) %s, line %i\n',...
+                    exception.message,...
+                    exception.stack(1).name,exception.stack(1).line);
+            end
         end
         fprintf('\ndone.\n');
     end
