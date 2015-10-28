@@ -14,7 +14,7 @@ function guiProcRast(varargin)
 %              easily in the future. Don't blame the author... ;-)
 
 % Copyright (c) 2014-15, Till Biskup
-% 2015-10-18
+% 2015-10-19
 
 if ~nargin && ~ischar(varargin{1})
     return;
@@ -28,9 +28,13 @@ switch lower(varargin{1})
             [a,b] = getSomething;
         catch  %#ok<CTCH>
         end
-        trEPRbusyWindow('delete');
         if exist('a','var')
+            trEPRbusyWindow('delete');
             showSomething(a,b);
+        else
+            trEPRbusyWindow('stop',['Your wish shall be granted...<br>'...
+            '(retrieving necessary data).<br /><b>failed</b>.']);
+            trEPRbusyWindow('deletedelayed');
         end
     case char([120 107 99 100])
         trEPRbusyWindow('start',['Your wish is my command...<br>'...
@@ -39,9 +43,13 @@ switch lower(varargin{1})
             [c,d] = getSomethingElse;
         catch  %#ok<CTCH>
         end
-        trEPRbusyWindow('delete');
         if exist('c','var')
+            trEPRbusyWindow('delete');
             showSomethingElse(c,d);
+        else
+            trEPRbusyWindow('start',['Your wish is my command...<br>'...
+                '(retrieving necessary data)<br /><b>failed</b>.']);
+            trEPRbusyWindow('deletedelayed');
         end
     case char([112 104 100 99 111 109 105 99])
         trEPRbusyWindow('start',['Good choice...<br>'...
@@ -50,9 +58,13 @@ switch lower(varargin{1})
             [e,f] = getSomethingThird;
         catch  %#ok<CTCH>
         end
-        trEPRbusyWindow('delete');
         if exist('e','var')
+            trEPRbusyWindow('delete');
             showSomethingThird(e,f);
+        else
+            trEPRbusyWindow('start',['Good choice...<br>'...
+                '(retrieving necessary data)<br /><b>failed</b>.']);
+            trEPRbusyWindow('deletedelayed');
         end
     case char([110 105 99 104 116 108 117 115 116 105 103])
         trEPRbusyWindow('start',['Deutschsprachig?...<br>'...
@@ -61,9 +73,13 @@ switch lower(varargin{1})
             [aa,bb] = getSomethingFourth;
         catch  %#ok<CTCH>
         end
-        trEPRbusyWindow('delete');
         if exist('aa','var')
+            trEPRbusyWindow('delete');
             showSomethingFourth(aa,bb);
+        else
+            trEPRbusyWindow('start',['Deutschsprachig?...<br>'...
+                '(besser isses...)<br /><b>failed</b>.']);
+            trEPRbusyWindow('deletedelayed');
         end
     otherwise
         return;
