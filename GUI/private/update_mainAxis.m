@@ -1057,112 +1057,123 @@ if ~ad.control.axis.limits.auto
     return
 end
 
-xmin = zeros(length(ad.control.data.visible),1);
-xmax = zeros(length(ad.control.data.visible),1);
-ymin = zeros(length(ad.control.data.visible),1);
-ymax = zeros(length(ad.control.data.visible),1);
-zmin = zeros(length(ad.control.data.visible),1);
-zmax = zeros(length(ad.control.data.visible),1);
-for k=1:length(ad.control.data.visible)
-    data = getData(ad.data{ad.control.data.visible(k)});
-    x = ad.data{ad.control.data.visible(k)}.axes.data(1).values;
-    y = ad.data{ad.control.data.visible(k)}.axes.data(2).values;
-    xmin(k) = x(1);
-    xmax(k) = x(end);
-    ymin(k) = y(1);
-    ymax(k) = y(end);
-    if ad.control.axis.normalisation.enable
-        if strcmpi(ad.control.axis.normalisation.dimension,'1d')
-            switch lower(ad.control.axis.displayType)
-                case '1d along x'
-                    data = data(ad.data{...
-                        ad.control.data.visible(k)}.display.position.data(2),:);
-                case '1d along y'
-                    data = data(:,ad.data{...
-                        ad.control.data.visible(k)}.display.position.data(1));
-            end
-            switch ad.control.axis.normalisation.type
-                case {'pk-pk','pk2pk'}
-                    zmin(k) = min(min(data/...
-                        (max(max(data))-...
-                        min(min(data)))));
-                    zmax(k) = max(max(data/...
-                        (max(max(data))-...
-                        min(min(data)))));
-                case 'area'
-                    zmin(k) = min(min(data/...
-                        sum(sum(abs(data)))));
-                    zmax(k) = max(max(data/...
-                        sum(sum(abs(data)))));
-                case 'max'
-                    zmin(k) = min(min(data/...
-                        max(max(data))));
-                    zmax(k) = max(max(data/...
-                        max(max(data))));
-                case 'min'
-                    zmin(k) = min(min(data/...
-                        abs(min(min(data)))));
-                    zmax(k) = max(max(data/...
-                        abs(min(min(data)))));
-            end
-        else % This is the 2D case
-            switch ad.control.axis.normalisation.type
-                case {'pk-pk','pk2pk'}
-                    zmin(k) = min(min(data/...
-                        (max(max(data))-...
-                        min(min(data)))));
-                    zmax(k) = max(max(data/...
-                        (max(max(data))-...
-                        min(min(data)))));
-                case 'area'
-                    zmin(k) = min(min(data/...
-                        sum(sum(abs(data)))));
-                    zmax(k) = max(max(data/...
-                        sum(sum(abs(data)))));
-                case 'max'
-                    zmin(k) = min(min(data/...
-                        max(max(data))));
-                    zmax(k) = max(max(data/...
-                        max(max(data))));
-                case 'min'
-                    zmin(k) = min(min(data/...
-                        min(min(data))));
-                    zmax(k) = max(max(data/...
-                        min(min(data))));
-            end
+try
+    xmin = zeros(length(ad.control.data.visible),1);
+    xmax = zeros(length(ad.control.data.visible),1);
+    ymin = zeros(length(ad.control.data.visible),1);
+    ymax = zeros(length(ad.control.data.visible),1);
+    zmin = zeros(length(ad.control.data.visible),1);
+    zmax = zeros(length(ad.control.data.visible),1);
+    for k=1:length(ad.control.data.visible)
+        data = getData(ad.data{ad.control.data.visible(k)});
+        x = ad.data{ad.control.data.visible(k)}.axes.data(1).values;
+        if isempty(x)
+            x = ad.data{ad.control.data.visible(k)}.axes.calculated(1).values;
         end
-    else
-        zmin(k) = ...
-            min(min(data));
-        zmax(k) = ...
-            max(max(data));
-        % WARNING: Quick and dirty fix for making displaying of
-        %          calculated spectra together with measured data
-        %          possible. Needs to be properly rewritten asap.
-        % TB 2013/11/28
-        if ad.control.axis.sim && isfield(ad.data{k},'calculated')
-            if zmin(k) > min(ad.data{k}.calculated)
-                zmin(k) = min(ad.data{k}.calculated);
+        y = ad.data{ad.control.data.visible(k)}.axes.data(2).values;
+        if isempty(y)
+            y = ad.data{ad.control.data.visible(k)}.axes.calculated(2).values;
+        end
+        xmin(k) = x(1);
+        xmax(k) = x(end);
+        ymin(k) = y(1);
+        ymax(k) = y(end);
+        if ad.control.axis.normalisation.enable
+            if strcmpi(ad.control.axis.normalisation.dimension,'1d')
+                switch lower(ad.control.axis.displayType)
+                    case '1d along x'
+                        data = data(ad.data{...
+                            ad.control.data.visible(k)}.display.position.data(2),:);
+                    case '1d along y'
+                        data = data(:,ad.data{...
+                            ad.control.data.visible(k)}.display.position.data(1));
+                end
+                switch ad.control.axis.normalisation.type
+                    case {'pk-pk','pk2pk'}
+                        zmin(k) = min(min(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                    case 'area'
+                        zmin(k) = min(min(data/...
+                            sum(sum(abs(data)))));
+                        zmax(k) = max(max(data/...
+                            sum(sum(abs(data)))));
+                    case 'max'
+                        zmin(k) = min(min(data/...
+                            max(max(data))));
+                        zmax(k) = max(max(data/...
+                            max(max(data))));
+                    case 'min'
+                        zmin(k) = min(min(data/...
+                            abs(min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            abs(min(min(data)))));
+                end
+            else % This is the 2D case
+                switch ad.control.axis.normalisation.type
+                    case {'pk-pk','pk2pk'}
+                        zmin(k) = min(min(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                        zmax(k) = max(max(data/...
+                            (max(max(data))-...
+                            min(min(data)))));
+                    case 'area'
+                        zmin(k) = min(min(data/...
+                            sum(sum(abs(data)))));
+                        zmax(k) = max(max(data/...
+                            sum(sum(abs(data)))));
+                    case 'max'
+                        zmin(k) = min(min(data/...
+                            max(max(data))));
+                        zmax(k) = max(max(data/...
+                            max(max(data))));
+                    case 'min'
+                        zmin(k) = min(min(data/...
+                            min(min(data))));
+                        zmax(k) = max(max(data/...
+                            min(min(data))));
+                end
             end
-            if zmax(k) < max(ad.data{k}.calculated)
-                zmax(k) = max(ad.data{k}.calculated);
+        else
+            zmin(k) = ...
+                min(min(data));
+            zmax(k) = ...
+                max(max(data));
+            % WARNING: Quick and dirty fix for making displaying of
+            %          calculated spectra together with measured data
+            %          possible. Needs to be properly rewritten asap.
+            % TB 2013/11/28
+            if ad.control.axis.sim && isfield(ad.data{k},'calculated')
+                if zmin(k) > min(ad.data{k}.calculated)
+                    zmin(k) = min(ad.data{k}.calculated);
+                end
+                if zmax(k) < max(ad.data{k}.calculated)
+                    zmax(k) = max(ad.data{k}.calculated);
+                end
             end
         end
     end
+    ad.control.axis.limits.x.min = min(xmin);
+    ad.control.axis.limits.x.max = max(xmax);
+    ad.control.axis.limits.y.min = min(ymin);
+    ad.control.axis.limits.y.max = max(ymax);
+    % Adjust z limits so that the axis limits are a bit wider than the
+    % actual z limits
+    zAmplitude = max(zmax)-min(zmin);
+    ad.control.axis.limits.z.min = min(zmin)-0.025*zAmplitude;
+    ad.control.axis.limits.z.max = max(zmax)+0.025*zAmplitude;
+    clear data;
+    
+    % update appdata of main window
+    setappdata(mainWindow,'control',ad.control);
+catch exception
+    trEPRmsg(getReport(exception, 'basic', 'hyperlinks', 'off'),...
+        'warning');
 end
-ad.control.axis.limits.x.min = min(xmin);
-ad.control.axis.limits.x.max = max(xmax);
-ad.control.axis.limits.y.min = min(ymin);
-ad.control.axis.limits.y.max = max(ymax);
-% Adjust z limits so that the axis limits are a bit wider than the
-% actual z limits
-zAmplitude = max(zmax)-min(zmin);
-ad.control.axis.limits.z.min = min(zmin)-0.025*zAmplitude;
-ad.control.axis.limits.z.max = max(zmax)+0.025*zAmplitude;
-clear data;
-
-% update appdata of main window
-setappdata(mainWindow,'control',ad.control);    
 
 end
 
@@ -1178,8 +1189,16 @@ end
 
 minmax = zeros(length(ad.control.data.visible),2);
 for idx = 1:length(ad.control.data.visible)
-    minmax(idx,1) = min(min(ad.data{ad.control.data.visible(idx)}.data));
-    minmax(idx,2) = max(max(ad.data{ad.control.data.visible(idx)}.data));
+    if ~isempty(ad.data{ad.control.data.visible(idx)}.data)
+        minmax(idx,1) = min(min(ad.data{ad.control.data.visible(idx)}.data));
+    else
+        minmax(idx,1) = min(min(ad.data{ad.control.data.visible(idx)}.calculated));
+    end
+    if ~isempty(ad.data{ad.control.data.visible(idx)}.data)
+        minmax(idx,2) = max(max(ad.data{ad.control.data.visible(idx)}.data));
+    else
+        minmax(idx,2) = max(max(ad.data{ad.control.data.visible(idx)}.calculated));
+    end
 end
 
 end
