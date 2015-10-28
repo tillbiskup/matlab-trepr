@@ -12,7 +12,7 @@ function status = trEPRguiUpdateStatusWindow(statusmessages)
 %   the last (i.e., most current) line of the status window is visible.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-18
+% 2015-10-21
 
 % Is there currently a trEPRgui_statuswindow object?
 statuswindow = trEPRguiGetWindowHandle('trEPRgui_statuswindow');
@@ -38,9 +38,10 @@ try
     % Now move the caret position to the end of the text
     jEdit.setCaretPosition(jEdit.getDocument.getLength);
     % jEdit.setContentType('text/html');
-catch exception
-    trEPRmsg(getReport(exception, 'extended', 'hyperlinks', 'off'),...
-        'warning');
+catch % exception
+%     trEPRmsg(getReport(exception, 'extended', 'hyperlinks', 'off'),...
+%         'warning');
+    trEPRmsg('Some problem with Java in Matlab(r)','warning');
 end
 
 status = 0;
