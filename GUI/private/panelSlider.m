@@ -8,7 +8,7 @@ function handle = panelSlider(parentHandle,position)
 %       Returns the handle of the added panel.
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-18
+% 2015-11-27
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -670,6 +670,7 @@ try
     if isempty(action)
         return;
     end
+    mainWindow = trEPRguiGetWindowHandle;
     
     switch lower(action)
         case 'pickmin'
