@@ -9,7 +9,7 @@ function status = update_mainAxis(varargin)
 %            0: successfully updated main axis
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-10-21
+% 2015-10-24
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
