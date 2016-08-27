@@ -15,7 +15,7 @@ function text = commonTextFileRead(filename,varargin)
 % commonBinaryFileWrite
 
 % Copyright (c) 2011-15, Till Biskup
-% 2015-03-25
+% 2015-11-27
 
 text = cell(0);
 
@@ -25,7 +25,7 @@ try
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addRequired('filename', @(x)ischar(x) || exist(x,'file'));
+    p.addRequired('filename', @(x)ischar(x) && exist(x,'file'));
     p.addParamValue('LineNumbers',logical(false),@islogical);
     p.parse(filename,varargin{:});
 catch exception
