@@ -15,8 +15,8 @@ function [status,warnings] = trEPRgui_cmd_saveHistory2File(varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2013, Till Biskup
-% 2013-04-07
+% Copyright (c) 2013-16, Till Biskup
+% 2016-08-27
 
 status = 0;
 warnings = cell(0);
@@ -55,11 +55,6 @@ end
 if isempty(ad.control.cmd.historyfile)
     ad.control.cmd.historyfile = '~/.trepr/history';
     setappdata(mainWindow,'control',ad.control);
-end
-
-if ~exist(ad.control.cmd.historyfile,'file') && ~strncmp(history,'%',1)
-    timeStamp = ['%-- ' datestr(now,'yyyy-mm-dd HH:MM') ' --%'];
-    ad.control.cmd.history = sprintf('%s\n',timeStamp);
 end
 
 % Actual write of file
