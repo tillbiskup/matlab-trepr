@@ -29,8 +29,8 @@ function [data,varargout] = trEPRFRload(filename,varargin)
 %
 % SEE ALSO: trEPRload
 
-% Copyright (c) 2015, Till Biskup
-% 2015-10-17
+% Copyright (c) 2015-16, Till Biskup
+% 2016-08-29
 
 % Assign default output
 data = [];
@@ -98,7 +98,7 @@ end
 
 function [data,parameters] = readFormat1(fileContents)
 
-parameters = parseHeader(fileContents(2:5));
+parameters = parseHeader(fileContents(1:5));
 
 % Line 6 to end contain the actual data
 data = sscanf([fileContents{6:end}],'%f')';
@@ -108,7 +108,7 @@ end
 
 function [data,parameters] = readFormat11(fileContents)
 
-parameters = parseHeader(fileContents([2:4,6]));
+parameters = parseHeader(fileContents([1:4,6]));
 
 % Line 5 contains value pairs for factor and offset for x, Re(y), Im(y)
 % This line is specific to formats 11-14
@@ -124,19 +124,31 @@ end
 
 function parameters = parseHeader(fileContents)
 
-% Line 1 contains B0 and mwFreq value
-parameters = parseB0andMWfreq(fileContents{1});
+% Line 1 contains timestamp
+parameters.timeStamp = parseTimestamp(fileContents{1});
 
-% Line 2 contains the user-specified comment
-parameters.comment = fileContents{2};
+% Line 2 contains B0 and mwFreq value
+parameters = parseB0andMWfreq(fileContents{2},parameters);
 
-% Line 3 contains format number, length, and info about x axis
-parameters = getXaxisInfo(fileContents{3},parameters);
+% Line 3 contains the user-specified comment
+parameters.comment = fileContents{3};
 
-% Line 4 contains units of x and y axes
-parameters = getUnits(fileContents{4},parameters);
+% Line 4 contains format number, length, and info about x axis
+parameters = getXaxisInfo(fileContents{4},parameters);
+
+% Line 5 contains units of x and y axes
+parameters = getUnits(fileContents{5},parameters);
 
 end
+
+
+function isoTimeStamp = parseTimestamp(inputString)
+
+inputString = inputString(strfind(inputString,'Time : ')+7:end);
+isoTimeStamp = datestr(datevec(inputString,'ddd mmm dd HH:MM:SS yyyy'),31);
+
+end
+
 
 function parameters = parseB0andMWfreq(fileContents,parameters)
 
@@ -221,5 +233,6 @@ dataset.axes.data(2).measure = 'magnetic field';
 dataset.axes.data(3).unit = par.intensity.unit;
 dataset.axes.data(3).measure = 'intensity';
 dataset.file = par.file;
+dataset.parameters.transient.timeStamp{1} = par.timeStamp;
 
 end

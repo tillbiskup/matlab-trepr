@@ -41,11 +41,11 @@ function varargout = trEPRdataStructure(varargin)
 %
 % See also TREPRLOAD.
 
-% Copyright (c) 2011-15, Till Biskup
-% 2015-10-17
+% Copyright (c) 2011-16, Till Biskup
+% 2016-08-29
 
 % Version string of data structure
-versionString = '1.13';
+versionString = '1.14';
 
 if ~nargin && ~nargout
     help trEPRdataStructure
@@ -351,9 +351,11 @@ dataStructure.parameters = struct(...
         )...
     );
 dataStructure.parameters.purpose = cell(0);
+dataStructure.parameters.transient.timeStamp = cell(0);
 dataStructure.sample = struct(...
     'name','',...
-    'tube',''...
+    'tube','',...
+    'id',''...
     );
 dataStructure.sample.description = cell(0);
 dataStructure.sample.buffer = cell(0);

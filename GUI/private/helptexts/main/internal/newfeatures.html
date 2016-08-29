@@ -15,14 +15,30 @@
 		<p>
 			Basically, the complete toolbox got reimplemented for version 0.3 (back in 2011), and the GUI rewritten with a complete new layout (and underlying code). Currently, besides adding new functionality, major reorganisation of the underlying code is taking place, aiming at a much more robust (and in certain aspects faster) code basis.
 		</p>
+		<h2>v.0.3.60</h2>
+		<ul>
+		    <li>New features</li>
+		    <ul>
+		        <li>Added mapping table for info file v.0.1.6 adds proper fields now</li>
+		    	<li>Import of Freiburg data reads timestamp</li>
+		    </ul>
+		    <li>Internals</li>
+		    <ul>
+		        <li>New function <tt>datevec2posixtime</tt> calculating POSIX timestamp from Matlab <tt>datevec</tt></li>
+		    </ul>
+		    <li>Compatibility</li>
+		    <ul>
+			    <li><b>trEPR dataset structure version 1.14.</b><br />Added field &quot;ID&quot; to sample.</li>
+		</ul>
 		<h2>v.0.3.59</h2>
 		<ul>
 		    <li>Bug fixes</li>
 		    <ul>
-		    	<li>...</li>
+		    	<li>Fixed bug with writing history of GUI</li>
 		    </ul>
 		    <li>New features</li>
 		    <ul>
+		        <li>Added mapping table for info file v.0.1.6 (without any additional mapping yet)</li>
 		    	<li><tt>CMD</tt> understands now multiple commands in one line (separated by &quot;; &quot;)</li>
 		    	<li><tt>trEPRplot</tt> now handles &quot;holes&quot; in datasets as well.</li>
 		    </ul>
@@ -751,10 +767,10 @@
 		</ul>
 		<div class="footer">
 		<p class="copyright">
-			&copy; 2011-15, Till Biskup
+			&copy; 2011-16, Till Biskup
 		</p>
 		<p class="lastchange">
-			2015-10-18
+			2016-08-29
 		</p>
 		</div>
 	</body>

@@ -24,8 +24,8 @@ function [combinedDataset,status] = trEPRcombine(datasets,varargin)
 % parameter/value pair. This label is used for the combined dataset,
 % otherwise the label of the first dataset that is combined gets used.
 
-% Copyright (c) 2011-15, Till Biskup
-% 2015-10-17
+% Copyright (c) 2011-16, Till Biskup
+% 2016-08-29
 
 % Assign default output
 combinedDataset = struct();
@@ -95,6 +95,11 @@ try
             % MW frequency
             combinedDataset.parameters.bridge.MWfrequency.values(k) = ...
                 datasets{k}.parameters.bridge.MWfrequency.value;
+            % TimeStamp
+            if ~isempty(datasets{k}.parameters.transient.timeStamp)
+                combinedDataset.parameters.transient.timeStamp{k} = ...
+                    datasets{k}.parameters.transient.timeStamp{1};
+            end
         end
         
         % Fix field parameters

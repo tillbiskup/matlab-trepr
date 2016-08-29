@@ -32,8 +32,8 @@ function [data,warnings] = trEPRload(filename, varargin)
 %
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
-% Copyright (c) 2009-2015, Till Biskup
-% 2015-10-18
+% Copyright (c) 2009-2016, Till Biskup
+% 2016-08-29
 
 % Assign default output
 data = struct();
@@ -320,11 +320,13 @@ end
 
 [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
 
-% Fix problem with overriding MWfrequency vector
+% Fix problem with overriding MWfrequency and timeStamp vector
 MWfrequency = data.parameters.bridge.MWfrequency.values;
+timeStamp = data.parameters.transient.timeStamp;
 if isempty(ifpwarnings)
     data = commonStructCopy(data,parameters);
     data.parameters.bridge.MWfrequency.values = MWfrequency;
+    data.parameters.transient.timeStamp = timeStamp;
     trEPRmsg({'Loaded info file and applied contents to dataset',...
         infoFileName},'info');
 else
