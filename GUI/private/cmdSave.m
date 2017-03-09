@@ -21,8 +21,8 @@ function [status,warnings] = cmdSave(handle,opt,varargin)
 %  warnings - cell array
 %             Contains warnings/error messages if any, otherwise empty
 
-% Copyright (c) 2014-15, Till Biskup
-% 2015-10-18
+% Copyright (c) 2014-17, Till Biskup
+% 2017-03-09
 
 status = 0;
 warnings = cell(0);
@@ -81,20 +81,16 @@ if ~isnan(str2double(opt{1}))
     opt(1) = [];
 else
     selected = active;
-end    
-
-if isempty(opt)
-    trEPRsaveDatasetInMainGUI(selected);
-else
-    % Check for path in filename and if none exists, add default path
-    [path,name,ext] = fileparts(opt{1});
-    if isempty(path)
-        filename = fullfile(ad.control.dirs.lastSave,[name ext]);
-    else
-        filename = opt{1};
-    end
-    
-    trEPRsaveAsDatasetInMainGUI(selected,filename);
 end
+
+% Check for path in filename and if none exists, add default path
+[path,name,ext] = fileparts(opt{1});
+if isempty(path)
+    filename = fullfile(ad.control.dirs.lastSave,[name ext]);
+else
+    filename = opt{1};
+end
+
+trEPRsaveAsDatasetInMainGUI(selected,filename);
 
 end

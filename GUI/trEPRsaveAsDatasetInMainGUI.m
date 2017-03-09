@@ -11,8 +11,8 @@ function [status,message] = trEPRsaveAsDatasetInMainGUI(id,varargin)
 %           In case of status <> 0 contains message telling user what went
 %           wrong.
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-09-22
+% Copyright (c) 2011-17, Till Biskup
+% 2017-03-09
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -43,9 +43,9 @@ try
     
     % Get appdata of main window
     ad = getappdata(mainWindow);
-    
+      
     % Create default filename
-    if isempty(p.Results.filename)
+    if isempty(p.Results.filename) || isdir(p.Results.filename)
         filename = suggestFilename(mainWindow,'Type','file');
     else
         [path,name,~] = fileparts(p.Results.filename);
@@ -155,13 +155,17 @@ try
     % Remove from modified
     ad.control.data.modified(...
         (ad.control.data.modified == id)) = [];
-    
+        
     % Set last save dir
-    [ad.control.dirs.lastSave,~,~] = fileparts(ad.data{id}.file.name);
-    if isempty(ad.control.dirs.lastSave)
+    [filepath,filename,~] = fileparts(ad.data{id}.file.name);
+    if isdir(fullfile(filepath,filename))
+        ad.control.dirs.lastSave = fullfile(filepath,filename);
+    elseif isempty(ad.control.dirs.lastSave)
         ad.control.dirs.lastSave = pwd;
+    else
+        ad.contro.dirs.lastSave = filepath;
     end
-    
+        
     % Write appdata
     setappdata(mainWindow,'data',ad.data);
     setappdata(mainWindow,'origdata',ad.data);
