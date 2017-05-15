@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-17, Till Biskup
-% 2017-03-09
+% 2017-05-15
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -22,6 +22,9 @@ if ishghandle(singleton)
     varargout{1} = singleton;
     return;
 end
+
+% Bad workaround for MATLAB > 2014b: Set colormap back to default
+set(groot,'DefaultFigureColormap',jet);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -1031,7 +1034,7 @@ try
             return;
         case 'detach'
             % Open new figure window
-            newFig = figure();
+            newFig = figure('Colormap',colormap('jet'));
             
             % Plot into new figure window
             update_mainAxis(newFig);
