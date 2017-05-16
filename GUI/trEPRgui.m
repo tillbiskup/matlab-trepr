@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-17, Till Biskup
-% 2017-05-15
+% 2017-05-16
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -23,8 +23,11 @@ if ishghandle(singleton)
     return;
 end
 
-% Bad workaround for MATLAB > 2014b: Set colormap back to default
-set(groot,'DefaultFigureColormap',jet);
+% Bad workaround for MATLAB >= 2014b: Set colormap back to default
+matlabVersionInfo = ver('matlab');
+if ~commonVersionLessThan(matlabVersionInfo.Version,'8.4')
+    set(groot,'DefaultFigureColormap',jet);
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
