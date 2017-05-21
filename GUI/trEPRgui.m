@@ -13,7 +13,7 @@ function varargout = trEPRgui(varargin)
 % trEPRgui figure window in the foreground and make it active.
 
 % Copyright (c) 2011-17, Till Biskup
-% 2017-05-15
+% 2017-05-21
 
 % Make GUI effectively a singleton
 singleton = trEPRguiGetWindowHandle();
@@ -23,15 +23,14 @@ if ishghandle(singleton)
     return;
 end
 
-% Bad workaround for MATLAB > 2014b: Set colormap back to default
-set(groot,'DefaultFigureColormap',jet);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Display "Splash"
 hSplash = trEPRguiSplashWindow();
+% Matlab > 2014a seems to need a pause here to display splash window...
+pause(0.001);
 
 % Set some defaults in case configuration cannot be loaded
 defaultBackground = [.9 .9 .9];
@@ -852,6 +851,8 @@ end
 
 % Make the GUI visible.
 set(hMainFigure,'Visible','on');
+% Making figure visible needs time to take effect...
+pause(0.001);
 if ishandle(hSplash)
     delete(hSplash);
 end

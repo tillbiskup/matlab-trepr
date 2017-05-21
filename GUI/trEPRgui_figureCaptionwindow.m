@@ -6,8 +6,8 @@ function varargout = trEPRgui_figureCaptionwindow(varargin)
 %
 % See also TREPRGUI
 
-% Copyright (c) 2013-15, Till Biskup
-% 2015-10-18
+% Copyright (c) 2013-17, Till Biskup
+% 2017-05-21
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %  Construct the components
@@ -430,7 +430,7 @@ function updateWindow()
         % Get appdata of main GUI
         mainGuiWindow = trEPRguiGetWindowHandle();
         % If there is no main GUI window, return, otherwise get its appdata
-        if ~mainGuiWindow
+        if isempty(mainGuiWindow)
             return;
         end
         adm = getappdata(mainGuiWindow);

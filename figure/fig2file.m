@@ -34,8 +34,8 @@ function status = fig2file(figHandle,fileName,varargin)
 %                'fig2file.ini' that is in the same directory as fig2file.m
 %
 
-% Copyright (c) 2011-14, Till Biskup
-% 2014-07-26
+% Copyright (c) 2011-17, Till Biskup
+% 2017-05-21
 
 % If called without arguments, print help and list of formats
 if ~nargin
@@ -75,7 +75,11 @@ exportFormat = p.Results.exportFormat;
 
 try
     % Read configuration for export formats (geometries) from ini file
-    exportFormatsConfigFile = [mfilename('full') '.ini'];
+    if commonHG2Support
+        exportFormatsConfigFile = [mfilename('full') '.hg2.ini'];
+    else
+        exportFormatsConfigFile = [mfilename('full') '.ini'];
+    end
     exportFormats = ...
         trEPRiniFileRead(exportFormatsConfigFile,'typeConversion',false);
 
@@ -160,7 +164,11 @@ try
                 oldAxisPosition = get(axisHandle,'Position');
                 set(axisHandle,'Unit',exportFormats.(exportFormat).PaperUnits);
                 tightInset = get(axisHandle,'TightInset');
-                axisPosition = exportFormats.(exportFormat).PaperPosition;
+                if isfield(exportFormats.(exportFormat),'AxesPosition')
+                    axisPosition = exportFormats.(exportFormat).AxesPosition;
+                else
+                    axisPosition = exportFormats.(exportFormat).PaperPosition;
+                end
                 axisPosition(1:2) = tightInset(1:2);
                 axisPosition(3) = axisPosition(3)-sum(tightInset([1,3]));
                 axisPosition(4) = axisPosition(4)-sum(tightInset([2,4]));

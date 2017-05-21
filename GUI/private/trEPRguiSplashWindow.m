@@ -9,8 +9,8 @@ function figureHandle = trEPRguiSplashWindow(varargin)
 %   figureHandle - handle
 %                  handle of the figure (useful for closing)
 
-% Copyright (c) 2014, Till Biskup
-% 2014-10-14
+% Copyright (c) 2014-17, Till Biskup
+% 2017-05-21
 
 figureHandle = [];
 
@@ -31,7 +31,7 @@ end
 
 % Get sizes
 imgSize = size(img);
-screenSize = get(0,'ScreenSize');
+screenSize = get(groot,'ScreenSize');
 textHeight = 25;
 
 centerPosition = screenSize(3:4)/2;

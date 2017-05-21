@@ -8,8 +8,8 @@ function status = update_mainAxis(varargin)
 %           -1: no tEPR_gui_mainwindow found
 %            0: successfully updated main axis
 
-% Copyright (c) 2011-15, Till Biskup
-% 2015-10-24
+% Copyright (c) 2011-17, Till Biskup
+% 2017-05-21
 
 % Is there currently a trEPRgui object?
 mainWindow = trEPRguiGetWindowHandle();
@@ -25,6 +25,7 @@ gh = ad.guiHandles;
 % Set current axes to the main axes of main GUI
 mainAxes = gh.mainAxis;
 set(mainWindow,'CurrentAxes',gh.mainAxis);
+set(mainWindow,'Colormap',colormap('jet'))
 
 % Set defaults
 showTitle = ad.control.axis.title;
