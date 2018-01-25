@@ -29,8 +29,8 @@ function [data,varargout] = trEPRFRload(filename,varargin)
 %
 % SEE ALSO: trEPRload
 
-% Copyright (c) 2015-16, Till Biskup
-% 2016-08-29
+% Copyright (c) 2015-18, Till Biskup
+% 2018-01-25
 
 % Assign default output
 data = [];
@@ -86,6 +86,10 @@ end
 function TF = correctFileFormat(fileContents)
 
 TF = strncmpi(fileContents{1},'Source : transient',18);
+
+if ~TF
+    TF = strncmpi(fileContents{1},'Source: Transient',17);
+end
 
 end
 
@@ -144,8 +148,12 @@ end
 
 function isoTimeStamp = parseTimestamp(inputString)
 
+isoTimeStamp = '';
+
 inputString = inputString(strfind(inputString,'Time : ')+7:end);
-isoTimeStamp = datestr(datevec(inputString,'ddd mmm dd HH:MM:SS yyyy'),31);
+if ~isempty(inputString)
+    isoTimeStamp = datestr(datevec(inputString,'ddd mmm dd HH:MM:SS yyyy'),31);
+end
 
 end
 
@@ -170,13 +178,19 @@ if any(strfind(fileContents,'Gaussmeter'))
                 'Could not recognise unit for magnetic field: ''%s''',...
                 tokens{1}{4}),'warning');
     end
+elseif any(strfind(fileContents,' T'))
+    tokens = regexp(fileContents,...
+        ['B0 = ([0-9.]*)\s*(\w*)'],...
+        'tokens');
 else
     tokens = regexp(fileContents,...
         'B0 = ([0-9.]*)\s*(\w*),\s* mw = ([0-9.]*)\s*(\w*)',...
         'tokens');
-    parameters.MWfrequency.value = ...
-        str2double(tokens{1}{3});
-    parameters.MWfrequency.unit = tokens{1}{4};
+    if ~isempty(tokens)
+        parameters.MWfrequency.value = ...
+            str2double(tokens{1}{3});
+        parameters.MWfrequency.unit = tokens{1}{4};
+    end
 end
 
 % Field parameters (from Hall probe) come always first.
@@ -184,10 +198,13 @@ parameters.field.value = str2double(tokens{1}{1});
 switch tokens{1}{2}
     case 'Gauss'
         parameters.field.unit = 'G';
+    case 'T'
+        parameters.field.unit = 'mT';
+        parameters.field.value = parameters.field.value * 1000;
     otherwise
         trEPRmsg(sprintf(...
             'Could not recognise unit for magnetic field: ''%s''',...
-            tokens{1}{4}),'warning');
+            tokens{1}{2}),'warning');
 end
 
 end
@@ -220,8 +237,13 @@ function dataset = map2dataset(data,par)
 dataset = trEPRdataStructure('structure');
 dataset.data = data;
 dataset.origdata = data;
-dataset.parameters.bridge.MWfrequency.value = par.MWfrequency.value;
-dataset.parameters.bridge.MWfrequency.unit = par.MWfrequency.unit;
+if isfield(par,'MWfrequency')
+    dataset.parameters.bridge.MWfrequency.value = par.MWfrequency.value;
+    dataset.parameters.bridge.MWfrequency.unit = par.MWfrequency.unit;
+else
+    dataset.parameters.bridge.MWfrequency.value = [];
+    dataset.parameters.bridge.MWfrequency.unit = 'GHz';
+end
 dataset.comment = {par.comment};
 dataset.axes.data(1).values = ...
     linspace(par.time.start,par.time.stop,par.time.length);
