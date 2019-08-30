@@ -96,7 +96,6 @@ end
 paths = regexp(message(1:end-1),'\n','split');
 
 % Take first path
-[pathToConvert,~,~] = fileparts(paths{1});
-
+[pathToConvert,~,~] = fileparts(paths{end});
 
 end
