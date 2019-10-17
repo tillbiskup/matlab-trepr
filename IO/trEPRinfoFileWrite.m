@@ -35,7 +35,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('filename', @(x)ischar(x));
 p.addRequired('parameters', @(x)isstruct(x));
-p.addParamValue('overwrite',logical(false),@islogical);
+p.addParameter('overwrite',logical(false),@islogical);
 %p.addOptional('command','',@(x)ischar(x));
 p.parse(filename,parameters,varargin{:});
 

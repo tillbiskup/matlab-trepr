@@ -89,7 +89,7 @@ function varargout = helpWindow(varargin)
 %         p.FunctionName = mfilename; % Function name in error messages
 %         p.KeepUnmatched = true;     % Errors on unmatched arguments
 %         p.StructExpand = true;      % Passing arguments in a structure
-%         p.addParamValue('page','',@(x)ischar(x));
+%         p.addParameter('page','',@(x)ischar(x));
 %         p.parse(varargin{:});
 %     catch exception
 %         disp(['(EE) ' exception.message]);
@@ -211,12 +211,12 @@ try
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addParamValue('basedir',pwd,@(x)ischar(x) && exist(x,'dir'));
-    p.addParamValue('tag',mfilename,@(x)ischar(x));
-    p.addParamValue('title','trEPR GUI',@(x)ischar(x));
-    p.addParamValue('page','',@(x)ischar(x));
-    p.addParamValue('position',[100 200],@(x)isvector(x) && length(x)==2);
-    p.addParamValue('visible',true,@(x)islogical(x));
+    p.addParameter('basedir',pwd,@(x)ischar(x) && exist(x,'dir'));
+    p.addParameter('tag',mfilename,@(x)ischar(x));
+    p.addParameter('title','trEPR GUI',@(x)ischar(x));
+    p.addParameter('page','',@(x)ischar(x));
+    p.addParameter('position',[100 200],@(x)isvector(x) && length(x)==2);
+    p.addParameter('visible',true,@(x)islogical(x));
     p.parse(varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

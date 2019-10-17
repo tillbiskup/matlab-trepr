@@ -63,8 +63,8 @@ p.addRequired('x', @(arg)isvector(arg) && ~isscalar(arg));
 p.addRequired('y', @(arg)ismatrix(arg) && ~isscalar(arg) ...
     && any(eq(length(x),size(y))));
 % Add optional parameters with default values
-p.addParamValue('percentage',10,@isscalar);
-p.addParamValue('yTick',false,@islogical);
+p.addParameter('percentage',10,@isscalar);
+p.addParameter('yTick',false,@islogical);
 % Parse input arguments
 p.parse(x,y,varargin{:});
 

@@ -28,7 +28,7 @@ try
     p.FunctionName = mfilename; % Include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addParamValue('position',[100 200],@(x)isvector(x) && length(x)==2);
+    p.addParameter('position',[100 200],@(x)isvector(x) && length(x)==2);
     p.parse(varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

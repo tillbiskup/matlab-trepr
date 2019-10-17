@@ -75,8 +75,8 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename', @ischar);
     p.addRequired('struct', @isstruct);
-    p.addParamValue('precision','real*8',@ischar);
-    p.addParamValue('extension','.xbz',@ischar);
+    p.addParameter('precision','real*8',@ischar);
+    p.addParameter('extension','.xbz',@ischar);
     p.parse(filename,struct,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

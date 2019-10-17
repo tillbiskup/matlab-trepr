@@ -22,7 +22,7 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('dataset', @(x)isnumeric(x));
-p.addParamValue('force',false,@islogical);
+p.addParameter('force',false,@islogical);
 p.parse(dataset,varargin{:});
 
 try

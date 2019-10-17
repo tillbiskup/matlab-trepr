@@ -22,7 +22,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('data', @(x)isstruct(x));
-    % parser.addParamValue('checkFormat',logical(true),@islogical);
+    % parser.addParameter('checkFormat',logical(true),@islogical);
     p.parse(data);
 catch exception
     disp(['(EE) ' exception.message]);

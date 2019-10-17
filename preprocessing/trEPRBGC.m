@@ -36,7 +36,7 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('data', @(x)(isnumeric(x) && ~isscalar(x)) || isstruct(x));
-p.addParamValue('numBGprofiles',5,@isvector);
+p.addParameter('numBGprofiles',5,@isvector);
 p.parse(data,varargin{:});
 
 % Assign output parameter(s)

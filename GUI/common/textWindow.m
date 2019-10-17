@@ -24,13 +24,13 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename', @ischar);
-    p.addParamValue('basedir',pwd,@(x)ischar(x) && exist(x,'dir'));
-    p.addParamValue('tag',mfilename,@(x)ischar(x));
-    p.addParamValue('title','trEPR GUI : Text window',@(x)ischar(x));
-    p.addParamValue('page','',@(x)ischar(x));
-    p.addParamValue('position',[100 200],@(x)isvector(x) && length(x)==2);
-    p.addParamValue('visible',true,@(x)islogical(x));
-    p.addParamValue('fbbuttons',false,@islogical);
+    p.addParameter('basedir',pwd,@(x)ischar(x) && exist(x,'dir'));
+    p.addParameter('tag',mfilename,@(x)ischar(x));
+    p.addParameter('title','trEPR GUI : Text window',@(x)ischar(x));
+    p.addParameter('page','',@(x)ischar(x));
+    p.addParameter('position',[100 200],@(x)isvector(x) && length(x)==2);
+    p.addParameter('visible',true,@(x)islogical(x));
+    p.addParameter('fbbuttons',false,@islogical);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

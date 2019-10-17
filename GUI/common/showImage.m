@@ -27,7 +27,7 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('img', @isnumeric);
     p.addOptional('map',[],@isnumeric);
-    p.addParamValue('Name','',@ischar);
+    p.addParameter('Name','',@ischar);
     p.parse(img,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

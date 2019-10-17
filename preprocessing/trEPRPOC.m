@@ -47,7 +47,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('data', @(x)(isnumeric(x) && ~isscalar(x)) || isstruct(x));
 p.addOptional('triggerPosition',[],@isscalar);
-p.addParamValue('cutRight',5,@isscalar);
+p.addParameter('cutRight',5,@isscalar);
 p.parse(data,varargin{:});
 
 % Assign output parameter(s)

@@ -47,7 +47,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('data', @(x)iscell(x) && all(size(x) == [1 2]));
-    p.addParamValue('dimension','2D',...
+    p.addParameter('dimension','2D',...
         @(x)ischar(x) && any(strcmpi(x,{'2d','x','y'})));
     p.parse(data,varargin{:});
 catch exception

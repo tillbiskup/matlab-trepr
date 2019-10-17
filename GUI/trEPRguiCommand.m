@@ -42,7 +42,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('command', @(x)ischar(x));
-    p.addParamValue('writeHistory',logical(true),@islogical);
+    p.addParameter('writeHistory',logical(true),@islogical);
     p.parse(command,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

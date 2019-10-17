@@ -31,7 +31,7 @@ try
     p.FunctionName = mfilename; % include function name in error messages
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
-    p.addParamValue('page','',@(x)ischar(x));
+    p.addParameter('page','',@(x)ischar(x));
     p.parse(varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

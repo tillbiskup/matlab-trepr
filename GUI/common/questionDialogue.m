@@ -55,17 +55,17 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('message',@(x)ischar(x));
-    p.addParamValue('title','Message',@(x)ischar(x));
-    p.addParamValue('tag','modalDialogueWindow',@(x)ischar(x));
-    p.addParamValue('buttons',{'OK','Cancel'},@(x)ischar(x) || iscell(x));
-    p.addParamValue('defaultButton','OK',@(x)ischar(x));
-    p.addParamValue('buttonWidth',60,@(x)isscalar(x));
-    p.addParamValue('buttonHeight',25,@(x)isscalar(x));
-    p.addParamValue('Position',[],...
+    p.addParameter('title','Message',@(x)ischar(x));
+    p.addParameter('tag','modalDialogueWindow',@(x)ischar(x));
+    p.addParameter('buttons',{'OK','Cancel'},@(x)ischar(x) || iscell(x));
+    p.addParameter('defaultButton','OK',@(x)ischar(x));
+    p.addParameter('buttonWidth',60,@(x)isscalar(x));
+    p.addParameter('buttonHeight',25,@(x)isscalar(x));
+    p.addParameter('Position',[],...
         @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
-    p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
+    p.addParameter('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
-    p.addParamValue('icon','none',@(x)ischar(x) && ...
+    p.addParameter('icon','none',@(x)ischar(x) && ...
         any(strcmpi(x,{'none','info','help','warning','error'})));
     p.parse(message,varargin{:});
 catch exception

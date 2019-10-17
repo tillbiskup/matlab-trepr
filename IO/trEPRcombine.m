@@ -38,7 +38,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('datasets', @(x)iscell(x));
-    p.addParamValue('label','', @(x)ischar(x));
+    p.addParameter('label','', @(x)ischar(x));
     p.parse(datasets,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

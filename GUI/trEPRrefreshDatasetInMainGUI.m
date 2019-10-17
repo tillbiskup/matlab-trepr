@@ -17,8 +17,8 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('dataset', @(x)isstruct(x) || iscell(x));
-p.addParamValue('modified',false,@islogical);
-p.addParamValue('label','',@ischar);
+p.addParameter('modified',false,@islogical);
+p.addParameter('label','',@ischar);
 p.parse(dataset,varargin{:});
 
 try

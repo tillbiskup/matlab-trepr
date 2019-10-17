@@ -37,8 +37,8 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('dataset', @(x)isstruct(x));
-    p.addParamValue('frequency',9.7,@(x)isscalar(x));
-    p.addParamValue('method','linear',@(x)any(strcmpi(x,{'linear'})));
+    p.addParameter('frequency',9.7,@(x)isscalar(x));
+    p.addParameter('method','linear',@(x)any(strcmpi(x,{'linear'})));
     p.parse(dataset,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

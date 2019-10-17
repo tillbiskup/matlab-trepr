@@ -63,10 +63,10 @@ p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('value', @(x)ischar(x));
 p.addOptional('vector',[],@(x)isvector(x));
-p.addParamValue('round',false, @(x)islogical(x));
-p.addParamValue('interp',false, @(x)islogical(x));
-p.addParamValue('map',false, @(x)islogical(x));
-p.addParamValue('index',false, @(x)islogical(x));
+p.addParameter('round',false, @(x)islogical(x));
+p.addParameter('interp',false, @(x)islogical(x));
+p.addParameter('map',false, @(x)islogical(x));
+p.addParameter('index',false, @(x)islogical(x));
 p.parse(value,varargin{:});
 
 vector = p.Results.vector;

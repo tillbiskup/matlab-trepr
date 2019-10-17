@@ -41,10 +41,10 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('text', @(x)ischar(x));
-    p.addParamValue('Parent',[],@ishandle);
-    p.addParamValue('Position',[0 0],...
+    p.addParameter('Parent',[],@ishandle);
+    p.addParameter('Position',[0 0],...
         @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
-    p.addParamValue('backgroundColor',[],...
+    p.addParameter('backgroundColor',[],...
         @(x)isvector(x) && length(x) == 3);
     p.parse(text,varargin{:});
 catch exception

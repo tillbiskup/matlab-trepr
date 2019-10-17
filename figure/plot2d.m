@@ -40,7 +40,7 @@ p.addRequired('C', @isnumeric);
 p.addOptional('x', @isnumeric);
 p.addOptional('y', @isnumeric);
 % Add optional parameters with default values
-%p.addParamValue('yTick',false,@islogical);
+%p.addParameter('yTick',false,@islogical);
 % Parse input arguments
 p.parse(C,varargin{:});
 

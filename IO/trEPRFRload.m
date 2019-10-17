@@ -42,7 +42,7 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename',@(x)ischar(x) && exist(x,'file'))
-    p.addParamValue('map2dataset',true,@islogical);
+    p.addParameter('map2dataset',true,@islogical);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

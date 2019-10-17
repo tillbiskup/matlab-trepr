@@ -47,8 +47,8 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename', @(x)(ischar(x) || iscell(x) || ...
         (isstruct(x) && isfield(x,'name'))));
-    p.addParamValue('combine',logical(false),@islogical);
-    p.addParamValue('loadInfoFile',logical(false),@islogical);
+    p.addParameter('combine',logical(false),@islogical);
+    p.addParameter('loadInfoFile',logical(false),@islogical);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

@@ -34,8 +34,8 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename', @(x)ischar(x) || iscell(x));
     % Note, this is to be compatible with TAload - currently without function!
-    p.addParamValue('checkFormat',logical(true),@islogical);
-    p.addParamValue('convertFormat',logical(true),@islogical);
+    p.addParameter('checkFormat',logical(true),@islogical);
+    p.addParameter('convertFormat',logical(true),@islogical);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

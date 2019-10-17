@@ -64,8 +64,8 @@ p.StructExpand = true;      % Enable passing arguments in a structure
 p.addRequired('figHandle', @(x)ishandle(x));
 p.addRequired('fileName', @(x)ischar(x));
 % Add a few optional parameters, with default values
-p.addParamValue('fileType','fig',@ischar);
-p.addParamValue('exportFormat','default',@ischar);
+p.addParameter('fileType','fig',@ischar);
+p.addParameter('exportFormat','default',@ischar);
 % Parse input arguments
 p.parse(figHandle,fileName,varargin{:});
 

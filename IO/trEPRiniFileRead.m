@@ -53,10 +53,10 @@ p.StructExpand = true;      % Enable passing arguments in a structure
 % Add required input arguments
 p.addRequired('fileName', @(x)ischar(x));
 % Add a few optional parameters, with default values
-p.addParamValue('commentChar','%',@ischar);
-p.addParamValue('assignmentChar','=',@ischar);
-p.addParamValue('blockStartChar','[',@ischar);
-p.addParamValue('typeConversion',false,@islogical);
+p.addParameter('commentChar','%',@ischar);
+p.addParameter('assignmentChar','=',@ischar);
+p.addParameter('blockStartChar','[',@ischar);
+p.addParameter('typeConversion',false,@islogical);
 % Parse input arguments
 p.parse(fileName,varargin{:});
 

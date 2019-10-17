@@ -12,7 +12,7 @@ parser.KeepUnmatched = true; % Enable errors on unmatched arguments
 parser.StructExpand  = true; % Enable passing arguments in a structure
 
 parser.addRequired('guiHandle',@ishandle);
-parser.addParamValue('type','file',@ischar);
+parser.addParameter('type','file',@ischar);
 parser.parse(guiHandle,varargin{:});
 
 % Get appdata and handles

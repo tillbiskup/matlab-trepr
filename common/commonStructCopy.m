@@ -44,7 +44,7 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('master', @(x)isstruct(x));
     p.addRequired('tocopy', @(x)isstruct(x));
-    p.addParamValue('overwrite',logical(false),@islogical);
+    p.addParameter('overwrite',logical(false),@islogical);
     p.parse(master,tocopy,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

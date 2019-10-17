@@ -55,9 +55,9 @@ p.StructExpand = true;      % Enable passing arguments in a structure
 % Add required input argument "action"
 p.addRequired('action', @(x)ischar(x));
 % Add a few optional parameters, with default values
-p.addParamValue('overwrite',logical(false),@islogical);
-p.addParamValue('file','',@(x) ischar(x));
-p.addParamValue('module','',@(x) ischar(x));
+p.addParameter('overwrite',logical(false),@islogical);
+p.addParameter('file','',@(x) ischar(x));
+p.addParameter('module','',@(x) ischar(x));
 % Parse input arguments
 p.parse(action,varargin{:});
 

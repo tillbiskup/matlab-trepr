@@ -73,10 +73,10 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('filename', @(x)ischar(x) || iscell(x));
-    p.addParamValue('precision','real*8',@ischar);
-    p.addParamValue('extension','.xbz',@ischar);
+    p.addParameter('precision','real*8',@ischar);
+    p.addParameter('extension','.xbz',@ischar);
     % Note, this is to be compatible with TAload - currently without function!
-    p.addParamValue('checkFormat',logical(true),@islogical);
+    p.addParameter('checkFormat',logical(true),@islogical);
     p.parse(filename);
 catch exception
     disp(['(EE) ' exception.message]);

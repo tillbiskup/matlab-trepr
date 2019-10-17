@@ -46,8 +46,8 @@ if nargin > 1
     p.FunctionName = mfilename; % Function name included in error messages
     p.KeepUnmatched = true; % Enable errors on unmatched arguments
     p.StructExpand = true; % Enable passing arguments in a structure
-    p.addParamValue('DisplayType','2D',@(x)ischar(x));
-    p.addParamValue('Shift',0,@(x)isscalar(x));
+    p.addParameter('DisplayType','2D',@(x)ischar(x));
+    p.addParameter('Shift',0,@(x)isscalar(x));
     p.parse(varargin{2:end});
 end
 

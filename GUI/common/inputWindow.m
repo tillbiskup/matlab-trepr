@@ -57,13 +57,13 @@ try
     p.KeepUnmatched = true;     % Enable errors on unmatched arguments
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('prompt',@(x)ischar(x));
-    p.addParamValue('preset','',@(x)ischar(x));
-    p.addParamValue('title','Enter value',@(x)ischar(x));
-    p.addParamValue('Position',[],...
+    p.addParameter('preset','',@(x)ischar(x));
+    p.addParameter('title','Enter value',@(x)ischar(x));
+    p.addParameter('Position',[],...
         @(x)isvector(x) && (length(x) == 2 || length(x) == 4));
-    p.addParamValue('backgroundColor',[0.9 0.9 0.9],...
+    p.addParameter('backgroundColor',[0.9 0.9 0.9],...
         @(x)isvector(x) && length(x) == 3);
-    p.addParamValue('html',false,@(x)islogical(x));
+    p.addParameter('html',false,@(x)islogical(x));
     p.parse(prompt,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

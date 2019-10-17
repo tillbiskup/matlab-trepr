@@ -26,7 +26,7 @@ p.StructExpand = true;      % Enable passing arguments in a structure
 p.addRequired('dataset', @(x)isstruct(x));
 p.addRequired('filename', @(x)ischar(x));
 % Add a few optional parameters, with default values
-%p.addParamValue('verbose',logical(true),@islogical);
+%p.addParameter('verbose',logical(true),@islogical);
 % Parse input arguments
 p.parse(dataset,filename,varargin{:});
 

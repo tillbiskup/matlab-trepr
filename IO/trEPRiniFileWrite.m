@@ -55,11 +55,11 @@ p.StructExpand = true;      % Enable passing arguments in a structure
 p.addRequired('fileName', @(x)ischar(x));
 p.addRequired('data', @(x)isstruct(x));
 % Add a few optional parameters, with default values
-p.addParamValue('header',cell(0),@(x) ischar(x) || iscell(x));
-p.addParamValue('commentChar','%',@ischar);
-p.addParamValue('assignmentChar',' =',@ischar);
-p.addParamValue('overwrite',false,@islogical);
-p.addParamValue('addModificationDate',true,@islogical);
+p.addParameter('header',cell(0),@(x) ischar(x) || iscell(x));
+p.addParameter('commentChar','%',@ischar);
+p.addParameter('assignmentChar',' =',@ischar);
+p.addParameter('overwrite',false,@islogical);
+p.addParameter('addModificationDate',true,@islogical);
 % Parse input arguments
 p.parse(fileName,data,varargin{:});
 

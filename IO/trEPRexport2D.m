@@ -51,10 +51,10 @@ try
     p.StructExpand = true;      % Enable passing arguments in a structure
     p.addRequired('dataset',@(x)isstruct(x));
     p.addRequired('filename',@(x)ischar(x));
-    p.addParamValue('commentChar','%',@(x)ischar(x));
-    p.addParamValue('delimiter','\t',@(x)ischar(x));
-    p.addParamValue('precision','%.4f',@(x)ischar(x));
-    p.addParamValue('includeAxes',true,@(x)islogical(x));
+    p.addParameter('commentChar','%',@(x)ischar(x));
+    p.addParameter('delimiter','\t',@(x)ischar(x));
+    p.addParameter('precision','%.4f',@(x)ischar(x));
+    p.addParameter('includeAxes',true,@(x)islogical(x));
     p.parse(dataset,filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);

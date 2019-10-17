@@ -52,7 +52,7 @@ p.KeepUnmatched = true; % Enable errors on unmatched arguments
 p.StructExpand = true; % Enable passing arguments in a structure
 
 p.addRequired('filename', @(x)ischar(x) || iscell(x));
-p.addParamValue('zerofill',logical(true),@islogical);
+p.addParameter('zerofill',logical(true),@islogical);
 %    parser.addOptional('parameters','',@isstruct);
 p.parse(filename,varargin{:});
     
