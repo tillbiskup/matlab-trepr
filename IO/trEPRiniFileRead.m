@@ -38,8 +38,8 @@ function [ data, warnings ] = trEPRiniFileRead ( fileName, varargin )
 %
 % See also: trEPRiniFileWrite
 
-% Copyright (c) 2008-15, Till Biskup, Bernd Paulus
-% 2015-10-17
+% Copyright (c) 2008-20, Till Biskup, Bernd Paulus
+% 2020-08-17
 
 % TODO
 %	* Change handling of whitespace characters (subfunctions) thus that it
@@ -88,14 +88,15 @@ iniFileContents = textFileRead(fileName);
 
 blockname = '';
 for k=1:length(iniFileContents)
-    if ~isempty(iniFileContents{k}) ...
+    iniFileLine = strtrim(iniFileContents{k});
+    if ~isempty(iniFileLine) ...
             && ~strcmp(iniFileContents{k}(1),commentChar)
-        if strcmp(iniFileContents{k}(1),blockStartChar)
+        if strcmp(iniFileLine(1),blockStartChar)
             % set blockname
             % assume thereby that blockname resides within brackets
             blockname = iniFileContents{k}(2:end-1);
         else
-            [names] = regexp(iniFileContents{k},...
+            [names] = regexp(iniFileLine,...
                 ['(?<key>[a-zA-Z0-9._-{}]+)\s*' assignmentChar '\s*(?<val>.*)'],...
                 'names');
             if isfield(data,blockname)
