@@ -9,8 +9,8 @@ function status = pdf2bitmap(pdfFile,varargin)
 % makes heavy use of the SYSTEM command. Currently, only Linux and Mac are
 % supported.
 
-% Copyright (c) 2014, Till Biskup
-% 2014-09-23
+% Copyright (c) 2014-20, Till Biskup
+% 2020-11-08
 
 % Set status
 if nargout
@@ -62,6 +62,9 @@ end
 function status = imageMagickInstalled
 
 status = false;
+
+% Hack around MATLAB: add "/usr/local/bin" to PATH
+setenv('PATH', [getenv('PATH'), ':/usr/local/bin']);
 
 % Call "convert" and get the bash exit code: 127 => "Command not found" 
 [exitCode,~] = system('convert');
