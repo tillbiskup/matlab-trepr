@@ -44,10 +44,14 @@ end
 dataset = datasets{1};
 
 data = [];
+averages = 0;
 for nr = 1:length(datasets)
     data(:, :, nr) = datasets{nr}.data;
+    averages = ...
+        averages + datasets{nr}.parameters.recorder.averages;
 end
 dataset.data = sum(data, 3);
+dataset.parameters.recorder.averages = averages;
 
 % Write history record
 history_record = trEPRdataStructure('history');
