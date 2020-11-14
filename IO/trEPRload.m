@@ -32,8 +32,8 @@ function [data,warnings] = trEPRload(filename, varargin)
 %
 % See also TREPRFSC2LOAD, TREPRDATASTRUCTURE.
 
-% Copyright (c) 2009-2016, Till Biskup
-% 2016-08-29
+% Copyright (c) 2009-2020, Till Biskup
+% 2020-11-14
 
 % Assign default output
 data = struct();
@@ -49,6 +49,7 @@ try
         (isstruct(x) && isfield(x,'name'))));
     p.addParameter('combine',logical(false),@islogical);
     p.addParameter('loadInfoFile',logical(false),@islogical);
+    p.addParameter('infoFileName','',@ischar);
     p.parse(filename,varargin{:});
 catch exception
     disp(['(EE) ' exception.message]);
@@ -111,7 +112,7 @@ end
 % Load and apply info file if necessary
 if ~isempty('data') && p.Results.loadInfoFile ...
         && ~strcmpi(data.file.format,'xmlzip')
-    data = loadAndApplyInfoFile(data,filename);
+    data = loadAndApplyInfoFile(data, filename, p.Results.infoFileName);
 end
 
 if ~nargout
@@ -299,23 +300,25 @@ function [data,warnings] = loadFile(filename)
     end
 end
 
-function data = loadAndApplyInfoFile(data,filename)
+function data = loadAndApplyInfoFile(data, filename, infoFileName)
 
-% Try to load info file
-[fpath,fname,~] = fileparts(filename);
-infoFileName = fullfile(fpath,[fname '.info']);
-
-% If infoFile doesn't exist, try with filename from dataset
-if ~exist(infoFileName,'file')
-    [fpath,fname,~] = fileparts(data.file.name);
+if isempty(infoFileName)
+    % Try to load info file
+    [fpath,fname,~] = fileparts(filename);
     infoFileName = fullfile(fpath,[fname '.info']);
-end
-
-% If infoFile still doesn't exist, return
-if ~exist(infoFileName,'file')
-    trEPRmsg({'Could not find accompanying info file.',...
-        infoFileName},'warning');
-    return;
+    
+    % If infoFile doesn't exist, try with filename from dataset
+    if ~exist(infoFileName,'file')
+        [fpath,fname,~] = fileparts(data.file.name);
+        infoFileName = fullfile(fpath,[fname '.info']);
+    end
+    
+    % If infoFile still doesn't exist, return
+    if ~exist(infoFileName,'file')
+        trEPRmsg({'Could not find accompanying info file.',...
+            infoFileName},'warning');
+        return;
+    end
 end
 
 [parameters,ifpwarnings] = trEPRinfoFileParse(infoFileName,'map');
