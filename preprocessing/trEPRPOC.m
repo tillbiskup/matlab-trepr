@@ -30,14 +30,20 @@ function varargout = trEPRPOC (data, varargin)
 %                   not to interfere with signals with a very sharp signal
 %                   rise around the trigger position)
 %                   Default: 5
+%
+% determineTriggerPosition - logical
+%                   Automatically determine trigger position from dataset.
+%                   Necessary if wrong parameters are given in the info
+%                   file.
+%                   Default: true
 % 
 % Works both with 1D and 2D data (single time profiles, S(t) and complete
 % datasets, S(B0,t)).
 %
 % See also: trEPRBGC
 
-% Copyright (c) 2010-15, Till Biskup
-% 2015-07-29
+% Copyright (c) 2010-21, Till Biskup
+% 2021-01-15
 
 % Parse input arguments using the inputParser functionality
 p = inputParser;   % Create an instance of the inputParser class.
@@ -48,6 +54,7 @@ p.StructExpand = true; % Enable passing arguments in a structure
 p.addRequired('data', @(x)(isnumeric(x) && ~isscalar(x)) || isstruct(x));
 p.addOptional('triggerPosition',[],@isscalar);
 p.addParameter('cutRight',5,@isscalar);
+p.addParameter('determineTriggerPosition',true,@islogical);
 p.parse(data,varargin{:});
 
 % Assign output parameter(s)
@@ -75,6 +82,11 @@ if ~exist('triggerPosition','var')
     else
         triggerPosition = p.Results.triggerPosition;
     end
+end
+
+if p.Results.determineTriggerPosition
+    [~, time_zero_index] = min(abs(dataset.axes.data(1).values));
+    triggerPosition = time_zero_index;
 end
 
 % Determine the dimensionality of the data (1D or 2D)
