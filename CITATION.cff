@@ -20,7 +20,8 @@ abstract: >-
   The toolbox is fully GUI-based, but all functions are accessible via command line (CLI) as well. Furthermore, the GUI is extensively documented. The toolbox started out in the PhD time of its main author and developer (T. Biskup), became fully GUI-based in about 2010, and got used for over a decade in day-to-day business dealing with trEPR data. The concepts developed towards reproducible research (https://www.reproducible-research.de/) ended up in the Python ASpecD framework (https://docs.aspecd.de/) for fully-reproducible Analysis of Spectroscopic Data.
 keywords:
   - "electron paramagnetic resonance spectroscopy"
-  - "EPR spectroscopy"
+  - "time-resolved electron paramagnetic resonance spectroscopy"
+  - "tr-EPR spectroscopy"
   - "spectroscopy"
   - "magnetic resonance"
   - "data processing and analysis"
