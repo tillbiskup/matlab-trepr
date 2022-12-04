@@ -61,23 +61,23 @@ There is a number of related MATLAB(TM) projects you may be interested in, but h
 
 ### MATLAB(TM) projects
 
-* [TSim](https://tsim.docs.till-biskup.de/)
+* [TSim](https://github.com/tillbiskup/matlab-trepr-tsim) [(Documentation)](https://tsim.docs.till-biskup.de/)
 
     A toolbox for the simulation and fitting of spin-polarised triplet states, using EasySpin for the simulation part, but guiding the user with an extensive CLI and creating well-formatted reports of the results for enhanced reproducibility. Developed by D. Meyer and maintained by T. Biskup.
 
-* common toolbox
+* [common toolbox](https://github.com/tillbiskup/matlab-common)
 
      Toolbox providing basic functionality for data analysis. Spiritual predecessor of the [ASpecD framework](https://docs.aspecd.de/) implemented in Python. Each processing and analysis step gets automatically logged with all parameters to ensure reproducibility. Provides basic functionality for installing and configuring as well as standard processing steps.
 
-* epr toolbox
+* [epr toolbox](https://github.com/tillbiskup/matlab-epr)
 
     Toolbox for analysing EPR data (common Toolbox based). Each processing and analysis step gets automatically logged with all parameters to ensure reproducibility. Provides basic functionality and processing steps for EPR spectroscopy.
 
-* cwepr toolbox
+* [cwepr toolbox](https://github.com/tillbiskup/matlab-cwepr)
 
     Toolbox for analysing cwEPR data (common Toolbox based). Spiritual predecessor of the [cwepr package](https://docs.cwepr.de/) implemented in Python. Each processing and analysis step gets automatically logged with all parameters to ensure reproducibility. Focusses particularly on automating the pre-processing and representation of data.
 
-* TA toolbox
+* [TA toolbox](https://github.com/tillbiskup/matlab-ta)
 
     Toolbox for preprocessing, display, analysis, and postprocessing of transient absorption (flash photolysis) data. Similarly to the trEPR toolbox, the TA toolbox is fully GUI-based, but all functions are accessible via command line (CLI) as well. Furthermore, the GUI is extensively documented.
 
