@@ -1,10 +1,12 @@
 # trEPR Toolbox
 
-A MATLAB(TM) toolbox for preprocessing, display, analysis, and postprocessing of transient (*i.e.*, time-resolved) electron spin resonance spectroscopy (in short: trEPR) data.
+[![DOI](zenodo.7395548.svg)](https://doi.org/10.5281/zenodo.7395548)
+
+A MATLAB(r) toolbox for preprocessing, display, analysis, and postprocessing of transient (*i.e.*, time-resolved) electron spin resonance spectroscopy (in short: trEPR) data.
 
 The toolbox is fully GUI-based, but all functions are accessible via command line (CLI) as well. Furthermore, the GUI is extensively documented. The toolbox started out in the PhD time of its main author and developer (T. Biskup), became fully GUI-based in about 2010, and got used for over a decade in day-to-day business dealing with trEPR data. The concepts developed towards [reproducible research](https://www.reproducible-research.de/) ended up in the Python [ASpecD framework](https://docs.aspecd.de/) for fully-reproducible *A*nalysis of *Spec*troscopic *D*ata.
 
-**Note:** While this MATLAB(TM) toolbox should still work with current versions of MATLAB(TM), you may be interested in the [Python package trepr](https://docs.trepr.de/) actively being developed and dedicated to fully reproducible data analysis.
+**Note:** While this MATLAB(r) toolbox should still work with current versions of MATLAB(r), you may be interested in the [Python package trepr](https://docs.trepr.de/) actively being developed and dedicated to fully reproducible data analysis.
 
 
 ## Features
@@ -28,19 +30,28 @@ The toolbox is fully GUI-based, but all functions are accessible via command lin
 
 ## Installation
 
-Download the toolbox (usually as compressed archive), uncompress (if necessary), start MATLAB(TM), change to the folder you have downloaded/uncompressed the toolbox files to, change to the directory `internal` and call the function `trEPRinstall` from within the MATLAB(TM) command line. This should guide you through the installation process (and add, *inter alia*, the toolbox to the MATLAB(TM) search path). To start using the trEPR toolbox, type `trEPRgui` at the MATLAB(TM) command line and enjoy the GUI.
+Download the toolbox (usually as compressed archive), uncompress (if necessary), start MATLAB(r), change to the folder you have downloaded/uncompressed the toolbox files to, change to the directory `internal` and call the function `trEPRinstall` from within the MATLAB(r) command line. This should guide you through the installation process (and add, *inter alia*, the toolbox to the MATLAB(r) search path). To start using the trEPR toolbox, type `trEPRgui` at the MATLAB(r) command line and enjoy the GUI.
+
+
+## How to cite
+
+The trEPR toolbox is free software. However, if you use it for your own research, please cite it accordingly:
+
+  * Till Biskup, Bernd Paulus, Deborah Meyer. trEPR toolbox (2022). [doi:10.5281/zenodo.7395548](https://doi.org/10.5281/zenodo.7395548)
+
+    [![DOI](zenodo.7395548.svg)](https://doi.org/10.5281/zenodo.7395548)
 
 
 ## License
 
 The toolbox is distributed under the GNU Lesser General Public License (LGPL) as published by the Free Software Foundation.
 
-This ensures both, free availability in source-code form and compatibility with the (closed-source and commercial) MATLAB(TM) environment.
+This ensures both, free availability in source-code form and compatibility with the (closed-source and commercial) MATLAB(r) environment.
 
 
 ## Authors
 
-* Till Biskup (2007-)
+* Till Biskup (2007-2022)
 
     The principal author and main developer of the trEPR toolbox
 
@@ -48,18 +59,17 @@ This ensures both, free availability in source-code form and compatibility with 
 
     Valuable contributions during his PhD time
 
-
-* Deborah Meyer (2013-15) 
+* Deborah Meyer (2013-15)
 
     Valuable contributions during her PhD time
 
 
 ## Related projects
 
-There is a number of related MATLAB(TM) projects you may be interested in, but have a look at the section with related Python projects as well that are actively being developed.
+There is a number of related MATLAB(r) projects you may be interested in, but have a look at the section with related Python projects as well that are actively being developed.
 
 
-### MATLAB(TM) projects
+### MATLAB(r) projects
 
 * [TSim](https://github.com/tillbiskup/matlab-trepr-tsim) [(Documentation)](https://tsim.docs.till-biskup.de/)
 

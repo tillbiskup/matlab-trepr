@@ -15,10 +15,9 @@ authors:
 repository-code: 'https://github.com/tillbiskup/matlab-trepr'
 url: 'https://www.trepr.de/'
 abstract: >-
-  A MATLAB(TM) toolbox for preprocessing, display,
-  analysis, and postprocessing of transient (i.e.,
-  time-resolved) electron spin resonance spectroscopy
-  (in short: trEPR) data.
+  A MATLAB(TM) toolbox for preprocessing, display, analysis, and postprocessing of transient (i.e., time-resolved) electron spin resonance spectroscopy (in short: trEPR) data.
+  
+  The toolbox is fully GUI-based, but all functions are accessible via command line (CLI) as well. Furthermore, the GUI is extensively documented. The toolbox started out in the PhD time of its main author and developer (T. Biskup), became fully GUI-based in about 2010, and got used for over a decade in day-to-day business dealing with trEPR data. The concepts developed towards reproducible research (https://www.reproducible-research.de/) ended up in the Python ASpecD framework (https://docs.aspecd.de/) for fully-reproducible Analysis of Spectroscopic Data.
 keywords:
   - "electron paramagnetic resonance spectroscopy"
   - "EPR spectroscopy"
@@ -28,3 +27,30 @@ keywords:
   - "reproducible science"
   - "reproducible research"
 license: LGPL-3.0
+identifiers:
+  - description: "The concept DOI of the work."
+    type: doi
+    value: 10.5281/zenodo.7395548
+references:
+  - authors:
+    - family-names: Biskup
+      given-names: Till
+      orcid: "https://orcid.org/0000-0003-2913-0004"
+    title: "Time-resolved EPR of radical pair intermediates in cryptochromes"
+    doi: 10.1080/00268976.2013.833350
+    journal: "Molecular Physics"
+    pages: 3698-3703
+    volume: 111
+    year: 2013
+    type: article
+  - authors:
+    - family-names: Biskup
+      given-names: Till
+      orcid: "https://orcid.org/0000-0003-2913-0004"
+    title: "Structure–Function Relationship of Organic Semiconductors: Detailed Insights From Time-Resolved EPR Spectroscopy"
+    doi: 10.1080/00268976.2013.833350
+    journal: "Frontiers in Chemistry"
+    pages: 10
+    volume: 7
+    year: 2019
+    type: article
