@@ -1,0 +1,30 @@
+cff-version: 1.2.0
+title: trEPR toolbox
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Till
+    family-names: Biskup
+    orcid: 'https://orcid.org/0000-0003-2913-0004'
+  - given-names: Bernd
+    family-names: Paulus
+  - given-names: Deborah
+    family-names: Meyer
+repository-code: 'https://github.com/tillbiskup/matlab-trepr'
+url: 'https://www.trepr.de/'
+abstract: >-
+  A MATLAB(TM) toolbox for preprocessing, display,
+  analysis, and postprocessing of transient (i.e.,
+  time-resolved) electron spin resonance spectroscopy
+  (in short: trEPR) data.
+keywords:
+  - "electron paramagnetic resonance spectroscopy"
+  - "EPR spectroscopy"
+  - "spectroscopy"
+  - "magnetic resonance"
+  - "data processing and analysis"
+  - "reproducible science"
+  - "reproducible research"
+license: LGPL-3.0
